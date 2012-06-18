@@ -1,0 +1,2 @@
+module Provision::Template
+end

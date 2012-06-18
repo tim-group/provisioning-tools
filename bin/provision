@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+$: << File.join(File.dirname(__FILE__), "..", "lib")
+
+require 'provision/build'
+require 'yaml'
+
+build = Provision::Build.new()
+build.load('config.rb')
+build.provision("blah")
