@@ -13,11 +13,12 @@ class Provision::Build
   end
 
   def interpret_dsl(&block)
-    @dsl.instance_eval(&block)
+    @dsl.instance_eval(&block)  
   end
 
   def provision(template, options={})
     interpret_dsl {
+      @options = options
       template(template) {}
     }
     @dsl.execute(options)

@@ -8,7 +8,6 @@ class Provision::DSL
     @run_blocks = []
     @cleanup_blocks = []
     @templates = {}
-    @commands = args[:commands] || Provision::Commands.new()
   end
 
   def define(name, &block)
@@ -21,7 +20,15 @@ class Provision::DSL
 
   def template(name, &block)
     temp = @templates[name]
-    temp.call(block)
+
+    begin
+      temp.call(block)
+    rescue Exception => e
+      print e
+      print @templates.keys
+      print "\n"
+      raise name
+    end
   end
 
   def execute(options)
@@ -30,11 +37,9 @@ class Provision::DSL
         print "#{block[:txt]}\t\t\t"
         error = nil
         begin
-          yaml_options = YAML::dump(options)
-          block[:block].binding.eval("options=YAML::load('#{yaml_options}')")
-          @commands.instance_eval(&block[:block])
+          block[:block].call()
         rescue Exception=>e
-
+          print e
           print e.backtrace
           error =e
         end
@@ -46,11 +51,12 @@ class Provision::DSL
         end
       }
     rescue Exception=>e
+      print e
     ensure
       print "cleaning up\t\t\t"
       @cleanup_blocks.reverse.each {|block|
         begin
-          @commands.instance_eval(&block)
+          block.call()
         rescue Exception=>e
           raise e
         ensure

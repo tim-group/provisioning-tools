@@ -1,11 +1,11 @@
-class Provision::Commands
+module Provision::Commands
   def initialize(options)
     @console_log = options[:console_log]
     @dir = options[:dir]
   end
 
   def cmd(cmd)
-    if ! system("#{command}  >> console.log 2>&1")
+    if ! system("#{cmd}  >> console.log 2>&1")
       raise "command returned non-zero error code"
     end
   end

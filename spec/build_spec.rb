@@ -3,32 +3,35 @@ require 'rubygems'
 require 'rspec'
 require 'provision/build'
 
-module Provision
-  
-  def ubuntu
-  end
-  
-  def whatever
-  end
-  
-  require 'blah'
-
-  class Builder
-    include Provision
-  end
-  
-end
-
-
 describe Provision::Build do
+  module MockCommands
+    include RSpec::Mocks
+    def cmd(cmd)
+      @@commands.cmd(cmd)
+    end
+
+    def hostname(cmd)
+      @@commands.hostname(cmd)
+    end
+
+    def self.set_commands(commands)
+      @@commands = commands
+    end
+
+    def self.commands
+      return @@commands
+    end
+  end
   before do
     @commands = double(Provision::Commands)
     @dsl = Provision::DSL.new(:commands=>@commands)
     @build = Provision::Build.new(:dsl=>@dsl)
+    MockCommands.set_commands(@commands)
   end
 
   it 'allows composition'  do
     @build.interpret_dsl do
+      extend MockCommands
       define "ubuntu_precise" do
         run("doing stuff") {
           cmd "precise-start"
@@ -66,6 +69,8 @@ describe Provision::Build do
 
   it 'executes cleanup instructions after run instructions'  do
     @build.interpret_dsl do
+      extend MockCommands
+
       define "template-x" do
         run("command") {
           cmd "hello1"
@@ -91,6 +96,8 @@ describe Provision::Build do
 
   it 'stops executing if an error occurs in a previous command' do
     @build.interpret_dsl do
+      extend MockCommands
+
       define "template-x" do
         run("command") {
           cmd "hello"
@@ -111,22 +118,25 @@ describe Provision::Build do
 
     proc { @build.provision("template-x") }.should raise_error(StandardError, "BAD STUFF")
   end
-#
-#  it 'I can pass a hostname' do
-#    @build.interpret_dsl do
-#      define "vanillavm" do
-#        run("configure hostname") {
-#          hostname = options[:hostname]
-#          hostname(hostname)
-#        }
-#      end
-#    end
-#
-#    @commands.should_receive(:hostname,"myoldchina").ordered
-#    @build.provision("vanillavm", {
-#      :hostname=>"myoldchina"
-#    })
-#  end
+
+  it 'I can pass a hostname' do
+    @commands.should_receive(:hostname,"myoldchina").ordered
+
+    @build.interpret_dsl do
+      extend MockCommands
+
+      define "vanillavm" do
+        run("configure hostname") {
+          hostname = @options[:hostname]
+          hostname(hostname)
+        }
+      end
+    end
+
+    @build.provision("vanillavm", {
+      :hostname=>"myoldchina"
+    })
+  end
 
   it 'defines a libvirt xml file'
 

@@ -5,5 +5,6 @@ require 'provision/build'
 require 'yaml'
 
 build = Provision::Build.new()
-build.load('config.rb')
-build.provision("blah")
+build.load('../lib/config/ubuntuprecise.rb')
+build.load('../lib/config/puppetmaster.rb')
+build.provision("puppetmaster")
