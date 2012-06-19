@@ -29,5 +29,8 @@ module Provision::Commands
   end
 
   def hostname(hostname)
+     puts "HOSTNAME #{hostname}"
   end
 end
+
+include Provision::Commands
