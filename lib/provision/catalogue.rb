@@ -15,16 +15,22 @@ module Provision
       @cleanups << block
     end
 
+    def call(method)
+      call_define(method,self)
+    end
+
+    def method_missing(name,*args,&block)
+      call(name.to_s())
+    end
+
     def execute()
+      position = 40
       begin
         @commands.each {|command|
-          position = 40
           txt = command[:txt]
           padding =  position - txt.length
           print "\n#{txt}"
-          for i in 0..padding:
-            print " "
-          end
+          padding.times {print " "}
 
           error = nil
           begin
@@ -41,14 +47,21 @@ module Provision
             end
           end
         }
-      rescue
-
+      rescue Exception=>e
+        print e.backtrace
       end
+
+      txt = "cleaning up"
+      print "#{txt}"
+      padding =  position - txt.length
+      padding.times {print " "}
 
       @cleanups.reverse.each {|command|
         begin
           command.call()
         rescue Exception=>e
+        ensure
+          print "[\e[0;32mDONE\e[0m]\n"
         end
       }
     end
@@ -66,6 +79,12 @@ module Provision
 
     def define(name, &block)
       @@catalogue[name] = block
+    end
+
+    def call_define(name, build)
+      closure = @@catalogue[name]
+      build.instance_eval(&closure)
+      return build
     end
 
     def build(name, options)
