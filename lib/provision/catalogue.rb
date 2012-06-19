@@ -18,6 +18,14 @@ module Provision
     def execute()
       begin
         @commands.each {|command|
+          position = 40
+          txt = command[:txt]
+          padding =  position - txt.length
+          print "\n#{txt}"
+          for i in 0..padding:
+            print " "
+          end
+
           error = nil
           begin
             command[:block].call()
@@ -31,14 +39,13 @@ module Provision
             else
               print "[\e[0;32mDONE\e[0m]\n"
             end
-
           end
         }
       rescue
 
       end
 
-      @cleanups.each {|command|
+      @cleanups.reverse.each {|command|
         begin
           command.call()
         rescue Exception=>e
@@ -50,6 +57,12 @@ module Provision
 
   module Catalogue
     @@catalogue = {}
+
+    def load(dir)
+      Dir.entries(dir).each do |file|
+        require "#{dir}/#{file}" if file =~/.rb$/
+      end
+    end
 
     def define(name, &block)
       @@catalogue[name] = block

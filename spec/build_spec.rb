@@ -19,11 +19,11 @@ describe XYZ do
     def action(args=nil)
       @@commands.action(args)
     end
-    
+
     def die(args=nil)
       raise "I was asked to die"
     end
-    
+
   end
 
   it 'cleanup blocks run after run blocks' do
@@ -54,6 +54,36 @@ describe XYZ do
     @commands.should_receive(:action).with("5")
     @commands.should_receive(:action).with("6")
     @commands.should_receive(:action).with("7")
+
+    build.execute()
+  end
+
+  it 'cleanup blocks run in reverse order' do
+    require 'provision/catalogue'
+    define "vanillavm" do
+      extend MockFunctions
+      cleanup {
+        action("2")
+        action("1")
+      }
+      cleanup {
+        action("4")
+        action("3")
+      }
+      cleanup {
+        action("6")
+        action("5")
+      }
+    end
+
+    build = Provision::Catalogue::build("vanillavm", {:hostname=>"myfirstmachine"})
+
+    @commands.should_receive(:action).with("6").ordered
+    @commands.should_receive(:action).with("5").ordered
+    @commands.should_receive(:action).with("4").ordered
+    @commands.should_receive(:action).with("3").ordered
+    @commands.should_receive(:action).with("2").ordered
+    @commands.should_receive(:action).with("1").ordered
 
     build.execute()
   end
@@ -91,4 +121,9 @@ describe XYZ do
 
     build.execute()
   end
+  
+  it 'can load files from a specified directory' do
+    Provision::Catalogue::load('lib/config')
+  end
+  
 end
