@@ -1,0 +1,12 @@
+
+system level tests for putting up whole vm's
+
+provisionvm dev-dellis-puppet
+
+make paths work well so we can build specific boxes
+
+catalogue of machines not types/roles
+
+
+parallel builds
+	-> monitor on losetup grabs
