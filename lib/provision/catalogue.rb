@@ -25,14 +25,14 @@ module Provision
 
     def execute()
       position = 40
+      error = nil
       begin
         @commands.each {|command|
           txt = command[:txt]
           padding =  position - txt.length
-          print "\n#{txt}"
+          print "#{txt}"
           padding.times {print " "}
 
-          error = nil
           begin
             command[:block].call()
           rescue Exception=>e
@@ -48,10 +48,9 @@ module Provision
           end
         }
       rescue Exception=>e
-        print e.backtrace
       end
 
-      txt = "cleaning up"
+      txt = "cleaning up #{@cleanups.size} blocks"
       print "#{txt}"
       padding =  position - txt.length
       padding.times {print " "}
@@ -60,10 +59,15 @@ module Provision
         begin
           command.call()
         rescue Exception=>e
+          print "[\e[0;31mFAILED\e[0m]\n"
         ensure
-          print "[\e[0;32mDONE\e[0m]\n"
         end
       }
+      print "[\e[0;32mDONE\e[0m]\n"
+      
+      if error!=nil
+        raise error
+      end
     end
 
   end

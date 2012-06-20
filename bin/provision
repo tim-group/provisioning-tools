@@ -4,5 +4,5 @@ $: << File.join(File.dirname(__FILE__), "..", "lib")
 require 'provision/catalogue'
 
 Provision::Catalogue::load('../lib/config')
-build = Provision::Catalogue::build("vanillavm", {:hostname=>"myfirstmachine"})
+build = Provision::Catalogue::build("ubuntuprecise", {:hostname=>"myfirstmachine"})
 build.execute()

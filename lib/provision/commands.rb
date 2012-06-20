@@ -5,19 +5,27 @@ module Provision::Commands
   end
 
   def cmd(cmd)
+    print "#{cmd}\n"
     if ! system("#{cmd}  >> console.log 2>&1")
-      raise "command returned non-zero error code"
+      raise "command #{cmd} returned non-zero error code"
     end
   end
 
   def cmd_ignore(cmd)
-    system("#{command}  >> #{@console_log} 2>&1")
+    print "#{cmd}\n"
+    
+    system("#{cmd}  >> console_log 2>&1")
   end
 
-  def chroot(cmd)
-    cmd("chroot #{@dir} /bin/bash -c '#{command}'")
+  def chroot(dir, cmd)
+    cmd("chroot #{dir} /bin/bash -c '#{cmd}'")
   end
 
+  def chroot_ignore(dir, cmd)
+    cmd_ignore("chroot #{dir} /bin/bash -c '#{cmd}'")
+  end
+
+  
   def cat(file, content)
     open(file, 'w') { |f|
       f.puts(content)
@@ -29,7 +37,6 @@ module Provision::Commands
   end
 
   def hostname(hostname)
-     puts "HOSTNAME #{hostname}"
   end
 end
 
