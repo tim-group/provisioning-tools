@@ -1,8 +1,0 @@
-#!/usr/bin/ruby
-$: << File.join(File.dirname(__FILE__), "..", "lib")
-
-require 'provision/catalogue'
-
-Provision::Catalogue::load('../lib/config')
-build = Provision::Catalogue::build("vanillavm", {:hostname=>"myfirstmachine"})
-build.execute()
