@@ -14,7 +14,7 @@ define "ubuntuprecise" do
     cmd "kvm-img create -fraw #{vm_name}.img 3G"
     cmd "losetup /dev/#{@loop0} #{vm_name}.img"
     cmd "parted -sm /dev/#{@loop0} mklabel msdos"
-    cmd_ignore "parted -sm /dev/#{@loop0} mkpart primary ext3 1 100%"
+    supress_error.cmd "parted -sm /dev/#{@loop0} mkpart primary ext3 1 100%"
     cmd "kpartx -a -v /dev/#{@loop0}"
     cmd "mkfs.ext4 /dev/mapper/#{@loop0}p1"
   }
@@ -32,13 +32,13 @@ define "ubuntuprecise" do
   }
 
   cleanup {
-    cmd_ignore "umount /dev/#{@loop1}"
-    cmd_ignore "losetup -d /dev/#{@loop1}"
+    cmd "umount /dev/#{@loop1}"
+    cmd "losetup -d /dev/#{@loop1}"
   }
 
-#  run("running debootstrap") {
-#    cmd "debootstrap --arch amd64 precise #{temp_dir} http://aptproxy:3142/ubuntu"
-#  }
+  #  run("running debootstrap") {
+  #    cmd "debootstrap --arch amd64 precise #{temp_dir} http://aptproxy:3142/ubuntu"
+  #  }
 
   run("mounting devices") {
     cmd "mount --bind /dev #{temp_dir}/dev"
@@ -49,9 +49,9 @@ define "ubuntuprecise" do
   cleanup {
     # FIXME Remove the sleep from here, ideally before dellis sees and stabs me.
     # Sleep required because prior steps do not release their file handles quick enough - or something.
-    chroot_ignore "#{temp_dir}","umount /proc"
-    chroot_ignore "#{temp_dir}","umount /sys"
-    chroot_ignore "#{temp_dir}","sleep 1; umount #{temp_dir}/dev"
+    chroot "#{temp_dir}","umount /proc"
+    chroot "#{temp_dir}","umount /sys"
+    chroot "#{temp_dir}","sleep 1; umount #{temp_dir}/dev"
   }
 
   run("set locale") {

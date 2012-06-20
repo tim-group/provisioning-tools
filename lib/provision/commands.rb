@@ -11,21 +11,10 @@ module Provision::Commands
     end
   end
 
-  def cmd_ignore(cmd)
-    print "#{cmd}\n"
-    
-    system("#{cmd}  >> console_log 2>&1")
-  end
-
   def chroot(dir, cmd)
     cmd("chroot #{dir} /bin/bash -c '#{cmd}'")
   end
 
-  def chroot_ignore(dir, cmd)
-    cmd_ignore("chroot #{dir} /bin/bash -c '#{cmd}'")
-  end
-
-  
   def cat(file, content)
     open(file, 'w') { |f|
       f.puts(content)

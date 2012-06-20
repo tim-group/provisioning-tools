@@ -88,6 +88,36 @@ describe XYZ do
     build.execute()
   end
 
+  it 'cleanup blocks ignore exceptions' do
+    require 'provision/catalogue'
+    define "vanillavm" do
+      extend MockFunctions
+      cleanup {
+        die("6")
+        action("5")
+      }
+    end
+
+    build = Provision::Catalogue::build("vanillavm", {:hostname=>"myfirstmachine"})
+    @commands.should_receive(:action).with("5")
+    build.execute()
+  end
+
+  it 'can ignore exceptions if chosen to' do
+    require 'provision/catalogue'
+    define "vanillavm" do
+      extend MockFunctions
+      run("do stuff") {
+        supress_error.die("6")
+        action("5")
+      }
+    end
+
+    build = Provision::Catalogue::build("vanillavm", {:hostname=>"myfirstmachine"})
+    @commands.should_receive(:action).with("5")
+    build.execute()
+  end
+
   it 'stops executing run commands after a failure' do
     require 'provision/catalogue'
     define "vanillavm" do
