@@ -8,26 +8,26 @@ end
 require 'optparse'
 require 'provision/catalogue'
 
+template = nil
+hostname = nil
 Provision::Catalogue::load('../lib/config')
 @option_parser = OptionParser.new do|opts|
       opts.banner =
 "Usage: provision --template ubuntuprecise --hostname mymachine"
-      opts.on("-t","--template TEMPLATE", "specify the template to use") do |template|
-        @template = template
+      opts.on("-t","--template TEMPLATE", "specify the template to use") do |template_p|
+        template = template_p
       end
-      opts.on("-h","--hostname HOSTNAME", "specify the template to use") do |hostname|
-        @hostname = hostname
+      opts.on("-h","--hostname HOSTNAME", "specify the template to use") do |hostname_p|
+        hostname = hostname_p
       end
-
-     def complete(key) end
-
 end
+@option_parser.parse!
 
-if (@template ==nil || @hostname == nil)
-print  @option_parser.help()
+if (template ==nil || hostname == nil)
+  print  @option_parser.help()
   exit
 end
 
 
-build = Provision::Catalogue::build(@template, {:hostname=>@hostname})
+build = Provision::Catalogue::build(template, {:hostname=>hostname})
 build.execute()
