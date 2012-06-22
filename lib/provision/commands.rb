@@ -9,26 +9,12 @@ module Provision::Commands
     end
   end
 
-  def chroot(dir, cmd)
-    cmd("chroot #{dir} /bin/bash -c '#{cmd}'")
-  end
-
-  def chroot2(cmd)
-
-print self.instance_variables()
+  def chroot(cmd)
     cmd("chroot #{temp_dir} /bin/bash -c '#{cmd}'")
   end
 
-  def cat(file, content)
-    open(file, 'w') { |f|
-      f.puts(content)
-    }
+  def apt_install(package)
+    chroot("DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install #{package}")
   end
 
-  def install(dir, package)
-    chroot(dir, "DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install #{package}")
-  end
-
-  def hostname(hostname)
-  end
 end

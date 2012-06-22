@@ -4,16 +4,13 @@ require 'provision/commands'
 define "ubuntuprecise" do
   extend Provision::Commands
   conventions()
-  vm_name = 'vm1'
-  temp_dir = 'vmtmp-'
-  #+ rand(36**8).to_s(36)
   loop0 = "loop0" #File.basename(`losetup -f`).chomp
   loop1 = "loop1"
 
   run("loopback devices") {
     cmd "mkdir #{temp_dir}"
-    cmd "kvm-img create -fraw #{vm_name}.img 3G"
-    cmd "losetup /dev/#{loop0} #{vm_name}.img"
+    cmd "kvm-img create -fraw #{hostname}.img 3G"
+    cmd "losetup /dev/#{loop0} #{hostname}.img"
     cmd "parted -sm /dev/#{loop0} mklabel msdos"
     supress_error.cmd "parted -sm /dev/#{loop0} mkpart primary ext3 1 100%"
     cmd "kpartx -a -v /dev/#{loop0}"
@@ -43,15 +40,15 @@ define "ubuntuprecise" do
 
   run("mounting devices") {
     cmd "mount --bind /dev #{temp_dir}/dev"
-    chroot "#{temp_dir}","mount -t proc none /proc"
-    chroot "#{temp_dir}","mount -t sysfs none /sys"
+    chroot "mount -t proc none /proc"
+    chroot "mount -t sysfs none /sys"
   }
 
   cleanup {
     # FIXME Remove the sleep from here, ideally before dellis sees and stabs me.
     # Sleep required because prior steps do not release their file handles quick enough - or something.
-    chroot2 "umount /proc"
-    chroot2 "umount /sys"
+    chroot "umount /proc"
+    chroot "umount /sys"
     cmd "sleep 1; umount #{temp_dir}/dev"
   }
 
@@ -60,7 +57,7 @@ define "ubuntuprecise" do
       f.puts 'LANG="en_GB.UTF-8"'
     }
 
-    chroot "#{temp_dir}", "locale-gen en_GB.UTF-8"
+    chroot "locale-gen en_GB.UTF-8"
   }
 
   run("set timezone") {
@@ -68,19 +65,20 @@ define "ubuntuprecise" do
       f.puts 'Europe/London'
     }
 
-    chroot "#{temp_dir}", "dpkg-reconfigure --frontend noninteractive tzdata"
+    chroot "dpkg-reconfigure --frontend noninteractive tzdata"
   }
 
   run("set hostname") {
     open("#{temp_dir}/etc/hostname", 'w') { |f|
-      f.puts "#{vm_name}"
+      f.puts "#{hostname}"
     }
   }
 
   run("install kernel and grub") {
-    chroot "#{temp_dir}", "apt-get -y --force-yes update"
-    chroot "#{temp_dir}","DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install linux-image-virtual"
-    chroot "#{temp_dir}","DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install grub-pc"
+    chroot "apt-get -y --force-yes update"
+    apt_install "linux-image-virtual"
+    apt_install "grub-pc"
+
     cmd "mkdir -p #{temp_dir}/boot/grub"
 
     open("#{temp_dir}/boot/grub/device.map", 'w') { |f|
@@ -106,11 +104,11 @@ define "ubuntuprecise" do
           }"
     }
 
-    chroot "#{temp_dir}", "grub-install --no-floppy --grub-mkdevicemap=/boot/grub/device.map /dev/#{loop0}"
+    chroot "grub-install --no-floppy --grub-mkdevicemap=/boot/grub/device.map /dev/#{loop0}"
   }
 
   run("set root password") {
-    chroot "#{temp_dir}","echo 'root:root' | chpasswd"
+    chroot "echo 'root:root' | chpasswd"
   }
 
   run("set up basic networking") {
@@ -127,13 +125,13 @@ define "ubuntuprecise" do
   }
 
   run("install misc packages") {
-    chroot "#{temp_dir}","DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install acpid openssh-server curl vim"
+    apt_install "acpid openssh-server curl vim"
   }
 
   # A few daemons hang around at the end of the bootstrapping process that prevent us unmounting.
   cleanup {
-    chroot2 "/etc/init.d/acpid stop"
-    chroot "#{temp_dir}","/etc/init.d/cron stop"
+    chroot "/etc/init.d/acpid stop"
+    chroot "/etc/init.d/cron stop"
   }
 
   run("configure youdevise apt repo") {
@@ -141,6 +139,6 @@ define "ubuntuprecise" do
       f.puts "deb http://apt/ubuntu stable main\ndeb-src http://apt/ubuntu stable main\n"
     }
 
-    chroot "#{temp_dir}","curl -Ss http://apt/ubuntu/repo.key | apt-key add -"
+    chroot "curl -Ss http://apt/ubuntu/repo.key | apt-key add -"
   }
 end
