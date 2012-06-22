@@ -1,14 +1,25 @@
+require 'logger'
+
 module Provision
+  @@log = Logger.new("provision.log")
+  def self.log()
+    return @@log
+  end
+
   class CatchAndIgnore
+    attr_accessor :build
     def initialize(build)
       @build = build
     end
 
     def method_missing(name,*args,&block)
+
+      print "SEND #{name} #{args}\n"
+
       begin
         @build.send name, *args
       rescue Exception=>e
-        print "CAUGHT #{name} #{e}"
+        Provision.log.error(e)
       end
     end
   end
@@ -23,12 +34,38 @@ module Provision
       @supress_error = CatchAndIgnore.new(self)
     end
 
+    def makevar(var,value)
+      @mine="hello"
+      @mine2="hello2"
+      var_string = var.to_s()
+      inst_variable_name = "@#{var_string}".to_sym
+      setter = "#{var_string}ll"
+      print ">>#{setter}..@cleanups.....................\n"
+
+      singleton = class << self; self end
+      singleton.send :define_method, setter, lambda { |new_value|
+        print "EEEEEEEEEEEEEEEEEEEEEEEEEEEE #{new_value} \n"
+      }
+
+      singleton.send :define_method, var_string, lambda { return instance_variable_get(inst_variable_name)}
+    end
+
+    def setvar(var,new_value)
+      inst_variable_name = "@#{var}".to_sym
+      instance_variable_set inst_variable_name, new_value
+    end
+
+    def getvar(var)
+      inst_variable_name = "@#{var}".to_sym
+      return instance_variable_get(inst_variable_name)
+    end
+
     def run(txt, &block)
       @commands << {:txt=>txt, :block=>block}
     end
 
     def cleanup(&block)
-      @cleanups << lambda {
+      @cleanups <<  lambda {
         supress_error.instance_eval(&block)
       }
     end
@@ -66,18 +103,18 @@ module Provision
           end
         }
       rescue Exception=>e
+        Provision.log.error(e)
       end
 
       txt = "cleaning up #{@cleanups.size} blocks"
       print "#{txt}"
       padding =  position - txt.length
       padding.times {print " "}
-
       @cleanups.reverse.each {|command|
         begin
           command.call()
         rescue Exception=>e
-          print "[\e[0;31mFAILED\e[0m]\n"
+          Provision.log(e)
         ensure
         end
       }
@@ -97,6 +134,10 @@ module Provision
       Dir.entries(dir).each do |file|
         require "#{dir}/#{file}" if file =~/.rb$/
       end
+    end
+
+    def list_templates()
+      return @@catalogue.keys()
     end
 
     def define(name, &block)
