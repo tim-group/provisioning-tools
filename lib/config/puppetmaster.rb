@@ -6,7 +6,6 @@ define "puppetmaster" do
   options = @options
 
   run("puppet mastery"){
-    hostname = @options[:hostname]
-    cmd "echo 'building puppet' #{hostname}"
+    cmd "echo 'building puppetmaster' #{hostname}"
   }
 end
