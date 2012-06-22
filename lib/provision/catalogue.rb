@@ -35,8 +35,6 @@ module Provision
     end
 
     def makevar(var,value)
-      @mine="hello"
-      @mine2="hello2"
       var_string = var.to_s()
       inst_variable_name = "@#{var_string}".to_sym
       setter = "#{var_string}ll"
@@ -46,6 +44,8 @@ module Provision
       singleton.send :define_method, setter, lambda { |new_value|
         print "EEEEEEEEEEEEEEEEEEEEEEEEEEEE #{new_value} \n"
       }
+
+      instance_variable_set(inst_variable_name, value)
 
       singleton.send :define_method, var_string, lambda { return instance_variable_get(inst_variable_name)}
     end

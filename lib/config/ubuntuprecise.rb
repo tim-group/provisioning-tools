@@ -3,6 +3,7 @@ require 'provision/commands'
 
 define "ubuntuprecise" do
   extend Provision::Commands
+  conventions()
   vm_name = 'vm1'
   temp_dir = 'vmtmp-'
   #+ rand(36**8).to_s(36)
@@ -49,9 +50,9 @@ define "ubuntuprecise" do
   cleanup {
     # FIXME Remove the sleep from here, ideally before dellis sees and stabs me.
     # Sleep required because prior steps do not release their file handles quick enough - or something.
-    chroot "#{temp_dir}","umount /proc"
-    chroot "#{temp_dir}","umount /sys"
-    chroot "#{temp_dir}","sleep 1; umount #{temp_dir}/dev"
+    chroot2 "umount /proc"
+    chroot2 "umount /sys"
+    cmd "sleep 1; umount #{temp_dir}/dev"
   }
 
   run("set locale") {
@@ -131,7 +132,7 @@ define "ubuntuprecise" do
 
   # A few daemons hang around at the end of the bootstrapping process that prevent us unmounting.
   cleanup {
-    chroot "#{temp_dir}","/etc/init.d/acpid stop"
+    chroot2 "/etc/init.d/acpid stop"
     chroot "#{temp_dir}","/etc/init.d/cron stop"
   }
 

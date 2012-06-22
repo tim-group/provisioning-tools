@@ -13,6 +13,12 @@ module Provision::Commands
     cmd("chroot #{dir} /bin/bash -c '#{cmd}'")
   end
 
+  def chroot2(cmd)
+
+print self.instance_variables()
+    cmd("chroot #{temp_dir} /bin/bash -c '#{cmd}'")
+  end
+
   def cat(file, content)
     open(file, 'w') { |f|
       f.puts(content)
