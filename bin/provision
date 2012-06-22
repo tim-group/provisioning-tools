@@ -1,8 +1,29 @@
 #!/usr/bin/ruby
 $: << File.join(File.dirname(__FILE__), "..", "lib")
 
+require 'optparse'
 require 'provision/catalogue'
 
 Provision::Catalogue::load('../lib/config')
-build = Provision::Catalogue::build("ubuntuprecise", {:hostname=>"myfirstmachine"})
+@option_parser = OptionParser.new do|opts|
+      opts.banner =
+"Usage: provision --template ubuntuprecise --hostname mymachine"
+      opts.on("-t","--template TEMPLATE", "specify the template to use") do |template|
+        @template = template
+      end
+      opts.on("-h","--hostname HOSTNAME", "specify the template to use") do |hostname|
+        @hostname = hostname
+      end
+
+     def complete(key) end
+
+end
+
+if (@template ==nil || @hostname == nil)
+print  @option_parser.help()
+  exit
+end
+
+
+build = Provision::Catalogue::build(@template, {:hostname=>@hostname})
 build.execute()
