@@ -1,13 +1,11 @@
 module Provision::Commands
   def initialize(options)
-    @console_log = options[:console_log]
-    @dir = options[:dir]
   end
 
   def cmd(cmd)
-    print "#{cmd}\n"
+    Provision.log.debug("running command #{cmd}")
     if ! system("#{cmd}  >> console.log 2>&1")
-      raise "command #{cmd} returned non-zero error code"
+      raise Exception.new("command #{cmd} returned non-zero error code")
     end
   end
 
@@ -21,12 +19,10 @@ module Provision::Commands
     }
   end
 
-  def install(package)
-    chroot("DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install #{package}")
+  def install(dir, package)
+    chroot(dir, "DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install #{package}")
   end
 
   def hostname(hostname)
   end
 end
-
-include Provision::Commands

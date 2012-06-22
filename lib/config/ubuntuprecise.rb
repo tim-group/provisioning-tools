@@ -1,39 +1,39 @@
 require 'provision/catalogue'
 require 'provision/commands'
 
-extend Provision::Commands
-
 define "ubuntuprecise" do
-  vm_name = ARGV[0] || 'vm1'
+  extend Provision::Commands
+  vm_name = 'vm1'
   temp_dir = 'vmtmp-'
   #+ rand(36**8).to_s(36)
+  loop0 = "loop0" #File.basename(`losetup -f`).chomp
+  loop1 = "loop1"
 
   run("loopback devices") {
-    @loop0 = "loop0" #File.basename(`losetup -f`).chomp
     cmd "mkdir #{temp_dir}"
     cmd "kvm-img create -fraw #{vm_name}.img 3G"
-    cmd "losetup /dev/#{@loop0} #{vm_name}.img"
-    cmd "parted -sm /dev/#{@loop0} mklabel msdos"
-    supress_error.cmd "parted -sm /dev/#{@loop0} mkpart primary ext3 1 100%"
-    cmd "kpartx -a -v /dev/#{@loop0}"
-    cmd "mkfs.ext4 /dev/mapper/#{@loop0}p1"
+    cmd "losetup /dev/#{loop0} #{vm_name}.img"
+    cmd "parted -sm /dev/#{loop0} mklabel msdos"
+    supress_error.cmd "parted -sm /dev/#{loop0} mkpart primary ext3 1 100%"
+    cmd "kpartx -a -v /dev/#{loop0}"
+    cmd "mkfs.ext4 /dev/mapper/#{loop0}p1"
   }
 
   cleanup {
-    cmd_ignore "kpartx -d /dev/#{@loop0}"
-    cmd_ignore "losetup -d /dev/#{@loop0}"
-    cmd_ignore "rmdir #{temp_dir}"
+    cmd "kpartx -d /dev/#{loop0}"
+    cmd "losetup -d /dev/#{loop0}"
+    cmd "rmdir #{temp_dir}"
   }
 
   run("loopback devices 2") {
-    @loop1 = "loop1" #File.basename(`losetup -f`).chomp
-    cmd "losetup /dev/#{@loop1} /dev/mapper/#{@loop0}p1"
-    cmd "mount /dev/#{@loop1} #{temp_dir}"
+    loop1 = "loop1" #File.basename(`losetup -f`).chomp
+    cmd "losetup /dev/#{loop1} /dev/mapper/#{loop0}p1"
+    cmd "mount /dev/#{loop1} #{temp_dir}"
   }
 
   cleanup {
-    cmd "umount /dev/#{@loop1}"
-    cmd "losetup -d /dev/#{@loop1}"
+    cmd "umount /dev/#{loop1}"
+    cmd "losetup -d /dev/#{loop1}"
   }
 
   #  run("running debootstrap") {

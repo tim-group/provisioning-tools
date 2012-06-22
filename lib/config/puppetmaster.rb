@@ -1,6 +1,6 @@
-extend Provision::Commands
 
 define "puppetmaster" do
+  extend Provision::Commands
   ubuntuprecise()
 
   options = @options

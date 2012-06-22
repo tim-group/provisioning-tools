@@ -114,7 +114,7 @@ module Provision
         begin
           command.call()
         rescue Exception=>e
-          Provision.log(e)
+          Provision.log.error(e)
         ensure
         end
       }
