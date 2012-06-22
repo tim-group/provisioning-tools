@@ -34,9 +34,9 @@ define "ubuntuprecise" do
     cmd "losetup -d /dev/#{loop1}"
   }
 
-  #  run("running debootstrap") {
-  #    cmd "debootstrap --arch amd64 precise #{temp_dir} http://aptproxy:3142/ubuntu"
-  #  }
+  run("running debootstrap") {
+    cmd "debootstrap --arch amd64 precise #{temp_dir} http://aptproxy:3142/ubuntu"
+  }
 
   run("mounting devices") {
     cmd "mount --bind /dev #{temp_dir}/dev"
