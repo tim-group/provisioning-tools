@@ -1,6 +1,10 @@
 #!/usr/bin/ruby
 $: << File.join(File.dirname(__FILE__), "..", "lib")
 
+if Process.uid != 0
+  raise 'FATAL: Process needs to run as root!'
+end 
+
 require 'optparse'
 require 'provision/catalogue'
 
