@@ -1,12 +1,10 @@
 
 system level tests for putting up whole vm's
-
-provisionvm dev-dellis-puppet
-
 make paths work well so we can build specific boxes
 
-catalogue of machines not types/roles
-
+loading should work from anywhere bin is called
+logs should go in log dir defined in a config
+there needs to be a working directory to do the workin.
 
 parallel builds
 	-> monitor on losetup grabs
