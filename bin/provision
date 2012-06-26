@@ -31,7 +31,6 @@ if (template ==nil || hostname == nil)
   exit
 end
 
-
 build = Provision::Catalogue::build(template, {:hostname=>hostname})
 Dir.chdir(target_dir)
 build.execute()

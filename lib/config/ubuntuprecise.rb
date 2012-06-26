@@ -1,8 +1,8 @@
-require 'provision/catalogue'
-require 'provision/commands'
+require 'provision/image/catalogue'
+require 'provision/image/commands'
 
 define "ubuntuprecise" do
-  extend Provision::Commands
+  extend Provision::Image::Commands
   conventions()
   loop0 = "loop0" #File.basename(`losetup -f`).chomp
   loop1 = "loop1"

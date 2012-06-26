@@ -1,11 +1,6 @@
-require 'logger'
+require 'provision/namespace'
 
-module Provision
-  @@log = Logger.new("provision.log")
-  def self.log()
-    return @@log
-  end
-
+module Provision::Image
   class CatchAndIgnore
     attr_accessor :build
     def initialize(build)
@@ -13,9 +8,6 @@ module Provision
     end
 
     def method_missing(name,*args,&block)
-
-      print "SEND #{name} #{args}\n"
-
       begin
         @build.send name, *args
       rescue Exception=>e
@@ -38,11 +30,8 @@ module Provision
       var_string = var.to_s()
       inst_variable_name = "@#{var_string}".to_sym
       setter = "#{var_string}ll"
-      print ">>#{setter}..@cleanups.....................\n"
-
       singleton = class << self; self end
       singleton.send :define_method, setter, lambda { |new_value|
-        print "EEEEEEEEEEEEEEEEEEEEEEEEEEEE #{new_value} \n"
       }
 
       instance_variable_set(inst_variable_name, value)
@@ -151,7 +140,7 @@ module Provision
     end
 
     def build(name, options)
-      build = Provision::Build.new(name, options)
+      build = Provision::Image::Build.new(name, options)
       closure = @@catalogue[name]
       build.instance_eval(&closure)
       return build
@@ -159,4 +148,4 @@ module Provision
   end
 end
 
-include Provision::Catalogue
+include Provision::Image::Catalogue

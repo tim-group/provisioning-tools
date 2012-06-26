@@ -8,3 +8,11 @@ there needs to be a working directory to do the workin.
 
 parallel builds
 	-> monitor on losetup grabs
+
+	
+
+image-builder
+vmbuilder
+vmcontroller
+
+catalogue

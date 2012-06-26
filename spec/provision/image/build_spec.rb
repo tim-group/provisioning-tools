@@ -27,7 +27,7 @@ describe XYZ do
   end
 
   it 'cleanup blocks run after run blocks' do
-    require 'provision/catalogue'
+    require 'provision/image/catalogue'
     define "vanillavm" do
       extend MockFunctions
       run("do stuff") {
@@ -45,7 +45,7 @@ describe XYZ do
       }
     end
 
-    build = Provision::Catalogue::build("vanillavm", {:hostname=>"myfirstmachine"})
+    build = Provision::Image::Catalogue::build("vanillavm", {:hostname=>"myfirstmachine"})
 
     @commands.should_receive(:action).with("1")
     @commands.should_receive(:action).with("2")
@@ -59,7 +59,7 @@ describe XYZ do
   end
 
   it 'cleanup blocks run in reverse order' do
-    require 'provision/catalogue'
+    require 'provision/image/catalogue'
     define "vanillavm" do
       extend MockFunctions
       cleanup {
@@ -76,7 +76,7 @@ describe XYZ do
       }
     end
 
-    build = Provision::Catalogue::build("vanillavm", {:hostname=>"myfirstmachine"})
+    build = Provision::Image::Catalogue::build("vanillavm", {:hostname=>"myfirstmachine"})
 
     @commands.should_receive(:action).with("6").ordered
     @commands.should_receive(:action).with("5").ordered
@@ -89,7 +89,7 @@ describe XYZ do
   end
 
   it 'cleanup blocks ignore exceptions' do
-    require 'provision/catalogue'
+    require 'provision/image/catalogue'
     define "vanillavm" do
       extend MockFunctions
       cleanup {
@@ -98,13 +98,13 @@ describe XYZ do
       }
     end
 
-    build = Provision::Catalogue::build("vanillavm", {:hostname=>"myfirstmachine"})
+    build = Provision::Image::Catalogue::build("vanillavm", {:hostname=>"myfirstmachine"})
     @commands.should_receive(:action).with("5")
     build.execute()
   end
 
   it 'can ignore exceptions if chosen to' do
-    require 'provision/catalogue'
+    require 'provision/image/catalogue'
     define "vanillavm" do
       extend MockFunctions
       run("do stuff") {
@@ -113,13 +113,13 @@ describe XYZ do
       }
     end
 
-    build = Provision::Catalogue::build("vanillavm", {:hostname=>"myfirstmachine"})
+    build = Provision::Image::Catalogue::build("vanillavm", {:hostname=>"myfirstmachine"})
     @commands.should_receive(:action).with("5")
     build.execute()
   end
 
   it 'stops executing run commands after a failure' do
-    require 'provision/catalogue'
+    require 'provision/image/catalogue'
     define "vanillavm" do
       extend MockFunctions
       run("do stuff") {
@@ -128,7 +128,7 @@ describe XYZ do
         action("3")
       }
     end
-    build = Provision::Catalogue::build("vanillavm", {:hostname=>"myfirstmachine"})
+    build = Provision::Image::Catalogue::build("vanillavm", {:hostname=>"myfirstmachine"})
     @commands.should_receive(:action).with("1")
     @commands.should_not_receive(:action).with("3")
 
@@ -136,7 +136,7 @@ describe XYZ do
   end
 
   it 'I can pass options through to my build' do
-    require 'provision/catalogue'
+    require 'provision/image/catalogue'
     define "vanillavm" do
       extend MockFunctions
       run("configure hostname") {
@@ -145,7 +145,7 @@ describe XYZ do
       }
     end
 
-    build = Provision::Catalogue::build("vanillavm", {:hostname=>"myfirstmachine"})
+    build = Provision::Image::Catalogue::build("vanillavm", {:hostname=>"myfirstmachine"})
 
     @commands.should_receive(:action).with("myfirstmachine")
 
@@ -153,7 +153,7 @@ describe XYZ do
   end
 
   it 'I can provide defaults' do
-    require 'provision/catalogue'
+    require 'provision/image/catalogue'
     define "defaults" do
       run("configure defaults") {
         @options[:disksize] = '3G'
@@ -169,13 +169,13 @@ describe XYZ do
       }
     end
 
-    build = Provision::Catalogue::build("vanillavm", {})
+    build = Provision::Image::Catalogue::build("vanillavm", {})
     @commands.should_receive(:action).with("3G")
     build.execute()
   end
 
   it 'can load files from a specified directory' do
-    Provision::Catalogue::load('lib/config')
+    Provision::Image::Catalogue::load('lib/config')
   end
 
 end
