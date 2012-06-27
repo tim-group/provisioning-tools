@@ -16,7 +16,7 @@ class Provision::Core::ProvisioningService
       :vnc_port => "-1",
       :ram => "3G",
       :images_dir => "/images",
-      :libvirt_dir =>"/var/lib/libvirt"
+      :libvirt_dir =>"/var/lib/libvirt/qemu"
     })
 
     @vm_service.destroy_vm(vm_descriptor.hostname)

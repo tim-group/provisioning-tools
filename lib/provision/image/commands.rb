@@ -1,4 +1,4 @@
-module Provision::Commands
+module Provision::Image::Commands
   def initialize(options)
   end
 
