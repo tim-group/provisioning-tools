@@ -11,7 +11,7 @@ describe Provision::VM::Virsh do
     virt_manager = Provision::VM::Virsh.new()
     vm_descriptor = Provision::VM::Descriptor.new(
     :hostname=>"vmx1",
-    :disk_dir=>"build/mnt4/",
+    :disk_dir=>"build/",
     :vnc_port=>9005,
     :ram => "1G",
     :images_dir => "build",
