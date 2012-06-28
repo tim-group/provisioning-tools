@@ -6,11 +6,12 @@ define "ubuntuprecise" do
   conventions()
   loop0 = "loop0" #File.basename(`losetup -f`).chomp
   loop1 = "loop1"
+  imagefile = "/images/#{hostname}.img"
 
   run("loopback devices") {
     cmd "mkdir #{temp_dir}"
-    cmd "kvm-img create -fraw #{hostname}.img 3G"
-    cmd "losetup /dev/#{loop0} #{hostname}.img"
+    cmd "kvm-img create -fraw #{imagefile} 3G"
+    cmd "losetup /dev/#{loop0} #{imagefile}"
     cmd "parted -sm /dev/#{loop0} mklabel msdos"
     supress_error.cmd "parted -sm /dev/#{loop0} mkpart primary ext3 1 100%"
     cmd "kpartx -a -v /dev/#{loop0}"
