@@ -21,7 +21,7 @@ describe Provision::Core::ProvisioningService do
     @image_service.should_receive(:build_image).with("ubuntuprecise",anything).ordered
     @vm_service.should_receive(:define_vm).ordered
     @vm_service.should_receive(:start_vm).ordered
-    @provisioning_service.provision_vm(:name=>"vmx1",:template=>"ubuntuprecise")
+    @provisioning_service.provision_vm(:hostname=>"vmx1",:template=>"ubuntuprecise")
   end
 
 end

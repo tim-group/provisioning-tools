@@ -12,7 +12,6 @@ class Provision::Core::ProvisioningService
   def provision_vm(options)
     vm_descriptor = Provision::VM::Descriptor.new({
       :hostname=>options[:hostname],
-      :mac_address => "5e:5d:ee:ff:ff:ee",
       :vnc_port => "-1",
       :ram => "3G",
       :images_dir => "/images",
@@ -24,5 +23,7 @@ class Provision::Core::ProvisioningService
     @image_service.build_image(options[:template], options)
     @vm_service.define_vm(vm_descriptor)
     @vm_service.start_vm(vm_descriptor.hostname)
+
+    return vm_descriptor
   end
 end

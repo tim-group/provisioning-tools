@@ -1,28 +1,31 @@
 require 'provision'
-require 'net/ssh'
+#require 'net/ssh'
 
 describe Provision do
-  it 'after building a test vm I am able to login' do
-    Provision.vm(:hostname=>"RANDOMX", :template=>"ubuntuprecise")
-
-    leasefile = "/tmp/my.lease"
-    macaddress = "5e:5d:ee:ff:ff:ee"
-
-    cmd = "cat #{leasefile} | grep #{macaddress} | awk '{print $3}'"
-
-    ipaddress = `#{cmd}`.chomp
-
-    print "IPADDR: #{ipaddress}\n"
-    sleep 5
-
-    hostname = nil
-    Net::SSH.start(ipaddress, 'root', :password => "root", :paranoid => Net::SSH::Verifiers::Null.new) do |ssh|
-      hostname = ssh.exec!("hostname").chomp
-      print ssh.exec("ip addr")
+ 
+  def wait_for_vm(ip_address)
+    5.times do 
+     begin
+       print ssh(ip_address,"uname -a")
+       return
+     rescue
+     end
+     sleep 1
     end
-
-    hostname.should eql("RANDOMX")
+    raise "VM never started"
   end
 
-  it 'after building a test vm I can verify the host is the one I specified'
+  def ssh(ip_address, cmd)
+#    Net::SSH.start(ip_address(), 'root', :password => "root", :paranoid => Net::SSH::Verifiers::Null.new) do |ssh|
+ #     hostname = ssh.exec!(cmd).chomp
+  #  end
+    raise "SSH ERROR"
+  end 
+ 
+  it 'after building a test vm I am able to login and the hostname is correct' do
+    descriptor = Provision.vm(:hostname=>"RANDOMX", :template=>"ubuntuprecise")
+    wait_for_vm(descriptor.ip_address)
+    ssh(descriptor.ip_address, "hostname").should eql("RANDOMX")
+  end
+
 end

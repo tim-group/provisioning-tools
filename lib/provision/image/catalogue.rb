@@ -76,6 +76,7 @@ module Provision::Image
           padding =  position - txt.length
           print "#{txt}"
           padding.times {print " "}
+	  start = Time.new
 
           begin
             command[:block].call()
@@ -87,7 +88,9 @@ module Provision::Image
               print "[\e[0;31mFAILED\e[0m]\n"
               raise error
             else
-              print "[\e[0;32mDONE\e[0m]\n"
+              elapsed_time = Time.now-start
+              print "[\e[0;32mDONE in #{elapsed_time*1000}ms\e[0m]\n"
+:s
             end
           end
         }

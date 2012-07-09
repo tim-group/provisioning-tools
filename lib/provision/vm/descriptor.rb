@@ -1,8 +1,9 @@
 require 'provision/vm/namespace'
+require 'provision/vm/netutils'
 
 class Provision::VM::Descriptor
+  include Provision::VM::NetUtils
   attr_accessor :hostname
-  attr_accessor :mac_address
   attr_accessor :vnc_port
   attr_accessor :ram
   attr_accessor :image_path
@@ -10,7 +11,6 @@ class Provision::VM::Descriptor
   
   def initialize(options)
     @hostname = options[:hostname]
-    @mac_address = options[:mac_address]
     @vnc_port = options[:vnc_port]
     @ram = options[:ram]
     @images_dir = options[:images_dir]
