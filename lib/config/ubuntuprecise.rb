@@ -17,23 +17,24 @@ define "ubuntuprecise" do
   }
 
   cleanup {
-    while(`dmsetup ls | grep #{loop0}p1 | wc -l`.chomp != "0")
-      cmd "kpartx -d /dev/#{loop0}"
-      sleep(0.1)
-    end
-    cmd "udevadm settle"
-    
-    while(`losetup -a | grep /dev/#{loop0} | wc -l`.chomp != "0")
-      cmd "losetup -d /dev/#{loop0}"
-    end
+   while(`dmsetup ls | grep #{loop0}p1 | wc -l`.chomp != "0")
+     cmd "kpartx -d /dev/#{loop0}"
+     sleep(0.1)
+   end
+   cmd "udevadm settle"
+   
+   while(`losetup -a | grep /dev/#{loop0} | wc -l`.chomp != "0")
+     cmd "losetup -d /dev/#{loop0}"
+     sleep(0.1)
+   end
  
-   while (`ls -d  #{temp_dir} 2> /dev/null | wc -l`.chomp!="0")
-      cmd "umount #{temp_dir}" 
-      cmd "rmdir #{temp_dir}" 
-      print "can't umount #{temp_dir}\n"
-      print `ls  #{temp_dir} 2> /dev/null | wc -l` 
-    end
-  }
+   while (`ls -d  #{temp_dir} 2> /dev/null | wc -l`.chomp != "0")
+     cmd "umount #{temp_dir}" 
+     cmd "rmdir #{temp_dir}" 
+     sleep(0.1) 
+   end
+   cmd "udevadm settl"
+ }
 
   run("loopback devices 2") {
     cmd "losetup /dev/#{loop1} /dev/mapper/#{loop0}p1"

@@ -14,18 +14,25 @@ class Provision::WorkQueue
 
   def process()
     threads = []
+    total = @queue.size()
     @worker_count.times {|i| 
       threads << Thread.new {
         while(not @queue.empty?)
           spec = @queue.pop(true) 
           spec[:thread_number] = i
-
-	   require 'yaml'
-	   print "MBUILD >>> #{spec.to_yaml} \n"
+	  require 'yaml'
+	  print "MBUILD >>> #{spec.to_yaml} \n"
 
           @provisioning_service.provision_vm(spec)
         end
       }
+    }
+
+    threads << Thread.new {
+      while(not @queue.empty?)
+        print "completed: #{total-@queue.size} / #{total} machines\n"
+        sleep 1
+      end
     }
 
     threads.each {|thread| thread.join()}

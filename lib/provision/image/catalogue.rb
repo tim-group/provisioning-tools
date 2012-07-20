@@ -13,9 +13,6 @@ module Provision::Image
       rescue Exception=>e
         Provision.log.error("error sending #{name}")
         Provision.log.error(e)
-
-
-        return false
       end
     end
   end

@@ -17,7 +17,6 @@ module Provision
 
   def self.vm(options)
     provisioning_service = Provision.create_provisioning_service()
- 
     provisioning_service.provision_vm(options)
   end
 end
