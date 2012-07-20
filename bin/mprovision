@@ -10,6 +10,7 @@ end
 
 require 'optparse'
 require 'provision'
+require 'provision/workqueue'
 
 template = nil
 hostname = nil
@@ -32,6 +33,10 @@ if (template ==nil || hostname == nil)
 end
 
 #Dir.chdir(target_dir)
-100.times {
-build = Provision.vm(:hostname=>hostname, :template=>template, :loop0=>"loop0",:loop1=>"loop1")
+workqueue = Provision::WorkQueue.new(:provisioning_service => Provision.create_provisioning_service())
+
+
+10.times {|i|
+  workqueue.add({:hostname=>"hostname_#{i}", :template=>template})
 }
+workqueue.process()

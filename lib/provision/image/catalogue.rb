@@ -11,7 +11,11 @@ module Provision::Image
       begin
         @build.send name, *args
       rescue Exception=>e
+        Provision.log.error("error sending #{name}")
         Provision.log.error(e)
+
+
+        return false
       end
     end
   end
@@ -55,7 +59,7 @@ module Provision::Image
 
     def cleanup(&block)
       @cleanups <<  lambda {
-        supress_error.instance_eval(&block)
+ 	supress_error.instance_eval(&block)
       }
     end
 
@@ -90,7 +94,6 @@ module Provision::Image
             else
               elapsed_time = Time.now-start
               print "[\e[0;32mDONE in #{elapsed_time*1000}ms\e[0m]\n"
-:s
             end
           end
         }
