@@ -2,9 +2,13 @@ module Provision::Image::Commands
   def initialize(options)
   end
 
+  def console_log()
+    return @console_log || "console.log"
+  end
+
   def cmd(cmd)
     Provision.log.debug("running command #{cmd}")
-    if ! system("#{cmd}  >> console.log 2>&1")
+    if ! system("#{cmd}  >> #{console_log} 2>&1")
       raise Exception.new("command #{cmd} returned non-zero error code")
     end
      `udevadm settle`

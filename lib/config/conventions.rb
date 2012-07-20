@@ -1,17 +1,18 @@
 define "conventions" do
   extend Provision::Image::Commands
-
-  @options['diskimg'] = @options['diskimg'] || "#{@options['hostname']}.img"
-  @options['disksize'] = @options['disksize'] || '3G'
-
-  makevar(:loop0, @options['loop0'])
-  makevar(:loop1, @options['loop1'])
-
   @options.keys.each {|key|
     makevar(key.to_sym, @options[key])
   }	
 
-  makevar(:temp_dir, hostname)
+  @build_dir = "build"
+  @options['diskimg'] = @options['diskimg'] || "#{@options['hostname']}.img"
+  @options['disksize'] = @options['disksize'] || '3G'
+
+  makevar(:loop0, "loop#{@thread_number*2}")
+  makevar(:loop1, "loop#{@thread_number*2+1}")
+
+  makevar(:console_log, "#{@build_dir}/console-#{@thread_number}.log")
+  makevar(:temp_dir, "#{@build_dir}/#{hostname}")
   #+ rand(36**8).to_s(36)
 
   run ("xxx") {

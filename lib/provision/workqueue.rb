@@ -18,8 +18,7 @@ class Provision::WorkQueue
       threads << Thread.new {
         while(not @queue.empty?)
           spec = @queue.pop(true) 
-          spec[:loop0] = "loop#{i*2}"
-          spec[:loop1] = "loop#{(i*2)+1}"
+          spec[:thread_number] = i
 
 	   require 'yaml'
 	   print "MBUILD >>> #{spec.to_yaml} \n"
