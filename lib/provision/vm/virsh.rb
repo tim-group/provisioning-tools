@@ -8,15 +8,15 @@ class Provision::VM::Virsh
   end
 
   def undefine_vm(hostname)
-    system("virsh undefine #{hostname}")
+    system("virsh undefine #{hostname} > /dev/null 2>&1")
   end
 
   def destroy_vm(hostname)
-    system("virsh destroy #{hostname}")
+    system("virsh destroy #{hostname} > /dev/null 2>&1")
   end
 
   def start_vm(hostname)
-    system("virsh start #{hostname}")
+    system("virsh start #{hostname} > /dev/null 2>&1")
   end
 
   def define_vm(vm_descriptor)
@@ -26,6 +26,6 @@ class Provision::VM::Virsh
       f.write template.result(vm_descriptor.get_binding())
     end
 
-    system("virsh define #{to}")
+    system("virsh define #{to} > /dev/null 2>&1")
   end
 end

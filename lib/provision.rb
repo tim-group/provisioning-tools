@@ -3,6 +3,7 @@ require 'provision/image/service'
 require 'provision/vm/virsh'
 require 'provision/vm/descriptor'
 require 'provision/core/provisioning_service'
+require 'provision/workqueue'
 
 module Provision
   def self.create_provisioning_service()
@@ -19,4 +20,11 @@ module Provision
     provisioning_service = Provision.create_provisioning_service()
     provisioning_service.provision_vm(options)
   end
+
+  def self.work_queue(options)
+    work_queue = Provision::WorkQueue.new(:provisioning_service => Provision.create_provisioning_service(), :worker_count=> options[:worker_count])
+
+    return work_queue
+  end
+
 end

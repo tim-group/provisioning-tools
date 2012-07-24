@@ -7,7 +7,7 @@ module Provision::Image::Commands
   end
 
   def cmd(cmd)
-    Provision.log.debug("running command #{cmd}")
+    log.debug("running command #{cmd}")
     if ! system("#{cmd}  >> #{console_log} 2>&1")
       raise Exception.new("command #{cmd} returned non-zero error code")
     end
@@ -40,7 +40,7 @@ module Provision::Image::Commands
 
   def wait_until(desc="", &block)    
     100.times {
-      Provision.log.debug("waiting until: #{desc}")
+      log.debug("waiting until: #{desc}")
       return if (block != nil and block.call() == true) 
       sleep(0.4)
     }

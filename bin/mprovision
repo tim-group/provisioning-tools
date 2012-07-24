@@ -33,10 +33,12 @@ if (template ==nil || hostname == nil)
 end
 
 #Dir.chdir(target_dir)
-workqueue = Provision::WorkQueue.new(:provisioning_service => Provision.create_provisioning_service())
-
+work_queue = Provision.work_queue(:worker_count=>4)
 
 10.times {|i|
-  workqueue.add({:hostname=>"hostname_#{i}", :template=>template})
+  work_queue.add({:hostname=>"hostname_#{i}", :template=>template})
 }
-workqueue.process()
+work_queue.process()
+
+
+

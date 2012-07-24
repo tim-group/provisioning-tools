@@ -11,13 +11,14 @@ module Provision::Image
       begin
         @build.send name, *args
       rescue Exception=>e
-        Provision.log.error("error sending #{name}")
-        Provision.log.error(e)
+        log.error("error sending #{name}")
+        log.error(e)
       end
     end
   end
 
   class Build
+    include Provision::Log
     attr_accessor :supress_error
     def initialize(name, options)
       @name = name
@@ -75,8 +76,7 @@ module Provision::Image
         @commands.each {|command|
           txt = command[:txt]
           padding =  position - txt.length
-          print "#{txt}"
-          padding.times {print " "}
+          summary_log.info "#{txt}"
 	  start = Time.new
 
           begin
@@ -86,31 +86,31 @@ module Provision::Image
             raise e
           ensure
             if (not error.nil?)
-              print "[\e[0;31mFAILED\e[0m]\n"
+              summary_log.info "[\e[0;31mFAILED\e[0m]\n"
               raise error
             else
               elapsed_time = Time.now-start
-              print "[\e[0;32mDONE in #{elapsed_time*1000}ms\e[0m]\n"
+              summary_log.info "[\e[0;32mDONE in #{elapsed_time*1000}ms\e[0m]\n"
             end
           end
         }
       rescue Exception=>e
-        Provision.log.error(e)
+summary_log.info e
+        log.error(e)
       end
 
       txt = "cleaning up #{@cleanups.size} blocks"
-      print "#{txt}"
+      summary_log.info "#{txt}"
       padding =  position - txt.length
-      padding.times {print " "}
       @cleanups.reverse.each {|command|
         begin
           command.call()
         rescue Exception=>e
-          Provision.log.error(e)
+          log.error(e)
         ensure
         end
       }
-      print "[\e[0;32mDONE\e[0m]\n"
+      summary_log.info "[\e[0;32mDONE\e[0m]\n"
 
       if error!=nil
         raise error

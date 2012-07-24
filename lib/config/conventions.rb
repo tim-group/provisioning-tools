@@ -11,6 +11,7 @@ define "conventions" do
   makevar(:loop0, "loop#{@thread_number*2}")
   makevar(:loop1, "loop#{@thread_number*2+1}")
 
+  makevar(:logdir, "#{@build_dir}/logs")
   makevar(:console_log, "#{@build_dir}/console-#{@thread_number}.log")
   makevar(:temp_dir, "#{@build_dir}/#{hostname}")
   #+ rand(36**8).to_s(36)

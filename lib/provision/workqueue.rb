@@ -6,7 +6,7 @@ class Provision::WorkQueue
  include Curses
  def initialize(args)
     @provisioning_service = args[:provisioning_service]
-    @worker_count = 4
+    @worker_count = args[:worker_count]
     @queue = Queue.new
   end
 
@@ -23,12 +23,10 @@ class Provision::WorkQueue
     thread_progress = []
     @worker_count.times {|i| 
       threads << Thread.new {
-        print "initializing thread #{i} \n"
         while(not @queue.empty?)
           spec = @queue.pop(true) 
           spec[:thread_number] = i
 	  require 'yaml'
-	  print "MBUILD >>> #{spec.to_yaml} \n"
           thread_progress[i] = spec
           begin
             @provisioning_service.provision_vm(spec)
@@ -40,7 +38,8 @@ class Provision::WorkQueue
         end
       }
     }
-   while(true) #completed<total)
+
+   while(completed<total)
      Curses.clear
      Curses.start_color
      Curses.init_pair(COLOR_BLUE,COLOR_BLUE,COLOR_BLACK)
