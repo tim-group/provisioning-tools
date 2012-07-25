@@ -20,7 +20,7 @@ class Provision::Core::ProvisioningService
 
     @vm_service.destroy_vm(vm_descriptor.hostname)
     @vm_service.undefine_vm(vm_descriptor.hostname)
-    @image_service.build_image(options[:template], options)
+    build = @image_service.build_image(options[:template], options)
     @vm_service.define_vm(vm_descriptor)
     @vm_service.start_vm(vm_descriptor.hostname)
 

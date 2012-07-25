@@ -103,6 +103,7 @@ define "ubuntuprecise" do
     open("#{temp_dir}/etc/hostname", 'w') { |f|
       f.puts "#{hostname}"
     }
+    chroot "hostname -F /etc/hostname"
   }
 
   run("install kernel and grub") {

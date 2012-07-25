@@ -146,6 +146,7 @@ summary_log.info e
       build = Provision::Image::Build.new(name, options)
       closure = @@catalogue[name]
       build.instance_eval(&closure)
+      print build.to_yaml
       return build
     end
   end
