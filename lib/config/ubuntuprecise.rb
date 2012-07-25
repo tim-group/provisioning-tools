@@ -166,6 +166,12 @@ define "ubuntuprecise" do
     chroot "/etc/init.d/cron stop"
   }
 
+  run("configure precise repos apt repo") {
+    open("#{temp_dir}/etc/apt/sources.list.d/ubuntu-precise.list", 'w') { |f|
+      f.puts "deb http://aptproxy:3142/ubuntu precise-updates main\n"
+    }
+  }
+
   run("configure youdevise apt repo") {
     open("#{temp_dir}/etc/apt/sources.list.d/youdevise.list", 'w') { |f|
       f.puts "deb http://apt/ubuntu stable main\ndeb-src http://apt/ubuntu stable main\n"
@@ -174,6 +180,13 @@ define "ubuntuprecise" do
     chroot "curl -Ss http://apt/ubuntu/repo.key | apt-key add -"
   }
 
+  run("configure google apt repo") {
+    open("#{temp_dir}/etc/apt/sources.list.d/google.list", 'w') { |f|
+      f.puts "deb http://dl.google.com/linux/deb/ stable main\n"
+    }
 
+    chroot "curl -Ss https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -"
+    chroot "apt-get update"
+  }
 
 end
