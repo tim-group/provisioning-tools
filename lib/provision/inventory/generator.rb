@@ -5,8 +5,9 @@ class Provision::Inventory::Generator
   attr_accessor :properties
   attr_accessor :spindles
 
-  def initialize(name)
+  def initialize(name, host)
     @name = name
+    @host = host
     @properties = []
   end
 
@@ -23,10 +24,6 @@ class Provision::Inventory::Generator
     @template = template
   end
 
-  def spindles(spindles)
-    @spindles = spindles
-  end
-
   def add_properties(symbol, properties)
     @properties << properties
     singleton = class << self; self end
@@ -38,7 +35,7 @@ class Provision::Inventory::Generator
   def generate_specs
     specs = []
     for i in @range_low..@range_high
-      specs<< spec = {:hostname => sprintf("%s-%03d", @basename, i), :template=>@template}
+      specs<< spec = {:hostname => sprintf("%s-%03d", @basename, i), :template=>@template, :spindle=>@host.spindle()}
       @properties.each { |bag|
         bag.each {|k,v|
           spec[k]=v

@@ -15,7 +15,7 @@ class Provision::Inventory::Host
   end
 
   def generator(name, &block)
-    generator = Provision::Inventory::Generator.new(name)
+    generator = Provision::Inventory::Generator.new(name,self)
     generator.instance_eval {
       extend Provision::Inventory::Generators::VMSpecGenerator
       extend Provision::Inventory::Generators::SeleniumSpecGenerator
@@ -31,5 +31,10 @@ class Provision::Inventory::Host
 
   def retrieve_specs(key)
     return @inventory[key].generate_specs;
+  end
+
+  def spindle()
+    @next_spindle = (@next_spindle==nil)?0: @next_spindle+1
+    return @spindles[@next_spindle % @spindles.length()]
   end
 end

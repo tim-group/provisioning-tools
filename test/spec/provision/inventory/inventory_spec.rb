@@ -17,11 +17,11 @@ describe Provision::Inventory do
     end
 
     expected_specs = [
-      {:hostname=>"ldn-selubuntu-001", :sehub=>"segrid:7799", :ram=>102400, :template=>"precise-selenium",:cpus=>1, :interfaces=>[:network=>"provnat", :bridge=>"br0"]},
-      {:hostname=>"ldn-selubuntu-002", :sehub=>"segrid:7799", :ram=>102400, :template=>"precise-selenium",:cpus=>1, :interfaces=>[:network=>"provnat", :bridge=>"br0"]},
-      {:hostname=>"ldn-selubuntu-003", :sehub=>"segrid:7799", :ram=>102400, :template=>"precise-selenium",:cpus=>1, :interfaces=>[:network=>"provnat", :bridge=>"br0"]},
-      {:hostname=>"ldn-selubuntu-004", :sehub=>"segrid:7799", :ram=>102400, :template=>"precise-selenium",:cpus=>1, :interfaces=>[:network=>"provnat", :bridge=>"br0"]},
-      {:hostname=>"ldn-selubuntu-005", :sehub=>"segrid:7799", :ram=>102400, :template=>"precise-selenium",:cpus=>1, :interfaces=>[:network=>"provnat", :bridge=>"br0"]},
+      {:hostname=>"ldn-selubuntu-001", :sehub=>"segrid:7799", :ram=>102400, :template=>"precise-selenium",:cpus=>1, :interfaces=>[:network=>"provnat", :bridge=>"br0"], :spindle=>"s1"},
+      {:hostname=>"ldn-selubuntu-002", :sehub=>"segrid:7799", :ram=>102400, :template=>"precise-selenium",:cpus=>1, :interfaces=>[:network=>"provnat", :bridge=>"br0"], :spindle=>"s2"},
+      {:hostname=>"ldn-selubuntu-003", :sehub=>"segrid:7799", :ram=>102400, :template=>"precise-selenium",:cpus=>1, :interfaces=>[:network=>"provnat", :bridge=>"br0"], :spindle=>"s1"},
+      {:hostname=>"ldn-selubuntu-004", :sehub=>"segrid:7799", :ram=>102400, :template=>"precise-selenium",:cpus=>1, :interfaces=>[:network=>"provnat", :bridge=>"br0"], :spindle=>"s2"},
+      {:hostname=>"ldn-selubuntu-005", :sehub=>"segrid:7799", :ram=>102400, :template=>"precise-selenium",:cpus=>1, :interfaces=>[:network=>"provnat", :bridge=>"br0"], :spindle=>"s1"},
     ]
     retrieve_specs("kvmc7").retrieve_specs("selubuntu").should eql(expected_specs)
   end
