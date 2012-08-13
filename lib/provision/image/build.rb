@@ -16,10 +16,11 @@ class Provision::Image::Build
     inst_variable_name = "@#{var_string}".to_sym
     setter = "#{var_string}ll"
     singleton = class << self; self end
-    singleton.send :define_method, setter, lambda { |new_value|
-    }
+    singleton.send :define_method, setter, lambda { |new_value| }
 
-    instance_variable_set(inst_variable_name, value)
+    if (instance_variable_get(inst_variable_name) == nil)
+      instance_variable_set(inst_variable_name, value)
+    end
 
     singleton.send :define_method, var_string, lambda { return instance_variable_get(inst_variable_name)}
   end

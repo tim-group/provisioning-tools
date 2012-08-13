@@ -4,7 +4,7 @@ require 'provision/image/commands'
 define "ubuntuprecise" do
   extend Provision::Image::Commands
   conventions()
-  imagefile = "/images/#{hostname}.img"
+  imagefile = "#{imagesdir}/#{hostname}.img"
 
   run("loopback devices") {
     cmd "mkdir #{temp_dir}"

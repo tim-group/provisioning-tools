@@ -14,6 +14,8 @@ define "conventions" do
   makevar(:logdir, "#{@build_dir}/logs")
   makevar(:console_log, "#{@build_dir}/console-#{@thread_number}.log")
   makevar(:temp_dir, "#{@build_dir}/#{hostname}")
+  makevar(:imagesdir, "/images")
+
   #+ rand(36**8).to_s(36)
 
   run ("xxx") {
