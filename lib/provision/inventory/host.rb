@@ -14,6 +14,10 @@ class Provision::Inventory::Host
     return generator
   end
 
+  def env(name, &block)
+    self.instance_eval(&block)
+  end
+
   def generator(name, &block)
     generator = Provision::Inventory::Generator.new(name,self)
     generator.instance_eval {

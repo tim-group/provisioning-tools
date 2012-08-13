@@ -5,14 +5,16 @@ describe Provision::Inventory do
   it 'generates a spec hash for a list of machine to be provisioned' do
     extend Provision::Inventory
     host "kvmc7", :spindles=>["s1","s2"] do
-      generator "selubuntu"  do
-        template "precise-selenium"
-        basename "ldn-selubuntu"
-        range(1,5)
-        selenium.sehub "segrid:7799"
-        vm.ram 102400
-        vm.interfaces [:network=>"provnat", :bridge => "br0"]
-        vm.cpus 1
+      env "ldn" do
+        generator "selubuntu"  do
+          template "precise-selenium"
+          basename "ldn-selubuntu"
+          range(1,5)
+          selenium.sehub "segrid:7799"
+          vm.ram 102400
+          vm.interfaces [:network=>"provnat", :bridge => "br0"]
+          vm.cpus 1
+        end
       end
     end
 
