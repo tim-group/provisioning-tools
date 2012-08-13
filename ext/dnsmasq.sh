@@ -1,1 +1,1 @@
-dnsmasq --strict-order --bind-interfaces --pid-file=/var/run/libvirt/network/provnat.pid --except-interface lo --listen-address 192.168.5.1 --listen-address 2001:db8:ca2:2::1 --dhcp-range 192.168.5.100,192.168.5.254 --dhcp-lease-max=155 --dhcp-no-override --dhcp-leasefile=/opt/my.lease
+dnsmasq --strict-order --bind-interfaces --pid-file=/var/run/libvirt/network/provnat.pid --except-interface lo --listen-address 192.168.5.1 --listen-address 2001:db8:ca2:2::1 --dhcp-range 192.168.5.100,192.168.5.254 --dhcp-lease-max=155 --dhcp-no-override --dhcp-leasefile=/tmp/my.lease

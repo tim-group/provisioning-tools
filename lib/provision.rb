@@ -1,4 +1,3 @@
-
 require 'provision/image/service'
 require 'provision/vm/virsh'
 require 'provision/vm/descriptor'
@@ -11,8 +10,8 @@ module Provision
     targetdir = File.join(File.dirname(__FILE__), "../target")
 
     return provisioning_service = Provision::Core::ProvisioningService.new(
-      :image_service=>Provision::Image::Service.new(:configdir=>configdir, :targetdir=>targetdir),
-      :vm_service=>Provision::VM::Virsh.new()
+    :image_service=>Provision::Image::Service.new(:configdir=>configdir, :targetdir=>targetdir),
+    :vm_service=>Provision::VM::Virsh.new()
     )
   end
 
@@ -26,5 +25,4 @@ module Provision
 
     return work_queue
   end
-
 end

@@ -8,8 +8,6 @@ class Provision::Image::Service
   end
 
   def build_image(template, options)
-    build =  Provision::Image::Catalogue.build(template, options)
-    build.execute()
-    return build
+    Provision::Image::Catalogue.build(template, options).execute()
   end
 end

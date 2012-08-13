@@ -38,8 +38,8 @@ module Provision::Image::Commands
     return Continuation.new(block)
   end
 
-  def wait_until(desc="", &block)    
-    100.times {
+  def wait_until(desc="", options= {:retry_attempts=>100}, &block)    
+    options[:retry_attempts].times {
       log.debug("waiting until: #{desc}")
       return if (block != nil and block.call() == true) 
       sleep(0.4)

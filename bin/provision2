@@ -1,0 +1,43 @@
+#!/usr/bin/ruby
+$: << File.join(File.dirname(__FILE__), "..", "lib")
+
+configdir = File.join(File.dirname(__FILE__), "../lib/config")
+target_dir = File.join(File.dirname(__FILE__), "../target")
+
+if Process.uid != 0
+  raise 'FATAL: Process needs to run as root!'
+end
+
+require 'optparse'
+require 'provision'
+require 'provision/inventory'
+require 'provision/workqueue'
+
+extend Provision::Inventory
+require 'dsl/inventory/kvmc7'
+
+host = nil
+
+@option_parser = OptionParser.new do|opts|
+  opts.banner = "Usage: provision --host"
+  opts.on("-h","--host HOST", "host") do |h|
+    host = h
+  end
+end
+@option_parser.parse!
+
+if (host == nil)
+  print  @option_parser.help()
+  exit
+end
+
+require 'yaml'
+
+work_queue = Provision.work_queue(:worker_count=>4)
+
+retrieve_specs(host).retrieve_specs("selubuntu").each do |spec|
+  print spec.to_yaml
+  work_queue.add(spec)
+end
+
+work_queue.process()

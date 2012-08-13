@@ -1,3 +1,47 @@
+inventory
+->
+	provide inventory listings
+
+->
+	vm configure interfaces
+	vm config cpus
+	vm config ram
+	vm config display port
+
+->
+	image build..
+		hostname -F isn't correct..
+
+->
+	sort out dirs for how it is really going to run..	
+
+
+
+lib/
+dsl/image/
+dsl/inventory/
+
+provision --host=kvmblah --env=blah --machine=stag-frapp-001
+
+host "otherbox" do
+  env "stag" do
+    
+  end
+end
+
+host "kvmc7" do
+  env "se" do
+    generator "" 
+  end
+
+  env "stag" do
+    puppetmaster
+    puppetized "frproxy"
+    puppetized "frdb"
+    puppetized "frapp"
+  end
+
+end
 
 system level tests for putting up whole vm's
 make paths work well so we can build specific boxes

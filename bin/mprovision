@@ -33,10 +33,10 @@ if (template ==nil || hostname == nil)
 end
 
 #Dir.chdir(target_dir)
-work_queue = Provision.work_queue(:worker_count=>1)
+work_queue = Provision.work_queue(:worker_count=>4)
 
-5.times {|i|
-  work_queue.add({:hostname=>"hostname#{i}", :template=>template})
+10.times {|i|
+  work_queue.add({:hostname=>"hostname_#{i}", :template=>template})
 }
 work_queue.process()
 

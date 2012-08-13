@@ -1,15 +1,14 @@
 require 'provision/vm/namespace'
 
 module Provision::VM::NetUtils
-  @@lease_file = "/opt/my.lease"
+  @@lease_file = "/tmp/dhcp.leases"
 
   def self.lease_file=(lease_file)
     @@lease_file = lease_file
   end
 
   def ip_address()
-    print "#{mac_address}<<<<"
-    cmd = "cat #{@@lease_file} | grep -i #{mac_address} | awk '{print $3}'"
+    cmd = "cat #{@@lease_file} | grep #{mac_address} | awk '{print $3}'"
     print cmd
     return `#{cmd}`.chomp
   end
