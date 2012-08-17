@@ -15,6 +15,7 @@ RSpec::Core::RakeTask.new("sys_spec") do |t|
     t.rspec_opts = %w[--color]
     t.pattern = "test/sys_spec/**/*_spec.rb"
 end
+
 desc "Run specs"
 RSpec::Core::RakeTask.new() do |t|
     t.rspec_opts = %w[--color]

@@ -5,9 +5,9 @@ class Provision::Inventory::Generator
   attr_accessor :properties
   attr_accessor :spindles
 
-  def initialize(name, host)
+  def initialize(name, env)
     @name = name
-    @host = host
+    @env = env
     @properties = []
   end
 
@@ -34,8 +34,9 @@ class Provision::Inventory::Generator
 
   def generate_specs
     specs = []
+
     for i in @range_low..@range_high
-      specs<< spec = {:hostname => sprintf("%s-%03d", @basename, i), :template=>@template, :spindle=>@host.spindle()}
+      specs<< spec = {:hostname => sprintf("%s-%s-%03d", @env.name,@basename, i), :template=>@template, :spindle=>@env.host.spindle(), :domain=>@env.options[:domain]}
       @properties.each { |bag|
         bag.each {|k,v|
           spec[k]=v

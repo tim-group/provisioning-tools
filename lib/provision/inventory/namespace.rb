@@ -10,7 +10,7 @@ module Provision::Inventory
     @hosts[name].instance_eval(&block)
   end
 
-  def retrieve_specs(key)
+  def get_host(key)
     return @hosts[key];
   end
 end

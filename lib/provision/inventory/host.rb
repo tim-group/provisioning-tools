@@ -2,39 +2,25 @@ require 'provision/inventory/namespace'
 require 'provision/inventory/generator'
 require 'provision/inventory/generators/selenium_spec_generator'
 require 'provision/inventory/generators/vm_spec_generator'
-
+require 'provision/inventory/env'
 
 class Provision::Inventory::Host
   attr_accessor :name
   attr_accessor :spindles
 
-  def add_generator(generator)
-    @inventory = {} if (@inventory==nil)
-    @inventory[generator.name] = generator
-    return generator
-  end
-
-  def env(name, &block)
-    self.instance_eval(&block)
-  end
-
-  def generator(name, &block)
-    generator = Provision::Inventory::Generator.new(name,self)
-    generator.instance_eval {
-      extend Provision::Inventory::Generators::VMSpecGenerator
-      extend Provision::Inventory::Generators::SeleniumSpecGenerator
-    }
-    generator.instance_eval(&block)
-    return add_generator(generator)
-  end
-
   def initialize(name, options)
     @name = name
     @spindles = options[:spindles] || "/mnt"
+    @inventory = {}
   end
 
-  def retrieve_specs(key)
-    return @inventory[key].generate_specs;
+  def env(name,options,&block)    
+    @inventory[name] = env = Provision::Inventory::Env.new(name,options,self)
+    env.instance_eval(&block)
+  end
+
+  def get_env(key)
+    return @inventory[key]
   end
 
   def spindle()

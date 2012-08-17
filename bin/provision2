@@ -17,11 +17,19 @@ extend Provision::Inventory
 require 'dsl/inventory/kvmc7'
 
 host = nil
+env = nil
+generator = nil
 
 @option_parser = OptionParser.new do|opts|
   opts.banner = "Usage: provision --host"
   opts.on("-h","--host HOST", "host") do |h|
     host = h
+  end
+  opts.on("-e","--env ENV", "env") do |h|
+    env = e
+  end
+  opts.on("-g","--gen GEN", "gen") do |h|
+    gen = g
   end
 end
 @option_parser.parse!
