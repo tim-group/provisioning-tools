@@ -11,20 +11,20 @@ class Provision::Inventory::Host
   def initialize(name, options={})
     @name = name
     @spindles = options[:spindles] || "/mnt"
-    @inventory = {}
+    @envs = {}
   end
 
   def env(name,options,&block)    
-    @inventory[name] = env = Provision::Inventory::Env.new(name,options,self)
+    @envs[name] = env = Provision::Inventory::Env.new(name,options,self)
     env.instance_eval(&block)
   end
 
   def get_env(key)
-    return @inventory[key]
+    return @envs[key]
   end
 
   def get_envs() 
-    return @inventory.values
+    return @envs.values
   end
 
   def spindle()

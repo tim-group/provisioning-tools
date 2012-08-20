@@ -9,12 +9,11 @@ class Provision::Inventory::Env
     @name = name
     @host = host
     @options = options
-
   end
 
   def add_generator(generator)
-    @inventory = {} if (@inventory==nil)
-    @inventory[generator.name] = generator
+    @generators = {} if (@inventory==nil)
+    @generators[generator.name] = generator
     return generator
   end
 
@@ -29,10 +28,10 @@ class Provision::Inventory::Env
   end
 
   def get_generator(name)
-    return @inventory[name]
+    return @generators[name]
   end
 
   def get_generators()
-    return @inventory.values()
+    return @generators.values()
   end
 end 
