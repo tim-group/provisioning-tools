@@ -8,7 +8,7 @@ class Provision::Inventory::Host
   attr_accessor :name
   attr_accessor :spindles
 
-  def initialize(name, options)
+  def initialize(name, options={})
     @name = name
     @spindles = options[:spindles] || "/mnt"
     @inventory = {}
@@ -21,6 +21,10 @@ class Provision::Inventory::Host
 
   def get_env(key)
     return @inventory[key]
+  end
+
+  def get_envs() 
+    return @inventory.values
   end
 
   def spindle()

@@ -31,4 +31,8 @@ class Provision::Inventory::Env
   def get_generator(name)
     return @inventory[name]
   end
+
+  def get_generators()
+    return @inventory.values()
+  end
 end 

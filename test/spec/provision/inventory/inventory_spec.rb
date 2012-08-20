@@ -31,6 +31,13 @@ describe Provision::Inventory do
   it 'can provide an inventory'
 ## prov --host=kvmc7 --env=grid 
 
-  it ''
+  it 'can print the structure to explore the inventory' do
+    extend Provision::Inventory
+    host "hostx" do
+    end
+    get_hosts().size().should eql(1)
+  end
+
+
 
 end

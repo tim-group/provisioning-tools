@@ -5,7 +5,7 @@ module Provision::Inventory
     base.instance_variable_set("@hosts".to_sym,{})
   end
 
-  def host(name, options, &block)
+  def host(name, options={}, &block)
     @hosts[name] = Host.new(name,options)
     @hosts[name].instance_eval(&block)
   end
@@ -13,4 +13,9 @@ module Provision::Inventory
   def get_host(key)
     return @hosts[key];
   end
+
+  def get_hosts()
+     return @hosts.values
+  end
+
 end
