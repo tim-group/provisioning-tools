@@ -19,11 +19,11 @@ class Provision::VM::Virsh
     system("virsh start #{hostname} > /dev/null 2>&1")
   end
 
-  def define_vm(vm_descriptor)
+  def define_vm(spec)
     template = ERB.new(File.read(@template))
-    to = "#{vm_descriptor.libvirt_dir}/#{vm_descriptor.hostname}.xml"
+    to = "#{spec[:libvirt_dir]}/#{spec[:hostname]}.xml"
     File.open to, 'w' do |f|
-      f.write template.result(vm_descriptor.get_binding())
+      f.write template.result(spec.get_binding())
     end
 
     system("virsh define #{to} > /dev/null 2>&1")

@@ -8,17 +8,22 @@ describe Provision::VM::Virsh do
   end
 
   it 'creates a virt machine xml file in libvirt' do
-    virt_manager = Provision::VM::Virsh.new()
-    vm_descriptor = Provision::VM::Descriptor.new(
-    :hostname=>"vmx1",
-    :disk_dir=>"build/",
-    :vnc_port=>9005,
-    :ram => "1G",
-    :images_dir => "build",
-    :libvirt_dir => "build"
+    machine_spec = Provision::Core::MachineSpec.new(
+      :hostname=>"vmx1",
+      :disk_dir=>"build/",
+      :vnc_port=>9005,
+      :ram => "1G",
+      :images_dir => "build",
+      :libvirt_dir => "build"
     )
 
-    virt_manager.define_vm(vm_descriptor)
+    virt_manager = Provision::VM::Virsh.new()
+    virt_manager.define_vm(machine_spec)
     File.exist?("build/vmx1.xml").should eql(true)
+    
+    IO.read("build/vmx1.xml").should match("vmx1")
+    IO.read("build/vmx1.xml").should match("1G")
+
+    IO.read("build/vmx1.xml").should match("build/vmx1.img")
   end
 end

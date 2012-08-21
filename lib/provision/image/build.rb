@@ -3,6 +3,7 @@ require 'provision/image/namespace'
 class Provision::Image::Build
   include Provision::Log
   attr_accessor :supress_error
+
   def initialize(name, options)
     @name = name
     @options = options

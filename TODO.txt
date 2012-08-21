@@ -53,10 +53,26 @@ there needs to be a working directory to do the workin.
 parallel builds
 	-> monitor on losetup grabs
 
-	
-
 image-builder
 vmbuilder
 vmcontroller
 
 catalogue
+
+
+
+spec = {
+	:hostname => "x1",
+	:domain => "x2",
+	:images_dir
+	:image_path => "images_dir/hostname.img"
+}
+
+
+spec = {}
+prov_service.apply_convention(spec)
+prov_service.define_image(spec)
+prov_service.define_vm(spec)
+
+spec -> configure(spec) -> vm 
+						-> image
