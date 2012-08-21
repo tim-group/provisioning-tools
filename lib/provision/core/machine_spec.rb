@@ -9,7 +9,7 @@ class Provision::Core::MachineSpec
 
   def apply_conventions()
     if_nil_define_var(:thread_number, 0)
-    if_nil_define_var(:build_dir,"build")
+    if_nil_define_var(:build_dir,"build") 
     if_nil_define_var(:images_dir,"/images")
     if_nil_define_var(:image_path,"#{@spec[:images_dir]}/#{@spec[:hostname]}.img")
     if_nil_define_var(:image_size,"3G")

@@ -140,7 +140,7 @@ describe XYZ do
     define "vanillavm" do
       extend MockFunctions
       run("configure hostname") {
-        hostname = @options[:hostname]
+        hostname = self.spec[:hostname]
         action(hostname)
       }
     end
@@ -156,7 +156,7 @@ describe XYZ do
     require 'provision/image/catalogue'
     define "defaults" do
       run("configure defaults") {
-        @options[:disksize] = '3G'
+        spec[:disksize] = '3G'
       }
     end
     define "vanillavm" do
@@ -164,7 +164,7 @@ describe XYZ do
       defaults()
 
       run("configure disk") {
-        disksize = @options[:disksize]
+        disksize = spec[:disksize]
         action(disksize)
       }
     end

@@ -2,38 +2,15 @@ require 'provision/image/namespace'
 
 class Provision::Image::Build
   include Provision::Log
+  attr_accessor :spec
   attr_accessor :supress_error
 
-  def initialize(name, options)
+  def initialize(name, spec)
     @name = name
-    @options = options
+    @spec = spec
     @commands = []
     @cleanups = []
     @supress_error = CatchAndIgnore.new(self)
-  end
-
-  def makevar(var,value)
-    var_string = var.to_s()
-    inst_variable_name = "@#{var_string}".to_sym
-    setter = "#{var_string}ll"
-    singleton = class << self; self end
-    singleton.send :define_method, setter, lambda { |new_value| }
-
-    if (instance_variable_get(inst_variable_name) == nil)
-      instance_variable_set(inst_variable_name, value)
-    end
-
-    singleton.send :define_method, var_string, lambda { return instance_variable_get(inst_variable_name)}
-  end
-
-  def setvar(var,new_value)
-    inst_variable_name = "@#{var}".to_sym
-    instance_variable_set inst_variable_name, new_value
-  end
-
-  def getvar(var)
-    inst_variable_name = "@#{var}".to_sym
-    return instance_variable_get(inst_variable_name)
   end
 
   def run(txt, &block)

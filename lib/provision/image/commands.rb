@@ -1,7 +1,4 @@
 module Provision::Image::Commands
-  def initialize(options)
-  end
-
   def console_log()
     return @console_log || "console.log"
   end
