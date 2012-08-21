@@ -15,7 +15,7 @@ class Provision::Core::ProvisioningService
     spec = Provision::Core::MachineSpec.new(spec_hash)
     @vm_service.destroy_vm(spec[:hostname])
     @vm_service.undefine_vm(spec[:hostname])
-    @image_service.build_image(spec[:template], spec)
+#    @image_service.build_image(spec[:template], spec)
     @vm_service.define_vm(spec)
     @vm_service.start_vm(spec[:hostname])
   end

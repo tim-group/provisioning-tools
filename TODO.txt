@@ -56,10 +56,7 @@ parallel builds
 image-builder
 vmbuilder
 vmcontroller
-
 catalogue
-
-
 
 spec = {
 	:hostname => "x1",
@@ -69,10 +66,12 @@ spec = {
 }
 
 
-spec = {}
-prov_service.apply_convention(spec)
-prov_service.define_image(spec)
-prov_service.define_vm(spec)
+Figure out directories:
+	lib/provision.rb
+	lib/provision/*
+	bin/provision --host=kvmc7 --env=se --generator=ubu
 
-spec -> configure(spec) -> vm 
-						-> image
+	$provision_home/
+		image_builders/ubuntuprecise.rb
+		vm_hosts/kvmc7.rb
+		vm_hosts/blinga.rb
