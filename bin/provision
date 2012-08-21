@@ -32,6 +32,6 @@ if (template ==nil || hostname == nil)
 end
 
 #Dir.chdir(target_dir)
-100.times {
+1.times {
 build = Provision.vm(:hostname=>hostname, :template=>template, :loop0=>"loop0",:loop1=>"loop1")
 }

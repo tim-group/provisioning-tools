@@ -13,8 +13,8 @@ define "selenium" do
     host = hubparts[0]
     port = hubparts[1]
 
-    cmd "mkdir -p #{temp_dir}/etc/default"
-    open("#{temp_dir}/etc/default/selenium", 'w') { |f|
+    cmd "mkdir -p #{spec[:temp_dir]}/etc/default"
+    open("#{spec[:temp_dir]}/etc/default/selenium", 'w') { |f|
       f.puts "HUBHOST=#{host}"
       f.puts "HUBPORT=#{port}"
     }
