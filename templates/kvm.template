@@ -28,7 +28,7 @@
       <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x1'/>
     </controller>
     <interface type='network'>
-      <mac address='<%=spec[:mac_address]%>'/>
+      <mac address='<%=mac_address%>'/>
       <source network='provnat'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
     </interface>

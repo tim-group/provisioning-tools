@@ -1,7 +1,6 @@
 require 'rubygems'
 require 'rspec'
 require 'provision/vm/virsh'
-require 'provision/vm/descriptor'
 require 'provision/core/provisioning_service'
 
 describe Provision::Core::ProvisioningService do

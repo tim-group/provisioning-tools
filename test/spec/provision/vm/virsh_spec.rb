@@ -1,7 +1,6 @@
 require 'rubygems'
 require 'rspec'
 require 'provision/vm/virsh'
-require 'provision/vm/descriptor'
 
 describe Provision::VM::Virsh do
   before do

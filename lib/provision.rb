@@ -1,6 +1,5 @@
 require 'provision/image/service'
 require 'provision/vm/virsh'
-require 'provision/vm/descriptor'
 require 'provision/core/provisioning_service'
 require 'provision/workqueue'
 

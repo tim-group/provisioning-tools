@@ -1,7 +1,10 @@
 require 'provision/core/machine_spec'
+require 'provision/vm/netutils'
 
 class Provision::Core::MachineSpec
+  include Provision::VM::NetUtils
   attr_accessor :spec
+
   def initialize(spec)
     @spec = spec
     apply_conventions()

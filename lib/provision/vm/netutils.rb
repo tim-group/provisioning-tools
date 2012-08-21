@@ -14,7 +14,7 @@ module Provision::VM::NetUtils
   end
 
   def mac_address()
-    domain = @hostname
+    domain = self.spec[:hostname]
     raise 'kvm_mac(): Requires a string type ' +
       'to work with' unless domain.is_a?(String)
     raise 'kvm_mac(): An argument given cannot ' +
