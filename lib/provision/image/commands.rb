@@ -1,6 +1,6 @@
 module Provision::Image::Commands
   def console_log()
-    return @console_log || "console.log"
+    return spec[:console_log] || "console.log"
   end
 
   def cmd(cmd)
@@ -12,7 +12,7 @@ module Provision::Image::Commands
   end
 
   def chroot(cmd)
-    cmd("chroot #{temp_dir} /bin/bash -c '#{cmd}'")
+    cmd("chroot #{spec[:temp_dir]} /bin/bash -c '#{cmd}'")
   end
 
   def apt_install(package)
