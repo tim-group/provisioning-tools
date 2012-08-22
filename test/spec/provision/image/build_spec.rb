@@ -175,7 +175,7 @@ describe XYZ do
   end
 
   it 'can load files from a specified directory' do
-    Provision::Image::Catalogue::load('lib/config')
+    Provision::Image::Catalogue::load('home/image_builders')
   end
 
 end
