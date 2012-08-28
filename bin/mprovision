@@ -35,7 +35,7 @@ end
 #Dir.chdir(target_dir)
 work_queue = Provision.work_queue(:worker_count=>4)
 
-10.times {|i|
+1.times {|i|
   work_queue.add({:hostname=>"hostname_#{i}", :template=>template})
 }
 work_queue.process()

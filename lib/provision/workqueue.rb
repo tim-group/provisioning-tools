@@ -33,7 +33,6 @@ class Provision::WorkQueue
             @provisioning_service.provision_vm(spec)
           rescue Exception => e
             errors+=1
-            print e
             @listener.error(e)
           ensure
             completed+=1

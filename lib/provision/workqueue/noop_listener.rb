@@ -3,6 +3,6 @@ class NoopListener
 	end
 	
 	def error(e)
-	  print e
+#	  print e
 	end
 end

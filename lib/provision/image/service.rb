@@ -3,7 +3,6 @@ require 'provision/image/catalogue'
 class Provision::Image::Service
   def initialize(options)
     @configdir = options[:configdir]
-    @targetdir = options[:targetdir]
     Provision::Image::Catalogue::load(@configdir)
   end
 

@@ -14,14 +14,22 @@ require 'provision/inventory'
 require 'provision/workqueue'
 
 extend Provision::Inventory
-require 'dsl/inventory/kvmc7'
+require 'home/inventory/kvmc7'
 
 host = nil
+env = nil
+generator = nil
 
 @option_parser = OptionParser.new do|opts|
   opts.banner = "Usage: provision --host"
   opts.on("-h","--host HOST", "host") do |h|
     host = h
+  end
+  opts.on("-e","--env ENV", "env") do |e|
+    env = e
+  end
+  opts.on("-g","--generator GENERATOR", "generator") do |g|
+    generator = g
   end
 end
 @option_parser.parse!
@@ -35,7 +43,7 @@ require 'yaml'
 
 work_queue = Provision.work_queue(:worker_count=>4)
 
-retrieve_specs(host).retrieve_specs("selubuntu").each do |spec|
+get_host(host).get_env(env).get_generator(generator).generate_specs.each do |spec|
   print spec.to_yaml
   work_queue.add(spec)
 end

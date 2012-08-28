@@ -66,12 +66,5 @@ spec = {
 }
 
 
-Figure out directories:
-	lib/provision.rb
-	lib/provision/*
-	bin/provision --host=kvmc7 --env=se --generator=ubu
-
-	$provision_home/
-		image_builders/ubuntuprecise.rb
-		vm_hosts/kvmc7.rb
-		vm_hosts/blinga.rb
+Next:
+	provision a segrid with the new..

@@ -10,6 +10,7 @@ class CursesListener
   end
   
   def error(e)
+    print e
     @errors << e
   end
   
