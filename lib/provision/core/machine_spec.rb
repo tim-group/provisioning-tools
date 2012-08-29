@@ -26,7 +26,7 @@ class Provision::Core::MachineSpec
     if_nil_define_var(:temp_dir, "#{Provision.base()}/#{@spec[:build_dir]}/#{@spec[:hostname]}")
 
     if_nil_define_var(:vnc_port,"-1")
-    if_nil_define_var(:ram,"512M")
+    if_nil_define_var(:ram,"1048576")
   end
 
   def if_nil_define_var(var,value)

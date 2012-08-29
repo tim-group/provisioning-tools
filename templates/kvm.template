@@ -27,9 +27,9 @@
     <controller type='ide' index='0'>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x1'/>
     </controller>
-    <interface type='network'>
+    <interface type='bridge'>
       <mac address='<%=mac_address%>'/>
-      <source network='provnat'/>
+      <source bridge='br0'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
     </interface>
     <serial type='pty'>

@@ -96,7 +96,11 @@ define "ubuntuprecise" do
     open("#{spec[:temp_dir]}/etc/hostname", 'w') { |f|
       f.puts "#{spec[:hostname]}"
     }
-    chroot "hostname -F /etc/hostname"
+#    chroot "hostname -F /etc/hostname"
+    open("#{spec[:temp_dir]}/etc/hosts", 'a') { |f|
+      f.puts "\n127.0.0.1		localhost\n"
+      f.puts "127.0.1.1		#{spec[:fqdn]}	#{spec[:hostname]}\n"
+    }
   }
 
   run("install kernel and grub") {
