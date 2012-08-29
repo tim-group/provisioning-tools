@@ -47,10 +47,10 @@ define "ubuntuprecise" do
   }
 
   run("running debootstrap") {
-    #    cmd "debootstrap --arch amd64 precise #{spec[:temp_dir]} http://aptproxy:3142/ubuntu"
-    cmd "mkdir #{spec[:temp_dir]}/proc"
-    cmd "mkdir #{spec[:temp_dir]}/sys"
-    cmd "mkdir #{spec[:temp_dir]}/dev"
+    cmd "debootstrap --arch amd64 precise #{spec[:temp_dir]} http://aptproxy:3142/ubuntu"
+#    cmd "mkdir #{spec[:temp_dir]}/proc"
+#    cmd "mkdir #{spec[:temp_dir]}/sys"
+#    cmd "mkdir #{spec[:temp_dir]}/dev"
     cmd "mkdir -p #{spec[:temp_dir]}/etc/default"
   }
 
