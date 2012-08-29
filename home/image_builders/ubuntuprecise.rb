@@ -94,7 +94,7 @@ define "ubuntuprecise" do
 
   run("set hostname") {
     open("#{spec[:temp_dir]}/etc/hostname", 'w') { |f|
-      f.puts "#{hostname}"
+      f.puts "#{spec[:hostname]}"
     }
     chroot "hostname -F /etc/hostname"
   }
