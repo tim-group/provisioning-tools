@@ -1,12 +1,14 @@
 define "selenium" do
   ubuntuprecise
-  
+
   run("create ci user") {
     chroot "/usr/sbin/useradd ci -M"
   }
 
   run("install selenium packages") {
     apt_install "openjdk-6-jdk"
+    apt_install "acpid"
+    apt_install "xvfb"
     apt_install "firefox"
     apt_install "google-chrome-stable"
     apt_install "selenium"

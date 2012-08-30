@@ -159,6 +159,7 @@ define "ubuntuprecise" do
 
   # A few daemons hang around at the end of the bootstrapping process that prevent us unmounting.
   cleanup {
+    chroot "/etc/init.d/dbus stop"
     chroot "/etc/init.d/acpid stop"
     chroot "/etc/init.d/cron stop"
   }

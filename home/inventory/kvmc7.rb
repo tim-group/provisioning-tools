@@ -15,7 +15,7 @@ host "kvmc7", :spindles=>["/mnt"] do
       template "selenium"
       basename "browser"
       range(1,5)
-      selenium.sehub "bos-sehub-001.bos.youdevise.com:7799"
+      selenium.sehub "ldn-dev-dellis.youdevise.com:7799"
     end
   end
 end
