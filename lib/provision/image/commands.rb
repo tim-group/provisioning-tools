@@ -1,14 +1,12 @@
 module Provision::Image::Commands
-  def console_log()
-    return spec[:console_log] || "console.log"
-  end
+  def cmd(cmd, log_file=console_log)
 
-  def cmd(cmd)
+print "#{cmd} logfile..#{log_file}\n"
+
     log.debug("running command #{cmd}")
-    if ! system("#{cmd}  >> #{console_log} 2>&1")
+    if ! system("#{cmd}  >> #{log_file} 2>&1")
       raise Exception.new("command #{cmd} returned non-zero error code")
     end
-     `udevadm settle`
   end
 
   def chroot(cmd)

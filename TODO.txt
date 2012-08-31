@@ -1,3 +1,7 @@
+improve errors on imagebuilder errors
+consolelogs vs cleanup
+
+
 inventory
 ->
 	provide inventory listings

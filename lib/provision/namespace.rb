@@ -3,7 +3,7 @@ require 'logger'
 module Provision
   module Log
     def new_log()
-      if (spec[:logdir]!=nil)
+      if (@spec!=nil and spec[:logdir]!=nil)
         @log = Logger.new("#{spec[:logdir]}/provision-#{spec[:thread_number]}.log")
       else
         @log = Logger.new(STDOUT)
@@ -11,7 +11,7 @@ module Provision
     end
 
     def new_summary_log()
-      if (spec[:logdir]!=nil)
+      if (@spec!=nil and spec[:logdir]!=nil)
         @summary_log = Logger.new("#{spec[:logdir]}/summary-#{spec[:thread_number]}.log")
       else
         @summary_log = Logger.new(STDOUT)

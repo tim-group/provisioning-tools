@@ -178,4 +178,21 @@ describe XYZ do
     Provision::Image::Catalogue::load('home/image_builders')
   end
 
+  it 'fails with a good error message' do
+    require 'provision/image/catalogue'
+    define "defaults" do
+      run("configure defaults") {
+        bing
+      }
+    end
+
+
+    build = Provision::Image::Catalogue::build("defaults", {})
+    expect {
+      build.execute()
+    }.should raise_error NameError
+
+  end
+
+
 end
