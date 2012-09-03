@@ -1,6 +1,3 @@
-improve errors on imagebuilder errors
-consolelogs vs cleanup
-
 
 inventory
 ->
@@ -13,17 +10,8 @@ inventory
 	vm config display port
 
 ->
-	image build..
-		hostname -F isn't correct..
+	sort out dirs for how it is really going to run... use absolute paths
 
-->
-	sort out dirs for how it is really going to run..	
-
-
-
-lib/
-dsl/image/
-dsl/inventory/
 
 provision --host=kvmblah --env=blah --machine=stag-frapp-001
 

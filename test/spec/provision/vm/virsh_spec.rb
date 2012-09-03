@@ -12,6 +12,7 @@ describe Provision::VM::Virsh do
       :disk_dir=>"build/",
       :vnc_port=>9005,
       :ram => "1G",
+      :interfaces => [{:type=>"bridge",:name=>"br0"}, {:type=>"network", :name=>"provnat0"}],
       :images_dir => "build",
       :libvirt_dir => "build"
     )
@@ -22,7 +23,6 @@ describe Provision::VM::Virsh do
     
     IO.read("build/vmx1.xml").should match("vmx1")
     IO.read("build/vmx1.xml").should match("1G")
-
     IO.read("build/vmx1.xml").should match("build/vmx1.img")
   end
 end
