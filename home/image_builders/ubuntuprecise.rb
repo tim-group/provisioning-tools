@@ -3,7 +3,7 @@ require 'provision/image/commands'
 
 define "ubuntuprecise" do
   extend Provision::Image::Commands
-
+ 
   run("loopback devices") {
     cmd "mkdir #{spec[:temp_dir]}"
     cmd "kvm-img create -fraw #{spec[:image_path]} 3G"
@@ -15,23 +15,23 @@ define "ubuntuprecise" do
   }
 
   cleanup {
-    while(`dmsetup ls | grep #{spec[:loop0]}p1 | wc -l`.chomp != "0")
-      cmd "kpartx -d /dev/#{spec[:loop0]}"
-      sleep(0.1)
-    end
+    keep_doing {
+      supress_error.cmd "kpartx -d /dev/#{spec[:loop0]}"
+    }.until {`dmsetup ls | grep #{spec[:loop0]}p1 | wc -l`.chomp == "0"}
+
     cmd "udevadm settle"
 
-    while(`losetup -a | grep /dev/#{spec[:loop0]} | wc -l`.chomp != "0")
-      cmd "losetup -d /dev/#{spec[:loop0]}"
-      sleep(0.1)
-    end
-
-    while (`ls -d  #{spec[:temp_dir]} 2> /dev/null | wc -l`.chomp != "0")
-      cmd "umount #{spec[:temp_dir]}"
-      cmd "rmdir #{spec[:temp_dir]}"
-      sleep(0.1)
-    end
+    keep_doing {
+      supress_error.cmd "losetup -d /dev/#{spec[:loop0]}"
+    }.until {`losetup -a | grep /dev/#{spec[:loop0]} | wc -l`.chomp == "0"}
+ 
+    keep_doing {
+      supress_error.cmd "umount #{spec[:temp_dir]}"
+      supress_error.cmd "rmdir #{spec[:temp_dir]}"
+    }.until {`ls -d  #{spec[:temp_dir]} 2> /dev/null | wc -l`.chomp == "0"}
+ 
     cmd "udevadm settle"
+    cmd "rmdir #{spec[:temp_dir]}"
   }
 
   run("loopback devices 2") {
@@ -40,17 +40,19 @@ define "ubuntuprecise" do
   }
 
   cleanup {
-    while(`losetup -a | grep /dev/#{spec[:loop1]} | wc -l`.chomp != "0")
+   keep_doing {
       cmd "umount -d /dev/#{spec[:loop1]}"
       cmd "losetup -d /dev/#{spec[:loop1]}"
-    end
+    }.until {
+      `losetup -a | grep /dev/#{spec[:loop1]} | wc -l`.chomp == "0"
+    }
   }
 
   run("running debootstrap") {
-    cmd "debootstrap --arch amd64 precise #{spec[:temp_dir]} http://aptproxy:3142/ubuntu"
-#    cmd "mkdir #{spec[:temp_dir]}/proc"
-#    cmd "mkdir #{spec[:temp_dir]}/sys"
-#    cmd "mkdir #{spec[:temp_dir]}/dev"
+#    cmd "debootstrap --arch amd64 precise #{spec[:temp_dir]} http://aptproxy:3142/ubuntu"
+    cmd "mkdir #{spec[:temp_dir]}/proc"
+    cmd "mkdir #{spec[:temp_dir]}/sys"
+    cmd "mkdir #{spec[:temp_dir]}/dev"
     cmd "mkdir -p #{spec[:temp_dir]}/etc/default"
   }
 

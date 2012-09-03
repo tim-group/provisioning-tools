@@ -8,7 +8,9 @@ describe Provision::Image::Commands do
     extend Provision::Log
     extend Provision::Image::Commands
     i=0;
-    expect {wait_until("blah", :retry_commands=>1) {i==5}}.should raise_error(Exception)
+    expect {
+	keep_doing {}.until {i==5}
+    }.should raise_error(Exception)
   end
 
   it 'continues when condition comes true' do
@@ -17,6 +19,12 @@ describe Provision::Image::Commands do
     extend Provision::Log
     extend Provision::Image::Commands
     i=0;
-    wait_until {i+=1; i==5}    
+    keep_doing {
+      i+=1
+      print i
+    }.until {i==5}
+
+    i.should eql(5)
   end
+ 
 end

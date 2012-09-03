@@ -72,7 +72,7 @@ class Provision::Image::Build
       begin
         command.call()
       rescue Exception=>e
-        log.error(e)
+        cleanup_log.error(e)
       ensure
       end
     }
@@ -95,16 +95,24 @@ class CatchAndIgnore
     return "#{spec[:console_log]}.suppressed"
   end
 
-  def cmd(cmd)
-    return @build.cmd(cmd,console_log)
-  end
+#  def cmd(cmd)
+ #    begin
+  #    return @build.cmd(cmd,console_log)
+   # rescue Exception=>e
+#      cleanup_log.error("error sending #{name}")
+#3      cleanup_log.error(e)
+#      return nil
+#    end
+# end
 
   def method_missing(name,*args,&block)
     begin
-      @build.send name, *args
+      result = @build.send name, *args, &block
+      return result
     rescue Exception=>e
-      log.error("error sending #{name}")
-      log.error(e)
+      cleanup_log.error("error sending #{name}")
+      cleanup_log.error(e)
+      return nil
     end
   end
 end

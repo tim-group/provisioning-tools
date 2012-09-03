@@ -24,6 +24,13 @@ describe XYZ do
       raise "I was asked to die"
     end
 
+    def returns_something
+      return "something"
+    end
+
+    def blah
+
+    end
   end
 
   it 'cleanup blocks run after run blocks' do
@@ -194,5 +201,41 @@ describe XYZ do
 
   end
 
+  it 'passes through the result when using supress_error' do
+    require 'provision/image/catalogue'
+    something = nil
+    define "defaults" do
+      extend MockFunctions
+      run("configure defaults") {
+        something = supress_error.returns_something()
+      }
+    end
 
+    build = Provision::Image::Catalogue::build("defaults", {})
+    build.execute()
+
+    something.should eql("something")
+  end
+  it 'CCCCCc' do
+    require 'provision/image/catalogue'
+    something = nil
+    define "defaults" do
+      extend Provision::Image::Commands
+      extend MockFunctions
+      run("configure defaults") {
+      }
+      cleanup {
+        keep_doing {
+	  supress_error.die("this line should throw an error and be swallowed")
+	  something = returns_something()
+          print "something = #{something} \n"
+	}.until {something=="something"}
+      }
+    end
+
+    build = Provision::Image::Catalogue::build("defaults", {})
+    build.execute()
+
+    something.should eql("something")
+  end
 end

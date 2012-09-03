@@ -1,8 +1,5 @@
 module Provision::Image::Commands
   def cmd(cmd, log_file=console_log)
-
-print "#{cmd} logfile..#{log_file}\n"
-
     log.debug("running command #{cmd}")
     if ! system("#{cmd}  >> #{log_file} 2>&1")
       raise Exception.new("command #{cmd} returned non-zero error code")
@@ -18,19 +15,25 @@ print "#{cmd} logfile..#{log_file}\n"
   end
 
   class Continuation
-      def initialize(block)
-       @block = block
+      def initialize(target_object, block)
+        raise "nil block given " unless block !=nil
+        @block = block
+        @target_object = target_object
       end 
+
       def until(&condition)
+
+print @target_object.class
         100.times {
-	  @block.call()
-          return if (condition.call() == true)
-        }
+          return if (@target_object.instance_eval(&condition) == true)
+  	  @target_object.instance_eval(&@block)
+       	}
+        raise "timeout waiting for condition"
       end
   end
  
   def keep_doing(&block)
-    return Continuation.new(block)
+    return Continuation.new(self, block)
   end
 
   def wait_until(desc="", options= {:retry_attempts=>100}, &block)    
