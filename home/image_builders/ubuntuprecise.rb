@@ -63,21 +63,19 @@ define "ubuntuprecise" do
   }
 
   cleanup {
-    while(`mount -l | grep #{spec[:hostname]}/proc | wc -l`.chomp != "0")
+    keep_doing {
       cmd "umount #{spec[:temp_dir]}/proc"
-      sleep(0.5)
-    end
-
-    while (`mount -l | grep #{spec[:hostname]}/sys | wc -l`.chomp != "0")
+    }.until {`mount -l | grep #{spec[:hostname]}/proc | wc -l`.chomp == "0"}
+ 
+    keep_doing {
       cmd "umount #{spec[:temp_dir]}/sys"
-      sleep(0.5)
-    end
+    }.until {`mount -l | grep #{spec[:hostname]}/sys | wc -l`.chomp == "0"}
 
-    while( `mount -l | grep #{spec[:hostname]}/dev | wc -l`.chomp != "0")
-      cmd "umount #{spec[:temp_dir]}/dev"
-      sleep(0.5)
-    end
+    keep_doing {
+      cmd "umount #{spec[:temp_dir]}/dev" 
+    }.until {`mount -l | grep #{spec[:hostname]}/dev | wc -l`.chomp == "0"}
   }
+
   run("set locale") {
     open("#{spec[:temp_dir]}/etc/default/locale", 'w') { |f|
       f.puts 'LANG="en_GB.UTF-8"'
