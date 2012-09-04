@@ -1,3 +1,13 @@
+host "test", :spindles=>["/mnt"] do
+  env "local", :domain=>"bos.net.local" do
+    generator "pm"  do
+      template "puppetmaster"
+      basename "puppetmaster"
+      range(1,2)
+    end
+  end
+end
+
 host "localhost", :spindles=>["/mnt"] do
   env "local", :domain=>"bos.net.local" do
     generator "pm"  do

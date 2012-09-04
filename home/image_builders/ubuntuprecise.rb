@@ -3,7 +3,7 @@ require 'provision/image/commands'
 
 define "ubuntuprecise" do
   extend Provision::Image::Commands
- 
+
   run("loopback devices") {
     cmd "mkdir #{spec[:temp_dir]}"
     cmd "kvm-img create -fraw #{spec[:image_path]} 3G"
@@ -24,12 +24,12 @@ define "ubuntuprecise" do
     keep_doing {
       supress_error.cmd "losetup -d /dev/#{spec[:loop0]}"
     }.until {`losetup -a | grep /dev/#{spec[:loop0]} | wc -l`.chomp == "0"}
- 
+
     keep_doing {
       supress_error.cmd "umount #{spec[:temp_dir]}"
       supress_error.cmd "rmdir #{spec[:temp_dir]}"
     }.until {`ls -d  #{spec[:temp_dir]} 2> /dev/null | wc -l`.chomp == "0"}
- 
+
     cmd "udevadm settle"
     cmd "rmdir #{spec[:temp_dir]}"
   }
@@ -49,10 +49,10 @@ define "ubuntuprecise" do
   }
 
   run("running debootstrap") {
-#    cmd "debootstrap --arch amd64 precise #{spec[:temp_dir]} http://aptproxy:3142/ubuntu"
-    cmd "mkdir #{spec[:temp_dir]}/proc"
-    cmd "mkdir #{spec[:temp_dir]}/sys"
-    cmd "mkdir #{spec[:temp_dir]}/dev"
+    cmd "debootstrap --arch amd64 precise #{spec[:temp_dir]} http://aptproxy:3142/ubuntu"
+#    cmd "mkdir #{spec[:temp_dir]}/proc"
+#    cmd "mkdir #{spec[:temp_dir]}/sys"
+#    cmd "mkdir #{spec[:temp_dir]}/dev"
     cmd "mkdir -p #{spec[:temp_dir]}/etc/default"
   }
 
@@ -66,13 +66,13 @@ define "ubuntuprecise" do
     keep_doing {
       cmd "umount #{spec[:temp_dir]}/proc"
     }.until {`mount -l | grep #{spec[:hostname]}/proc | wc -l`.chomp == "0"}
- 
+
     keep_doing {
       cmd "umount #{spec[:temp_dir]}/sys"
     }.until {`mount -l | grep #{spec[:hostname]}/sys | wc -l`.chomp == "0"}
 
     keep_doing {
-      cmd "umount #{spec[:temp_dir]}/dev" 
+      cmd "umount #{spec[:temp_dir]}/dev"
     }.until {`mount -l | grep #{spec[:hostname]}/dev | wc -l`.chomp == "0"}
   }
 
@@ -162,6 +162,15 @@ define "ubuntuprecise" do
     chroot "/etc/init.d/dbus stop"
     chroot "/etc/init.d/acpid stop"
     chroot "/etc/init.d/cron stop"
+  }
+
+  run("configure precise repo") {
+    open("#{spec[:temp_dir]}/etc/apt/sources.list", 'w') { |f|
+      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ precise main\n"
+      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ precise universe\n"
+      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ precise-updates main\n"
+      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ precise-updates universe\n"
+    }
   }
 
   run("configure precise repos apt repo") {
