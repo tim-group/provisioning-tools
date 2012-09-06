@@ -14,12 +14,15 @@ define "puppetmaster" do
     ###??
   }
 
+  cleanup {
+    chroot "/etc/init.d/puppetmaster stop"
+  }
 
   run("puppet master code checkout") {
     # trash the modules, manifests, templates
     chroot "rmdir /etc/puppet/modules"
     chroot "rmdir /etc/puppet/manifests"
-    cmd "cp -r /home/workspace/puppetx #{temp_dir}/etc/puppet/"
+    cmd "cp -r /home/dellis/workspace/puppetx #{spec[:temp_dir]}/etc/puppet/"
   }
 
   run("write bootstrap puppet.conf") {
@@ -28,11 +31,33 @@ define "puppetmaster" do
 #    git clone git@git:puppet /etc/puppet
 
     open("#{spec[:temp_dir]}/etc/puppet/puppet.conf", 'w') { |f|
-      f.puts 
-%[
+      f.puts """
+[main]
+    vardir                         = /var/lib/puppet
+    logdir                         = /var/log/puppet
+    rundir                         = /var/run/puppet
+    confdir                        = /etc/puppet
+    ssldir                         = $vardir/ssl
+    runinterval                    = 600
+    pluginsync                     = true
+    factpath                       = $vardir/lib/facter
+    splay                          = false
+    preferred_serialization_format = marshal
+    environment                    = masterbranch
+    configtimeout                  = 3000
+    server                         = #{spec[:fqdn]}
 
-]
-    }
+[master]
+    certname                       = #{spec[:fqdn]}
+
+[agent]
+    report            = true
+
+[masterbranch]
+    modulepath=$confdir/modules/common
+    manifest=$confdir/manifests/production/site.pp
+"""}
+
   }
 
 end

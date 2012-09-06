@@ -41,18 +41,18 @@ define "ubuntuprecise" do
 
   cleanup {
    keep_doing {
-      supress_errors.cmd "umount -d /dev/#{spec[:loop1]}"
-      supress_errors.cmd "losetup -d /dev/#{spec[:loop1]}"
+      supress_error.cmd "umount -d /dev/#{spec[:loop1]}"
+      supress_error.cmd "losetup -d /dev/#{spec[:loop1]}"
     }.until {
       `losetup -a | grep /dev/#{spec[:loop1]} | wc -l`.chomp == "0"
     }
   }
 
   run("running debootstrap") {
-#    cmd "debootstrap --arch amd64 precise #{spec[:temp_dir]} http://aptproxy:3142/ubuntu"
-    cmd "mkdir #{spec[:temp_dir]}/proc"
-    cmd "mkdir #{spec[:temp_dir]}/sys"
-    cmd "mkdir #{spec[:temp_dir]}/dev"
+    cmd "debootstrap --arch amd64 precise #{spec[:temp_dir]} http://aptproxy:3142/ubuntu"
+ #   cmd "mkdir #{spec[:temp_dir]}/proc"
+ #   cmd "mkdir #{spec[:temp_dir]}/sys"
+ #   cmd "mkdir #{spec[:temp_dir]}/dev"
     cmd "mkdir -p #{spec[:temp_dir]}/etc/default"
   }
 
@@ -63,16 +63,18 @@ define "ubuntuprecise" do
   }
 
   cleanup {
+    log.debug("cleaning up procs")
+    log.debug(`mount -l | grep #{spec[:hostname]}/proc | wc -l`.chomp)
     keep_doing {
-      supress_errors.cmd "umount #{spec[:temp_dir]}/proc"
+      supress_error.cmd "umount -l #{spec[:temp_dir]}/proc"
     }.until {`mount -l | grep #{spec[:hostname]}/proc | wc -l`.chomp == "0"}
 
     keep_doing {
-      supress_errors.cmd "umount #{spec[:temp_dir]}/sys"
+      supress_error.cmd "umount -l #{spec[:temp_dir]}/sys"
     }.until {`mount -l | grep #{spec[:hostname]}/sys | wc -l`.chomp == "0"}
 
     keep_doing {
-      supress_errors.cmd "umount #{spec[:temp_dir]}/dev"
+      supress_error.cmd "umount -l #{spec[:temp_dir]}/dev"
     }.until {`mount -l | grep #{spec[:hostname]}/dev | wc -l`.chomp == "0"}
   }
 
@@ -105,7 +107,7 @@ define "ubuntuprecise" do
       f.puts "\ndomain #{spec[:domain]}\n"
       f.puts "\nsearch #{spec[:domain]} net.local youdevise.com\n"
       f.puts "\nnameserver 10.108.11.201\n"
-      f.puts "\nnameserver 10.108.11.211\n"    
+      f.puts "\nnameserver 10.108.11.211\n"
     }
  }
 
@@ -199,7 +201,7 @@ define "ubuntuprecise" do
     }
 
     chroot "curl -Ss https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -"
-    chroot "apt-get update"
+    supress_error.chroot "apt-get update"
   }
 
 end

@@ -19,30 +19,30 @@ module Provision::Image::Commands
         raise "nil block given " unless block !=nil
         @block = block
         @target_object = target_object
-      end 
+      end
 
       def until(&condition)
 
-print @target_object.class
         100.times {
           return if (@target_object.instance_eval(&condition) == true)
-  	  @target_object.instance_eval(&@block)
+  	      @target_object.instance_eval(&@block)
+          sleep(0.5)
        	}
         raise "timeout waiting for condition"
       end
   end
- 
+
   def keep_doing(&block)
     return Continuation.new(self, block)
   end
 
-  def wait_until(desc="", options= {:retry_attempts=>100}, &block)    
+  def wait_until(desc="", options= {:retry_attempts=>100}, &block)
     options[:retry_attempts].times {
       log.debug("waiting until: #{desc}")
-      return if (block != nil and block.call() == true) 
+      return if (block != nil and block.call() == true)
       sleep(0.4)
     }
     raise "timeout waiting for condition"
   end
-  
+
 end
