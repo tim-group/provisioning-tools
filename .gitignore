@@ -1,3 +1,6 @@
 *.log
 *.img
+*.swp
+*.swl
+*.swm
 build

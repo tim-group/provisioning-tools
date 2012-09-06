@@ -1,36 +1,17 @@
 
-define "puppetmaster" do
+define "puppetclient" do
   ubuntuprecise
 
-  run("puppet mastery"){
+  run("puppet client modules"){
     cmd "echo 'building puppetmaster' #{spec[:hostname]}"
     apt_install "rubygems"
-    apt_install "puppetmaster"
-#    apt_install "libapache2-mod-passenger"
     apt_install "rubygem-hiera"
     apt_install "rubygem-hiera-puppet"
-    apt_install "puppetdb"
-    apt_install "puppetdb-terminus"
-    ###??
-  }
-
-  cleanup {
-    chroot "/etc/init.d/puppetmaster stop"
-  }
-
-  run("puppet master code checkout") {
-    # trash the modules, manifests, templates
-    chroot "rmdir /etc/puppet/modules"
-    chroot "rmdir /etc/puppet/manifests"
-    chroot "rmdir /etc/puppet/templates"
-    cmd "cp -r /home/dellis/workspace/puppetx/* #{spec[:temp_dir]}/etc/puppet/"
-  }
+    apt_install "puppet"
+    apt_install "facter"
+ }
 
   run("write bootstrap puppet.conf") {
-
-    # git clone puppet.git
-#    git clone git@git:puppet /etc/puppet
-
     open("#{spec[:temp_dir]}/etc/puppet/puppet.conf", 'w') { |f|
       f.puts """
 [main]
@@ -46,7 +27,7 @@ define "puppetmaster" do
     preferred_serialization_format = marshal
     environment                    = masterbranch
     configtimeout                  = 3000
-    server                         = #{spec[:fqdn]}
+    server                         = #{spec[:env]}-puppetmaster-001.#{spec[:domain]}
 
 [master]
     certname                       = #{spec[:fqdn]}
@@ -54,9 +35,6 @@ define "puppetmaster" do
 [agent]
     report            = true
 
-[masterbranch]
-    modulepath=$confdir/modules/common
-    manifest=$confdir/manifests/production/site.pp
 """}
 
   }

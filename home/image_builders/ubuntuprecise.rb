@@ -104,12 +104,17 @@ define "ubuntuprecise" do
       f.puts "127.0.1.1		#{spec[:fqdn]}	#{spec[:hostname]}\n"
     }
     open("#{spec[:temp_dir]}/etc/resolve.conf", 'w') { |f|
-      f.puts "\ndomain #{spec[:domain]}\n"
-      f.puts "\nsearch #{spec[:domain]} net.local youdevise.com\n"
-      f.puts "\nnameserver 10.108.11.201\n"
-      f.puts "\nnameserver 10.108.11.211\n"
+      f.puts "
+      option rfc3442-classless-static-routes code 121 = array of unsigned integer 8;
+      send host-name \"<hostname>\";
+      supersede domain-name \"#{spec[:domain]}\";
+      "
     }
- }
+  }
+
+  run("configure DHCP so it doesn't trash our settings") {
+    
+  }
 
   run("install kernel and grub") {
     chroot "apt-get -y --force-yes update"
