@@ -1,0 +1,26 @@
+Building a puppetmaster
+=======================
+after bootstrapping 
+	- certname= and server=
+	- plugin sync=true
+	- /etc/resolve.conf
+	- /etc/hosts
+	- ...
+	
+	- run puppetd -t
+	- sign cert
+	- run puppetd -t
+
+	- puppet needs to be configured to point to itself, should generate certificate on pm when good.
+		-> set certname to #hostname
+		-> add alias in /etc/hosts
+
+	- working puppet.conf needs to materialize.
+	- clone the git repo into /etc/puppet
+
+
+	
+To make staging work
+====================
+	- correctly setup DNS entries in /etc/resolve.conf and dhpclient.conf
+	- run puppet and auto sign on puppetmaster (via mc?) 
