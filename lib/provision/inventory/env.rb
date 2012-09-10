@@ -12,7 +12,7 @@ class Provision::Inventory::Env
   end
 
   def add_generator(generator)
-    @generators = {} if (@inventory==nil)
+    @generators = {} if (@generators==nil)
     @generators[generator.name] = generator
     return generator
   end
@@ -34,4 +34,4 @@ class Provision::Inventory::Env
   def get_generators()
     return @generators.values()
   end
-end 
+end
