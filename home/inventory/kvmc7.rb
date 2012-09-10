@@ -12,11 +12,11 @@ host "localhost", :spindles=>["/mnt"] do
 #      range(1,1)
 #    end
 
-#    generator "refapp"  do
- #     template "puppetclient"
-#      basename "refapp"
-#      range(1,2)
-#    end
+    generator "refapp"  do
+      template "puppetclient"
+      basename "refapp"
+      range(1,2)
+    end
   end
 end
 
