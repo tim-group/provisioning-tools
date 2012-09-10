@@ -15,6 +15,8 @@ describe Provision::Inventory do
           vm.interfaces [{:type=>"network",:name=>"provnat"}, {:type=>"bridge", :name => "br0"}]
           vm.cpus 1
         end
+        generator "la" do
+        end
       end
     end
 
