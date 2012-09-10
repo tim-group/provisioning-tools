@@ -1,4 +1,5 @@
 require 'provision/inventory/namespace'
+require 'provision/inventory/composite_generator'
 
 class Provision::Inventory::Env
   attr_accessor :name
@@ -28,6 +29,10 @@ class Provision::Inventory::Env
   end
 
   def get_generator(name)
+    if (name=="*")
+      return Provision::Inventory::CompositeGenerator.new(@generators.values, self)
+    end
+
     return @generators[name]
   end
 

@@ -33,6 +33,34 @@ describe Provision::Inventory do
   it 'can provide an inventory'
   ## prov --host=kvmc7 --env=grid
 
+
+  it 'can generate specs for all generators in an environment' do
+    extend Provision::Inventory
+
+    expected_specs = [
+      {:hostname=>"se-selubuntu-001", :sehub=>"segrid:7799", :ram=>102400, :template=>"precise-selenium",:cpus=>1,:interfaces=>[{:type=>"network",:name=>"provnat"}, {:type=>"bridge", :name => "br0"}], :spindle=>"s1", :domain=>"net.local"},
+      {:hostname=>"se-selubuntu-002", :sehub=>"segrid:7799", :ram=>102400, :template=>"precise-selenium",:cpus=>1,:interfaces=>[{:type=>"network",:name=>"provnat"}, {:type=>"bridge", :name => "br0"}], :spindle=>"s2",:domain=>"net.local"},
+      {:hostname=>"se-selubuntu-003", :sehub=>"segrid:7799", :ram=>102400, :template=>"precise-selenium",:cpus=>1, :interfaces=>[{:type=>"network",:name=>"provnat"}, {:type=>"bridge", :name => "br0"}], :spindle=>"s1",:domain=>"net.local"},
+      {:hostname=>"se-selubuntu-004", :sehub=>"segrid:7799", :ram=>102400, :template=>"precise-selenium",:cpus=>1, :interfaces=>[{:type=>"network",:name=>"provnat"}, {:type=>"bridge", :name => "br0"}], :spindle=>"s2",:domain=>"net.local"},
+      {:hostname=>"se-selubuntu-005", :sehub=>"segrid:7799", :ram=>102400, :template=>"precise-selenium",:cpus=>1, :interfaces=>[{:type=>"network",:name=>"provnat"}, {:type=>"bridge", :name => "br0"}], :spindle=>"s1",:domain=>"net.local"},
+    ]
+
+    host "kvmc7", :spindles=>["s1","s2"] do
+      env "se", :domain=>"net.local" do
+        generator "selubuntu"  do
+          template "precise-selenium"
+          basename "selubuntu"
+          range(1,5)
+          selenium.sehub "segrid:7799"
+          vm.ram 102400
+          vm.interfaces [{:type=>"network",:name=>"provnat"}, {:type=>"bridge", :name => "br0"}]
+          vm.cpus 1
+        end
+      end
+    end
+    get_host("kvmc7").get_env("se").get_generator("*").generate_specs.should eql(expected_specs)
+  end
+
   it 'can print the structure to explore the inventory' do
     extend Provision::Inventory
     host "hostx" do
