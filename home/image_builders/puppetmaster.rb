@@ -23,7 +23,7 @@ define "puppetmaster" do
     chroot "rmdir /etc/puppet/modules"
     chroot "rmdir /etc/puppet/manifests"
     chroot "rmdir /etc/puppet/templates"
-    cmd "cp -r /home/dellis/workspace/puppetx/* #{spec[:temp_dir]}/etc/puppet/"
+#    cmd "cp -r /home/dellis/workspace/puppetx/* #{spec[:temp_dir]}/etc/puppet/"
   }
 
   run("write bootstrap puppet.conf") {
