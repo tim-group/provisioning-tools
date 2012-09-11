@@ -14,7 +14,11 @@ module Provision::Image::Commands
     chroot("DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install #{package}")
   end
 
-  class Continuation
+  def apt_remove(package)
+    chroot("DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes remove #{package}")
+  end
+
+ class Continuation
       def initialize(target_object, block)
         raise "nil block given " unless block !=nil
         @block = block

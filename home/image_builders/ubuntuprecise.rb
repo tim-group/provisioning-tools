@@ -56,6 +56,10 @@ define "ubuntuprecise" do
     cmd "mkdir -p #{spec[:temp_dir]}/etc/default"
   }
 
+  run("removing unwanted packages") {
+    apt_remove "resolveconf"
+  }
+
   run("mounting devices") {
     cmd "mount --bind /dev #{spec[:temp_dir]}/dev"
     cmd "mount -t proc none #{spec[:temp_dir]}/proc"
@@ -113,7 +117,7 @@ supersede domain-name \"#{spec[:domain]}\";
   }
 
   run("configure DHCP so it doesn't trash our settings") {
-    
+
   }
 
   run("install kernel and grub") {
