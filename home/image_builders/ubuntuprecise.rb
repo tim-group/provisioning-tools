@@ -57,7 +57,7 @@ define "ubuntuprecise" do
   }
 
   run("removing unwanted packages") {
-    apt_remove "resolveconf"
+    apt_remove "resolvconf"
   }
 
   run("mounting devices") {
