@@ -5,7 +5,7 @@ define "mcollective_server" do
     apt_install "activemq"
 
     chroot "ln -s /opt/activemq/bin/activemq /etc/init.d/activemq"
-    cmd "cp #{spec[:temp_dir]}/../../files/activemq.xml /opt/activemq/conf/"
+    cmd "cp #{Dir.pwd}/files/activemq.xml /opt/activemq/conf/"
   }	
 
 end
