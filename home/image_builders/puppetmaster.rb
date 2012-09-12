@@ -1,6 +1,7 @@
 
 define "puppetmaster" do
   ubuntuprecise
+  mcollective_server
 
   run("puppet mastery"){
     cmd "echo 'building puppetmaster' #{spec[:hostname]}"
