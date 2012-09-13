@@ -1,6 +1,7 @@
 
 define "puppetmaster" do
   ubuntuprecise
+  mcollective
   mcollective_server
 
   run("puppet mastery"){
