@@ -1,14 +1,3 @@
-
-define "mcollective" do
-
-  run("install and configure mcollective") {
-    apt_install "ruby-stomp"
-    apt_install "mcollective"
-    cmd "cp #{Dir.pwd}/files/mcollective/server.cfg #{spec[:temp_dir]}/etc/mcollective/"
-  }
-
-end
-
 define "mcollective_server" do
 
   run("install and configure activemq #{Dir.pwd}") {
