@@ -1,6 +1,7 @@
 
 define "puppetclient" do
   ubuntuprecise
+  mcollective
 
   run("puppet client modules"){
     cmd "echo 'building puppetmaster' #{spec[:hostname]}"

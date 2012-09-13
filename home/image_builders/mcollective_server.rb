@@ -1,4 +1,14 @@
 
+define "mcollective" do
+
+  run("install and configure mcollective") {
+    apt_install "ruby-stomp"
+    apt_install "mcollective"
+    cmd "cp #{Dir.pwd}/files/mcollective/server.cfg #{spec[:temp_dir]}/etc/mcollective/"
+  }
+
+end
+
 define "mcollective_server" do
 
   run("install and configure activemq #{Dir.pwd}") {
@@ -7,12 +17,6 @@ define "mcollective_server" do
     chroot "ln -s /opt/activemq/bin/activemq /etc/init.d/activemq"
     cmd "cp #{Dir.pwd}/files/activemq.xml #{spec[:temp_dir]}/opt/activemq/conf/"
     chroot "update-rc.d activemq defaults"
-  }
-
-  run("install and configure mcollective") {
-    apt_install "ruby-stomp"
-    apt_install "mcollective"
-    cmd "cp #{Dir.pwd}/files/mcollective/server.cfg #{spec[:temp_dir]}/etc/mcollective/"
   }
 
   run("install and configure mcollective client") {
