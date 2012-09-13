@@ -17,7 +17,7 @@ define "mcollective_server" do
 
   run("install and configure mcollective client") {
     apt_install "mcollective-client"
-    cmd "cp #{Dir.pwd}/files/mcollective/client.cfg #{spec[:temp_dir]}/opt/mcollective/"
+    cmd "cp #{Dir.pwd}/files/mcollective/client.cfg #{spec[:temp_dir]}/etc/mcollective/"
   }
 
 end
