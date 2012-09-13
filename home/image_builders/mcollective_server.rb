@@ -12,12 +12,12 @@ define "mcollective_server" do
   run("install and configure mcollective") {
     apt_install "ruby-stomp"
     apt_install "mcollective"
-    cmd "cp #{Dir.pwd}/files/mcollective/server.cfg #{spec[:temp_dir]}/opt/activemq/conf/"
+    cmd "cp #{Dir.pwd}/files/mcollective/server.cfg #{spec[:temp_dir]}/etc/mcollective/"
   }
 
   run("install and configure mcollective client") {
     apt_install "mcollective-client"
-    cmd "cp #{Dir.pwd}/files/mcollective/client.cfg #{spec[:temp_dir]}/opt/activemq/conf/"
+    cmd "cp #{Dir.pwd}/files/mcollective/client.cfg #{spec[:temp_dir]}/opt/mcollective/"
   }
 
 end
