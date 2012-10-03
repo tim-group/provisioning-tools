@@ -17,7 +17,13 @@ host "localhost", :spindles=>["/mnt"] do
       basename "refapp"
       range(1,2)
     end
-  end
+
+    generator "lb"  do
+      template "puppetclient"
+      basename "lb"
+      range(1,1)
+    end
+ end
 end
 
 host "kvmc7", :spindles=>["/mnt"] do
