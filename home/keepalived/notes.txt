@@ -1,0 +1,54 @@
+
+
+Acceptance Criteria
+
+Client -> LB "Hello!"
+LB -> APP "Hello"
+LB <- APP "Hi"
+Client <- LB "Hi"
+
+
+--- 
+
+
+### ON THE PHYSICAL MACHINE ###
+
+# Create LB VM
+sudo ./bin/inventory -hlocalhost -edev -glb
+
+# Setup networking
+sudo bash ext/define-net.sh 
+sudo bash ext/dnsmasq.sh 
+
+
+
+### ON THE LB ###
+
+# Install Keepalived
+sudo apt-get install keepalived
+
+# NOTES (discovered by asking the boxes):
+LB = 192.168.5.231  (dev-lb-001)
+VIP = 192.168.5.42  
+RIP1 = 192.168.5.238 (dev-refapp-001)
+RIP2 = 192.168.5.252 (dev-refapp-002)
+
+
+### ON THE REAL APP SERVERS (RIPS)
+
+Additional network entry on every APP server:
+    auto lo:0                                                                  
+      iface lo:0 inet static                                                     
+      address 192.168.5.42                                                       
+      netmask 255.255.255.255 
+ifup lo:0
+
+
+
+### LB CONFIGURATION NOTES  ###
+
+lb_algo wlc = CRAP -  A returning node with a lower number of Inactive connections will get a crap load more load until it reaches the same as the other node.
+delay_loop 1 - Delay before checking a node is available again (0 = Go as fast as possible, 1 probalby more sensible.
+inhibit_on_failure - Should not be used due to "TCP - Keep Alive" (http://www.austintek.com/LVS/LVS-HOWTO/HOWTO/LVS-HOWTO.persistent_connection.html)
+
+
