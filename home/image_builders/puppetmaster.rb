@@ -57,6 +57,13 @@ define "puppetmaster" do
 """}
   }
 
+  run("add autosign") {
+    open("#{spec[:temp_dir]}/etc/puppet/autosign.conf", 'w') { |f|
+      f.puts """
+*.dev.net.local
+"""}
+  }
+
   run("configuring puppetdb terminus") {
     open("#{spec[:temp_dir]}/etc/puppet/puppetdb.conf", 'w') { |f|
 f.puts """[main]
