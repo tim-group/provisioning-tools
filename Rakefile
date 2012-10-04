@@ -8,6 +8,13 @@ task :default do
   sh "rake -s -T"
 end
 
+desc "Build app VMs"
+task :build_app do
+  sh "sudo ./bin/inventory -hlocalhost -edev -grefapp"
+  sh "ssh-keygen -R dev-refapp-001"
+  sh "ssh-keygen -R dev-refapp-002"
+end
+
 desc "Build loadbalancer VM"
 task :build_lb do
   sh "sudo ./bin/inventory -hlocalhost -edev -glb"
