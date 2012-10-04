@@ -13,4 +13,8 @@ define "mcollective_server" do
     cmd "cp #{Dir.pwd}/files/mcollective/client.cfg #{spec[:temp_dir]}/etc/mcollective/"
   }
 
+  run("install puppetd application") {
+    cmd "cp #{Dir.pwd}/files/mcollective/applications/puppetd.rb #{spec[:temp_dir]}/usr/share/mcollective/plugins/mcollective/application/puppetd.rb"
+  }
+
 end
