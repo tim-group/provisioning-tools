@@ -13,6 +13,7 @@ define "puppetmaster" do
     apt_install "rubygem-hiera-puppet"
     apt_install "puppetdb"
     apt_install "puppetdb-terminus"
+    apt_install "git-core"
     ###??
   }
 
@@ -21,17 +22,11 @@ define "puppetmaster" do
   }
 
   run("puppet master code checkout") {
-    # trash the modules, manifests, templates
-    chroot "rmdir /etc/puppet/modules"
-    chroot "rmdir /etc/puppet/manifests"
-    chroot "rmdir /etc/puppet/templates"
-#    cmd "cp -r /home/dellis/workspace/puppetx/* #{spec[:temp_dir]}/etc/puppet/"
+    chroot "rm -rf /etc/puppet"
+    chroot "git clone http://git.youdevise.com/git/puppet /etc/puppet"
   }
 
   run("write bootstrap puppet.conf") {
-
-    # git clone puppet.git
-#    git clone git@git:puppet /etc/puppet
 
     open("#{spec[:temp_dir]}/etc/puppet/puppet.conf", 'w') { |f|
       f.puts """
