@@ -52,8 +52,8 @@ define "puppetmaster" do
     report            = true
 
 [masterbranch]
-    modulepath=$confdir/environments/masterbranch/modules
-    manifest=$confdir/environments/masterbranch/manifests/site.pp
+    modulepath=$confdir/modules
+    manifest=$confdir/manifests/site.pp
 """}
   }
 
