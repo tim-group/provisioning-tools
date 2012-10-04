@@ -52,19 +52,20 @@ define "puppetmaster" do
 [masterbranch]
     modulepath=$confdir/modules
     manifest=$confdir/manifests/site.pp
-"""}
+"""
+    }
   }
 
   run("add autosign") {
     open("#{spec[:temp_dir]}/etc/puppet/autosign.conf", 'w') { |f|
-      f.puts """
-*.dev.net.local
-"""}
+      f.puts """*.dev.net.local
+"""
+    }
   }
 
   run("configuring puppetdb terminus") {
     open("#{spec[:temp_dir]}/etc/puppet/puppetdb.conf", 'w') { |f|
-f.puts """[main]
+      f.puts """[main]
 server = #{spec[:fqdn]}
 port   = 8081
 """
@@ -78,6 +79,7 @@ port   = 8081
 apt-get install -y --force-yes puppetdb
 echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local
 exit 0
-"""}
+"""
+    }
   }
 end
