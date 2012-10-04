@@ -12,14 +12,17 @@ desc "Build loadbalancer VM"
 task :build_lb do
   sh "sudo ./bin/inventory -hlocalhost -edev -glb"
   sh "ssh-keygen -R dev-lb-001"
-#  sh "ssh -o StrictHostKeyChecking=no root@dev-lb-001 'puppetd --test' "
 end
 
 desc "Build puppetmaster VM"
 task :build_pm do
   sh "sudo ./bin/inventory -hlocalhost -edev -gpm"
   sh "ssh-keygen -R dev-puppetmaster-001"
-#  sh "ssh -o StrictHostKeyChecking=no root@dev-lb-001 'puppetd --test' "
+end
+
+desc "Run puppet"
+task :run_puppet do
+  sh "ssh -o StrictHostKeyChecking=no root@dev-puppetmaster-001 'mco puppetd runall 4'"
 end
 
 task :test => [:setup]
