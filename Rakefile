@@ -15,6 +15,13 @@ task :build_lb do
 #  sh "ssh -o StrictHostKeyChecking=no root@dev-lb-001 'puppetd --test' "
 end
 
+desc "Build puppetmaster VM"
+task :build_pm do
+  sh "sudo ./bin/inventory -hlocalhost -edev -gpm"
+  sh "ssh-keygen -R dev-puppetmaster-001"
+#  sh "ssh -o StrictHostKeyChecking=no root@dev-lb-001 'puppetd --test' "
+end
+
 task :test => [:setup]
 Rake::TestTask.new { |t|
     t.pattern = 'test/**/*_test.rb'
