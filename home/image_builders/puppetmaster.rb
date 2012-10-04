@@ -25,8 +25,7 @@ define "puppetmaster" do
     chroot "git clone http://git.youdevise.com/git/puppet /etc/puppet"
   }
 
-  run("write bootstrap puppet.conf") {
-
+  run("configure puppetmaster") {
     open("#{spec[:temp_dir]}/etc/puppet/puppet.conf", 'w') { |f|
       f.puts """
 [main]
@@ -53,10 +52,9 @@ define "puppetmaster" do
     report            = true
 
 [masterbranch]
-    modulepath=$confdir/modules/common
-    manifest=$confdir/manifests/production/site.pp
+    modulepath=$confdir/environments/masterbranch/modules
+    manifest=$confdir/environments/masterbranch/manifests/site.pp
 """}
-
   }
 
   run("configuring puppetdb terminus") {
