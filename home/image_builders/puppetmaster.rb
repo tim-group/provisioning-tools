@@ -78,7 +78,7 @@ port   = 8081
       f.puts """
 #!/bin/sh -e
 apt-get install -y --force-yes puppetdb
-echo \"#!/bin/sh -e\n exit 0\" > /etc/rc.local
+echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local
 exit 0
 """}
   }
