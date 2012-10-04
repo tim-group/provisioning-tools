@@ -2,3 +2,4 @@
 * Allow overriding disk size per template, e.g. puppetmaster needs to be >3
 * Fix puppetdb installation to not be done in rc.local
 * Trap ^C and cleanup correctly.
+* Fix missing env var (e.g. dev) in puppet.conf on clients.
