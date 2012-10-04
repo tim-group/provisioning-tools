@@ -14,6 +14,7 @@ Client <- LB "Hi"
 ### ON THE PHYSICAL MACHINE ###
 
 # Create LB VM
+cd /home/rpearce/provisioning-tools/
 sudo ./bin/inventory -hlocalhost -edev -glb
 
 # Setup networking
@@ -50,5 +51,71 @@ ifup lo:0
 lb_algo wlc = CRAP -  A returning node with a lower number of Inactive connections will get a crap load more load until it reaches the same as the other node.
 delay_loop 1 - Delay before checking a node is available again (0 = Go as fast as possible, 1 probalby more sensible.
 inhibit_on_failure - Should not be used due to "TCP - Keep Alive" (http://www.austintek.com/LVS/LVS-HOWTO/HOWTO/LVS-HOWTO.persistent_connection.html)
+
+
+### USEFUL ###
+http://www.austintek.com/LVS/LVS-HOWTO/HOWTO/index.html
+http://www.keepalived.org/LVS-NAT-Keepalived-HOWTO.html
+http://www.ultramonkey.org/papers/lvs_tutorial/html/
+
+
+### 
+
+- Edit the hosts.conf add manual entries for puppetmaster server 
+- Edit puppet.conf (correct entry: dev-puppetmaster-001.dev.net.local) -> BUG 
+- puppetca --sign dev-refapp-001.dev.net.local (Using Autosign)
+
+
+
+
+PUppetMaster
+/usr/share/mcollective/plugins/mcollective/application/puppetd.rb
+
+
+sudo ./bin/inventory -hlocalhost -edev -g*
+
+- Temporary fix (create a module with a lib folder)
+- Edit routes.yaml remove puppetdb
+
+
+
+
+### AUTOMATING ####
+ - Create Puppet Master
+ - Creation of Interface on app servers. (create lo:0 on devices)
+ - Puppetise keepalived.conf as a template. (borrow keepalived module)
+ - Convert to use Application check
+
+
+
+vip
+port
+rip_servers
+
+
+
+
+
+
+
+ rsync -av --exclude=".git"  -e 'ssh' rpearce@192.168.5.1:~/workspace/puppet/manifests/nodes . 
+
+
+
+#!/bin/bash
+
+ rsync -av --exclude=".git"  -e 'ssh' rpearce@192.168.5.1:~/workspace/puppet/manifests/nodes /etc/puppet/manifests
+ rsync -av --exclude=".git"  -e 'ssh' rpearce@192.168.5.1:~/workspace/puppet/modules /etc/puppet 
+
+ #Clean up certs
+ puppet cert clean dev-lb-001.dev.net.local
+
+ # 
+mco puppetd runall 4
+
+
+
+
+
 
 

@@ -4,6 +4,16 @@ require 'rake/testtask'
 require 'fileutils'
 require 'rspec/core/rake_task'
 
+task :default do
+  sh "rake -s -T"
+end
+
+desc "Build loadbalancer VM"
+task :build_lb do
+  sh "sudo ./bin/inventory -hlocalhost -edev -glb"
+  sh "ssh-keygen -R dev-lb-001"
+#  sh "ssh -o StrictHostKeyChecking=no root@dev-lb-001 'puppetd --test' "
+end
 
 task :test => [:setup]
 Rake::TestTask.new { |t|
