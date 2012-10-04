@@ -10,6 +10,7 @@ define "puppetmaster" do
     apt_install "rubygem-hiera"
     apt_install "rubygem-hiera-puppet"
     apt_install "puppetdb-terminus"
+    # FIXME Need to throw the symlink in /usr/share/mcollective
     apt_install "puppet-updator"
   }
 
