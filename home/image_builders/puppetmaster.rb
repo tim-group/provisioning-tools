@@ -1,4 +1,3 @@
-
 define "puppetmaster" do
   ubuntuprecise
   mcollective
@@ -8,12 +7,10 @@ define "puppetmaster" do
     cmd "echo 'building puppetmaster' #{spec[:hostname]}"
     apt_install "rubygems"
     apt_install "puppetmaster"
-#    apt_install "libapache2-mod-passenger"
     apt_install "rubygem-hiera"
     apt_install "rubygem-hiera-puppet"
     apt_install "puppetdb-terminus"
-    apt_install "git-core"
-    ###??
+    apt_install "puppet-updator"
   }
 
   cleanup {
@@ -21,6 +18,7 @@ define "puppetmaster" do
   }
 
   run("puppet master code checkout") {
+    apt_install "git-core"
     chroot "rm -rf /etc/puppet"
     chroot "git clone http://git.youdevise.com/git/puppet /etc/puppet"
   }
