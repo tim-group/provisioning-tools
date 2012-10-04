@@ -17,6 +17,15 @@ define "selenium" do
     chroot "sed -i'.bak' -e 's#^securerandom.source=file:/dev/urandom#securerandom.source=file:/dev/../dev/urandom#g' /etc/java-6-openjdk/security/java.security"
   }
 
+  run("configure google apt repo") {
+    open("#{spec[:temp_dir]}/etc/apt/sources.list.d/google.list", 'w') { |f|
+      f.puts "deb http://dl.google.com/linux/deb/ stable main\n"
+    }
+
+    chroot "curl -Ss https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -"
+    supress_error.chroot "apt-get update"
+  }
+
   run("place the selenium node config") {
     hubparts = spec[:sehub].split(":")
     host = hubparts[0]

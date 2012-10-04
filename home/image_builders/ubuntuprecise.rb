@@ -204,13 +204,4 @@ supersede domain-name \"#{spec[:domain]}\";
     chroot "curl -Ss http://apt/ubuntu/repo.key | apt-key add -"
   }
 
-  run("configure google apt repo") {
-    open("#{spec[:temp_dir]}/etc/apt/sources.list.d/google.list", 'w') { |f|
-      f.puts "deb http://dl.google.com/linux/deb/ stable main\n"
-    }
-
-    chroot "curl -Ss https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -"
-    supress_error.chroot "apt-get update"
-  }
-
 end
