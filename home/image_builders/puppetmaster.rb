@@ -11,7 +11,6 @@ define "puppetmaster" do
 #    apt_install "libapache2-mod-passenger"
     apt_install "rubygem-hiera"
     apt_install "rubygem-hiera-puppet"
-    apt_install "puppetdb"
     apt_install "puppetdb-terminus"
     apt_install "git-core"
     ###??
@@ -47,6 +46,8 @@ define "puppetmaster" do
 
 [master]
     certname                       = #{spec[:fqdn]}
+    storeconfigs                   = true
+    storeconfigs_backend           = puppetdb
 
 [agent]
     report            = true
@@ -58,4 +59,22 @@ define "puppetmaster" do
 
   }
 
+  run("configuring puppetdb terminus") {
+    open("#{spec[:temp_dir]}/etc/puppet/puppetdb.conf", 'w') { |f|
+f.puts """[main]
+server = #{spec[:fqdn]}
+port   = 8081
+"""
+    }
+  }
+
+  run("nasty hack to install puppetdb with correct cert name") {
+    open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
+      f.puts """
+#!/bin/sh -e
+apt-get install -y --force-yes puppetdb
+echo \"#!/bin/sh -e\n exit 0\" > /etc/rc.local
+exit 0
+"""}
+  }
 end
