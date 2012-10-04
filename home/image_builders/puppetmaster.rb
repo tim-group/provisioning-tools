@@ -77,13 +77,10 @@ port   = 8081
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
       f.puts """#!/bin/sh -e
 apt-get install -y --force-yes puppetdb
+update-rc.d puppetdb defaults
 echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local
 exit 0
 """
     }
-  }
-
-  run("autostart puppetdb on boot") {
-    chroot "update-rc.d puppetdb defaults"
   }
 end
