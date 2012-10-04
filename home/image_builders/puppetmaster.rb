@@ -82,4 +82,8 @@ exit 0
 """
     }
   }
+
+  run("autostart puppetdb on boot") {
+    chroot "update-rc.d puppetdb defaults"
+  }
 end
