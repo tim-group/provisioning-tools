@@ -36,7 +36,7 @@ class Provision::Inventory::Generator
     specs = []
 
     for i in @range_low..@range_high
-      specs<< spec = {:hostname => sprintf("%s-%s-%03d", @env.name,@basename, i), :template=>@template, :spindle=>@env.host.spindle(), :domain=>@env.options[:domain]}
+      specs<< spec = {:env=>@env.name, :hostname => sprintf("%s-%s-%03d", @env.name,@basename, i), :template=>@template, :spindle=>@env.host.spindle(), :domain=>@env.options[:domain]}
       @properties.each { |bag|
         bag.each {|k,v|
           spec[k]=v
