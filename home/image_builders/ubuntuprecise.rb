@@ -112,6 +112,7 @@ define "ubuntuprecise" do
 option rfc3442-classless-static-routes code 121 = array of unsigned integer 8;
 send host-name \"#{spec[:hostname]}\";
 supersede domain-name \"#{spec[:domain]}\";
+supersede domain-search \"#{spec[:domain]}\", \"youdevise.com\";
       "
     }
   }
@@ -202,6 +203,11 @@ supersede domain-name \"#{spec[:domain]}\";
     }
 
     chroot "curl -Ss http://apt/ubuntu/repo.key | apt-key add -"
+  }
+
+
+  run("run apt-update ") {
+    chroot "apt-get -y --force-yes update"
   }
 
 end
