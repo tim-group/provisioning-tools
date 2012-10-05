@@ -40,7 +40,7 @@ end
 
 desc "Run puppet"
 task :run_puppet do
-  sh "ssh -o StrictHostKeyChecking=no root@dev-puppetmaster-001 'mco puppetd runall 4'"
+  sh "ssh -o StrictHostKeyChecking=no root@$(dig dev-puppetmaster-001.dev.net.local @192.168.5.1 +short) 'mco puppetd runall 4'"
 end
 
 task :test => [:setup]
