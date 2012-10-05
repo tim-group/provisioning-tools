@@ -152,6 +152,7 @@ supersede domain-search \"#{spec[:domain]}\", \"youdevise.com\";
   }
 
   run("deploy the root key") {
+    cmd "mkdir -p #{spec[:temp_dir]}/root/.ssh/"
     cmd "cp #{Dir.pwd}/files/id_rsa.pub #{spec[:temp_dir]}/root/.ssh/authorized_keys"
   }
 
