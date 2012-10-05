@@ -19,6 +19,15 @@ task :network do
     sh "sudo bash 'ext/dnsmasq.sh'"
 end
 
+desc "Build all VMs"
+task :build_all do
+  sh "sudo ./bin/inventory -hlocalhost -edev -g*"
+  sh "ssh-keygen -R dev-refapp-001"
+  sh "ssh-keygen -R dev-refapp-002"
+  sh "ssh-keygen -R dev-lb-001"
+  sh "ssh-keygen -R dev-puppetmaster-001"
+end
+
 desc "Build app VMs"
 task :build_app do
   sh "sudo ./bin/inventory -hlocalhost -edev -grefapp"
@@ -41,6 +50,7 @@ end
 desc "Run puppet"
 task :run_puppet do
   sh "ssh-keygen -R $(dig dev-puppetmaster-001.dev.net.local @192.168.5.1 +short)"
+  sh "chmod 600 files/id_rsa"
   sh "ssh -o StrictHostKeyChecking=no -i files/id_rsa root@$(dig dev-puppetmaster-001.dev.net.local @192.168.5.1 +short) 'mco puppetd runall 4'"
 end
 
