@@ -76,7 +76,7 @@ port   = 8081
   run("nasty hack to install puppetdb with correct cert name") {
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
       f.puts """#!/bin/sh -e
-apt-get install -y --force-yes puppetdb
+DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install puppetdb
 update-rc.d puppetdb defaults
 echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local
 exit 0
