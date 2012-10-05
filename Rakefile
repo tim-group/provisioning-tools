@@ -8,6 +8,17 @@ task :default do
   sh "rake -s -T"
 end
 
+task :thing do
+    sh "sudo pwd"
+end
+
+desc "Set up virtual network"
+task :network do
+    sh "sudo bash 'ext/define-net.sh' 2>/dev/null"
+    sh "sudo pkill dnsmasq"
+    sh "sudo bash 'ext/dnsmasq.sh'"
+end
+
 desc "Build app VMs"
 task :build_app do
   sh "sudo ./bin/inventory -hlocalhost -edev -grefapp"
