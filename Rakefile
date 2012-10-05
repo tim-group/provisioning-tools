@@ -8,8 +8,9 @@ task :default do
   sh "rake -s -T"
 end
 
-task :thing do
-    sh "sudo pwd"
+desc "Demonstrate load balancing by hammering the VIP."
+task :hammer do
+    sh "watch -n 1 'curl http://192.168.5.42 --connect-timeout 1'"
 end
 
 desc "Set up virtual network"
