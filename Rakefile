@@ -41,7 +41,7 @@ end
 desc "Run puppet"
 task :run_puppet do
   sh "ssh-keygen -R $(dig dev-puppetmaster-001.dev.net.local @192.168.5.1 +short)"
-  sh "ssh -o StrictHostKeyChecking=no root@$(dig dev-puppetmaster-001.dev.net.local @192.168.5.1 +short) 'mco puppetd runall 4'"
+  sh "ssh -o StrictHostKeyChecking=no -i files/id_rsa root@$(dig dev-puppetmaster-001.dev.net.local @192.168.5.1 +short) 'mco puppetd runall 4'"
 end
 
 task :test => [:setup]
