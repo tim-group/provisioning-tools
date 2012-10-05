@@ -165,7 +165,7 @@ supersede domain-search \"#{spec[:domain]}\", \"youdevise.com\";
   }
 
   run("install misc packages") {
-    apt_install "acpid openssh-server curl vim dnsutils"
+    apt_install "acpid openssh-server curl vim dnsutils lsof"
   }
 
   # A few daemons hang around at the end of the bootstrapping process that prevent us unmounting.
