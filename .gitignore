@@ -1,5 +1,4 @@
 *.log
 *.img
 .*.sw[a-z]
-/build
 /tags
