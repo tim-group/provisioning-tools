@@ -55,6 +55,11 @@ task :run_puppet do
   sh "ssh -o StrictHostKeyChecking=no -i files/id_rsa root@$(dig dev-puppetmaster-001.dev.net.local @192.168.5.1 +short) 'mco puppetd runall 4'"
 end
 
+desc "Generate CTags"
+task :ctags do
+  sh "ctags -R --exclude=.git --exclude=build *"
+end
+
 task :test => [:setup]
 Rake::TestTask.new { |t|
     t.pattern = 'test/**/*_test.rb'

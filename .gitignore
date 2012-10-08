@@ -1,4 +1,5 @@
 *.log
 *.img
 .*.sw[a-z]
-build
+/build
+/tags
