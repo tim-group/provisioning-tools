@@ -8,6 +8,14 @@ if Process.uid != 0
   raise 'FATAL: Process needs to run as root!'
 end
 
+dependencies = ['/sbin/kpartx', '/usr/sbin/debootstrap']
+
+for binary in dependencies do
+  if not File.executable?(binary)
+    raise "FATAL #{binary} not executable and/or not installed!"
+  end
+end
+
 require 'optparse'
 require 'provision'
 require 'provision/inventory'
