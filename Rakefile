@@ -60,6 +60,18 @@ task :ctags do
   sh "ctags -R --exclude=.git --exclude=build *"
 end
 
+desc 'Do intial setup including configuring the networking and dnsmasq'
+task :setup do
+  sh "sudo bash ext/define-net.sh > /dev/null"
+  begin
+    sh "sudo bash ext/dnsmasq.sh > /dev/null 2>&1"
+  rescue
+    # For some reason this fails with dnsmasq: failed to create listening socket for 192.168.5.1: Address already in use
+    # due to DNSMasq trying to bind twice - unsure why.
+    puts "Eating error, expected failure."
+  end
+end
+
 task :test => [:setup]
 Rake::TestTask.new { |t|
     t.pattern = 'test/**/*_test.rb'
