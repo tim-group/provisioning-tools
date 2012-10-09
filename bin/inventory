@@ -4,18 +4,6 @@ $: << File.join(File.dirname(__FILE__), "..", "lib")
 configdir = File.join(File.dirname(__FILE__), "../lib/config")
 target_dir = File.join(File.dirname(__FILE__), "../target")
 
-if Process.uid != 0
-  raise 'FATAL: Process needs to run as root!'
-end
-
-dependencies = ['/sbin/kpartx', '/usr/sbin/debootstrap']
-
-for binary in dependencies do
-  if not File.executable?(binary)
-    raise "FATAL #{binary} not executable and/or not installed!"
-  end
-end
-
 require 'optparse'
 require 'provision'
 require 'provision/inventory'
@@ -26,17 +14,16 @@ require 'home/inventory/kvmc7'
 
 host = nil
 env = nil
-generator = nil
 
 @option_parser = OptionParser.new do|opts|
-  opts.banner = "Usage: provision --host"
-  opts.on("-h","--host HOST", "host") do |h|
+  opts.banner = "Usage: inventory --host"
+  opts.on("-h","--host HOST", "Hostname of the dom0 you are provisioning to") do |h|
     host = h
   end
-  opts.on("-e","--env ENV", "env") do |e|
+  opts.on("-e","--env ENV", "Environment name that you are provisioning to") do |e|
     env = e
   end
-  opts.on("-g","--generator GENERATOR", "generator") do |g|
+  opts.on("-g","--generator GENERATOR", "Generator that should be used to provision") do |g|
     generator = g
   end
 end
@@ -45,6 +32,18 @@ end
 if (host == nil)
   print  @option_parser.help()
   exit
+end
+
+if Process.uid != 0
+  raise 'FATAL: Process needs to run as root!'
+end
+
+dependencies = ['/sbin/kpartx', '/usr/sbin/debootstrap']
+
+for binary in dependencies do
+  if not File.executable?(binary)
+    raise "FATAL #{binary} not executable and/or not installed!"
+  end
 end
 
 require 'yaml'
