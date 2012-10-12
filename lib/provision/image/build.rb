@@ -38,6 +38,8 @@ class Provision::Image::Build
   def execute()
     position = 40
     error = nil
+    trap("SIGINT") { throw :ctrl_c }
+ 
     begin
       @commands.each {|command|
         txt = command[:txt]

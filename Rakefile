@@ -48,6 +48,13 @@ task :build_pm do
   sh "ssh-keygen -R dev-puppetmaster-001"
 end
 
+desc "Build puppetmaster VM"
+task :build_px do
+  sh "sudo ./bin/inventory -hlocalhost -edev -gpx"
+  sh "ssh-keygen -R dev-px-001"
+end
+
+
 desc "Run puppet"
 task :run_puppet do
   sh "ssh-keygen -R $(dig dev-puppetmaster-001.dev.net.local @192.168.5.1 +short)"

@@ -6,6 +6,13 @@ host "localhost", :spindles=>["/mnt"] do
       range(1,1)
     end
 
+    generator "px"  do
+      template "ubuntuprecise"
+      basename "px"
+      range(1,1)
+    end
+
+
 #    generator "lb"  do
 #      template "puppetclient"
 #      basename "lb"

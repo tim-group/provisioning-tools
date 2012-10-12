@@ -49,12 +49,12 @@ define "ubuntuprecise" do
   }
 
   run("running debootstrap") {
-    cmd "debootstrap --arch amd64 precise #{spec[:temp_dir]} http://aptproxy:3142/ubuntu"
+    cmd "debootstrap --no-check-certificate --arch amd64 --extractor=dpkg-deb --exclude=resolvconf precise #{spec[:temp_dir]} http://localhost/mirror"
     cmd "mkdir -p #{spec[:temp_dir]}/etc/default"
   }
 
   run("removing unwanted packages") {
-    apt_remove "resolvconf"
+#    apt_remove "resolvconf"
   }
 
   run("mounting devices") {
@@ -83,7 +83,6 @@ define "ubuntuprecise" do
     open("#{spec[:temp_dir]}/etc/default/locale", 'w') { |f|
       f.puts 'LANG="en_GB.UTF-8"'
     }
-
     chroot "locale-gen en_GB.UTF-8"
   }
 
@@ -91,7 +90,6 @@ define "ubuntuprecise" do
     open("#{spec[:temp_dir]}/etc/timezone", 'w') { |f|
       f.puts 'Europe/London'
     }
-
     chroot "dpkg-reconfigure --frontend noninteractive tzdata"
   }
 
@@ -159,14 +157,25 @@ supersede domain-search \"#{spec[:domain]}\", \"youdevise.com\";
   run("set up basic networking") {
     open("#{spec[:temp_dir]}/etc/network/interfaces", 'w') { |f|
       f.puts "
-     # The loopback network interface
-     auto lo
-     iface lo inet loopback
-     # The primary network interface
-     auto eth0
-     iface eth0 inet dhcp
-       "
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+auto mgmt
+iface mgmt inet dhcp
+"
+
+      end
+   }
+    open("#{spec[:temp_dir]}/etc/udev/rules.d/70-persistent-net.rules", 'w') { |f|
+      spec.interfaces.each do |nic|
+        f.puts %[
+SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="#{nic[:mac]}", ATTR{type}=="1",  NAME="#{nic[:network]}"\n
+        ]
+      end
     }
+    
   }
 
   run("install misc packages") {
@@ -200,11 +209,11 @@ supersede domain-search \"#{spec[:domain]}\", \"youdevise.com\";
       f.puts "deb http://apt/ubuntu stable main\ndeb-src http://apt/ubuntu stable main\n"
     }
 
-    chroot "curl -Ss http://apt/ubuntu/repo.key | apt-key add -"
+#    chroot "curl -Ss http://apt/ubuntu/repo.key | apt-key add -"
   }
 
   run("run apt-update ") {
-    chroot "apt-get -y --force-yes update"
+#    chroot "apt-get -y --force-yes update"
   }
 
 end
