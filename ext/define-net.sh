@@ -1,19 +1,24 @@
-virsh net-destroy provnat
-virsh net-undefine provnat
+virsh net-destroy mgmt
+virsh net-undefine mgmt
 
-virsh net-define "templates/nat.xml"
-virsh net-start "provnat"
+virsh net-define "templates/mgmt.xml"
+virsh net-start "mgmt"
 
-virsh net-destroy provnat2
-virsh net-undefine provnat2
+virsh net-destroy back
+virsh net-undefine back
 
-virsh net-define "templates/nat2.xml"
-virsh net-start "provnat2"
+virsh net-define "templates/back.xml"
+virsh net-start "back"
 
-virsh net-destroy provnat3
-virsh net-undefine provnat3
+virsh net-destroy middle
+virsh net-undefine middle
 
-virsh net-define "templates/nat3.xml"
-virsh net-start "provnat3"
+virsh net-define "templates/middle.xml"
+virsh net-start "middle"
 
+virsh net-destroy front
+virsh net-undefine front
+
+virsh net-define "templates/front.xml"
+virsh net-start "front"
 

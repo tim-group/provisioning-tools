@@ -1,0 +1,4 @@
+<network>
+     <name>front</name>
+     <bridge name="front_br" />
+</network>

@@ -49,7 +49,7 @@ define "ubuntuprecise" do
   }
 
   run("running debootstrap") {
-    cmd "debootstrap --no-check-certificate --arch amd64 --extractor=dpkg-deb --exclude=resolvconf precise #{spec[:temp_dir]} http://localhost/mirror"
+    cmd "debootstrap --no-check-certificate --arch amd64 --extractor=dpkg-deb --exclude=resolvconf precise #{spec[:temp_dir]} http://aptproxy:3142/ubuntu"
     cmd "mkdir -p #{spec[:temp_dir]}/etc/default"
   }
 
@@ -165,8 +165,6 @@ iface lo inet loopback
 auto mgmt
 iface mgmt inet dhcp
 "
-
-      end
    }
     open("#{spec[:temp_dir]}/etc/udev/rules.d/70-persistent-net.rules", 'w') { |f|
       spec.interfaces.each do |nic|
@@ -175,7 +173,7 @@ SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="#{nic[:mac]}", A
         ]
       end
     }
-    
+
   }
 
   run("install misc packages") {
@@ -209,11 +207,11 @@ SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="#{nic[:mac]}", A
       f.puts "deb http://apt/ubuntu stable main\ndeb-src http://apt/ubuntu stable main\n"
     }
 
-#    chroot "curl -Ss http://apt/ubuntu/repo.key | apt-key add -"
+    chroot "curl -Ss http://apt/ubuntu/repo.key | apt-key add -"
   }
 
   run("run apt-update ") {
-#    chroot "apt-get -y --force-yes update"
+    chroot "apt-get -y --force-yes update"
   }
 
 end
