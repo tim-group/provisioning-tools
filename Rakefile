@@ -83,3 +83,17 @@ RSpec::Core::RakeTask.new() do |t|
     t.rspec_opts = %w[--color]
     t.pattern = "test/spec/**/*_spec.rb"
 end
+
+desc "On"
+task :switch_on do
+  `sudo virsh net-start mgmt`
+  `sudo virsh net-start front`
+  `sudo virsh net-start middle`
+  `sudo virsh net-start back`
+ 
+  `sudo virsh start dev-lb-001`
+  `sudo virsh start dev-refapp-001`
+  `sudo virsh start dev-refapp-002`
+  `sudo virsh start dev-puppetmaster-001`
+
+end
