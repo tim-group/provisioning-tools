@@ -84,7 +84,7 @@ RSpec::Core::RakeTask.new() do |t|
     t.pattern = "test/spec/**/*_spec.rb"
 end
 
-desc "On"
+desc "on"
 task :switch_on do
   `sudo virsh net-start mgmt`
   `sudo virsh net-start front`
@@ -95,5 +95,11 @@ task :switch_on do
   `sudo virsh start dev-refapp-001`
   `sudo virsh start dev-refapp-002`
   `sudo virsh start dev-puppetmaster-001`
+end
 
+
+desc "x"
+task :run_tests do
+
+  `rspec test/spec/acceptance/router_spec.rb`
 end

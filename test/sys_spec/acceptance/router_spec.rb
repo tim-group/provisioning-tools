@@ -30,13 +30,14 @@ describe 'role_router' do
 
   let(:blah) {"1"}
 
+  def host(machine)
+    return  `dig #{machine}@192.168.5.1 +short`.chomp
+  end
+
   it 'can route between networks on different subnets' do
-
   #  desc.host("puppetmaster-001").nic("mgmt").ip
-
 #    from("dev-puppetmaster-001").pinging(machine("dev-puppetmaster-001").ip("mgmt")).should get_responses()
-    from("dev-puppetmaster-001").pinging("dev-puppetmaster-001").should get_responses()
-    from("dev-puppetmaster-001").pinging("spaceman").should_not get_responses()
+    from(host("dev-puppetmaster-001")).pinging("localhost").should get_responses()
   end
 
 end
