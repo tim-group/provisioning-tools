@@ -84,13 +84,13 @@ RSpec::Core::RakeTask.new() do |t|
     t.pattern = "test/spec/**/*_spec.rb"
 end
 
-desc "on"
+desc "Start all the networks and VMs"
 task :switch_on do
   `sudo virsh net-start mgmt`
   `sudo virsh net-start front`
   `sudo virsh net-start middle`
   `sudo virsh net-start back`
- 
+
   `sudo virsh start dev-lb-001`
   `sudo virsh start dev-refapp-001`
   `sudo virsh start dev-refapp-002`
