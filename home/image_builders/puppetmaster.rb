@@ -61,6 +61,7 @@ define "puppetmaster" do
   run("add autosign") {
     open("#{spec[:temp_dir]}/etc/puppet/autosign.conf", 'w') { |f|
       f.puts """*.dev.net.local
+      *.stag.net.local
 """
     }
   }
