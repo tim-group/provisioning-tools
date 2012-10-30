@@ -46,6 +46,7 @@ define "puppetmaster" do
     certname                       = #{spec[:fqdn]}
     storeconfigs                   = true
     storeconfigs_backend           = puppetdb
+    reports                        = foreman,successful_run_commit_id
 
 [agent]
     report            = true
