@@ -176,6 +176,17 @@ SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="#{nic[:mac]}", A
 
   }
 
+  run("enable serial so we can use virsh console") {
+    open("#{spec[:temp_dir]}/etc/init/ttyS0.conf", 'w') { |f|
+      f.puts """
+start on stopped rc RUNLEVEL=[2345]
+stop on runlevel [!2345]
+respawn
+exec /sbin/getty -L ttyS0 115200 vt102
+"""
+    }
+  }
+
   run("install misc packages") {
     apt_install "acpid openssh-server curl vim dnsutils lsof"
   }
