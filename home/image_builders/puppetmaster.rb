@@ -10,8 +10,7 @@ define "puppetmaster" do
     apt_install "rubygem-hiera"
     apt_install "rubygem-hiera-puppet"
     apt_install "puppetdb-terminus"
-    # FIXME Need to throw the symlink in /usr/share/mcollective
-    #apt_install "puppet-updator"
+    apt_install "libapache2-mod-passenger"
   }
 
   cleanup {
@@ -56,6 +55,12 @@ define "puppetmaster" do
     manifest=$confdir/manifests/site.pp
 """
     }
+  }
+
+  run("configure apache for puppetmaster") {
+    cmd "cp #{Dir.pwd}/files/apache2-puppetmaster-init #{spec[:temp_dir]}/etc/init.d/"
+    cmd "cp #{Dir.pwd}/files/apache2-puppetmaster.conf #{spec[:temp_dir]}/etc/apache2/puppetmaster.conf"
+    cmd "cp #{Dir.pwd}/files/puppetmaster #{spec[:temp_dir]}/etc/default/"
   }
 
   run("add autosign") {
