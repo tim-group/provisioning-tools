@@ -58,7 +58,7 @@ define "puppetmaster" do
   }
 
   run("configure apache for puppetmaster") {
-    cmd "cp #{Dir.pwd}/files/apache2-puppetmaster-init #{spec[:temp_dir]}/etc/init.d/"
+    cmd "cp #{Dir.pwd}/files/apache2-puppetmaster #{spec[:temp_dir]}/etc/init.d/"
     cmd "cp #{Dir.pwd}/files/apache2-puppetmaster.conf #{spec[:temp_dir]}/etc/apache2/puppetmaster.conf"
     cmd "cp #{Dir.pwd}/files/puppetmaster #{spec[:temp_dir]}/etc/default/"
   }
