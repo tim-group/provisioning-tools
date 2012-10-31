@@ -15,6 +15,7 @@ define "puppetmaster" do
 
   cleanup {
     chroot "/etc/init.d/puppetmaster stop"
+    chroot "/etc/init.d/apache2 stop"
   }
 
   run("puppet master code checkout") {
