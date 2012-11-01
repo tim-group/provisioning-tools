@@ -87,7 +87,8 @@ port   = 8081
       f.puts """#!/bin/sh -e
 DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install puppetdb
 update-rc.d puppetdb defaults
-puppet master --verbose --logdest=syslog && killall puppet
+# FIXME Grep the log to check its started then kill it instead?
+puppet master --verbose --logdest=syslog && sleep 5 && killall puppet
 echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local
 exit 0
 """
