@@ -62,6 +62,7 @@ define "puppetmaster" do
     cmd "cp #{Dir.pwd}/files/apache2-puppetmaster #{spec[:temp_dir]}/etc/init.d/"
     cmd "cp #{Dir.pwd}/files/apache2-puppetmaster.conf #{spec[:temp_dir]}/etc/apache2/puppetmaster.conf"
     cmd "cp #{Dir.pwd}/files/puppetmaster #{spec[:temp_dir]}/etc/default/"
+    chroot "update-rc.d apache2-puppetmaster defaults"
   }
 
   run("add autosign") {
@@ -86,6 +87,7 @@ port   = 8081
       f.puts """#!/bin/sh -e
 DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install puppetdb
 update-rc.d puppetdb defaults
+puppet master --verbose --logdest=syslog && killall puppet
 echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local
 exit 0
 """
