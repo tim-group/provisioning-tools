@@ -64,6 +64,7 @@ define "puppetmaster" do
     cmd "cp #{Dir.pwd}/files/apache2-puppetmaster.conf #{spec[:temp_dir]}/etc/apache2/puppetmaster.conf"
     cmd "cp #{Dir.pwd}/files/puppetmaster #{spec[:temp_dir]}/etc/default/"
     chroot "update-rc.d apache2-puppetmaster defaults"
+    chroot "update-rc.d -f apache2 remove"
   }
 
   run("add autosign") {
