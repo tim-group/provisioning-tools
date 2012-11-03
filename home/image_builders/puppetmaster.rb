@@ -83,6 +83,10 @@ port   = 8081
     }
   }
 
+  run("increase puppetdb heap") {
+    cmd "cp #{Dir.pwd}/files/puppetdb #{spec[:temp_dir]}/etc/default/"
+  }
+
   run("nasty hack to install puppetdb with correct cert name") {
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
       f.puts """#!/bin/sh -e
