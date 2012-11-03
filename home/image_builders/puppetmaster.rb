@@ -63,6 +63,7 @@ define "puppetmaster" do
     cmd "cp #{Dir.pwd}/files/apache2-puppetmaster #{spec[:temp_dir]}/etc/init.d/"
     cmd "cp #{Dir.pwd}/files/apache2-puppetmaster.conf #{spec[:temp_dir]}/etc/apache2/puppetmaster.conf"
     cmd "cp #{Dir.pwd}/files/puppetmaster #{spec[:temp_dir]}/etc/default/"
+    cmd "mkdir #{spec[:temp_dir]}/var/run/apache2"
     chroot "update-rc.d apache2-puppetmaster defaults"
     chroot "update-rc.d -f apache2 remove"
   }
