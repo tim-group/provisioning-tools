@@ -83,15 +83,12 @@ port   = 8081
     }
   }
 
-  run("increase puppetdb heap") {
-    cmd "cp #{Dir.pwd}/files/puppetdb #{spec[:temp_dir]}/etc/default/"
-  }
-
   run("nasty hack to install puppetdb with correct cert name") {
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
       f.puts """#!/bin/sh -e
 DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install puppetdb
 update-rc.d puppetdb defaults
+sed -i 's/-Xmx192m/-Xmx512m/' /etc/default/puppetdb
 puppet cert clean --all
 puppet cert generate #{spec[:fqdn]}
 echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local
