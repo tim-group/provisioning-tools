@@ -22,6 +22,7 @@ define "puppetmaster" do
     apt_install "git-core"
     chroot "rm -rf /etc/puppet"
     chroot "git clone http://git.youdevise.com/git/puppet /etc/puppet"
+    chroot "chown -R puppet:puppet /etc/puppet"
   }
 
   run("configure puppetmaster") {
