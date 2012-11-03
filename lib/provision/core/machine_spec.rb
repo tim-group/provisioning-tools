@@ -28,7 +28,7 @@ class Provision::Core::MachineSpec
     if_nil_define_var(:fqdn,"#{@spec[:hostname]}.#{@spec[:domain]}")
 
     if_nil_define_var(:vnc_port,"-1")
-    if_nil_define_var(:ram,"1048576")
+    if_nil_define_var(:ram,"2097152")
 
     @spec[:networks] = ["mgmt","back","middle","front"]
   end
