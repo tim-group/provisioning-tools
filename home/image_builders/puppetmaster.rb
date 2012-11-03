@@ -88,11 +88,11 @@ port   = 8081
   run("nasty hack to install puppetdb with correct cert name") {
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
       f.puts """#!/bin/sh -e
+puppet cert clean --all
+puppet cert generate #{spec[:fqdn]}
 DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install puppetdb
 sed -i 's/-Xmx192m/-Xmx512m/' /etc/default/puppetdb
 update-rc.d puppetdb defaults
-puppet cert clean --all
-puppet cert generate #{spec[:fqdn]}
 /etc/init.d/puppetdb restart
 /etc/init.d/apache2-puppetmaster restart
 echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local
