@@ -114,8 +114,7 @@ supersede domain-search \"#{spec[:domain]}\", \"youdevise.com\";
 
   run("enable apt proxy") {
     open("#{spec[:temp_dir]}/etc/apt/apt.conf.d/01proxy", 'w') { |f|
-      f.puts '
-Acquire::http::Proxy "http://aptproxy:3142";
+      f.puts 'Acquire::http::Proxy "http://aptproxy:3142";
       '
     }
   }
