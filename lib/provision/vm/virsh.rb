@@ -4,7 +4,7 @@ require 'ostruct'
 
 class Provision::VM::Virsh
   def initialize()
-    @template = "templates/kvm.template"
+    @template = "#{Provision.base}/templates/kvm.template"
   end
 
   def undefine_vm(hostname)
@@ -20,17 +20,15 @@ class Provision::VM::Virsh
   end
 
   def define_vm(spec)
-print "helo"  
 
-  template = ERB.new(File.read(@template))
+    template = ERB.new(File.read(@template))
     to = "#{spec[:libvirt_dir]}/#{spec[:hostname]}.xml"
-
-  begin
-print template.result(spec.get_binding())
-rescue Exception=>e
-print e
-print e.backtrace
- end
+    begin
+      print template.result(spec.get_binding())
+    rescue Exception=>e
+      print e
+      print e.backtrace
+    end
     File.open to, 'w' do |f|
       f.write template.result(spec.get_binding())
     end

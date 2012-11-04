@@ -1,37 +1,27 @@
 #!/usr/bin/ruby
+require 'yaml'
 $: << File.join(File.dirname(__FILE__), "..", "lib")
 
 configdir = File.join(File.dirname(__FILE__), "../lib/config")
 target_dir = File.join(File.dirname(__FILE__), "../target")
 
-if Process.uid != 0
-  raise 'FATAL: Process needs to run as root!'
-end
-
 require 'optparse'
 require 'provision'
+require 'provision/inventory'
+require 'provision/workqueue'
 
-template = nil
-hostname = nil
 
-@option_parser = OptionParser.new do|opts|
-  opts.banner =
-  "Usage: provision --template ubuntuprecise --hostname mymachine"
-  opts.on("-t","--template TEMPLATE", "specify the template to use") do |template_p|
-    template = template_p
-  end
-  opts.on("-h","--hostname HOSTNAME", "specify the template to use") do |hostname_p|
-    hostname = hostname_p
-  end
+specs = YAML::load($stdin.read())
+
+listener = NoopListener.new()
+work_queue = Provision.work_queue(:worker_count=>4, :listener=>listener)
+work_queue.fill(specs)
+
+
+work_queue.process()
+
+if (listener.has_errors?)
+  exit(1)
+else
+  exit(0)
 end
-@option_parser.parse!
-
-if (template ==nil || hostname == nil)
-  print  @option_parser.help()
-  exit
-end
-
-#Dir.chdir(target_dir)
-1.times {
-build = Provision.vm(:hostname=>hostname, :template=>template, :loop0=>"loop0",:loop1=>"loop1")
-}

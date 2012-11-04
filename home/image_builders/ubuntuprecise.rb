@@ -49,7 +49,7 @@ define "ubuntuprecise" do
   }
 
   run("running debootstrap") {
-    cmd "debootstrap --no-check-certificate --arch amd64 --extractor=dpkg-deb --exclude=resolvconf precise #{spec[:temp_dir]} http://aptproxy:3142/ubuntu"
+    cmd "debootstrap --no-check-certificate --arch amd64 --extractor=dpkg-deb --exclude=resolvconf precise #{spec[:temp_dir]} http://localhost/mirror"
     cmd "mkdir -p #{spec[:temp_dir]}/etc/default"
   }
 
@@ -151,7 +151,7 @@ supersede domain-search \"#{spec[:domain]}\", \"youdevise.com\";
 
   run("deploy the root key") {
     cmd "mkdir -p #{spec[:temp_dir]}/root/.ssh/"
-    cmd "cp #{Dir.pwd}/files/id_rsa.pub #{spec[:temp_dir]}/root/.ssh/authorized_keys"
+#    cmd "cp #{Dir.pwd}/files/id_rsa.pub #{spec[:temp_dir]}/root/.ssh/authorized_keys"
   }
 
   run("set up basic networking") {
@@ -218,7 +218,7 @@ exec /sbin/getty -L ttyS0 115200 vt102
       f.puts "deb http://apt/ubuntu stable main\ndeb-src http://apt/ubuntu stable main\n"
     }
 
-    chroot "curl -Ss http://apt/ubuntu/repo.key | apt-key add -"
+#    chroot "curl -Ss http://apt/ubuntu/repo.key | apt-key add -"
   }
 
   run("run apt-update ") {

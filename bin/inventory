@@ -56,4 +56,4 @@ get_host(host).get_env(env).get_generator(generator).generate_specs.each do |spe
   work_queue.add(spec)
 end
 
-work_queue.process()
+#work_queue.process()

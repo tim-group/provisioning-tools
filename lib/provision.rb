@@ -5,7 +5,7 @@ require 'provision/workqueue'
 
 module Provision
   def self.base(dir="")
-    return File.join(File.dirname(__FILE__), "../#{dir}")
+    return File.expand_path(File.join(File.dirname(__FILE__), "../#{dir}"))
   end
 
   def self.home(dir="")
@@ -27,7 +27,7 @@ module Provision
 
   def self.work_queue(options)
     work_queue = Provision::WorkQueue.new(
-      :listener=>NoopListener.new(),
+      :listener=>options[:listener],
       :provisioning_service => Provision.create_provisioning_service(),
       :worker_count=> options[:worker_count])
     return work_queue

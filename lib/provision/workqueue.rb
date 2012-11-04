@@ -7,8 +7,15 @@ class Provision::WorkQueue
   def initialize(args)
     @provisioning_service = args[:provisioning_service]
     @worker_count = args[:worker_count] 
-    @listener = args[:listener]||  NoopListener.new()
+    @listener = args[:listener]
     @queue = Queue.new
+  end
+
+  def fill(specs)
+    raise "an array of machine specifications is expected" unless specs.kind_of?(Array)
+    specs.each do |spec|
+      add(spec)
+    end
   end
 
   def add(spec)
@@ -18,25 +25,18 @@ class Provision::WorkQueue
   def process()
     threads = []
     total = @queue.size()
-    completed = 0
-    errors = 0
-    thread_progress = []
-    @listener.update(:errors=>errors, :completed=>completed)
     @worker_count.times {|i|
       threads << Thread.new {
         while(not @queue.empty?)
           spec = @queue.pop(true)
           spec[:thread_number] = i
           require 'yaml'
-          thread_progress[i] = spec
           begin
-            @provisioning_service.provision_vm(spec)
+#            @provisioning_service.provision_vm(spec)
           rescue Exception => e
-            errors+=1
-            @listener.error(e)
+            @listener.error(e, spec)
           ensure
-            completed+=1
-            @listener.update(:errors=>errors, :completed=>completed)
+             @listener.passed(spec)
           end
         end
       }
