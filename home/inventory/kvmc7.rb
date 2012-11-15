@@ -1,6 +1,12 @@
 host "localhost", :spindles=>["/mnt"] do
   env "dev", :domain=>"dev.net.local" do
-    generator "pm"  do
+   generator "os"  do
+      template "ubuntuprecise"
+      basename "os"
+      range(1,1)
+   end
+
+   generator "pm"  do
       template "puppetmaster"
       basename "puppetmaster"
       range(1,1)

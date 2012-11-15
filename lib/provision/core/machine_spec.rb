@@ -30,7 +30,7 @@ class Provision::Core::MachineSpec
     if_nil_define_var(:vnc_port,"-1")
     if_nil_define_var(:ram,"2097152")
 
-    @spec[:networks] = ["mgmt","back","middle","front"]
+    @spec[:networks] = ["mgmt","prod"]
   end
 
   def if_nil_define_var(var,value)

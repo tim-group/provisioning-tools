@@ -24,7 +24,7 @@ class Provision::VM::Virsh
     template = ERB.new(File.read(@template))
     to = "#{spec[:libvirt_dir]}/#{spec[:hostname]}.xml"
     begin
-      print template.result(spec.get_binding())
+      template.result(spec.get_binding())
     rescue Exception=>e
       print e
       print e.backtrace
@@ -32,8 +32,6 @@ class Provision::VM::Virsh
     File.open to, 'w' do |f|
       f.write template.result(spec.get_binding())
     end
-
- print "helx"
-     system("virsh define #{to} > /dev/null 2>&1")
+    system("virsh define #{to} > /dev/null 2>&1")
   end
 end

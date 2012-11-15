@@ -1,3 +1,7 @@
+
+--- NETWORKING - mgmt and prod
+
+
 * Rename logfiles to use VM name instead of incremental number.  e.g. console-puppetmaster.log instead of console-0.log
 * Allow overriding disk size per template, e.g. puppetmaster needs to be >3
 * Fix puppetdb installation to not be done in rc.local
@@ -9,3 +13,4 @@
 
 * KERNEL IS HARDCODED
 
+* PARAMETERIZE puppetmaster.conf

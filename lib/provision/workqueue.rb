@@ -31,12 +31,14 @@ class Provision::WorkQueue
           spec = @queue.pop(true)
           spec[:thread_number] = i
           require 'yaml'
+          error = nil
           begin
-#            @provisioning_service.provision_vm(spec)
+            @provisioning_service.provision_vm(spec)
           rescue Exception => e
             @listener.error(e, spec)
+            error = e
           ensure
-             @listener.passed(spec)
+             @listener.passed(spec) if error.nil?
           end
         end
       }
