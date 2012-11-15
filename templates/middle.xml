@@ -1,0 +1,4 @@
+<network>
+     <name>middle</name>
+     <bridge name="middle_br" />
+</network>

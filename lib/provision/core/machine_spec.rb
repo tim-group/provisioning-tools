@@ -1,3 +1,4 @@
+require 'provision'
 require 'provision/core/namespace'
 require 'provision/core/machine_spec'
 require 'provision/vm/netutils'
