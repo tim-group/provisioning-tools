@@ -1,4 +1,0 @@
-<network>
-     <name>back</name>
-     <bridge name="back_br" />
-</network>
