@@ -5,8 +5,12 @@ module Provision::Image::Catalogue
   @@catalogue = {}
 
   def load(dir)
-    Dir.entries(dir).each do |file|
-      require "#{dir}/#{file}" if file =~/.rb$/
+    begin
+      Dir.entries(dir).each do |file|
+        require "#{dir}/#{file}" if file =~/.rb$/
+      end
+    rescue Exception=>e
+      print e
     end
   end
 

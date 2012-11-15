@@ -9,7 +9,7 @@ module Provision
   end
 
   def self.home(dir="")
-    return File.join(File.dirname(__FILE__), "../home/#{dir}")
+    return File.expand_path(File.join(File.dirname(__FILE__), "../home/#{dir}"))
   end
 
   def self.create_provisioning_service()
