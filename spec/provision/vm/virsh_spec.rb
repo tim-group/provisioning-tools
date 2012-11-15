@@ -1,6 +1,8 @@
 require 'rubygems'
 require 'rspec'
+require 'provision'
 require 'provision/vm/virsh'
+require 'provision/core/machine_spec'
 
 describe Provision::VM::Virsh do
   before do

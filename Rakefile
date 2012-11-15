@@ -67,39 +67,9 @@ task :ctags do
   sh "ctags -R --exclude=.git --exclude=build *"
 end
 
-task :test => [:setup]
-Rake::TestTask.new { |t|
-    t.pattern = 'test/**/*_test.rb'
-}
-
-desc "Run specs"
-RSpec::Core::RakeTask.new("sys_spec") do |t|
-    t.rspec_opts = %w[--color]
-    t.pattern = "test/sys_spec/**/*_spec.rb"
-end
 
 desc "Run specs"
 RSpec::Core::RakeTask.new() do |t|
     t.rspec_opts = %w[--color]
-    t.pattern = "test/spec/**/*_spec.rb"
-end
-
-desc "Start all the networks and VMs"
-task :switch_on do
-  `sudo virsh net-start mgmt`
-  `sudo virsh net-start front`
-  `sudo virsh net-start middle`
-  `sudo virsh net-start back`
-
-  `sudo virsh start dev-lb-001`
-  `sudo virsh start dev-refapp-001`
-  `sudo virsh start dev-refapp-002`
-  `sudo virsh start dev-puppetmaster-001`
-end
-
-
-desc "x"
-task :run_tests do
-
-  `rspec test/spec/acceptance/router_spec.rb`
+    t.pattern = "spec/**/*_spec.rb"
 end
