@@ -1,6 +1,6 @@
 
 --- NETWORKING - mgmt and prod
-
+--- TIDYUP RAKEFILE (moved to acceptest)
 
 * Rename logfiles to use VM name instead of incremental number.  e.g. console-puppetmaster.log instead of console-0.log
 * Allow overriding disk size per template, e.g. puppetmaster needs to be >3
