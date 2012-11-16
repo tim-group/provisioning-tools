@@ -16,22 +16,22 @@ define "ubuntuprecise" do
 
   cleanup {
     keep_doing {
-      supress_error.cmd "kpartx -d /dev/#{spec[:loop0]}"
-    }.until {`dmsetup ls | grep #{spec[:loop0]}p1 | wc -l`.chomp == "0"}
+    supress_error.cmd "kpartx -d /dev/#{spec[:loop0]}"
+  }.until {`dmsetup ls | grep #{spec[:loop0]}p1 | wc -l`.chomp == "0"}
 
-    cmd "udevadm settle"
+  cmd "udevadm settle"
 
-    keep_doing {
-      supress_error.cmd "losetup -d /dev/#{spec[:loop0]}"
-    }.until {`losetup -a | grep /dev/#{spec[:loop0]} | wc -l`.chomp == "0"}
+  keep_doing {
+    supress_error.cmd "losetup -d /dev/#{spec[:loop0]}"
+  }.until {`losetup -a | grep /dev/#{spec[:loop0]} | wc -l`.chomp == "0"}
 
-    keep_doing {
-      supress_error.cmd "umount #{spec[:temp_dir]}"
-      supress_error.cmd "rmdir #{spec[:temp_dir]}"
-    }.until {`ls -d  #{spec[:temp_dir]} 2> /dev/null | wc -l`.chomp == "0"}
+  keep_doing {
+    supress_error.cmd "umount #{spec[:temp_dir]}"
+    supress_error.cmd "rmdir #{spec[:temp_dir]}"
+  }.until {`ls -d  #{spec[:temp_dir]} 2> /dev/null | wc -l`.chomp == "0"}
 
-    cmd "udevadm settle"
-    cmd "rmdir #{spec[:temp_dir]}"
+  cmd "udevadm settle"
+  cmd "rmdir #{spec[:temp_dir]}"
   }
 
   run("loopback devices 2") {
@@ -40,7 +40,7 @@ define "ubuntuprecise" do
   }
 
   cleanup {
-   keep_doing {
+    keep_doing {
       supress_error.cmd "umount -d /dev/#{spec[:loop1]}"
       supress_error.cmd "losetup -d /dev/#{spec[:loop1]}"
     }.until {
@@ -51,10 +51,6 @@ define "ubuntuprecise" do
   run("running debootstrap") {
     cmd "debootstrap --no-check-certificate --arch amd64 --exclude=resolvconf precise #{spec[:temp_dir]} http://aptproxy:3142/ubuntu"
     cmd "mkdir -p #{spec[:temp_dir]}/etc/default"
-  }
-
-  run("removing unwanted packages") {
-#    apt_remove "resolvconf"
   }
 
   run("mounting devices") {
@@ -97,18 +93,18 @@ define "ubuntuprecise" do
     open("#{spec[:temp_dir]}/etc/hostname", 'w') { |f|
       f.puts "#{spec[:hostname]}"
     }
-#    chroot "hostname -F /etc/hostname"
+  #    chroot "hostname -F /etc/hostname"
     open("#{spec[:temp_dir]}/etc/hosts", 'a') { |f|
-      f.puts "\n127.0.0.1		localhost\n"
-      f.puts "127.0.1.1		#{spec[:fqdn]}	#{spec[:hostname]}\n"
-    }
-    open("#{spec[:temp_dir]}/etc/dhcp/dhclient.conf", 'w') { |f|
-      f.puts "
+    f.puts "\n127.0.0.1		localhost\n"
+    f.puts "127.0.1.1		#{spec[:fqdn]}	#{spec[:hostname]}\n"
+  }
+  open("#{spec[:temp_dir]}/etc/dhcp/dhclient.conf", 'w') { |f|
+    f.puts "
 option rfc3442-classless-static-routes code 121 = array of unsigned integer 8;
 send host-name \"#{spec[:hostname]}\";
 supersede domain-name \"#{spec[:domain]}\";
 supersede domain-search \"#{spec[:domain]}\", \"youdevise.com\";
-      "
+    "
     }
   }
 
@@ -116,7 +112,6 @@ supersede domain-search \"#{spec[:domain]}\", \"youdevise.com\";
     chroot "apt-get -y --force-yes update"
     apt_install "linux-image-virtual"
     apt_install "grub-pc"
-
     cmd "mkdir -p #{spec[:temp_dir]}/boot/grub"
 
     open("#{spec[:temp_dir]}/boot/grub/device.map", 'w') { |f|
@@ -151,12 +146,12 @@ supersede domain-search \"#{spec[:domain]}\", \"youdevise.com\";
 
   run("deploy the root key") {
     cmd "mkdir -p #{spec[:temp_dir]}/root/.ssh/"
-#    cmd "cp #{Dir.pwd}/files/id_rsa.pub #{spec[:temp_dir]}/root/.ssh/authorized_keys"
+    #    cmd "cp #{Dir.pwd}/files/id_rsa.pub #{spec[:temp_dir]}/root/.ssh/authorized_keys"
   }
 
   run("set up basic networking") {
     open("#{spec[:temp_dir]}/etc/network/interfaces", 'w') { |f|
-      f.puts "
+    f.puts "
 # The loopback network interface
 auto lo
 iface lo inet loopback
@@ -164,27 +159,30 @@ iface lo inet loopback
 # The primary network interface
 auto mgmt
 iface mgmt inet dhcp
-"
-   }
-    open("#{spec[:temp_dir]}/etc/udev/rules.d/70-persistent-net.rules", 'w') { |f|
-      spec.interfaces.each do |nic|
-        f.puts %[
-SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="#{nic[:mac]}", ATTR{type}=="1",  NAME="#{nic[:network]}"\n
-        ]
-      end
-    }
 
+# The primary network interface
+auto prod
+iface prod inet dhcp
+    "
+  }
+  open("#{spec[:temp_dir]}/etc/udev/rules.d/70-persistent-net.rules", 'w') { |f|
+    spec.interfaces.each do |nic|
+      f.puts %[
+SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="#{nic[:mac]}", ATTR{type}=="1",  NAME="#{nic[:network]}"\n
+      ]
+    end
+  }
   }
 
   run("enable serial so we can use virsh console") {
     open("#{spec[:temp_dir]}/etc/init/ttyS0.conf", 'w') { |f|
-      f.puts """
+    f.puts """
 start on stopped rc RUNLEVEL=[2345]
 stop on runlevel [!2345]
 respawn
 exec /sbin/getty -L ttyS0 115200 vt102
-"""
-    }
+    """
+  }
   }
 
   run("install misc packages") {
@@ -217,12 +215,25 @@ exec /sbin/getty -L ttyS0 115200 vt102
     open("#{spec[:temp_dir]}/etc/apt/sources.list.d/youdevise.list", 'w') { |f|
       f.puts "deb http://apt/ubuntu stable main\ndeb-src http://apt/ubuntu stable main\n"
     }
-
-#    chroot "curl -Ss http://apt/ubuntu/repo.key | apt-key add -"
+    chroot "curl -Ss http://apt/ubuntu/repo.key | apt-key add -"
   }
 
   run("run apt-update ") {
     chroot "apt-get -y --force-yes update"
   }
 
+  run("bootpuppet") {
+    cmd "cp -r #{Dir.pwd}/puppetboot #{spec[:temp_dir]}/"
+    apt_install "puppet"
+
+    run("nasty hack to install puppetdb with correct cert name") {
+    open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
+      f.puts """#!/bin/sh -e
+puppet apply /puppetboot/master.pp -l /var/log/puppetinit.log
+echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local
+exit 0
+"""
+    }
+    }
+  }
 end
