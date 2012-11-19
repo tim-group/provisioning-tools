@@ -10,9 +10,10 @@ end
 
 desc "Set up virtual network"
 task :network do
-    sh "sudo bash 'ext/define-net.sh' 2>/dev/null"
-    sh "sudo pkill dnsmasq"
-    sh "sudo bash 'ext/dnsmasq.sh'"
+  sh "sudo pkill dnsmasq"
+  sh "sudo bash 'networking/define-net.sh'"
+  sh "sudo pkill dnsmasq"
+  sh "sudo bash 'networking/dnsmasq.sh'"
 end
 
 desc "Run puppet"
