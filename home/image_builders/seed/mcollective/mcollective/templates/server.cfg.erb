@@ -1,0 +1,67 @@
+############################################
+# WARNING:
+# Managed by puppet - DO NOT modify locally.
+############################################
+
+topicprefix = /topic/
+main_collective = mcollective
+collectives = mcollective,stag
+identity = <%= scope.lookupvar('::fqdn') %>
+libdir = /usr/share/mcollective/plugins
+logfile = /var/log/mcollective.log
+loglevel = info
+# Rotate the main logfile weekly. audit log is rotated with logrotate
+keeplogs = weekly
+daemonize = 1
+classesfile=/var/lib/puppet/state/classes.txt
+
+# Plugins
+securityprovider = ssl
+plugin.ssl_server_private = /etc/mcollective/ssl/server-private.pem
+plugin.ssl_server_public = /etc/mcollective/ssl/clients/server-public.pem
+plugin.ssl_client_cert_dir = /etc/mcollective/ssl/clients/
+
+connector = activemq
+plugin.activemq.pool.size = 1
+plugin.activemq.initial_reconnect_delay = 0.01
+plugin.activemq.max_reconnect_delay = 5
+plugin.activemq.use_exponential_back_off = true
+plugin.activemq.back_off_multiplier = 2
+plugin.activemq.max_reconnect_attempts = 0
+plugin.activemq.randomize = false
+plugin.activemq.timeout = -1
+plugin.activemq.connect_timeout = 3
+
+plugin.activemq.pool.1.host = enfield.youdevise.com
+plugin.activemq.pool.1.port = 6163
+plugin.activemq.pool.1.user = mcollective
+plugin.activemq.pool.1.password = marionette
+plugin.activemq.pool.1.ssl = false
+
+
+direct_addressing = 1
+direct_addressing_threshold = 5
+
+plugin.nrpe.conf_dir = /etc/nagios/nrpe.d
+
+# Facts
+factsource = yaml
+plugin.yaml = /etc/mcollective/facts.yaml
+
+# Auditing
+rpcaudit = 1
+rpcauditprovider = Logfile
+plugin.rpcaudit.logfile = /var/log/mcollective-audit.log
+
+# ACLs
+rpcauthorization = 1
+rpcauthprovider = action_policy
+plugin.actionpolicy.allow_unconfigured = 1
+plugin.actionpolicy.enable_default = 1
+plugin.actionpolicy.default_name = default
+
+# Registration
+registerinterval = 120
+registration = Meta
+plugin.registration.extra_yaml_dir = /etc/mcollective/extra_facts.d
+
