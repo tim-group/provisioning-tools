@@ -1,7 +1,18 @@
 node default {
+  include puppetmaster::preinstall
   include puppetmaster::install
   include puppetmaster::config
   include puppetmaster::service
+}
+
+class puppetmaster::preinstall {
+  exec {
+    'puppet is crap':
+      path    => '/bin:/usr/bin',
+      command => "echo -e '#!/bin/sh\nexport JAVA_BIN=/does-not-exist\n' > /etc/default/puppetdb",
+      onlyif  => "/usr/bin/test ! -e /etc/default/puppetdb";
+  }
+
 }
 
 class puppetmaster::install {
@@ -15,12 +26,13 @@ class puppetmaster::install {
     'libapache2-mod-passenger',
     'puppetmaster',
     'ruby-stomp']:
-      ensure  => "latest"
+      ensure  => "latest",
+      require => Class['puppetmaster::preinstall']
   }
 
   exec{"reposetup":
     command => "/seed/clonerepo.sh",
-    onlyif  => "/usr/bin/test -d /etc/puppet/hiera.yaml",
+    onlyif  => "/usr/bin/test -e /etc/puppet/hiera.yaml",
     require => Package['puppetdb']
   }
 }
@@ -47,7 +59,8 @@ class puppetmaster::config {
     ensure  => 'file',
     owner   => 'root',
     path    => '/etc/default/puppetdb',
-    content => template('/seed/default_puppetdb.erb');
+    content => template('/seed/default_puppetdb.erb'),
+    require => Exec['reposetup'];
 
   '/etc/init.d/apache2-puppetmaster':
     ensure      => 'file',
@@ -89,6 +102,10 @@ class puppetmaster::service {
     'puppetmaster':
       ensure =>'stopped',
       require => Package['puppetmaster'];
+
+    'puppetdb':
+      ensure  => 'running',
+      require => Class['puppetmaster::config'];
   }
 
 }
