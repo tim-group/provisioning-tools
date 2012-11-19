@@ -30,18 +30,18 @@ class puppetmaster::install {
       require => Class['puppetmaster::preinstall']
   }
 
+  package{'git-core':
+    ensure => 'latest'
+  }
+
   exec{"reposetup":
     command => "/seed/clonerepo.sh",
-    onlyif  => "/usr/bin/test -e /etc/puppet/hiera.yaml",
-    require => Package['puppetdb']
+    onlyif  => "/usr/bin/test ! -e /etc/puppet/hiera.yaml",
+    require => Package['puppetdb','git-core']
   }
 }
 
 class puppetmaster::config {
-
-  package{'git-core':
-    ensure => 'latest'
-  }
 
   file{'/etc/puppet/puppet.conf':
     ensure  => 'file',
