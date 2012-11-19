@@ -226,14 +226,12 @@ exec /sbin/getty -L ttyS0 115200 vt102
     cmd "cp -r #{Dir.pwd}/puppetboot #{spec[:temp_dir]}/"
     apt_install "puppet"
 
-    run("nasty hack to install puppetdb with correct cert name") {
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
       f.puts """#!/bin/sh -e
 puppet apply /puppetboot/master.pp -l /var/log/puppetinit.log
 echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local
 exit 0
 """
-    }
     }
   }
 end
