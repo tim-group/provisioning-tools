@@ -1,19 +1,17 @@
 define "mcollective" do
+  ubuntuprecise
 
-  run("install and configure mcollective") {
-    apt_install "ruby-stomp"
-    apt_install "mcollective"
-    cmd "cp #{Dir.pwd}/files/mcollective/server.cfg #{spec[:temp_dir]}/etc/mcollective/"
+  run("mcollective") {
+    cmd "cp -r #{Dir.pwd}/seed/mcollective  #{spec[:temp_dir]}/seed"
+    apt_install "puppet"
+
+    open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
+      f.puts """#!/bin/sh -e
+ puppet apply /seed/install.pp -l /seed/init.log
+ echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local
+ exit 0
+      """
+    }
   }
-
-  run("install puppetd agent") {
-    cmd "cp #{Dir.pwd}/files/mcollective/agents/puppetd.rb #{spec[:temp_dir]}/usr/share/mcollective/plugins/mcollective/agent/puppetd.rb"
-    cmd "cp #{Dir.pwd}/files/mcollective/agents/puppetd.ddl #{spec[:temp_dir]}/usr/share/mcollective/plugins/mcollective/agent/puppetd.ddl"
-  }
-
-  cleanup {
-    chroot "/etc/init.d/mcollective stop"
-  }
-
 
 end
