@@ -37,11 +37,14 @@ class puppetmaster::install {
   exec{"reposetup":
     command => "/seed/clonerepo.sh",
     onlyif  => "/usr/bin/test ! -e /etc/puppet/hiera.yaml",
-    require => Package['puppetdb','git-core']
+    require => Package['puppetmaster','puppetdb','git-core']
   }
 }
 
 class puppetmaster::config {
+  File {
+    require => Class['puppetmaster::install']
+  }
 
   file{'/etc/puppet/puppet.conf':
     ensure  => 'file',
@@ -78,11 +81,12 @@ class puppetmaster::config {
     content => template('/seed/puppetmaster.conf.erb');
 
   '/etc/puppet/rack':
-    ensure => 'directory';
+    ensure  => 'directory',
+    require => Class['puppetmaster::install'];
 
   '/etc/puppet/rack/config.ru':
     ensure  => 'file',
-    owner   => 'root',
+    owner   => 'puppet',
     path    => '/etc/puppet/rack/config.ru',
     require  => File['/etc/puppet/rack'],
     content => template('/seed/config.ru.erb')
