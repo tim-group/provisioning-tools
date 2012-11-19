@@ -1,8 +1,8 @@
-define "mcollective" do
+define "puppetapply" do
   ubuntuprecise
 
-  run("mcollective") {
-    cmd "cp -r #{File.dirname(__FILE__)}/seed/mcollective  #{spec[:temp_dir]}/seed"
+  run("puppetapply") {
+    cmd "cp -r #{File.dirname(__FILE__)}/seed/#{spec[:seed]}  #{spec[:temp_dir]}/seed"
     apt_install "puppet"
 
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
