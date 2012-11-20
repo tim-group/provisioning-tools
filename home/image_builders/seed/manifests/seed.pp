@@ -1,3 +1,3 @@
 node default {
-  include puppetmaster
+  include mcollective
 }
