@@ -32,8 +32,7 @@ class puppetmaster::install {
     'puppetdb-terminus',
     'apache2',
     'libapache2-mod-passenger',
-    'puppetmaster',
-    'ruby-stomp']:
+    'puppetmaster']:
       ensure  => "latest",
       require => Class['puppetmaster::preinstall']
   }

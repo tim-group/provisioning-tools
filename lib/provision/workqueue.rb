@@ -6,7 +6,7 @@ require 'provision/workqueue/curses_listener'
 class Provision::WorkQueue
   def initialize(args)
     @provisioning_service = args[:provisioning_service]
-    @worker_count = args[:worker_count] 
+    @worker_count = args[:worker_count]
     @listener = args[:listener]
     @queue = Queue.new
   end
@@ -35,6 +35,7 @@ class Provision::WorkQueue
           begin
             @provisioning_service.provision_vm(spec)
           rescue Exception => e
+            print e.backtrace
             @listener.error(e, spec)
             error = e
           ensure
