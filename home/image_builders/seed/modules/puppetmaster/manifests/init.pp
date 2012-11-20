@@ -1,4 +1,4 @@
-node default {
+class puppetmaster {
   include puppetmaster::preinstall
   include puppetmaster::install
   include puppetmaster::config
@@ -18,7 +18,7 @@ class puppetmaster::preinstall {
       ensure  => 'file',
       owner   => 'root',
       path    => '/etc/default/puppetmaster',
-      content => template('/seed/default_puppetmaster.erb'),
+      content => template('puppetmaster/default_puppetmaster.erb'),
   }
 
 }
@@ -58,19 +58,19 @@ class puppetmaster::config {
     ensure  => 'file',
     owner   => 'root',
     path    => '/etc/puppet/puppet.conf',
-    content => template('/seed/puppet.conf.erb');
+    content => template('puppetmaster/puppet.conf.erb');
 
   '/etc/puppet/puppetdb.conf':
     ensure  => 'file',
     owner   => 'root',
     path    => '/etc/puppet/puppetdb.conf',
-    content => template('/seed/puppetdb.conf.erb');
+    content => template('puppetmaster/puppetdb.conf.erb');
 
   '/etc/default/puppetdb':
     ensure  => 'file',
     owner   => 'root',
     path    => '/etc/default/puppetdb',
-    content => template('/seed/default_puppetdb.erb'),
+    content => template('puppetmaster/default_puppetdb.erb'),
     require => Exec['reposetup'];
 
   '/etc/init.d/apache2-puppetmaster':
@@ -78,7 +78,7 @@ class puppetmaster::config {
     owner       => 'root',
     mode        => 744,
     path        => '/etc/init.d/apache2-puppetmaster',
-    content     => template('/seed/init_apache-puppetmaster.erb'),
+    content     => template('puppetmaster/init_apache-puppetmaster.erb'),
     require => Package['libapache2-mod-passenger'];
 
   '/etc/apache2/puppetmaster.conf':
@@ -86,7 +86,7 @@ class puppetmaster::config {
     owner   => 'root',
     path    => '/etc/apache2/puppetmaster.conf',
     require => Package['libapache2-mod-passenger'],
-    content => template('/seed/puppetmaster.conf.erb');
+    content => template('puppetmaster/puppetmaster.conf.erb');
 
   '/etc/puppet/rack':
     ensure  => 'directory',
@@ -97,7 +97,7 @@ class puppetmaster::config {
     owner   => 'puppet',
     path    => '/etc/puppet/rack/config.ru',
     require  => File['/etc/puppet/rack'],
-    content => template('/seed/config.ru.erb');
+    content => template('puppetmaster/config.ru.erb');
 
   '/var/lib/puppet/ssl':
     ensure => 'directory',
