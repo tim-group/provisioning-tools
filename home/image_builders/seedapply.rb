@@ -5,9 +5,15 @@ define "seedapply" do
     cmd "mkdir #{spec[:temp_dir]}/seed"
     cmd "cp -r #{File.dirname(__FILE__)}/seed  #{spec[:temp_dir]}/"
     apt_install "puppet"
-    cmd "cp -r #{File.dirname(__FILE__)}/ssl  #{spec[:temp_dir]}/var/lib/puppet/"
-    chroot "chown -R puppet /var/lib/puppet/ssl"
 
+    #    cmd "cp -r #{File.dirname(__FILE__)}/ssl  #{spec[:temp_dir]}/var/lib/puppet/"
+    cmd "mkdir -p #{spec[:temp_dir]}/var/lib/puppet/ssl/private_keys"
+    cmd "mkdir -p #{spec[:temp_dir]}/var/lib/puppet/ssl/certs"
+
+    cmd "cp #{File.dirname(__FILE__)}/ssl/private_keys/generic.dev.net.local.pem  #{spec[:temp_dir]}/var/lib/puppet/ssl/private_keys/"
+    cmd "cp #{File.dirname(__FILE__)}/ssl/ca/signed/generic.dev.net.local.pem  #{spec[:temp_dir]}/var/lib/puppet/ssl/certs/"
+
+    chroot "chown -R puppet /var/lib/puppet/ssl"
 
     open("#{spec[:temp_dir]}/seed/puppet.yaml", "w") {|f|
       f.puts YAML.dump(spec[:enc])
