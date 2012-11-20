@@ -4,11 +4,13 @@ class mcollective::plugins {
     require => Class['mcollective::config'],
   }
 
-  # Add plugins
-  file { '/usr/share/mcollective/plugins/mcollective/registration/meta.rb':
-    ensure => present,
-    source => 'puppet:///modules/mcollective/registration/meta.rb';
-  }
 
+  # Add plugins
+  file {
+  '/usr/share/mcollective/plugins/mcollective':
+    ensure  => directory,
+    source  => 'puppet:///modules/mcollective/mcollective',
+    recurse => true;
+  }
 }
 
