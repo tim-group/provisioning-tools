@@ -1,7 +1,7 @@
-define "puppetapply" do
+define "seedapply" do
   ubuntuprecise
 
-  run("puppetapply") {
+  run("seedapply") {
     cmd "mkdir #{spec[:temp_dir]}/seed"
     cmd "cp -r #{File.dirname(__FILE__)}/seed/#{spec[:seed]}/  #{spec[:temp_dir]}/seed"
     apt_install "puppet"
