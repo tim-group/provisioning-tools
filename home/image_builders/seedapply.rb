@@ -8,10 +8,9 @@ define "seedapply" do
     cmd "cp -r #{File.dirname(__FILE__)}/ssl  #{spec[:temp_dir]}/var/lib/puppet/"
     chroot "chown -R puppet /var/lib/puppet/ssl"
 
+
     open("#{spec[:temp_dir]}/seed/puppet.yaml", "w") {|f|
-      f.puts "---\n"
-      f.puts "classes:\n"
-      f.puts "  #{spec[:seed]}:\n"
+      f.puts YAML.dump(spec[:enc])
     }
 
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
