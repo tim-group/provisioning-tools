@@ -1,3 +1,2 @@
 node default {
-  include puppetmaster
 }

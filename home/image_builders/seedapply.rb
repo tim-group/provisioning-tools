@@ -8,9 +8,15 @@ define "seedapply" do
     cmd "cp -r #{File.dirname(__FILE__)}/ssl  #{spec[:temp_dir]}/var/lib/puppet/"
     chroot "chown -R puppet /var/lib/puppet/ssl"
 
+    open("#{spec[:temp_dir]}/seed/puppet.yaml", "w") {|f|
+      f.puts "---\n"
+      f.puts "classes:\n"
+      f.puts "  #{spec[:seed]}:\n"
+    }
+
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
       f.puts """#!/bin/sh -e
- puppet apply /seed/manifests/seed.pp --modulepath=/seed/modules -l /seed/init.log
+ puppet apply /seed/manifests/seed.pp --node_terminus exec --external_nodes /seed/enc.sh --modulepath=/seed/modules -l /seed/init.log
  echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local
  exit 0
       """
