@@ -13,6 +13,14 @@ class puppetmaster::preinstall {
       onlyif  => "/usr/bin/test ! -e /etc/default/puppetdb";
   }
 
+  file {
+    '/etc/default/puppetmaster':
+      ensure  => 'file',
+      owner   => 'root',
+      path    => '/etc/default/puppetmaster',
+      content => template('/seed/default_puppetmaster.erb'),
+  }
+
 }
 
 class puppetmaster::install {
@@ -89,8 +97,19 @@ class puppetmaster::config {
     owner   => 'puppet',
     path    => '/etc/puppet/rack/config.ru',
     require  => File['/etc/puppet/rack'],
-    content => template('/seed/config.ru.erb')
+    content => template('/seed/config.ru.erb');
+
+  '/var/lib/puppet/ssl':
+    ensure => 'directory',
+    owner  => 'puppet';
+
+  '/var/lib/puppet/reports':
+    ensure => 'directory',
+    owner  => 'puppet';
   }
+
+
+
 }
 
 class puppetmaster::service {
