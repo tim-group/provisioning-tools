@@ -2,16 +2,20 @@ define "seedapply" do
   ubuntuprecise
 
   run("seedapply") {
+    pp spec[:enc]
     cmd "mkdir #{spec[:temp_dir]}/seed"
     cmd "cp -r #{File.dirname(__FILE__)}/seed  #{spec[:temp_dir]}/"
     apt_install "puppet"
 
-    #    cmd "cp -r #{File.dirname(__FILE__)}/ssl  #{spec[:temp_dir]}/var/lib/puppet/"
-    cmd "mkdir -p #{spec[:temp_dir]}/var/lib/puppet/ssl/private_keys"
-    cmd "mkdir -p #{spec[:temp_dir]}/var/lib/puppet/ssl/certs"
 
-    cmd "cp #{File.dirname(__FILE__)}/ssl/private_keys/generic.dev.net.local.pem  #{spec[:temp_dir]}/var/lib/puppet/ssl/private_keys/"
-    cmd "cp #{File.dirname(__FILE__)}/ssl/ca/signed/generic.dev.net.local.pem  #{spec[:temp_dir]}/var/lib/puppet/ssl/certs/"
+    if spec[:enc]["classes"].has_key?("puppetmaster") != nil
+      cmd "cp -r #{File.dirname(__FILE__)}/ssl  #{spec[:temp_dir]}/var/lib/puppet/"
+    else
+      cmd "mkdir -p #{spec[:temp_dir]}/var/lib/puppet/ssl/private_keys"
+      cmd "mkdir -p #{spec[:temp_dir]}/var/lib/puppet/ssl/certs"
+      cmd "cp #{File.dirname(__FILE__)}/ssl/private_keys/generic.dev.net.local.pem  #{spec[:temp_dir]}/var/lib/puppet/ssl/private_keys/"
+     cmd "cp #{File.dirname(__FILE__)}/ssl/ca/signed/generic.dev.net.local.pem  #{spec[:temp_dir]}/var/lib/puppet/ssl/certs/"
+   end
 
     chroot "chown -R puppet /var/lib/puppet/ssl"
 
