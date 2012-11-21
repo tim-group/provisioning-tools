@@ -1,2 +1,0 @@
-policy default deny
-allow	cert=seed	*	*	*

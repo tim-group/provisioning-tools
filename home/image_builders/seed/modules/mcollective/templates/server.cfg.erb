@@ -42,8 +42,6 @@ plugin.activemq.pool.1.ssl = false
 direct_addressing = 1
 direct_addressing_threshold = 5
 
-plugin.nrpe.conf_dir = /etc/nagios/nrpe.d
-
 # Facts
 factsource = yaml
 plugin.yaml = /etc/mcollective/facts.yaml
@@ -53,15 +51,5 @@ rpcaudit = 1
 rpcauditprovider = Logfile
 plugin.rpcaudit.logfile = /var/log/mcollective-audit.log
 
-# ACLs
-rpcauthorization = 1
-rpcauthprovider = action_policy
-plugin.actionpolicy.allow_unconfigured = 1
-plugin.actionpolicy.enable_default = 1
-plugin.actionpolicy.default_name = default
 
-# Registration
-registerinterval = 120
-registration = Meta
-plugin.registration.extra_yaml_dir = /etc/mcollective/extra_facts.d
 

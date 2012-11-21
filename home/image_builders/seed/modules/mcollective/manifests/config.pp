@@ -1,13 +1,9 @@
 class mcollective::config {
 
-  File {
-    require => Class['mcollective::install'],
-  }
-
   # Configure it
   file {
 
-    [ '/etc/mcollective', '/etc/mcollective/ssl', '/etc/mcollective/ssl/clients', '/etc/mcollective/extra_facts.d', '/etc/mcollective/policies' ]:
+    [ '/etc/mcollective', '/etc/mcollective/ssl', '/etc/mcollective/ssl/clients' ]:
       ensure => directory;
 
     '/etc/mcollective/server.cfg':
@@ -36,13 +32,5 @@ class mcollective::config {
       group  => 'root',
       mode   => '0400',
       source => 'puppet:///modules/mcollective/ssl/clients/seed.pem';
-
-    '/etc/mcollective/policies/default.policy':
-      ensure => file,
-      source => 'puppet:///modules/mcollective/default.policy';
   }
 }
-
-
-
-

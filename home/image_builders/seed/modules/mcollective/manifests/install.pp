@@ -1,6 +1,9 @@
 class mcollective::install {
 
-  # Install it
+  Package {
+    require => Class["mcollective::config"]
+  }
+
   package {
      [ 'libstomp-ruby1.8', 'libstomp-ruby', 'ruby-stomp' ]:
        ensure => installed;
