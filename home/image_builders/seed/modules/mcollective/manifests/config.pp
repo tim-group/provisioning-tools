@@ -1,4 +1,4 @@
-class mcollective::config {
+class mcollective::config($collective) {
 
   # Configure it
   file {

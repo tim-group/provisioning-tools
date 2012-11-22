@@ -4,8 +4,8 @@
 ############################################
 
 topicprefix = /topic/
-main_collective = mcollective
-collectives = mcollective,stag
+main_collective = <%= collective %>
+collectives = <%= collective %>
 identity = <%= scope.lookupvar('::fqdn') %>
 libdir = /usr/share/mcollective/plugins
 logfile = /var/log/mcollective.log

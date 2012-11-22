@@ -1,6 +1,8 @@
-class mcollective {
+class mcollective($collective) {
   include mcollective::install
-  include mcollective::config
+  class { 'mcollective::config':
+    collective => $collective
+  }
   include mcollective::service
 }
 
