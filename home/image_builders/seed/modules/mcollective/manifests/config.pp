@@ -1,4 +1,4 @@
-class mcollective::config($collective) {
+class mcollective::config($collective, $broker) {
 
   # Configure it
   file {
