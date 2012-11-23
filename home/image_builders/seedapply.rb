@@ -14,8 +14,8 @@ define "seedapply" do
       cmd "mkdir -p #{spec[:temp_dir]}/var/lib/puppet/ssl/private_keys"
       cmd "mkdir -p #{spec[:temp_dir]}/var/lib/puppet/ssl/certs"
       cmd "cp #{File.dirname(__FILE__)}/ssl/private_keys/generic.dev.net.local.pem  #{spec[:temp_dir]}/var/lib/puppet/ssl/private_keys/"
-     cmd "cp #{File.dirname(__FILE__)}/ssl/ca/signed/generic.dev.net.local.pem  #{spec[:temp_dir]}/var/lib/puppet/ssl/certs/"
-   end
+      cmd "cp #{File.dirname(__FILE__)}/ssl/ca/signed/generic.dev.net.local.pem  #{spec[:temp_dir]}/var/lib/puppet/ssl/certs/"
+    end
 
     chroot "chown -R puppet /var/lib/puppet/ssl"
 

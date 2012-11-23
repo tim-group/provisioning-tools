@@ -3,7 +3,13 @@ class mcollective::config($collective, $broker) {
   # Configure it
   file {
 
-    [ '/etc/mcollective', '/etc/mcollective/ssl', '/etc/mcollective/ssl/clients' ]:
+    [ '/etc/mcollective',
+    '/etc/mcollective/ssl',
+    '/etc/mcollective/ssl/clients',
+    '/usr/share/mcollective/',
+    '/usr/share/mcollective/plugins'
+
+    ]:
       ensure => directory;
 
     '/etc/mcollective/server.cfg':
@@ -32,5 +38,11 @@ class mcollective::config($collective, $broker) {
       group  => 'root',
       mode   => '0400',
       source => 'puppet:///modules/mcollective/ssl/clients/seed.pem';
+
+    '/usr/share/mcollective/plugins/mcollective/':
+      ensure   => directory,
+      source   => 'puppet:///modules/mcollective/plugins',
+      require => File['/usr/share/mcollective/plugins'],
+      recurse => true;
   }
 }
