@@ -4,7 +4,7 @@ require 'provision/image/build'
 module Provision::Image::Catalogue
   @@catalogue = {}
 
-  def load(dir)
+  def loadconfig(dir)
     begin
       Dir.entries(dir).each do |file|
         require "#{dir}/#{file}" if file =~/.rb$/
