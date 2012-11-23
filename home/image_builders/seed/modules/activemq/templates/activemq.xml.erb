@@ -1,0 +1,95 @@
+<beans
+  xmlns="http://www.springframework.org/schema/beans"
+  xmlns:amq="http://activemq.apache.org/schema/core"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+  http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd
+  http://activemq.apache.org/camel/schema/spring http://activemq.apache.org/camel/schema/spring/camel-spring.xsd">
+
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="locations">
+      <value>file:${activemq.base}/conf/credentials.properties</value>
+    </property>
+  </bean>
+
+  <broker xmlns="http://activemq.apache.org/schema/core" brokerName="<%= hostname -%>" dataDirectory="${activemq.base}/data" useJmx="true">
+
+    <destinationPolicy>
+      <policyMap>
+        <policyEntries>
+          <policyEntry topic=">" producerFlowControl="false" memoryLimit="100mb">
+            <pendingSubscriberPolicy>
+              <vmCursor />
+            </pendingSubscriberPolicy>
+          </policyEntry>
+          <policyEntry queue="*.reply.>" gcInactiveDestinations="true" inactiveTimoutBeforeGC="300000" memoryLimit="100mb">
+            <pendingSubscriberPolicy>
+              <vmCursor />
+            </pendingSubscriberPolicy>
+          </policyEntry>
+          <policyEntry queue=">" producerFlowControl="true" memoryLimit="100mb">
+            <pendingQueuePolicy>
+              <vmQueueCursor/>
+            </pendingQueuePolicy>
+          </policyEntry>
+        </policyEntries>
+      </policyMap>
+    </destinationPolicy>
+
+    <managementContext>
+      <managementContext connectorPort="1099" jmxDomainName="org.apache.activemq"/>
+    </managementContext>
+
+    <networkConnectors>
+    </networkConnectors>
+
+    <persistenceAdapter>
+      <kahaDB directory="${activemq.base}/data/kahadb"/>
+    </persistenceAdapter>
+
+    <plugins>
+      <statisticsBrokerPlugin/>
+
+      <simpleAuthenticationPlugin>
+        <users>
+          <authenticationUser username="<%= mcollective_username -%>" password="<%= mcollective_password -%>" groups="mcollective,admins,everyone"/>
+          <authenticationUser username="<%= admin_username -%>" password="<%= admin_password -%>" groups="mcollective,admins,everyone"/>
+        </users>
+      </simpleAuthenticationPlugin>
+
+      <authorizationPlugin>
+        <map>
+          <authorizationMap>
+            <authorizationEntries>
+              <authorizationEntry queue=">" write="admins" read="admins" admin="admins" />
+              <authorizationEntry topic=">" write="admins" read="admins" admin="admins" />
+              <authorizationEntry topic="ActiveMQ.Advisory.>" write="everyone" read="everyone" admin="everyone"/>
+            </authorizationEntries>
+          </authorizationMap>
+        </map>
+      </authorizationPlugin>
+    </plugins>
+
+    <systemUsage>
+      <systemUsage>
+        <memoryUsage>
+          <memoryUsage limit="1 gb" />
+        </memoryUsage>
+        <storeUsage>
+          <storeUsage limit="1 gb" />
+        </storeUsage>
+        <tempUsage>
+          <tempUsage limit="500 mb" />
+        </tempUsage>
+      </systemUsage>
+    </systemUsage>
+
+    <transportConnectors>
+      <transportConnector name="openwire" uri="tcp://0.0.0.0:6166"/>
+      <transportConnector name="stomp"   uri="stomp://0.0.0.0:6163"/>
+    </transportConnectors>
+
+  </broker>
+
+  <import resource="jetty.xml"/>
+</beans>
