@@ -113,6 +113,7 @@ supersede domain-search \"#{spec[:domain]}\", \"youdevise.com\";
     apt_install "linux-image-virtual"
     apt_install "grub-pc"
     cmd "mkdir -p #{spec[:temp_dir]}/boot/grub"
+    cmd "tune2fs -Lmain /dev/#{spec[:loop1]}"
 
     open("#{spec[:temp_dir]}/boot/grub/device.map", 'w') { |f|
       f.puts "(hd0) /dev/#{spec[:loop0]}"
@@ -132,7 +133,8 @@ supersede domain-search \"#{spec[:domain]}\", \"youdevise.com\";
           insmod part_msdos
           insmod ext2
           set root='(hd0,1)'
-          linux #{kernel} root=/dev/disk/by-uuid/#{uuid} ro
+          search --label --no-floppy --set=root main
+          linux #{kernel} root=/dev/disk/by-label/main ro
           initrd #{initrd}
           }"
     }
