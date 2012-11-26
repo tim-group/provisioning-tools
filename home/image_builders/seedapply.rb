@@ -1,5 +1,6 @@
 define "seedapply" do
-  ubuntuprecise
+#  ubuntuprecise
+  copyboot
 
   run("seedapply") {
     pp spec[:enc]
