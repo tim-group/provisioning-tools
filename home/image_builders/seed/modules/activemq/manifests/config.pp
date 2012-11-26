@@ -9,7 +9,7 @@ class activemq::config {
   #$subcollectives = 'mcollective'
 
   file {
-    '/var/log/activemq':
+    ['/opt/activemq', '/opt/activemq/conf']:
       ensure => directory;
 
     '/etc/init.d/activemq':
@@ -22,7 +22,8 @@ class activemq::config {
 
     '/etc/activemq/activemq.xml':
       ensure  => file,
-      content => template("activemq/activemq.xml.erb"),
-      require => Class['activemq::install'];
+      content => template("activemq/activemq.xml.erb");
+
   }
 }
+
