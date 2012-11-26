@@ -1,7 +1,8 @@
 define rabbitmq::create_user ($password) {
   Exec {
     path    => ['/bin','/usr/bin','/usr/sbin'],
-    require => Class['rabbitmq::service'],
+    require => Class['rabbitmq::install'],
+    before  => Class['rabbitmq::post_config'],
   }
   exec {
     "/usr/sbin/rabbitmqctl add_user ${name} ${password} ; /usr/sbin/rabbitmqctl set_permissions -p / ${name} '.*' '.*' '.*'":

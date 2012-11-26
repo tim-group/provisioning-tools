@@ -5,7 +5,7 @@ class rabbitmq::service {
         provider   => debian,
         hasrestart => true,
         hasstatus  => true,
-        require    => Class['rabbitmq::plugins'];
+        require    => Class['rabbitmq::install'];
     }
 }
 
