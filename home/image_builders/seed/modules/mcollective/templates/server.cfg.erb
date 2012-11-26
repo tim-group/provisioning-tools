@@ -21,22 +21,22 @@ plugin.ssl_server_private = /etc/mcollective/ssl/server-private.pem
 plugin.ssl_server_public = /etc/mcollective/ssl/clients/server-public.pem
 plugin.ssl_client_cert_dir = /etc/mcollective/ssl/clients/
 
-connector = activemq
-plugin.activemq.pool.size = 1
-plugin.activemq.initial_reconnect_delay = 0.01
-plugin.activemq.max_reconnect_delay = 5
-plugin.activemq.use_exponential_back_off = true
-plugin.activemq.back_off_multiplier = 2
-plugin.activemq.max_reconnect_attempts = 0
-plugin.activemq.randomize = false
-plugin.activemq.timeout = -1
-plugin.activemq.connect_timeout = 3
+connector = stomp
+plugin.stomp.pool.size = 1
+plugin.stomp.initial_reconnect_delay = 0.01
+plugin.stomp.max_reconnect_delay = 5
+plugin.stomp.use_exponential_back_off = true
+plugin.stomp.back_off_multiplier = 2
+plugin.stomp.max_reconnect_attempts = 0
+plugin.stomp.randomize = false
+plugin.stomp.timeout = -1
+plugin.stomp.connect_timeout = 3
 
-plugin.activemq.pool.1.host = <%= broker %>
-plugin.activemq.pool.1.port = 6163
-plugin.activemq.pool.1.user = mcollective
-plugin.activemq.pool.1.password = marionette
-plugin.activemq.pool.1.ssl = false
+plugin.stomp.pool.host1 = <%= broker %>
+plugin.stomp.pool.port1 = 6163
+plugin.stomp.pool.user1 = mcollective
+plugin.stomp.pool.password1 = marionette
+plugin.stomp.pool.ssl1 = false
 
 
 direct_addressing = 1
