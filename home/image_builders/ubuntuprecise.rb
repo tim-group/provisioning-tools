@@ -207,12 +207,6 @@ exec /sbin/getty -L ttyS0 115200 vt102
     }
   }
 
-  run("configure precise repos apt repo") {
-    open("#{spec[:temp_dir]}/etc/apt/sources.list.d/ubuntu-precise.list", 'w') { |f|
-      f.puts "deb http://aptproxy:3142/ubuntu precise-updates main\n"
-    }
-  }
-
   run("configure youdevise apt repo") {
     open("#{spec[:temp_dir]}/etc/apt/sources.list.d/youdevise.list", 'w') { |f|
       f.puts "deb http://apt/ubuntu stable main\ndeb-src http://apt/ubuntu stable main\n"
