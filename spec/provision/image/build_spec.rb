@@ -182,7 +182,7 @@ describe XYZ do
   end
 
   it 'can load files from a specified directory' do
-    Provision::Image::Catalogue::load('home/image_builders')
+    Provision::Image::Catalogue::loadconfig('home/image_builders')
   end
 
   it 'fails with a good error message' do
