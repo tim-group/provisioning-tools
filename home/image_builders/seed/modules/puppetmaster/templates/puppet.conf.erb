@@ -11,10 +11,10 @@
     preferred_serialization_format = marshal
     environment                    = masterbranch
     configtimeout                  = 3000
-    server                         = <%=fqdn%>
+    server                         = <%= scope.lookupvar('::fqdn') %>
 
 [master]
-    certname                       = <%=fqdn%>
+    certname                       = <%= scope.lookupvar('::fqdn') %>
     storeconfigs                   = true
     storeconfigs_backend           = puppetdb
     reports                        = foreman,successful_run_commit_id
