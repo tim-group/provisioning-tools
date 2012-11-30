@@ -7,7 +7,7 @@ define "grow" do
   run("grow the partition table and filesystem") {
     cmd "cp /mnt/generic.img #{spec[:image_path]}"
     cmd "losetup /dev/#{spec[:loop0]} #{spec[:image_path]}"
-    cmd "qemu-img resize #{spec[:image_path]} 3G"
+    cmd "qemu-img resize #{spec[:image_path]} #{spec[:image_size]}"
     cmd "losetup -c /dev/#{spec[:loop0]}"
     cmd "parted -s /dev/#{spec[:loop0]} rm 1"
     cmd "parted -s /dev/#{spec[:loop0]} mkpart primary ext3 2048s 100%"
