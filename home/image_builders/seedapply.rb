@@ -6,7 +6,7 @@ define "seedapply" do
     pp spec[:enc]
     cmd "mkdir #{spec[:temp_dir]}/seed"
     cmd "cp -r #{File.dirname(__FILE__)}/seed  #{spec[:temp_dir]}/"
-    apt_install "puppet"
+#    apt_install "puppet"
 
 
     if spec[:enc]["classes"].has_key?("puppetmaster") != nil

@@ -218,4 +218,9 @@ exec /sbin/getty -L ttyS0 115200 vt102
     chroot "apt-get -y --force-yes update"
   }
 
+  run("install some other useful stuff") {
+    apt_install "puppet"
+#    apt_install "mcollective"
+  }
+
 end

@@ -4,10 +4,11 @@ require 'provision/image/commands'
 define "copyboot" do
   extend Provision::Image::Commands
 
+  grow
 
   run("loopback devices") {
     cmd "mkdir #{spec[:temp_dir]}"
-    cmd "cp /mnt/generic.img #{spec[:image_path]}"
+    #cmd "cp /mnt/generic.img #{spec[:image_path]}"
     #    cmd "dd if=/mnt/generic.img of=/dev/mapper/MYMACHINE"
     #
     print "mounting #{spec[:image_path]} to #{spec[:temp_dir]}\n"
