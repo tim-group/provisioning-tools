@@ -32,4 +32,14 @@ module Provision
       :worker_count=> options[:worker_count])
     return work_queue
   end
+
+  def self.create_gold_image(spec_hash)
+    spec = Provision::Core::MachineSpec.new(spec_hash)
+    spec[:thread_number] = 0
+    targetdir = File.join(File.dirname(__FILE__), "../target")
+    image_service = Provision::Image::Service.new(:configdir=>home("image_builders"), :targetdir=>targetdir)
+    image_service.build_image("ubuntuprecise", spec)
+    image_service.build_image("shrink", spec)
+  end
+
 end

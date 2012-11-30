@@ -4,7 +4,6 @@ end
 require 'provision/namespace'
 require 'provision/core/machine_spec'
 
-
 class Provision::Core::ProvisioningService
   def initialize(options)
     @vm_service = options[:vm_service]
