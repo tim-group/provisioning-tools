@@ -28,7 +28,7 @@ class Provision::Image::Build
   end
 
   def call(method)
-    call_define(method,self)
+    call_define(method, self)
   end
 
   def method_missing(name,*args,&block)
@@ -39,7 +39,7 @@ class Provision::Image::Build
     position = 40
     error = nil
     trap("SIGINT") { throw :ctrl_c }
- 
+
     begin
       @commands.each {|command|
         txt = command[:txt]
@@ -118,3 +118,4 @@ class CatchAndIgnore
     end
   end
 end
+

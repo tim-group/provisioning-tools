@@ -50,3 +50,4 @@ module Provision::Image::Commands
   end
 
 end
+

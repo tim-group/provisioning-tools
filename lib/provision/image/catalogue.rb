@@ -43,3 +43,4 @@ module Provision::Image::Catalogue
 end
 
 include Provision::Image::Catalogue
+

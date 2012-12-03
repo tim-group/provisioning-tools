@@ -10,3 +10,4 @@ class Provision::Image::Service
     Provision::Image::Catalogue.build(template, options).execute()
   end
 end
+
