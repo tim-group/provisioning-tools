@@ -5,10 +5,12 @@ require 'provision/vm/netutils'
 
 class Provision::Core::MachineSpec
   include Provision::VM::NetUtils
-  attr_accessor :spec, :thread_number
+  attr_accessor :spec
+  attr_reader :thread_number, :build_dir
 
   def initialize(spec)
     @thread_number = spec[:thread_number] || 0
+    @build_dir = spec[:build_dir] || 'build'
     @spec = spec
     apply_conventions()
   end
@@ -20,12 +22,12 @@ class Provision::Core::MachineSpec
     if_nil_define_var(:image_path,"#{@spec[:images_dir]}/#{@spec[:hostname]}.img")
     if_nil_define_var(:image_size,"3G")
 
-    if_nil_define_var(:loop0,"loop#{@spec[:thread_number]*2}")
-    if_nil_define_var(:loop1,"loop#{@spec[:thread_number]*2+1}")
+    if_nil_define_var(:loop0,"loop#{@thread_number*2}")
+    if_nil_define_var(:loop1,"loop#{@thread_number*2+1}")
 
-    if_nil_define_var(:logdir,"#{Provision.home()}/../#{@spec[:build_dir]}/logs")
-    if_nil_define_var(:console_log,"#{Provision.base()}/#{@spec[:build_dir]}/logs/console-#{@spec[:thread_number]}.log")
-    if_nil_define_var(:temp_dir, "#{Provision.base()}/#{@spec[:build_dir]}/#{@spec[:hostname]}")
+    if_nil_define_var(:logdir,"#{Provision.home()}/../#{@build_dir}/logs")
+    if_nil_define_var(:console_log,"#{Provision.base()}/#{@build_dir}/logs/console-#{@thread_number}.log")
+    if_nil_define_var(:temp_dir, "#{Provision.base()}/#{@build_dir}/#{@spec[:hostname]}")
 
     if_nil_define_var(:fqdn,"#{@spec[:hostname]}.#{@spec[:domain]}")
 
