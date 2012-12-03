@@ -15,6 +15,7 @@ Gem::Specification.new do |s|
   s.files       = FileList['lib/**/*.rb',
                             'bin/*',
                             'home/**/*',
+                            'templates/**/*',
                             '[A-Z]*',
                             'test/**/*'].to_a
 end
