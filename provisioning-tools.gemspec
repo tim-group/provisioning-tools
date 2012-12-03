@@ -14,6 +14,7 @@ Gem::Specification.new do |s|
   s.email       = 'tomas.doran@youdevise.com'
   s.files       = FileList['lib/**/*.rb',
                             'bin/*',
+                            'home/**/*',
                             '[A-Z]*',
                             'test/**/*'].to_a
 end
