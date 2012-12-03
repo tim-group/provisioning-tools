@@ -3,24 +3,24 @@ require 'logger'
 module Provision
   module Log
     def new_log()
-      if (@spec!=nil and spec[:logdir]!=nil)
-        @log = Logger.new("#{spec[:logdir]}/provision-#{spec.thread_number}.log")
+      if (@spec!=nil)
+        @log = spec.get_logger('provision')
       else
         @log = Logger.new(STDOUT)
       end
     end
 
     def new_cleanup_log()
-      if (@spec!=nil and spec[:logdir]!=nil)
-        @cleanup_log = Logger.new("#{spec[:logdir]}/cleanup_provision-#{spec.thread_number}.log")
+      if (@spec!=nil)
+        @cleanup_log = spec.get_logger('cleanup_provision')
       else
         @cleanup_log = Logger.new(STDOUT)
       end
     end
 
    def new_summary_log()
-      if (@spec!=nil and spec[:logdir]!=nil)
-        @summary_log = Logger.new("#{spec[:logdir]}/summary-#{spec.thread_number}.log")
+      if (@spec!=nil)
+        @summary_log = spec.get_logger('summary')
       else
         @summary_log = Logger.new(STDOUT)
       end
@@ -42,3 +42,4 @@ module Provision
     end
   end
 end
+

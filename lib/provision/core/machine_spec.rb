@@ -2,16 +2,18 @@ require 'provision'
 require 'provision/core/namespace'
 require 'provision/core/machine_spec'
 require 'provision/vm/netutils'
+require 'logger'
 
 class Provision::Core::MachineSpec
   include Provision::VM::NetUtils
   attr_accessor :spec
-  attr_reader :thread_number, :build_dir
+  attr_reader :thread_number, :build_dir, :log_dir
 
   def initialize(spec)
     @thread_number = spec[:thread_number] || 0
     b_d = spec[:build_dir] || 'build'
     @build_dir = "#{Provision.base()}/#{b_d}"
+    @log_dir = spec[:log_dir] || "#{build_dir}/logs"
     @spec = spec
     apply_conventions()
   end
@@ -25,7 +27,6 @@ class Provision::Core::MachineSpec
     if_nil_define_var(:loop0,"loop#{@thread_number*2}")
     if_nil_define_var(:loop1,"loop#{@thread_number*2+1}")
 
-    if_nil_define_var(:logdir,"#{@build_dir}/logs")
     if_nil_define_var(:console_log,"#{@build_dir}/logs/console-#{@thread_number}.log")
     if_nil_define_var(:temp_dir, "#{@build_dir}/#{@spec[:hostname]}")
 
@@ -52,4 +53,9 @@ class Provision::Core::MachineSpec
   def get_binding
     return binding()
   end
+
+  def get_logger(fn)
+    Logger.new("#{@log_dir}/%{fn}-#{@thread_number}.log")
+  end
 end
+

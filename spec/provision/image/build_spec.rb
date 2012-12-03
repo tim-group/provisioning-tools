@@ -52,7 +52,7 @@ describe XYZ do
       }
     end
 
-    build = Provision::Image::Catalogue::build("vanillavm", {:hostname=>"myfirstmachine"})
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({:hostname=>"myfirstmachine"}))
 
     @commands.should_receive(:action).with("1")
     @commands.should_receive(:action).with("2")
@@ -83,7 +83,7 @@ describe XYZ do
       }
     end
 
-    build = Provision::Image::Catalogue::build("vanillavm", {:hostname=>"myfirstmachine"})
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({:hostname=>"myfirstmachine"}))
 
     @commands.should_receive(:action).with("6").ordered
     @commands.should_receive(:action).with("5").ordered
@@ -105,7 +105,7 @@ describe XYZ do
       }
     end
 
-    build = Provision::Image::Catalogue::build("vanillavm", {:hostname=>"myfirstmachine"})
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({:hostname=>"myfirstmachine"}))
     @commands.should_receive(:action).with("5")
     build.execute()
   end
@@ -120,7 +120,7 @@ describe XYZ do
       }
     end
 
-    build = Provision::Image::Catalogue::build("vanillavm", {:hostname=>"myfirstmachine"})
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({:hostname=>"myfirstmachine"}))
     @commands.should_receive(:action).with("5")
     build.execute()
   end
@@ -135,7 +135,7 @@ describe XYZ do
         action("3")
       }
     end
-    build = Provision::Image::Catalogue::build("vanillavm", {:hostname=>"myfirstmachine"})
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({:hostname=>"myfirstmachine"}))
     @commands.should_receive(:action).with("1")
     @commands.should_not_receive(:action).with("3")
 
@@ -152,7 +152,7 @@ describe XYZ do
       }
     end
 
-    build = Provision::Image::Catalogue::build("vanillavm", {:hostname=>"myfirstmachine"})
+    build = Provision::Image::Catalogue::build("vanillavm",Provision::Core::MachineSpec.new({:hostname=>"myfirstmachine"}))
 
     @commands.should_receive(:action).with("myfirstmachine")
 
@@ -176,7 +176,7 @@ describe XYZ do
       }
     end
 
-    build = Provision::Image::Catalogue::build("vanillavm", {})
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({}))
     @commands.should_receive(:action).with("3G")
     build.execute()
   end
@@ -211,7 +211,7 @@ describe XYZ do
       }
     end
 
-    build = Provision::Image::Catalogue::build("defaults", {})
+    build = Provision::Image::Catalogue::build("defaults", Provision::Core::MachineSpec.new({}))
     build.execute()
 
     something.should eql("something")
@@ -233,7 +233,7 @@ describe XYZ do
       }
     end
 
-    build = Provision::Image::Catalogue::build("defaults", {})
+    build = Provision::Image::Catalogue::build("defaults", Provision::Core::MachineSpec.new({}))
     build.execute()
 
     something.should eql("something")
