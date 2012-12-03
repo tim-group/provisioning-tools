@@ -10,13 +10,11 @@ require 'provision'
 require 'provision/inventory'
 require 'provision/workqueue'
 
-
 specs = YAML::load($stdin.read())
 
 listener = NoopListener.new()
-work_queue = Provision.work_queue(:worker_count=>4, :listener=>listener)
+work_queue = Provision.work_queue( :worker_count => 4, :listener => listener)
 work_queue.fill(specs)
-
 
 work_queue.process()
 
@@ -25,3 +23,4 @@ if (listener.has_errors?)
 else
   exit(0)
 end
+

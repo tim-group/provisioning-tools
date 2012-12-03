@@ -2,17 +2,9 @@
 require 'yaml'
 $: << File.join(File.dirname(__FILE__), "..", "lib")
 
-configdir = File.join(File.dirname(__FILE__), "../lib/config")
-target_dir = File.join(File.dirname(__FILE__), "../target")
-
-require 'optparse'
 require 'provision'
-require 'provision/inventory'
-require 'provision/workqueue'
 require 'pp'
 
-
-listener = NoopListener.new()
 result = Provision.create_gold_image({
   :spindle=>"/mnt",
   :hostname=>"generic"
