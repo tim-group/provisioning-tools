@@ -94,12 +94,8 @@ define "ubuntuprecise" do
       f.puts "#{spec[:hostname]}"
     }
   #    chroot "hostname -F /etc/hostname"
-    open("#{spec[:temp_dir]}/etc/hosts", 'a') { |f|
-    f.puts "\n127.0.0.1		localhost\n"
-    f.puts "127.0.1.1		#{spec[:fqdn]}	#{spec[:hostname]}\n"
-  }
-  open("#{spec[:temp_dir]}/etc/dhcp/dhclient.conf", 'w') { |f|
-    f.puts "
+    open("#{spec[:temp_dir]}/etc/dhcp/dhclient.conf", 'w') { |f|
+      f.puts "
 option rfc3442-classless-static-routes code 121 = array of unsigned integer 8;
 send host-name \"#{spec[:hostname]}\";
 supersede domain-name \"#{spec[:domain]}\";
