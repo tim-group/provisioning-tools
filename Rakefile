@@ -36,7 +36,8 @@ end
 
 desc "Generate deb"
 task :package do
-    sh "rm *.deb *.gem"
+    sh "if [ -f *.deb ]; then rm *.deb; fi"
+    sh "if [ -f *.gem ]; then rm *.gem; fi"
     sh "gem build provisioning-tools.gemspec"
     sh "fpm -s gem -t deb provisioning-tools-*.gem"
 end
