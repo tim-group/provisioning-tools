@@ -5,9 +5,10 @@ require 'provision/vm/netutils'
 
 class Provision::Core::MachineSpec
   include Provision::VM::NetUtils
-  attr_accessor :spec
+  attr_accessor :spec, :thread_number
 
   def initialize(spec)
+    @thread_number = spec[:thread_number] || 0
     @spec = spec
     apply_conventions()
   end

@@ -4,16 +4,16 @@ class CursesListener
   attr_accessor :errors
 
   include Curses
-  
+
   def initialize
     @errors = []
   end
-  
+
   def error(e)
     print e
     @errors << e
   end
-  
+
   def update(options)
     completed = options[:completed]
     errors = options[:errors]
@@ -29,7 +29,7 @@ class CursesListener
       offset = 0
       #      thread_progress.each {|thread|
       #        if thread!=nil
-      #          Curses.addstr("thread #{thread[:thread_number]}")
+      #          Curses.addstr("thread #{thread.thread_number}")
       #          Curses.addstr(" building: #{thread[:hostname]}\n")
       #        end
       #      }
@@ -49,3 +49,4 @@ class CursesListener
     sleep 0.3
   end
 end
+

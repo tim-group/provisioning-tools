@@ -4,7 +4,7 @@ module Provision
   module Log
     def new_log()
       if (@spec!=nil and spec[:logdir]!=nil)
-        @log = Logger.new("#{spec[:logdir]}/provision-#{spec[:thread_number]}.log")
+        @log = Logger.new("#{spec[:logdir]}/provision-#{spec.thread_number}.log")
       else
         @log = Logger.new(STDOUT)
       end
@@ -12,7 +12,7 @@ module Provision
 
     def new_cleanup_log()
       if (@spec!=nil and spec[:logdir]!=nil)
-        @cleanup_log = Logger.new("#{spec[:logdir]}/cleanup_provision-#{spec[:thread_number]}.log")
+        @cleanup_log = Logger.new("#{spec[:logdir]}/cleanup_provision-#{spec.thread_number}.log")
       else
         @cleanup_log = Logger.new(STDOUT)
       end
@@ -20,7 +20,7 @@ module Provision
 
    def new_summary_log()
       if (@spec!=nil and spec[:logdir]!=nil)
-        @summary_log = Logger.new("#{spec[:logdir]}/summary-#{spec[:thread_number]}.log")
+        @summary_log = Logger.new("#{spec[:logdir]}/summary-#{spec.thread_number}.log")
       else
         @summary_log = Logger.new(STDOUT)
       end

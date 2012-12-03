@@ -26,5 +26,5 @@ describe Provision::Image::Commands do
 
     i.should eql(5)
   end
- 
+
 end
