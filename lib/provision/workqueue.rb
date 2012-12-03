@@ -1,4 +1,4 @@
-require 'provision/namespace.rb'
+require 'provision/namespace'
 require 'thread'
 require 'provision/workqueue/noop_listener'
 require 'provision/workqueue/curses_listener'

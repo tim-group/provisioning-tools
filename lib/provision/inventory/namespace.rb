@@ -19,3 +19,4 @@ module Provision::Inventory
   end
 
 end
+

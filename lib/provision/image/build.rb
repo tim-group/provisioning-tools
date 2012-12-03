@@ -1,4 +1,5 @@
 require 'provision/image/namespace'
+require 'provision/log'
 
 class Provision::Image::Build
   include Provision::Log
@@ -85,6 +86,12 @@ class Provision::Image::Build
     end
   end
 
+  def summary_log()
+    @summary_log ||= @spec.get_logger('summary')
+  end
+  def cleanup_log()
+    @cleanup_log ||= @spec.get_logger('cleanup_provision')
+  end
 end
 
 class CatchAndIgnore
