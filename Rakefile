@@ -34,8 +34,10 @@ RSpec::Core::RakeTask.new() do |t|
     t.pattern = "spec/**/*_spec.rb"
 end
 
-desc "Generate gem"
-task :gem do
-  sh "gem build provisioning-tools.gemspec"
+desc "Generate deb"
+task :package do
+    sh "rm *.deb *.gem"
+    sh "gem build provisioning-tools.gemspec"
+    sh "fpm -s gem -t deb provisioning-tools-*.gem"
 end
 
