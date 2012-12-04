@@ -11,8 +11,9 @@ class Provision::Core::MachineSpec
 
   def initialize(spec)
     @thread_number = spec[:thread_number] || 0
-    b_d = spec[:build_dir] || 'build'
-    @build_dir = "#{Provision.base()}/#{b_d}"
+    # FIXME - Should we detect if we're a git checkout or a built / installed gem and change
+    #         paths as appropriate?
+    b_d = spec[:build_dir] || ENV['PROVISIONING_TOOLS_BUILD_DIR'] || "#{Provision.base()}/build"
     Dir.mkdir(@build_dir) if ! File.directory? @build_dir
     @log_dir = spec[:log_dir] || "#{build_dir}/logs"
     Dir.mkdir(@log_dir) if ! File.directory? @log_dir
