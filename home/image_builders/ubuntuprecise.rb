@@ -210,8 +210,18 @@ exec /sbin/getty -L ttyS0 115200 vt102
     chroot "curl -Ss http://apt/ubuntu/repo.key | apt-key add -"
   }
 
+  run("configure aptproxy") {
+    open("#{spec[:temp_dir]}/etc/apt/apt.conf.d/01proxy", 'w') { |f|
+      f.puts "Acquire::http::Proxy \"http://aptproxy:3142\";\n"
+    }
+  }
+
   run("run apt-update ") {
     chroot "apt-get -y --force-yes update"
+  }
+
+  cleanup {
+    chroot "rm -rf /var/cache/apt/archives/*"
   }
 
   run("install some other useful stuff") {
