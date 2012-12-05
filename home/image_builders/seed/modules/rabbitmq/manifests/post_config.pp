@@ -5,7 +5,7 @@ class rabbitmq::post_config {
       ensure => directory;
 
     '/etc/rabbitmq/rabbitmq.config':
-      source => 'puppet:///rabbitmq/rabbitmq.config',
+      source => 'puppet:///modules/rabbitmq/rabbitmq.config',
       notify => Class['rabbitmq::service'];
 
   }
