@@ -119,7 +119,7 @@ class puppetmaster::service {
 
     'apache2-puppetmaster':
       ensure  => 'running',
-      require => File['/etc/init.d/apache2-puppetmaster'];
+      require => [Exec['wait for puppetdb to come up'], File['/etc/init.d/apache2-puppetmaster']];
 
     'puppetmaster':
       ensure =>'stopped',
@@ -127,7 +127,16 @@ class puppetmaster::service {
 
     'puppetdb':
       ensure  => 'running',
-      require => Class['puppetmaster::config'];
+      require => Class['puppetmaster::config'],
+      notify  => Exec['wait for puppetdb to come up'];
   }
-
+  exec { 'wait for puppetdb to come up':
+         cwd         => '/tmp',
+         command     => "curl -H 'Accept: application/json' 'http://localhost:8080/metrics/mbean/com.puppetlabs.puppetdb.query.population:type=default,name=num-resources'",
+         try_sleep   => 1,
+         tries       => 60,
+         refreshonly => true,
+         path        => '/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin';
+  }
 }
+
