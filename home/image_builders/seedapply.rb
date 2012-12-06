@@ -2,8 +2,12 @@ define "seedapply" do
 #  ubuntuprecise
   copyboot
 
+  run("run apt-update ") {
+    chroot "apt-get -y --force-yes update"
+  }
+
   run("seedapply") {
-    pp spec[:enc]
+    #pp spec[:enc]
     cmd "mkdir #{spec[:temp_dir]}/seed"
     cmd "cp -r #{File.dirname(__FILE__)}/seed  #{spec[:temp_dir]}/"
 #    apt_install "puppet"

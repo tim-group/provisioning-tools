@@ -11,7 +11,7 @@ define "copyboot" do
     #cmd "cp /mnt/generic.img #{spec[:image_path]}"
     #    cmd "dd if=/mnt/generic.img of=/dev/mapper/MYMACHINE"
     #
-    print "mounting #{spec[:image_path]} to #{spec[:temp_dir]}\n"
+    #print "mounting #{spec[:image_path]} to #{spec[:temp_dir]}\n"
     cmd "mount -o offset=1048576  #{spec[:image_path]} #{spec[:temp_dir]}"
   }
 

@@ -36,7 +36,7 @@ module Provision::Image::Catalogue
   def build(name, options)
     build = Provision::Image::Build.new(name, options)
     closure = @@catalogue[name]
-    print "building #{name} \n"
+    #print "building #{name} \n"
     build.instance_eval(&closure)
     return build
   end
