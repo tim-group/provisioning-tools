@@ -30,6 +30,20 @@ define "copyboot" do
       f.puts "127.0.1.1		#{spec[:fqdn]}	#{spec[:hostname]}\n"
     }
     run("setup networking") {
+      open("#{spec[:temp_dir]}/etc/network/interfaces", 'w') { |f|
+        f.puts "
+# The loopback network interface
+auto lo
+iface lo inet loopback
+"
+
+        spec.interfaces.each do |nic|
+          f.puts "
+auto #{nic[:network]}
+iface #{nic[:network]} inet dhcp
+"
+        end
+      }
 
       open("#{spec[:temp_dir]}/etc/dhcp/dhclient.conf", 'w') { |f|
         f.puts "

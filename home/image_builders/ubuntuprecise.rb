@@ -149,38 +149,38 @@ supersede domain-search \"#{spec[:domain]}\", \"youdevise.com\";
 
   run("set up basic networking") {
     open("#{spec[:temp_dir]}/etc/network/interfaces", 'w') { |f|
-    f.puts "
+      f.puts "
 # The loopback network interface
 auto lo
 iface lo inet loopback
+"
 
-# The primary network interface
-auto mgmt
-iface mgmt inet dhcp
+      spec.interfaces.each do |nic|
+        f.puts "
+auto #{nic[:network]}
+iface #{nic[:network]} inet dhcp
+"
+      end
+    }
 
-# The primary network interface
-auto prod
-iface prod inet dhcp
-    "
-  }
-  open("#{spec[:temp_dir]}/etc/udev/rules.d/70-persistent-net.rules", 'w') { |f|
-    spec.interfaces.each do |nic|
-      f.puts %[
+    open("#{spec[:temp_dir]}/etc/udev/rules.d/70-persistent-net.rules", 'w') { |f|
+      spec.interfaces.each do |nic|
+        f.puts %[
 SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="#{nic[:mac]}", ATTR{type}=="1",  NAME="#{nic[:network]}"\n
-      ]
-    end
-  }
+        ]
+      end
+    }
   }
 
   run("enable serial so we can use virsh console") {
     open("#{spec[:temp_dir]}/etc/init/ttyS0.conf", 'w') { |f|
-    f.puts """
+      f.puts """
 start on stopped rc RUNLEVEL=[2345]
 stop on runlevel [!2345]
 respawn
 exec /sbin/getty -L ttyS0 115200 vt102
     """
-  }
+    }
   }
 
   run("install misc packages") {
