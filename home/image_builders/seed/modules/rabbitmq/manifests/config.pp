@@ -4,7 +4,7 @@ class rabbitmq::config {
   }
 
   rabbitmq::create_user { 'mcollective':
-    password => 'marionette';
+    password => 'so6aeh9tieD2';
   }
 
 }
