@@ -2,6 +2,7 @@ require 'provision/image/service'
 require 'provision/vm/virsh'
 require 'provision/core/provisioning_service'
 require 'provision/workqueue'
+require 'provision/dns'
 
 module Provision
   def self.base(dir="")
@@ -15,8 +16,12 @@ module Provision
   def self.create_provisioning_service()
     targetdir = File.join(File.dirname(__FILE__), "../target")
     return provisioning_service = Provision::Core::ProvisioningService.new(
-      :image_service=>Provision::Image::Service.new(:configdir=>home("image_builders"), :targetdir=>targetdir),
-      :vm_service=>Provision::VM::Virsh.new()
+      :image_service     => Provision::Image::Service.new(
+          :configdir => home("image_builders"),
+          :targetdir => targetdir
+      ),
+      :vm_service        => Provision::VM::Virsh.new()
+      :numbering_service => Provision::DNS.new()
     )
   end
 

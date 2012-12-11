@@ -7,16 +7,16 @@ class Provision::VM::Virsh
     @template = "#{Provision.base}/templates/kvm.template"
   end
 
-  def undefine_vm(hostname)
-    system("virsh undefine #{hostname} > /dev/null 2>&1")
+  def undefine_vm(spec)
+    system("virsh undefine #{spec[:hostname]} > /dev/null 2>&1")
   end
 
-  def destroy_vm(hostname)
-    system("virsh destroy #{hostname} > /dev/null 2>&1")
+  def destroy_vm(spec)
+    system("virsh destroy #{spec[:hostname]} > /dev/null 2>&1")
   end
 
-  def start_vm(hostname)
-    system("virsh start #{hostname} > /dev/null 2>&1")
+  def start_vm(spec)
+    system("virsh start #{spec[:hostname]} > /dev/null 2>&1")
   end
 
   def define_vm(spec)
