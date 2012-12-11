@@ -1,7 +1,6 @@
 <network>
      <name>prod</name>
-     <bridge name="prod_br" />
-     <forward mode="nat"/>
-     <ip address="192.168.6.1" netmask="255.255.255.0"></ip>
+     <bridge name="br_prod" />
+     <forward mode="bridge"/>
 </network>
 

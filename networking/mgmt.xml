@@ -1,7 +1,6 @@
 <network>
      <name>mgmt</name>
-     <bridge name="mgmt_br" />
-     <forward mode="nat"/>
-     <ip address="192.168.5.1" netmask="255.255.255.0"></ip>
+     <bridge name="br_mgmt" />
+     <forward mode="bridge"/>
 </network>
 

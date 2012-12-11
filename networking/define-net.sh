@@ -9,3 +9,9 @@ virsh net-undefine prod
 
 virsh net-define "networking/prod.xml"
 virsh net-start "prod"
+
+virsh net-destroy front
+virsh net-undefine front
+
+virsh net-define "networking/front.xml"
+virsh net-start "front"

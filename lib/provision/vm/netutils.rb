@@ -15,8 +15,8 @@ module Provision::VM::NetUtils
       nics << {
 		:slot=>slot,
 		:mac=> mac_address("#{self.spec[:hostname]}.#{net}"),
-		:bridge=> "#{net}_br",
-                :network=>"#{net}"
+		:bridge=> "br_#{net}",
+    :network=>"#{net}"
 	}
       slot = slot+1
     }

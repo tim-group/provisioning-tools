@@ -1,0 +1,6 @@
+<network>
+     <name>front</name>
+     <bridge name="br_front" />
+     <forward mode="bridge"/>
+</network>
+
