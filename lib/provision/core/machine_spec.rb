@@ -71,10 +71,10 @@ class Provision::Core::MachineSpec
     slot = 6
     @spec[:networks].each {|net|
       nics << {
-        :slot=>slot,
-        :mac=> mac_address("#{@spec[:hostname]}.#{net}"),
-        :bridge=> "br_#{net}",
-        :network=>"#{net}"
+        :slot    => slot,
+        :mac     => mac_address("#{@spec[:hostname]}.#{net}"),
+        :bridge  => "br_#{net}",
+        :network => "#{net}"
       }
       slot = slot+1
     }
