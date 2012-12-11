@@ -72,7 +72,7 @@ class Provision::Core::MachineSpec
     @spec[:networks].each {|net|
       nics << {
         :slot    => slot,
-        :mac     => mac_address("#{@spec[:hostname]}.#{net}"),
+        :mac     => mac("#{@spec[:hostname]}.#{net}"),
         :bridge  => "br_#{net}",
         :network => "#{net}"
       }
@@ -81,7 +81,7 @@ class Provision::Core::MachineSpec
     nics
   end
 
-  def mac_address(domain = @spec[:hostname])
+  def mac(domain = @spec[:hostname])
     raise 'kvm_mac(): Requires a string type ' +
       'to work with' unless domain.is_a?(String)
     raise 'kvm_mac(): An argument given cannot ' +
