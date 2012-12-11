@@ -1,4 +1,5 @@
 require 'ipaddr'
+require 'provision/namespace'
 
 class Provision::DNS
   def self.get_backend(name)

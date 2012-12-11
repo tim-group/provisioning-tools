@@ -28,15 +28,12 @@ describe Provision::Core::MachineSpec do
     machine_spec[:value1].should eql(18)
     machine_spec[:value2].should eql(25)
   end
-  
-  
+
+
   it 'renders a valid xml from the template' do
     machine_spec = Provision::Core::MachineSpec.new(:value1=>5,:value2=>25)
 
-  
-    
   end
-  
-  
-  
+
 end
+
