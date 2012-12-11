@@ -15,6 +15,11 @@ class Provision::DNS::DNSMasq < Provision::DNS
   end
 
   def allocate_ip_for(spec)
+    # Note that we re-parse the hosts file on every allocation
+    # to avoid multiple simultaneous allocators from being able
+    # to allocate the same IP
+    # FIXME - There is still a race condition here with other processes
+    parse_hosts
     hn = spec[:fqdn]
     if @by_name[hn]
       puts "No new allocation for #{hn}, already allocated to #{@by_name[hn]}"
@@ -25,7 +30,6 @@ class Provision::DNS::DNSMasq < Provision::DNS
       puts "Allocated IP #{@max_ip} to host #{hn}"
       File.open(@hosts_file, 'a') { |f| f.write "#{@max_ip.to_s} #{hn}\n" }
       File.open(@ethers_file, 'a') { |f| f.write "#{spec.interfaces[0][:mac]} #{@max_ip.to_s}\n" }
-      @by_name[hn] = @max_ip
       @max_ip
     end
   end

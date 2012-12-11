@@ -27,7 +27,7 @@ describe Provision::DNS::DNSMasq do
       first_again.to_s.should eql("192.168.5.2")
 
       new_thing = Provision::DNS.get_backend("DNSMasq")
-      new_thing_ip = thing.allocate_ip_for(Provision::Core::MachineSpec.new(:hostname => "example", :domain => "youdevise.com"))
+      new_thing_ip = new_thing.allocate_ip_for(Provision::Core::MachineSpec.new(:hostname => "example", :domain => "youdevise.com"))
       new_thing_ip.to_s.should eql("192.168.5.2")
 
       new_thing.max_ip.should eql("192.168.5.3")
@@ -51,6 +51,17 @@ describe Provision::DNS::DNSMasq do
           "flib" => "192.168.5.1"
       })
       thing.max_ip.should eql("192.168.5.5")
+    }
+  end
+
+  it 'writes hosts and ethers out' do
+    Dir.mktmpdir {|dir|
+      Provision::DNS::DNSMasq.files_dir = dir
+      File.open("#{dir}/hosts", 'w') { |f| f.write "\n" }
+      thing = Provision::DNS.get_backend("DNSMasq")
+      thing.allocate_ip_for(Provision::Core::MachineSpec.new(:hostname => "example", :domain => "youdevise.com"))
+      File.open("#{dir}/ethers", 'r') { |f| f.read.should eql("52:54:00:01:55:3f 192.168.5.2\n") }
+      File.open("#{dir}/hosts", 'r') { |f| f.read.should eql("\n192.168.5.2 example.youdevise.com\n") }
     }
   end
 end
