@@ -197,7 +197,7 @@ describe XYZ do
     build = Provision::Image::Catalogue::build("defaults", {})
     expect {
       build.execute()
-    }.should raise_error NameError
+    }.to raise_error NameError
 
   end
 
