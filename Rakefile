@@ -13,7 +13,7 @@ task :network do
   sh "sudo pkill dnsmasq"
   sh "sudo bash 'networking/define-net.sh'"
   sh "sudo pkill dnsmasq"
-  sh "sudo bash 'networking/dnsmasq.sh'"
+  sh "sudo bash 'networking/numbering_service.sh'"
 end
 
 desc "Run puppet"
