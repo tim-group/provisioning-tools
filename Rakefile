@@ -10,9 +10,8 @@ end
 
 desc "Set up virtual network"
 task :network do
-  sh "sudo pkill dnsmasq"
+  sh "kill -0 dnsmasq; if [ $? -eq 0 ]; then sudo pkill dnsmasq; fi"
   sh "sudo bash 'networking/define-net.sh'"
-  sh "sudo pkill dnsmasq"
   sh "sudo bash 'networking/numbering_service.sh'"
 end
 
