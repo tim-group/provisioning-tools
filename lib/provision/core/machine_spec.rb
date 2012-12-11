@@ -1,11 +1,10 @@
 require 'provision'
 require 'provision/core/namespace'
 require 'provision/core/machine_spec'
-require 'provision/vm/netutils'
 require 'logger'
+require 'digest/sha1'
 
 class Provision::Core::MachineSpec
-  include Provision::VM::NetUtils
   attr_accessor :spec
   attr_reader :thread_number, :build_dir, :log_dir
 
@@ -19,6 +18,7 @@ class Provision::Core::MachineSpec
     @log_dir = spec[:log_dir] || "#{build_dir}/logs"
     Dir.mkdir(@log_dir) if ! File.directory? @log_dir
     @spec = spec
+    @@lease_file = "/tmp/dhcp.leases"
     apply_conventions()
   end
 
@@ -60,6 +60,35 @@ class Provision::Core::MachineSpec
 
   def get_logger(fn)
     Logger.new("#{@log_dir}/#{fn}-#{@thread_number}.log")
+  end
+
+  def self.lease_file=(lease_file)
+    @@lease_file = lease_file
+  end
+
+  def interfaces()
+    nics =[]
+    slot = 6
+    @spec[:networks].each {|net|
+      nics << {
+        :slot=>slot,
+        :mac=> mac_address("#{@spec[:hostname]}.#{net}"),
+        :bridge=> "br_#{net}",
+        :network=>"#{net}"
+      }
+      slot = slot+1
+    }
+    nics
+  end
+
+  def mac_address(domain = @spec[:hostname])
+    raise 'kvm_mac(): Requires a string type ' +
+      'to work with' unless domain.is_a?(String)
+    raise 'kvm_mac(): An argument given cannot ' +
+      'be an empty string value.' if domain.empty?
+    sha1  = Digest::SHA1.new
+    bytes = sha1.digest(domain)
+    "52:54:00:%s" % bytes.unpack('H2x9H2x8H2').join(':')
   end
 end
 
