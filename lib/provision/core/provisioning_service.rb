@@ -6,8 +6,9 @@ require 'provision/core/machine_spec'
 
 class Provision::Core::ProvisioningService
   def initialize(options)
-    @vm_service = options[:vm_service] || raise "No :vm_service option passed"
-    @image_service = options[:image_service] || raise "No :image_service option passed"
+    @vm_service = options[:vm_service] || raise("No :vm_service option passed")
+    @image_service = options[:image_service] || raise("No :image_service option passed")
+    @numbering_service = options[:numbering_service] || raise("No :numbering_service option passed")
   end
 
   def provision_vm(spec_hash)
