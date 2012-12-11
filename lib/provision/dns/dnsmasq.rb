@@ -9,7 +9,6 @@ class Provision::DNS::DNSMasq < Provision::DNS
 
   def allocate_ip_for(spec)
     hn = spec[:fqdn]
-    puts "ALLOCATE IP FOR #{spec.to_yaml}"
     if @by_name[hn]
       puts "No new allocation for #{hn}, already allocated to #{@by_name[hn]}"
       @by_name[hn]
