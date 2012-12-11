@@ -1,12 +1,8 @@
-require 'provision/vm/namespace'
-
 class Provision::DNS
-  def initialize()
+  def self.get_backend(name)
+    require "provision/dns/#{name.downcase}"
+    classname = "Provision::DNS::#{name}"
+    classname.new()
   end
-
-  def allocate_ip_for(spec)
-    "1.1.1.1"
-  end
-
 end
 

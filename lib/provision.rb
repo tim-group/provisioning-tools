@@ -21,7 +21,7 @@ module Provision
           :targetdir => targetdir
       ),
       :vm_service        => Provision::VM::Virsh.new(),
-      :numbering_service => Provision::DNS.new()
+      :numbering_service => Provision::DNS.get_backend("DNSMasq")
     )
   end
 
