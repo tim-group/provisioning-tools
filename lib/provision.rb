@@ -20,7 +20,7 @@ module Provision
           :configdir => home("image_builders"),
           :targetdir => targetdir
       ),
-      :vm_service        => Provision::VM::Virsh.new()
+      :vm_service        => Provision::VM::Virsh.new(),
       :numbering_service => Provision::DNS.new()
     )
   end
