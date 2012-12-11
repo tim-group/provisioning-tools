@@ -1,4 +1,5 @@
-require "yaml"
+require 'ipaddr'
+
 class Provision::DNS::DNSMasq < Provision::DNS
   @@files_dir = "/etc"
 
@@ -29,8 +30,9 @@ class Provision::DNS::DNSMasq < Provision::DNS
     end
   end
 
+  private
+
   def parse_hosts
-    require 'ipaddr'
     network = IPAddr.new("192.168.5.0/24")
     @by_name = {}
     @max_ip = IPAddr.new("192.168.5.1")
