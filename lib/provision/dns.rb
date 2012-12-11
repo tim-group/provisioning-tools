@@ -1,3 +1,5 @@
+require 'ipaddr'
+
 class Provision::DNS
   def self.get_backend(name)
     require "provision/dns/#{name.downcase}"

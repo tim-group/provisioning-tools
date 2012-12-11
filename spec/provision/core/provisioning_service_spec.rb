@@ -3,21 +3,23 @@ require 'rspec'
 require 'provision'
 require 'provision/vm/virsh'
 require 'provision/core/provisioning_service'
+require 'provision/dns'
 
 describe Provision::Core::ProvisioningService do
   before do
     @image_service = double()
     @vm_service = double()
     @provisioning_service = Provision::Core::ProvisioningService.new(
-      :image_service=>@image_service,
-      :vm_service=>@vm_service
+      :image_service => @image_service,
+      :vm_service => @vm_service,
+      :numbering_service => Provision::DNS.get_backend("Fake")
     )
   end
 
   it 'should run the configure sections to define common conventions' do
-    
+
   end
-  
+
   it 'allows the user to define vm from an image catalogue and vmdescription catalogue' do
     @vm_service.should_receive(:destroy_vm).ordered
     @vm_service.should_receive(:undefine_vm).ordered
