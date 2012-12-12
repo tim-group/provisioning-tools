@@ -38,9 +38,11 @@ puppet apply /seed/manifests/seed.pp --node_terminus exec --external_nodes /seed
 
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
       f.puts """#!/bin/sh -e
- puppet apply /seed/manifests/seed.pp --node_terminus exec --external_nodes /seed/enc.sh --modulepath=/seed/modules -l /seed/init.log
- echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local
- exit 0
+echo 'Running seed puppet'
+/seed/puppet.sh
+echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local
+echo 'Finished running seed puppet'
+exit 0
       """
     }
   }
