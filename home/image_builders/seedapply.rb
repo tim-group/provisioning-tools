@@ -28,16 +28,24 @@ define "seedapply" do
       f.puts YAML.dump(spec[:enc])
     }
 
+    open("#{spec[:temp_dir]}/seed/puppet.sh", 'w') { |f|
+      f.puts """#!/bin/sh -e
+puppet apply /seed/manifests/seed.pp --node_terminus exec --external_nodes /seed/enc.sh --modulepath=/seed/modules 2>&1 | tee /seed/init.log
+      """
+    }
+
+    cmd "chmod 700 #{spec[:temp_dir]}/seed/puppet.sh"
+
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
       f.puts """#!/bin/sh -e
 echo 'Running seed puppet: '
 cat /etc/resolv.conf > /seed/pre_puppet_resolv.conf
-puppet apply /seed/manifests/seed.pp --node_terminus exec --external_nodes /seed/enc.sh --modulepath=/seed/modules 2>&1 | tee /seed/init.log
+/seed/puppet.sh
 echo 'Finished running seed puppet.'
 echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local
 exit 0
       """
     }
   }
-
 end
+
