@@ -1,0 +1,10 @@
+# <%= serial_port %> - getty
+#
+# This service maintains a getty on ttyS0 from the point the system is
+# started until it is shut down again.
+
+start on stopped rc RUNLEVEL=[2345]
+stop on runlevel [!2345]
+
+respawn
+exec /sbin/getty -L <%= serial_port %> 115200 vt102
