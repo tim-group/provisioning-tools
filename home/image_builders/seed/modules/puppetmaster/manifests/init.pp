@@ -37,6 +37,11 @@ class puppetmaster::install {
       require => Class['puppetmaster::preinstall']
   }
 
+  package {'mcollective-plugins-puppetca':
+    ensure  => "latest",
+    require => Class['mcollective::install']
+  }
+
   package{'git-core':
     ensure => 'latest'
   }
