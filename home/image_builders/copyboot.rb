@@ -62,9 +62,6 @@ SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="#{nic[:mac]}", A
       ]
       end
     }
-
-    res = `cat #{spec[:temp_dir]}/etc/resolv.conf`
-    puts "GOT RESOLV\n#{res}\nEND RESOLV"
   }
 
 end
