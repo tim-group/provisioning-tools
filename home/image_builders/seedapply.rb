@@ -30,10 +30,12 @@ define "seedapply" do
 
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
       f.puts """#!/bin/sh -e
+echo 'Running seed puppet: '
 cat /etc/resolv.conf > /seed/pre_puppet_resolv.conf
- puppet apply /seed/manifests/seed.pp --node_terminus exec --external_nodes /seed/enc.sh --modulepath=/seed/modules -l /seed/init.log
- echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local
- exit 0
+puppet apply /seed/manifests/seed.pp --node_terminus exec --external_nodes /seed/enc.sh --modulepath=/seed/modules 2>&1 | tee /seed/init.log
+echo 'Finished running seed puppet.'
+echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local
+exit 0
       """
     }
   }
