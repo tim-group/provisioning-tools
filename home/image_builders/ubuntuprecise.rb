@@ -227,6 +227,10 @@ exec /sbin/getty -L ttyS0 115200 vt102
   run("install some other useful stuff") {
     apt_install "puppet"
     apt_install "nagios-nrpe-server"
+    apt_install "psmisc"
+    apt_install "vim"
+    apt_install "nmap"
+    apt_install "traceroute"
   }
 
 end
