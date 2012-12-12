@@ -6,6 +6,9 @@ ifconfig br_prod up 192.168.6.1/24
 #/sbin/iptables -I FORWARD -i br_mgmt -o br_front -j ACCEPT
 #/sbin/iptables -I FORWARD -i br_mgmt -o br_front -m state --state RELATED,ESTABLISHED -j ACCEPT
 #/sbin/iptables -I FORWARD -o br_mgmt -i br_front -m state --state RELATED,ESTABLISHED -j ACCEPT
+#/sbin/iptables -I FORWARD -i br_prod -o br_front -j ACCEPT
+#/sbin/iptables -I FORWARD -i br_prod -o br_front -m state --state RELATED,ESTABLISHED -j ACCEPT
+#/sbin/iptables -I FORWARD -o br_front -i br_prod -m state --state RELATED,ESTABLISHED -j ACCEPT
 
 virsh net-destroy mgmt
 virsh net-undefine mgmt
