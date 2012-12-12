@@ -1,4 +1,5 @@
 ifconfig br_mgmt up 192.168.5.1/24
+ifconfig br_prod up 192.168.6.1/24
 
 virsh net-destroy mgmt
 virsh net-undefine mgmt
