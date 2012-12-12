@@ -49,7 +49,7 @@ define "ubuntuprecise" do
   }
 
   run("running debootstrap") {
-    cmd "debootstrap --no-check-certificate --arch amd64 --exclude=resolvconf precise #{spec[:temp_dir]} http://aptproxy:3142/ubuntu"
+    cmd "debootstrap --no-check-certificate --arch amd64 --exclude=resolvconf,ubuntu-minimal precise #{spec[:temp_dir]} http://aptproxy:3142/ubuntu"
     cmd "mkdir -p #{spec[:temp_dir]}/etc/default"
   }
 
@@ -99,7 +99,7 @@ define "ubuntuprecise" do
 option rfc3442-classless-static-routes code 121 = array of unsigned integer 8;
 send host-name \"#{spec[:hostname]}\";
 supersede domain-name \"#{spec[:domain]}\";
-supersede domain-search \"#{spec[:domain]}\", \"youdevise.com\";
+supersede domain-search \"#{spec[:domain]}\", \"net.local\";
     "
     }
   }
@@ -208,12 +208,6 @@ exec /sbin/getty -L ttyS0 115200 vt102
       f.puts "deb http://apt/ubuntu stable main\ndeb-src http://apt/ubuntu stable main\n"
     }
     chroot "curl -Ss http://apt/ubuntu/repo.key | apt-key add -"
-  }
-
-  run("configure aptproxy") {
-    open("#{spec[:temp_dir]}/etc/apt/apt.conf.d/01proxy", 'w') { |f|
-      f.puts "Acquire::http::Proxy \"http://aptproxy:3142\";\n"
-    }
   }
 
   run("run apt-update ") {

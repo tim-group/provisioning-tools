@@ -50,7 +50,7 @@ iface #{nic[:network]} inet dhcp
 option rfc3442-classless-static-routes code 121 = array of unsigned integer 8;
 send host-name \"#{spec[:hostname]}\";
 supersede domain-name \"#{spec[:domain]}\";
-supersede domain-search \"#{spec[:domain]}\", \"youdevise.com\";
+supersede domain-search \"#{spec[:domain]}\", \"net.local\";
     "
       }
     }
@@ -61,6 +61,12 @@ supersede domain-search \"#{spec[:domain]}\", \"youdevise.com\";
 SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="#{nic[:mac]}", ATTR{type}=="1",  NAME="#{nic[:network]}"\n
       ]
       end
+    }
+  }
+
+  run("configure aptproxy") {
+    open("#{spec[:temp_dir]}/etc/apt/apt.conf.d/01proxy", 'w') { |f|
+      f.puts "Acquire::http::Proxy \"http://#{spec[:aptproxy]}:3142\";\n"
     }
   }
 

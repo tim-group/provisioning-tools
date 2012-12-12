@@ -1,0 +1,39 @@
+<html>
+   <head>
+      <title>Not Found, APT Reconfiguration required</title>
+      $STYLE
+   </head>
+   <body>
+      <table border=0 width=580>
+         <td><tr>
+               <h2>The requested page is not accessible.</h2>
+               <p>
+               You attempted to browse the contents of a virtual HTTP repository.
+               However, the intended way of use is the configuration of<br>APT and related
+               package management systems to retrieve the software packages through this
+               service.
+               <p>
+               To configure APT for use of <a
+                  href=http://www.unix-ag.uni-kl.de/~bloch/acng/>Apt-Cacher&nbsp;NG</a>
+               you need to...
+               <br>
+               <ul>
+                  <li>Configure APT to use a HTTP proxy by specifying it
+                  in apt.conf or related configuration files, see apt.conf<br>manual page for
+                  details. Server and Port need to match the values used to visit this
+                  page. For example, edit<br><i>/etc/apt/apt.conf</i> and add the
+                  line:
+         <pre><font size=-1><b>Acquire::http { Proxy "http://aptproxy:$SERVERPORT"; };</b></font>
+         </pre>
+                  </li>
+               </ul>
+               <h3>Related links</h3>
+               <ul>
+                  <li><a href=$REPAGE>Statitics report and configuration page</a> for this Apt-Cacher NG installation.</li>
+               </ul>
+         </td></tr>
+      </table>
+
+   </body>
+</html>
+

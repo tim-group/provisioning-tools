@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+   <head>
+      <title>Apt-Cacher NG transfer statistics</title>
+      $STYLE
+   </head>
+   <body>
+      <div align="center">
+         <span class="title">Apt-Cacher NG transfer statistics for @H</span>
+         <br />
+         <p></p>
+         <br>
+         <table border=1 cellpadding=4 cellspacing=0>
+            <tr>
+               <td class=coltitle>Date/Period</td>
+               <td class=coltitle>Transfer count (in+out)<br>(day average)</td>
+               <td class=coltitle>Share/Download ratio</td>
+            </tr>
+            @W300
+            @T<tr class="colcont"><td><center>%s</center></td><td><center>%2.2fMiB</center></td><td style="padding-left:1px;padding-right:1px;"><center><table><tr><td bgcolor=green width=%d>&nbsp;</td><td bgcolor=red width=%d>&nbsp;</td></tr></table></center></td></tr>
+         </table>
+      </div>
+
+      <h2>Configuration instructions</h2>
+      <p>
+      Please visit any invalid download URL to see <a href=/>configuration
+         instructions</a> for users. For system administrators, read the manual
+      which may be available on the <a href=file:///usr/share/doc/apt-cacher-ng/html/index.html>local filesystem</a> or
+      be <a href=http://$SERVERIP/doc/apt-cacher-ng/html/index.html>browsable here</a>.
+
+
+      <h2>Expiration</h2>
+      <p>
+      Expiration mechanism is needed to delete files from the local cache when
+      they are removed on the servers, e.g. when the software versions of the
+      package is updated and the package files are replaced. This is rarely
+      needed when Stable system distribution is used by the clients, but use of
+      unstable branches with high fluctuation requires to clean up the local
+      cache from time to time. ACNG includes helper code to identify
+      unreferenced files automatically (executed with the button below).
+      <br>
+      <b>Warning:</b> this operation redownloads all index files. The current
+      implementation does not support delta-based reconstruction of index files
+      ("pdiff" mechanism).
+      </p>
+
+      <form action="#bottom">
+         <p>
+         <input type="submit" name="doExpire" value="Start Expiration">
+         <input type="checkbox" name="abortOnErrors" value="aOe" checked> Stop cleanup on errors during index update step
+         </p>
+      </form>
+      <h2>Import</h2>
+      <p>
+      Importing package files from foreign sources works in following case:
+         <!--
+      <ul>
+         <li>
+         Files are imported from Apt-Cacher 1.x and their meta data is completely available and is correct
+         </li>
+         <li>
+         -->
+         <p>
+         Files can be assigned to <b>known</b> download locations. The
+         locations become known when they are found in index files. However,
+         this index files must exist in the package cache, therefore at least
+         one client needs to download them, i.e. running "<b>apt-get update</b>" on a client system
+         which is configured for use with ACNG. See ACNG manual for more details.
+         <p>
+         <!--
+         </li>
+      </ul>
+      -->
+      When all conditions are met <!--for one of the described ways,--> put your files into
+      the "_import" directory, e.g. <i>/var/cache/apt-cacher-ng/_import/</i>.
+      Subdirectories and symlinks are ok. Then run import.       </p>
+      <form action="#bottom">
+         <p>
+         <input type="submit" name="doImport" value="Start Import">
+         </p>
+      </form>
+      <p>
+      Another kind of maintenance work is repairing the headers. This may
+      necessary if .head files became corrupt for some reason, or when the user
+      copied files manually into the cache without using the import function.
+      </p>
+      <form action="#bottom">
+         <p>
+         <input type="submit" name="doRepair" value="Generate Missing Headers">
+         </p>
+      </form>
+
+      <hr>
+   </body>
+</html>
+
