@@ -225,6 +225,14 @@ exec /sbin/getty -L ttyS0 115200 vt102
     apt_install "vim"
     apt_install "nmap"
     apt_install "traceroute"
+    apt_install "git-core"
+    apt_install "rubygems"
+    apt_install "libstomp-ruby"
+    apt_install "mcollective"
+  }
+
+  cleanup {
+    chroot "/etc/init.d/mcollective stop"
   }
 
 end
