@@ -210,6 +210,13 @@ exec /sbin/getty -L ttyS0 115200 vt102
     chroot "curl -Ss http://apt/ubuntu/repo.key | apt-key add -"
   }
 
+  run("prevent apt from making stupid suggestions") {
+    open("#{spec[:temp_dir]}/etc/apt/apt.conf.d/99no-recommends", 'w') { |f|
+      f.puts 'APT::Install-Recommends "false";\n'
+      f.puts 'APT::Install-Suggests "false";\n'
+    }
+  }
+
   run("run apt-update ") {
     chroot "apt-get -y --force-yes update"
   }
