@@ -212,8 +212,8 @@ exec /sbin/getty -L ttyS0 115200 vt102
 
   run("prevent apt from making stupid suggestions") {
     open("#{spec[:temp_dir]}/etc/apt/apt.conf.d/99no-recommends", 'w') { |f|
-      f.puts 'APT::Install-Recommends "false";\n'
-      f.puts 'APT::Install-Suggests "false";\n'
+      f.puts "APT::Install-Recommends \"false\";\n"
+      f.puts "APT::Install-Suggests \"false\";\n"
     }
   }
 
