@@ -3,6 +3,7 @@ require 'provision/core/namespace'
 require 'provision/core/machine_spec'
 require 'logger'
 require 'digest/sha1'
+require 'socket'
 
 class Provision::Core::MachineSpec
   attr_accessor :spec
@@ -73,7 +74,7 @@ class Provision::Core::MachineSpec
     @spec[:networks].each {|net|
       nics << {
         :slot    => slot,
-        :mac     => mac("#{@spec[:hostname]}.#{net}"),
+        :mac     => mac("#{@spec[:fqdn]}.#{net}"),
         :bridge  => "br_#{net}",
         :network => "#{net}"
       }
@@ -82,13 +83,16 @@ class Provision::Core::MachineSpec
     nics
   end
 
-  def mac(domain = @spec[:hostname])
+  def mac(fqdn = @spec[:fqdn])
+
+    host = Socket.gethostname
+    puts "#{fqdn} #{host}"
     raise 'kvm_mac(): Requires a string type ' +
-      'to work with' unless domain.is_a?(String)
+      'to work with' unless fqdn.is_a?(String)
     raise 'kvm_mac(): An argument given cannot ' +
-      'be an empty string value.' if domain.empty?
+      'be an empty string value.' if fqdn.empty?
     sha1  = Digest::SHA1.new
-    bytes = sha1.digest(domain)
+    bytes = sha1.digest(fqdn+host)
     "52:54:00:%s" % bytes.unpack('H2x9H2x8H2').join(':')
   end
 end

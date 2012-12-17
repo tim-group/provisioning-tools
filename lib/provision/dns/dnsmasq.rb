@@ -20,18 +20,33 @@ class Provision::DNS::DNSMasq < Provision::DNS
     # to allocate the same IP
     # FIXME - There is still a race condition here with other processes
     parse_hosts
+
     hn = spec[:fqdn]
     if @by_name[hn]
       puts "No new allocation for #{hn}, already allocated to #{@by_name[hn]}"
       @by_name[hn]
     else
       # FIXME - THERE IS NO CHECKING HERE - THIS WILL ALLOCATE THE BROADCAST ADDRESS...
+
+      aliases = ""
+      if (!spec[:aliases].nil?)
+        aliases = spec[:aliases].collect {|a| a + '.' + spec[:domain] }.join(' ')
+      end
       @max_ip = IPAddr.new(@max_ip.to_i + 1, Socket::AF_INET)
-      puts "Allocated IP #{@max_ip} to host #{hn}"
-      File.open(@hosts_file, 'a') { |f| f.write "#{@max_ip.to_s} #{hn}\n" }
-      File.open(@ethers_file, 'a') { |f| f.write "#{spec.interfaces[0][:mac]} #{@max_ip.to_s}\n" }
+      puts "Allocated IP #{@max_ip} to host #{hn} with aliases (#{aliases})"
+      File.open(@hosts_file, 'a') { |f| f.write "#{@max_ip.to_s} #{hn} #{aliases}\n" }
+      File.open(@ethers_file, 'a') { |f|
+        f.write "#{spec.interfaces[0][:mac]} #{@max_ip.to_s}\n"
+        puts "Sir I wish to write to ethers file #{spec.interfaces[0][:mac]}"
+        pp spec
+      }
       @max_ip
+
     end
+    pid = File.open('/var/run/dnsmasq.pid').first.to_i
+    puts "Reloading dnsmasq (#{pid})"
+    Process.kill("HUP", pid)
+
   end
 
   private
