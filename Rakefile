@@ -11,7 +11,6 @@ end
 desc "Set up virtual network"
 task :network do
   sh "killall -0 dnsmasq; if [ $? -eq 0 ]; then sudo pkill dnsmasq; fi"
-  sh "sudo bash 'networking/define-net.sh'"
   sh "sudo bash 'networking/numbering_service.sh'"
 end
 

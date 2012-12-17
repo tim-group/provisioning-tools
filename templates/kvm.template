@@ -28,9 +28,9 @@
       <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x1'/>
     </controller>
     <% interfaces.each do |nic| %>
-    <interface type='network'>
+    <interface type='bridge'>
       <mac address='<%= nic[:mac] %>'/>
-      <source network='<%= nic[:network] %>'/>
+      <source bridge='br_<%= nic[:network] %>'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x0<%=nic[:slot]%>' function='0x0'/>
     </interface>
     <% end %>

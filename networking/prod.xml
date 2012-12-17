@@ -1,6 +1,0 @@
-<network>
-     <name>prod</name>
-     <bridge name="br_prod" />
-     <forward mode="bridge"/>
-</network>
-

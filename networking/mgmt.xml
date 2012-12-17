@@ -1,6 +1,0 @@
-<network>
-     <name>mgmt</name>
-     <bridge name="br_mgmt" />
-     <forward mode="bridge"/>
-</network>
-
