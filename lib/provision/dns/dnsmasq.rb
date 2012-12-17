@@ -37,8 +37,6 @@ class Provision::DNS::DNSMasq < Provision::DNS
       File.open(@hosts_file, 'a') { |f| f.write "#{@max_ip.to_s} #{hn} #{aliases}\n" }
       File.open(@ethers_file, 'a') { |f|
         f.write "#{spec.interfaces[0][:mac]} #{@max_ip.to_s}\n"
-        puts "Sir I wish to write to ethers file #{spec.interfaces[0][:mac]}"
-        pp spec
       }
       @max_ip
 
