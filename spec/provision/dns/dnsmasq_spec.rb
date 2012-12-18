@@ -84,5 +84,39 @@ describe Provision::DNS::DNSMasq do
       File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("\n192.168.5.2 example.youdevise.com puppet.youdevise.com broker.youdevise.com\n") }
     }
   end
+
+  def process_running(pid)
+    begin
+      Process.getpgid(pid)
+      true
+    rescue Errno::ESRCH
+      false
+    end
+  end
+
+  it 'should hup dnsmasq' do
+    Dir.mktmpdir {|dir|
+      mksubdirs(dir)
+      File.open("#{dir}/etc/hosts", 'w') { |f| f.write "\n" }
+      Provision::DNS::DNSMasq.files_dir = dir
+
+      response = ""
+      pid = fork do
+        running = true
+        Signal.trap("HUP") do
+          running = false
+        end
+        while running
+        end
+      end
+
+      process_running(pid).should eql true
+      File.open("#{dir}/var/run/dnsmasq.pid", 'w') { |f| f.write "#{pid}\n" }
+      thing = Provision::DNS.get_backend("DNSMasq")
+      thing.reload_dnsmasq()
+      Process.waitpid(pid)
+      process_running(pid).should eql false
+    }
+  end
 end
 

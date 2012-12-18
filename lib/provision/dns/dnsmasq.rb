@@ -15,6 +15,14 @@ class Provision::DNS::DNSMasq < Provision::DNS
     parse_hosts
   end
 
+  def reload_dnsmasq
+    if (File.exists?(@dnsmasq_pid_file))
+      pid = File.open(@dnsmasq_pid_file).first.to_i
+      puts "Reloading dnsmasq (#{pid})"
+      Process.kill("HUP", pid)
+    end
+  end
+
   def allocate_ip_for(spec)
     ip = nil
     # Note that we re-parse the hosts file on every allocation
@@ -36,11 +44,7 @@ class Provision::DNS::DNSMasq < Provision::DNS
       File.open(@ethers_file, 'a') { |f|
         f.write "#{spec.interfaces[0][:mac]} #{@max_ip.to_s}\n"
       }
-      if (File.exists?(@dnsmasq_pid_file))
-        pid = File.open(@dnsmasq_pid_file).first.to_i
-        puts "Reloading dnsmasq (#{pid})"
-        Process.kill("HUP", pid)
-      end
+      reload_dnsmasq
       @max_ip
     end
   end
