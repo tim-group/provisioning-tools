@@ -41,7 +41,7 @@ class Provision::DNS::DNSMasq < Provision::DNS
     if File.exist?('/var/run/dnsmasq.pid')
       pid = File.open('/var/run/dnsmasq.pid').first.to_i
       puts "Reloading dnsmasq (#{pid})"
-      Process.kill("HUP", pid)
+      #Process.kill("HUP", pid)
     end
 
     ip
