@@ -84,7 +84,6 @@ class Provision::Core::MachineSpec
   end
 
   def mac(fqdn = @spec[:fqdn])
-
     host = Socket.gethostname
     raise 'kvm_mac(): Requires a string type ' +
       'to work with' unless fqdn.is_a?(String)

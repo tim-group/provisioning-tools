@@ -1,7 +1,7 @@
 require 'ipaddr'
 
 class Provision::DNS::DNSMasq < Provision::DNS
-  @@files_dir = "/etc"
+  @@files_dir = ""
 
   def self.files_dir=(f)
     @@files_dir = f
@@ -9,8 +9,9 @@ class Provision::DNS::DNSMasq < Provision::DNS
 
   def initialize()
     super
-    @hosts_file = "#{@@files_dir}/hosts"
-    @ethers_file = "#{@@files_dir}/ethers"
+    @hosts_file = "#{@@files_dir}/etc/hosts"
+    @ethers_file = "#{@@files_dir}/etc/ethers"
+    @dnsmasq_pid_file = "#{@@files_dir}/var/run/dnsmasq.pid"
     parse_hosts
   end
 
@@ -35,16 +36,13 @@ class Provision::DNS::DNSMasq < Provision::DNS
       File.open(@ethers_file, 'a') { |f|
         f.write "#{spec.interfaces[0][:mac]} #{@max_ip.to_s}\n"
       }
-      ip = @max_ip
+      if (File.exists?(@dnsmasq_pid_file))
+        pid = File.open(@dnsmasq_pid_file).first.to_i
+        puts "Reloading dnsmasq (#{pid})"
+        Process.kill("HUP", pid)
+      end
+      @max_ip
     end
-
-    if File.exist?('/var/run/dnsmasq.pid')
-      pid = File.open('/var/run/dnsmasq.pid').first.to_i
-      puts "Reloading dnsmasq (#{pid})"
-      #Process.kill("HUP", pid)
-    end
-
-    ip
   end
 
   private
