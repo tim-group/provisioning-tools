@@ -60,7 +60,7 @@ describe Provision::DNS::DNSMasq do
       File.open("#{dir}/hosts", 'w') { |f| f.write "\n" }
       thing = Provision::DNS.get_backend("DNSMasq")
       thing.allocate_ip_for(Provision::Core::MachineSpec.new(:hostname => "example", :domain => "youdevise.com"))
-      File.open("#{dir}/ethers", 'r') { |f| f.read.should eql("52:54:00:01:55:3f 192.168.5.2\n") }
+      File.open("#{dir}/ethers", 'r') { |f| f.read.should eql("52:54:00:5d:79:c3 192.168.5.2\n") }
       File.open("#{dir}/hosts", 'r') { |f| f.read.should eql("\n192.168.5.2 example.youdevise.com\n") }
     }
   end

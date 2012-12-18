@@ -94,5 +94,13 @@ class Provision::Core::MachineSpec
     bytes = sha1.digest(fqdn+host)
     "52:54:00:%s" % bytes.unpack('H2x9H2x8H2').join(':')
   end
+
+  def all_hostnames
+    hn = [ @spec[:fqdn] ]
+    if (!spec[:aliases].nil?)
+      hn << spec[:aliases].collect {|a| a + '.' + @spec[:domain] }
+    end
+    hn
+  end
 end
 

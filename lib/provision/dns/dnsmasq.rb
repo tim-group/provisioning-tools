@@ -15,6 +15,7 @@ class Provision::DNS::DNSMasq < Provision::DNS
   end
 
   def allocate_ip_for(spec)
+    ip = nil
     # Note that we re-parse the hosts file on every allocation
     # to avoid multiple simultaneous allocators from being able
     # to allocate the same IP
@@ -24,27 +25,26 @@ class Provision::DNS::DNSMasq < Provision::DNS
     hn = spec[:fqdn]
     if @by_name[hn]
       puts "No new allocation for #{hn}, already allocated to #{@by_name[hn]}"
-      @by_name[hn]
+      ip = @by_name[hn]
     else
       # FIXME - THERE IS NO CHECKING HERE - THIS WILL ALLOCATE THE BROADCAST ADDRESS...
 
-      aliases = ""
-      if (!spec[:aliases].nil?)
-        aliases = spec[:aliases].collect {|a| a + '.' + spec[:domain] }.join(' ')
-      end
       @max_ip = IPAddr.new(@max_ip.to_i + 1, Socket::AF_INET)
-      puts "Allocated IP #{@max_ip} to host #{hn} with aliases (#{aliases})"
-      File.open(@hosts_file, 'a') { |f| f.write "#{@max_ip.to_s} #{hn} #{aliases}\n" }
+      puts "Allocated IP #{@max_ip} to host #{spec.all_hostnames.join(" ")}"
+      File.open(@hosts_file, 'a') { |f| f.write "#{@max_ip.to_s} #{spec.all_hostnames.join(" ")}\n" }
       File.open(@ethers_file, 'a') { |f|
         f.write "#{spec.interfaces[0][:mac]} #{@max_ip.to_s}\n"
       }
-      @max_ip
-
+      ip = @max_ip
     end
-    pid = File.open('/var/run/dnsmasq.pid').first.to_i
-    puts "Reloading dnsmasq (#{pid})"
-    Process.kill("HUP", pid)
 
+    if File.exist?('/var/run/dnsmasq.pid')
+      pid = File.open('/var/run/dnsmasq.pid').first.to_i
+      puts "Reloading dnsmasq (#{pid})"
+      Process.kill("HUP", pid)
+    end
+
+    ip
   end
 
   private
