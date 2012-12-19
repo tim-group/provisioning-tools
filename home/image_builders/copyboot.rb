@@ -24,6 +24,13 @@ define "copyboot" do
     open("#{spec[:temp_dir]}/etc/hostname", 'w') { |f|
       f.puts "#{spec[:hostname]}"
     }
+    open("#{spec[:temp_dir]}/etc/dhcp/dhclient.conf", 'w') { |f|
+      f.puts "
+option rfc3442-classless-static-routes code 121 = array of unsigned integer 8;
+send host-name \"<hostname>\";
+request subnet-mask, broadcast-address, time-offset, routers, domain-name, domain-name-servers, domain-search, host-name, netbios-name-servers, netbios-scope, interface-mtu, rfc3442-classless-static-routes, ntp-servers;
+"
+    }
   #    chroot "hostname -F /etc/hostname"
     open("#{spec[:temp_dir]}/etc/hosts", 'a') { |f|
       f.puts "\n127.0.0.1		localhost\n"
