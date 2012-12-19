@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'spec_helper'
 
-describe 'provisionvm' do
+describe 'provisionvm',:mcollective=>true do
 
   before do
     agent_file = File.join([File.dirname(__FILE__)], '../../../lib/mcollective/agent/Provisionvm.rb')
