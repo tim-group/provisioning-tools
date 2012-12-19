@@ -44,15 +44,6 @@ iface #{nic[:network]} inet dhcp
 "
         end
       }
-
-      open("#{spec[:temp_dir]}/etc/dhcp/dhclient.conf", 'w') { |f|
-        f.puts "
-option rfc3442-classless-static-routes code 121 = array of unsigned integer 8;
-send host-name \"#{spec[:hostname]}\";
-supersede domain-name \"#{spec[:domain]}\";
-supersede domain-search \"#{spec[:domain]}\", \"net.local\";
-    "
-      }
     }
 
     open("#{spec[:temp_dir]}/etc/udev/rules.d/70-persistent-net.rules", 'w') { |f|

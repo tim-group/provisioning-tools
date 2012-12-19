@@ -95,12 +95,11 @@ define "ubuntuprecise" do
     }
   #    chroot "hostname -F /etc/hostname"
     open("#{spec[:temp_dir]}/etc/dhcp/dhclient.conf", 'w') { |f|
-      f.puts "
+f.puts "
 option rfc3442-classless-static-routes code 121 = array of unsigned integer 8;
-send host-name \"#{spec[:hostname]}\";
-supersede domain-name \"#{spec[:domain]}\";
-supersede domain-search \"#{spec[:domain]}\", \"net.local\";
-    "
+send host-name "<hostname>";
+request subnet-mask, broadcast-address, time-offset, routers, domain-name, domain-name-servers, domain-search, host-name, netbios-name-servers, netbios-scope, interface-mtu, rfc3442-classless-static-routes, ntp-servers;
+"
     }
   }
 
