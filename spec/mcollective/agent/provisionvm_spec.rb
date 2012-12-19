@@ -1,3 +1,4 @@
+require 'rubygems'
 require 'spec_helper'
 
 describe 'provisionvm' do
