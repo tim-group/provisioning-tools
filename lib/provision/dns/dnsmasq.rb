@@ -34,6 +34,7 @@ class Provision::DNS::DNSMasq < Provision::DNS
           matching_line ? (found+=1) : (tmp_file.puts line)
         }
       end
+      tmp_file.close
       found > 0 ? FileUtils.mv(tmp_file.path, file) : false
       puts "#{found} lines removed from #{file}"
       return found

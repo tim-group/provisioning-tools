@@ -92,13 +92,20 @@ describe Provision::DNS::DNSMasq do
       File.open("#{dir}/etc/hosts", 'w') { |f| f.write "" }
       File.open("#{dir}/etc/ethers", 'w') { |f| f.write "" }
       thing = Provision::DNS.get_backend("DNSMasq")
-      spec = Provision::Core::MachineSpec.new(
+      spec1 = Provision::Core::MachineSpec.new(
           :hostname => "example",
           :domain   => "youdevise.com",
           :aliases  => ["puppet", "broker"]
       )
-      thing.allocate_ip_for(spec)
-      thing.remove_ip_for(spec).should eql true
+      spec2 = Provision::Core::MachineSpec.new(
+          :hostname => "example2",
+          :domain   => "youdevise.com",
+          :aliases  => ["puppet", "broker"]
+      )
+      thing.allocate_ip_for(spec1)
+      thing.allocate_ip_for(spec2)
+      thing.remove_ip_for(spec1).should eql true
+      thing.remove_ip_for(spec2).should eql true
 
       File.open("#{dir}/etc/ethers", 'r') { |f| f.read.should eql("") }
       File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("") }
