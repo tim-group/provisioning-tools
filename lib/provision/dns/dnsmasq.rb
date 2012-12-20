@@ -1,4 +1,6 @@
 require 'ipaddr'
+require 'fileutils'
+require 'tempfile'
 
 class Provision::DNS::DNSMasq < Provision::DNS
   @@files_dir = ""
@@ -20,6 +22,38 @@ class Provision::DNS::DNSMasq < Provision::DNS
       pid = File.open(@dnsmasq_pid_file).first.to_i
       puts "Reloading dnsmasq (#{pid})"
       Process.kill("HUP", pid)
+    end
+  end
+
+  def remove_lines_from_file(regex,file)
+      found = 0
+      tmp_file = Tempfile.new('remove_temp')
+      File.open(file, 'r') do |f|
+        f.each_line{|line|
+          matching_line = line =~ regex
+          matching_line ? (found+=1) : (tmp_file.puts line)
+        }
+      end
+      found > 0 ? FileUtils.mv(tmp_file.path, file) : false
+      puts "#{found} lines removed from #{file}"
+      return found
+  end
+
+  def remove_ip_for(spec)
+    ip = nil
+    parse_hosts
+
+    hn = spec[:fqdn]
+    if @by_name[hn]
+      ip = @by_name[hn]
+      puts "Removing ip allocation (#{ip}) for #{hn}"
+      hosts_removed = remove_lines_from_file(/^#{ip}.+$/,@hosts_file)
+      ethers_removed = remove_lines_from_file(/^.+#{ip}$/,@ethers_file)
+      hosts_removed > 0 || ethers_removed > 0 ?  reload_dnsmasq : false
+      return true
+    else
+      puts "No ip allocation found for #{hn}, not removing"
+      return false
     end
   end
 

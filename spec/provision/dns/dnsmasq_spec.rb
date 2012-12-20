@@ -85,6 +85,25 @@ describe Provision::DNS::DNSMasq do
     }
   end
 
+  it 'removes entries from hosts and ethers file' do
+    Dir.mktmpdir {|dir|
+      mksubdirs(dir)
+      Provision::DNS::DNSMasq.files_dir = dir
+      File.open("#{dir}/etc/hosts", 'w') { |f| f.write "" }
+      File.open("#{dir}/etc/ethers", 'w') { |f| f.write "" }
+      thing = Provision::DNS.get_backend("DNSMasq")
+      spec = Provision::Core::MachineSpec.new(
+          :hostname => "example",
+          :domain   => "youdevise.com",
+          :aliases  => ["puppet", "broker"]
+      )
+      thing.allocate_ip_for(spec)
+      thing.remove_ip_for(spec).should eql true
+
+      File.open("#{dir}/etc/ethers", 'r') { |f| f.read.should eql("") }
+      File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("") }
+    }
+  end
   def process_running(pid)
     begin
       Process.getpgid(pid)
