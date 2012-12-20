@@ -22,6 +22,31 @@ class Provision::WorkQueue
     @queue << spec
   end
 
+  def clean()
+    threads = []
+    total = @queue.size()
+    @worker_count.times {|i|
+      threads << Thread.new {
+        while(not @queue.empty?)
+          spec = @queue.pop(true)
+          spec[:thread_number] = i
+          require 'yaml'
+          error = nil
+          begin
+            @provisioning_service.clean_vm(spec)
+          rescue Exception => e
+            print e.backtrace
+            @listener.error(e, spec)
+            error = e
+          ensure
+             @listener.passed(spec) if error.nil?
+          end
+        end
+      }
+    }
+    threads.each {|thread| thread.join()}
+  end
+
   def process()
     threads = []
     total = @queue.size()

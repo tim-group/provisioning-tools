@@ -11,10 +11,15 @@ class Provision::Core::ProvisioningService
     @numbering_service = options[:numbering_service] || raise("No :numbering_service option passed")
   end
 
-  def provision_vm(spec_hash)
+  def clean_vm(spec_hash)
     spec = Provision::Core::MachineSpec.new(spec_hash)
     @vm_service.destroy_vm(spec)
     @vm_service.undefine_vm(spec)
+  end
+
+  def provision_vm(spec_hash)
+    clean_vm(spec_hash)
+    spec = Provision::Core::MachineSpec.new(spec_hash)
     @numbering_service.allocate_ip_for(spec)
     @image_service.build_image(spec[:template], spec)
     @vm_service.define_vm(spec)

@@ -5,7 +5,7 @@ require 'provision/workqueue'
 
 describe Provision::WorkQueue do
   before do
-    @listener = NoopListener.new() 
+    @listener = NoopListener.new()
   end
 
   it 'processes work items' do
@@ -49,4 +49,15 @@ describe Provision::WorkQueue do
 
     @workqueue.process()
   end
+
+  it 'cleans up vms' do
+    @provisioning_service = double()
+    @workqueue = Provision::WorkQueue.new(:provisioning_service=>@provisioning_service,:worker_count=>1, :listener=>@listener)
+    spec = {:hostname => "myvm1",
+      :ram => "256Mb"}
+    @provisioning_service.should_receive(:clean_vm).with(spec)
+    @workqueue.add(spec)
+    @workqueue.clean()
+  end
+
 end
