@@ -49,12 +49,27 @@ module MCollective
 
       private
       def last_run_summary
-        summary = YAML.load_file(@last_summary)
 
+        summary = nil
+        10.times do |i|
+          summary = YAML.load_file(@last_summary)
+          break unless summary["resources"].nil?
+          sleep 4
+        end
+
+        raise "summary['resources'] is nil" if summary["resources"].nil?
+
+
+        begin
         reply[:resources] = {"failed"=>0, "changed"=>0, "total"=>0, "restarted"=>0, "out_of_sync"=>0}.merge(summary["resources"])
 
         ["time", "events", "changes", "version"].each do |dat|
           reply[dat.to_sym] = summary[dat]
+        end
+        rescue Exception=>e
+          logger.error(e)
+          logger.error(e.backtrace)
+raise e
         end
       end
 
