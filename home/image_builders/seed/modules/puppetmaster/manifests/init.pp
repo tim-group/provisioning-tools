@@ -115,14 +115,17 @@ class puppetmaster::config {
 
 class puppetmaster::service {
   include puppetdb::wait_for
+  include puppetmaster::wait_for
+
   service{
     'apache2':
       ensure  => 'stopped',
       require => Package['apache2'];
 
     'apache2-puppetmaster':
-      ensure  => 'running',
-      require => [Exec['waitfor_puppetdb'], File['/etc/init.d/apache2-puppetmaster']];
+      ensure    => 'running',
+      notify    => Exec['waitfor_puppetmaster'],
+      require   => [Exec['waitfor_puppetdb'], File['/etc/init.d/apache2-puppetmaster']];
 
     'puppetmaster':
       ensure =>'stopped',
