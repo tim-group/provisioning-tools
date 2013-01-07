@@ -35,6 +35,7 @@ class Provision::DNS::DNSMasq < Provision::DNS
         }
       end
       tmp_file.close
+      File.new(tmp_file.path, 'a').chmod(0644)
       found > 0 ? FileUtils.mv(tmp_file.path, file) : false
       puts "#{found} lines removed from #{file}"
       return found
