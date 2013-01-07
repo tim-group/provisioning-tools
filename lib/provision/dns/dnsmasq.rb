@@ -76,9 +76,13 @@ class Provision::DNS::DNSMasq < Provision::DNS
 
       @max_ip = IPAddr.new(@max_ip.to_i + 1, Socket::AF_INET)
       puts "Allocated IP #{@max_ip} to host #{spec.all_hostnames.join(" ")}"
-      File.open(@hosts_file, 'a') { |f| f.write "#{@max_ip.to_s} #{spec.all_hostnames.join(" ")}\n" }
+      File.open(@hosts_file, 'a') { |f|
+        f.write "#{@max_ip.to_s} #{spec.all_hostnames.join(" ")}\n"
+        f.chmod(0644)
+      }
       File.open(@ethers_file, 'a') { |f|
         f.write "#{spec.interfaces[0][:mac]} #{@max_ip.to_s}\n"
+        f.chmod(0644)
       }
       reload_dnsmasq
       @max_ip
