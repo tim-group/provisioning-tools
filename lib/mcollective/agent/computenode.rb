@@ -3,7 +3,6 @@ require 'mcollective'
 module MCollective
   module Agent
     class Computenode < RPC::Agent
-      include MCollective::RPCClient
 
       def provision(specs)
         require 'provision'
@@ -16,7 +15,7 @@ module MCollective
         return listener.results()
       end
 
-      action "provision_vms" do
+      action "launch" do
         File.open("/var/lock/provision.lock", "w") do |f|
           f.flock(File::LOCK_EX)
           specs = request[:specs]
