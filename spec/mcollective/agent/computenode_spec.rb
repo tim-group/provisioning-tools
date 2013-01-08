@@ -4,8 +4,8 @@ require 'spec_helper'
 describe 'provisionvm',:mcollective=>true do
 
   before do
-    agent_file = File.join([File.dirname(__FILE__)], '../../../lib/mcollective/agent/Provisionvm.rb')
-    @agent = MCollective::Test::LocalAgentTest.new("provisionvm", :agent_file=> agent_file).plugin
+    agent_file = File.join([File.dirname(__FILE__)], '../../../lib/mcollective/agent/Computenode.rb')
+    @agent = MCollective::Test::LocalAgentTest.new("computenode", :agent_file=> agent_file).plugin
   end
 
   it 'responds with available if the host can use this vm' do

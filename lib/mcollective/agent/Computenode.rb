@@ -2,7 +2,8 @@ require 'mcollective'
 
 module MCollective
   module Agent
-    class Provisionvm < RPC::Agent
+    class Computenode < RPC::Agent
+      include MCollective::RPCClient
 
       def provision(specs)
         require 'provision'
@@ -13,16 +14,6 @@ module MCollective
         work_queue.fill(specs)
         work_queue.process()
         return listener.results()
-      end
-
-      action "find_hosts" do
-        specs = request[:specs]
-        hostnames = specs.map {|spec| spec[:hostname] }
-        response = {}
-        hostnames.each do |hostname|
-          response[hostname]  = "OK"
-        end
-        reply.data = response
       end
 
       action "provision_vms" do
