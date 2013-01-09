@@ -20,6 +20,7 @@ class Provision::Core::ProvisioningService
 
   def provision_vm(spec_hash)
     clean_vm(spec_hash)
+    # FIXME - numbering_service to potentially move out of here? (When we do dynamic dns)
     spec = Provision::Core::MachineSpec.new(spec_hash)
     @numbering_service.allocate_ip_for(spec)
     @image_service.build_image(spec[:template], spec)
