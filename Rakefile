@@ -28,24 +28,35 @@ end
 
 desc "Run specs"
 RSpec::Core::RakeTask.new() do |t|
-    t.rspec_opts = %w[--color]
-    t.pattern = "spec/provision/**/*_spec.rb"
+  t.rspec_opts = %w[--color]
+  t.pattern = "spec/provision/**/*_spec.rb"
 end
 
 desc "MCollective Run specs"
 RSpec::Core::RakeTask.new(:mcollective_spec) do |t|
-    t.rspec_opts = %w[--color]
-    t.pattern = "spec/mcollective/**/*_spec.rb"
+  t.rspec_opts = %w[--color]
+  t.pattern = "spec/mcollective/**/*_spec.rb"
 end
 
-
-desc "Generate deb"
-task :package do
-    sh "if [ -f *.deb ]; then rm *.deb; fi"
-    sh "if [ -f *.gem ]; then rm *.gem; fi"
-    sh "gem build provisioning-tools.gemspec"
-    sh "fpm -s gem -t deb provisioning-tools-*.gem"
+desc "Clean everything up"
+task :clean do
+  sh "rm -rf build"
 end
+
+desc "Generate deb file for the gem and command-line tools"
+task :package_main do
+  sh "mkdir -p build"
+  sh "if [ -f *.gem ]; then rm *.gem; fi"
+  sh "cd build && gem build ../provisioning-tools.gemspec"
+  sh "cd build && fpm -s gem -t deb provisioning-tools-*.gem"
+end
+
+desc "Generate deb file for the MCollective agent"
+task :package_agent do
+  sh "echo I AM PACKAGING THE MCO AGENT"
+end
+
+task :package => [:package_main, :package_agent]
 
 task :test => [:spec, :mcollective_spec]
 
