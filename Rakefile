@@ -48,12 +48,32 @@ task :package_main do
   sh "mkdir -p build"
   sh "if [ -f *.gem ]; then rm *.gem; fi"
   sh "cd build && gem build ../provisioning-tools.gemspec"
-  sh "cd build && fpm -s gem -t deb provisioning-tools-*.gem"
+  sh "cd build && fpm -s gem -t deb -n provisioning-tools provisioning-tools-*.gem"
 end
 
 desc "Generate deb file for the MCollective agent"
 task :package_agent do
-  sh "echo I AM PACKAGING THE MCO AGENT"
+  sh "mkdir -p build"
+  require File.join(File.dirname(__FILE__), "version")
+  commandLine  = "fpm",
+    "-s", "dir",
+    "-t", "deb",
+    "-n", "provisioning-tools-mcollective-plugin",
+    "-v", version,
+    "-d", "provisioning-tools",
+    "-a", "all",
+    "-C", "build",
+    "-p", "build/provisioning-tools-mcollective-plugin_#{version}.deb",
+    "--prefix", "/usr/share/mcollective/plugins/mcollective",
+    "../mcollective/agent"
+
+   sh commandLine.join(' ')
+
+    #      '-m',"youDevise <support@timgroup.com>",
+    #      '--description',"TIM Account Management Report Tool (Import)",
+    #      '--pre-install','build-scripts/deb-pre-install.rb',
+    #      '--post-install','build-scripts/deb-post-install.rb',
+    #      '-C','build/package',
 end
 
 task :package => [:package_main, :package_agent]
