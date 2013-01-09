@@ -1,6 +1,5 @@
-*.deb
-*.gem
 *.log
 *.img
 .*.sw[a-z]
 /tags
+/build
