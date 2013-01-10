@@ -24,42 +24,43 @@ define "copyboot" do
     open("#{spec[:temp_dir]}/etc/hostname", 'w') { |f|
       f.puts "#{spec[:hostname]}"
     }
-    open("#{spec[:temp_dir]}/etc/dhcp/dhclient.conf", 'w') { |f|
-      f.puts "
+  open("#{spec[:temp_dir]}/etc/dhcp/dhclient.conf", 'w') { |f|
+    f.puts "
 option rfc3442-classless-static-routes code 121 = array of unsigned integer 8;
 send host-name \"<hostname>\";
 request subnet-mask, broadcast-address, time-offset, routers, domain-name, domain-name-servers, domain-search, host-name, netbios-name-servers, netbios-scope, interface-mtu, rfc3442-classless-static-routes, ntp-servers;
-"
-    }
+    "
+  }
   #    chroot "hostname -F /etc/hostname"
-    open("#{spec[:temp_dir]}/etc/hosts", 'a') { |f|
-      f.puts "\n127.0.0.1		localhost\n"
-      f.puts "127.0.1.1		#{spec[:fqdn]}	#{spec[:hostname]}\n"
-    }
-    run("setup networking") {
-      open("#{spec[:temp_dir]}/etc/network/interfaces", 'w') { |f|
-        f.puts "
+  open("#{spec[:temp_dir]}/etc/hosts", 'a') { |f|
+    f.puts "\n127.0.0.1		localhost\n"
+    f.puts "127.0.1.1		#{spec[:fqdn]}	#{spec[:hostname]}\n"
+  }
+  }
+
+  run("setup networking") {
+    open("#{spec[:temp_dir]}/etc/network/interfaces", 'w') { |f|
+    f.puts "
 # The loopback network interface
 auto lo
 iface lo inet loopback
-"
+    "
 
-        spec.interfaces.each do |nic|
-          f.puts "
+    spec.interfaces.each do |nic|
+      f.puts "
 auto #{nic[:network]}
 iface #{nic[:network]} inet dhcp
 "
-        end
-      }
-    }
+    end
+  }
 
-    open("#{spec[:temp_dir]}/etc/udev/rules.d/70-persistent-net.rules", 'w') { |f|
-      spec.interfaces.each do |nic|
-        f.puts %[
+  open("#{spec[:temp_dir]}/etc/udev/rules.d/70-persistent-net.rules", 'w') { |f|
+    spec.interfaces.each do |nic|
+      f.puts %[
 SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="#{nic[:mac]}", ATTR{type}=="1",  NAME="#{nic[:network]}"\n
       ]
-      end
-    }
+    end
+  }
   }
 
   run("configure aptproxy") {
@@ -69,4 +70,3 @@ SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="#{nic[:mac]}", A
   }
 
 end
-
