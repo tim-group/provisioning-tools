@@ -1,15 +1,16 @@
 require 'mcollective'
+require 'provision'
+require 'provision/inventory'
+require 'provision/workqueue'
 
 module MCollective
   module Agent
     class Computenode < RPC::Agent
 
       def prepare_work_queue(specs, listener)
-        require 'provision'
-        require 'provision/inventory'
-        require 'provision/workqueue'
         work_queue = Provision.work_queue(:worker_count=>1, :listener=>listener)
         work_queue.fill(specs)
+        return work_queue
       end
 
       def with_lock(&action)
@@ -26,8 +27,8 @@ module MCollective
           queue = prepare_work_queue(specs, listener)
 
           puts "Launching #{specs.size} nodes"
-          reply.data = queue.process(specs)
-          return listener.results
+          queue.process()
+          reply.data = listener.results
         end
       end
 
@@ -38,8 +39,8 @@ module MCollective
           queue = prepare_work_queue(specs, listener)
 
           puts "Cleaning #{specs.size} nodes"
-          reply.data = queue.clean(specs)
-          return listener.results
+          queue.clean()
+          reply.data = listener.results
         end
       end
     end
