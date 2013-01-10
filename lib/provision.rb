@@ -15,13 +15,19 @@ module Provision
 
   def self.create_provisioning_service()
     targetdir = File.join(File.dirname(__FILE__), "../target")
+
+    numbering_service = Provision::DNS.get_backend("DNSMasq")
+
+    numbering_service.add_network("mgmt", "192.168.5.0/24")
+    numbering_service.add_network("prod", "192.168.6.0/24")
+
     return provisioning_service = Provision::Core::ProvisioningService.new(
       :image_service     => Provision::Image::Service.new(
           :configdir => home("image_builders"),
           :targetdir => targetdir
       ),
       :vm_service        => Provision::VM::Virsh.new(),
-      :numbering_service => Provision::DNS.get_backend("DNSMasq")
+      :numbering_service => numbering_service
     )
   end
 
