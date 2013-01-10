@@ -63,7 +63,7 @@ desc "Generate deb file for the gem and command-line tools"
 task :package_main do
   sh "mkdir -p build"
   sh "if [ -f *.gem ]; then rm *.gem; fi"
-  sh "cd build && gem build ../provisioning-tools.gemspec"
+  sh "gem build provisioning-tools.gemspec && mv provisioning-tools-*.gem build/"
   sh "cd build && fpm -s gem -t deb -n provisioning-tools provisioning-tools-*.gem"
 end
 
