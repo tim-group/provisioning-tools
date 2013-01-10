@@ -1,9 +1,12 @@
 require 'rake'
-require File.join(File.dirname(__FILE__), "version")
+
+hash = `git rev-parse --short HEAD`.chomp
+v_part= ENV['BUILD_NUMBER'] || "0.pre.#{hash}"
+version = "0.0.#{v_part}"
 
 Gem::Specification.new do |s|
   s.name        = 'provisioning-tools'
-  s.version     = version()
+  s.version     = version
   s.date        = Time.now.strftime("%Y-%m-%d")
   s.summary     = "Provisioning tools for building gold images"
   s.description = "Provisioning tools for building gold images and other libraries"

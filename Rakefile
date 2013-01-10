@@ -3,6 +3,22 @@ require 'rake'
 require 'rake/testtask'
 require 'fileutils'
 require 'rspec/core/rake_task'
+require 'fpm'
+
+def build_deb()
+  $: << File.join(File.dirname(__FILE__), "..", "..", "lib")
+
+  package = FPM::Package::Gem.new
+  package.input(ARGV[0])
+  rpm = package.convert(FPM::Package::RPM)
+  begin
+    output = "NAME-VERSION.ARCH.rpm"
+    rpm.output(rpm.to_s(output))
+  ensure
+    rpm.cleanup
+  end
+end
+
 
 task :default do
   sh "rake -s -T"
@@ -54,7 +70,10 @@ end
 desc "Generate deb file for the MCollective agent"
 task :package_agent do
   sh "mkdir -p build"
-  require File.join(File.dirname(__FILE__), "version")
+  hash = `git rev-parse --short HEAD`.chomp
+  v_part= ENV['BUILD_NUMBER'] || "0.pre.#{hash}"
+  version = "0.0.#{v_part}"
+
   commandLine  = "fpm",
     "-s", "dir",
     "-t", "deb",
@@ -67,13 +86,13 @@ task :package_agent do
     "--prefix", "/usr/share/mcollective/plugins/mcollective",
     "../mcollective/agent"
 
-   sh commandLine.join(' ')
+  sh commandLine.join(' ')
 
-    #      '-m',"youDevise <support@timgroup.com>",
-    #      '--description',"TIM Account Management Report Tool (Import)",
-    #      '--pre-install','build-scripts/deb-pre-install.rb',
-    #      '--post-install','build-scripts/deb-post-install.rb',
-    #      '-C','build/package',
+  #      '-m',"youDevise <support@timgroup.com>",
+  #      '--description',"TIM Account Management Report Tool (Import)",
+  #      '--pre-install','build-scripts/deb-pre-install.rb',
+  #      '--post-install','build-scripts/deb-post-install.rb',
+  #      '-C','build/package',
 end
 
 task :package => [:package_main, :package_agent]
