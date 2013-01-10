@@ -5,10 +5,10 @@ require 'provision/core/machine_spec'
 
 class Provision::DNS::DNSMasq
   def max_ip
-    @max_ip.to_s
+    @networkx.max_ip.to_s
   end
   def hosts_by_name
-    @by_name
+    @networkx.by_name
   end
 end
 
