@@ -4,26 +4,24 @@ require 'Dnsruby'
 require 'provision/dns'
 
 class Provision::DNS::DDNS < Provision::DNS
-#  def initialize(options={})
-#    super
-#    @range = options[:range] || raise("No network range supplied")
-#    @min_allocation = options[:min_allocation] || 10
-#  end
-
-  def get_primary_nameserver_for(zone)
-    'moo'
+  def initialize(options={})
+    super()
+    range = options[:network_range] || raise("No :network_range supplied")
+    parts = range.split('/')
+    if parts.size != 2
+      raise(":network_range must be of the format X.X.X.X/Y")
+    end
+    broadcast_mask = (IPAddr::IN4MASK >> parts[1].to_i)
+    @network = IPAddr.new(parts[0]).mask(parts[1])
+    @broadcast = @network | IPAddr.new(broadcast_mask, Socket::AF_INET)
+    @max_allocation = IPAddr.new(@broadcast.to_i - 1, Socket::AF_INET)
+    min_allocation = options[:min_allocation] || 10
+    @min_allocation = IPAddr.new(min_allocation.to_i + @network.to_i, Socket::AF_INET)
   end
 
   def reverse_zone
+    
     '16.16.172.in-addr.arpa'
-  end
-
-  def calc_max_ip_to_allocate
-    '172.16.16.255'
-  end
-
-  def calc_min_ip_to_allocate
-    '172.16.16.16'
   end
 
   def get_primary_nameserver_for(zone)
@@ -58,7 +56,7 @@ class Provision::DNS::DDNS < Provision::DNS
 
   def try_add_reverse_lookup(ip, fqdn)
     update = Dnsruby::Update.new(reverse_zone)
-    ip_rev = ip.split('.').reverse.join('.')
+    ip_rev = ip.to_s.split('.').reverse.join('.')
     update.absent("#{ip_rev}.in-addr.arpa.", 'PTR') # prereq
     update.add("#{ip_rev}.in-addr.arpa.", 'PTR', 86400, "#{fqdn}.")
     send_update(reverse_zone, update)
@@ -73,10 +71,13 @@ class Provision::DNS::DDNS < Provision::DNS
       return lookup_ip_for(spec)
     else
 
-      max_ip = calc_max_ip_to_allocate
-      ip = calc_min_ip_to_allocate
+      max_ip = @max_allocation
+      ip = @min_allocation
       while !try_add_reverse_lookup(ip, hn)
-        ip = IPAddr.new(ip + 1, Socket::AF_INET)
+        ip = IPAddr.new(ip.to_i + 1, Socket::AF_INET)
+        if ip >= max_ip
+            raise("Ran out of ips")
+        end
       end
     end
     ip

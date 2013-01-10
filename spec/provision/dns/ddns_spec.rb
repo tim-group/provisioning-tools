@@ -3,9 +3,16 @@ require 'provision/dns/ddns'
 require 'tmpdir'
 require 'provision/core/machine_spec'
 
+class Provision::DNS::DDNS
+  attr_reader :network, :broadcast, :min_allocation
+end
+
 describe Provision::DNS::DDNS do
   it 'constructs once' do
-    Provision::DNS::DDNS.new
+    dns = Provision::DNS::DDNS.new(:network_range => '192.168.1.0/24')
+    expect(dns.network.to_s).to eq('192.168.1.0')
+    expect(dns.broadcast.to_s).to eq('192.168.1.255')
+    expect(dns.min_allocation.to_s).to eq('192.168.1.10')
   end
 end
 
