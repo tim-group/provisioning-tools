@@ -162,10 +162,13 @@ class Provision::DNS::DNSMasq < Provision::DNS
   end
 
   def remove_ips_for(spec)
-    @networks.each do |name, net|
+    remove_results = {}
 
-      return net.remove_ip_for(spec)
+    @networks.each do |name, net|
+      remove_results[name] = net.remove_ip_for(spec)
     end
+
+    return remove_results
   end
 end
 
