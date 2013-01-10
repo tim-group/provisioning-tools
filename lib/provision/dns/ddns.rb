@@ -1,6 +1,6 @@
 require 'ipaddr'
 require 'rubygems'
-require 'Dnsruby'
+#require 'Dnsruby'
 require 'provision/dns'
 
 class Provision::DNS::DDNS < Provision::DNS
@@ -20,7 +20,7 @@ class Provision::DNS::DDNS < Provision::DNS
   end
 
   def reverse_zone
-    
+
     '16.16.172.in-addr.arpa'
   end
 

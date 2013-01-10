@@ -4,6 +4,11 @@ require 'tempfile'
 
 class Provision::DNS::DNSMasq < Provision::DNS
   @@files_dir = ""
+  module IPAddrExtensions
+    def subnet_mask
+      return _to_string(@mask_addr)
+    end
+  end
 
   def self.files_dir=(f)
     @@files_dir = f
@@ -14,6 +19,8 @@ class Provision::DNS::DNSMasq < Provision::DNS
     @hosts_file = "#{@@files_dir}/etc/hosts"
     @ethers_file = "#{@@files_dir}/etc/ethers"
     @dnsmasq_pid_file = "#{@@files_dir}/var/run/dnsmasq.pid"
+    @network = IPAddr.new("192.168.5.0/24")
+    @network.extend(IPAddrExtensions)
     parse_hosts
   end
 
@@ -26,19 +33,19 @@ class Provision::DNS::DNSMasq < Provision::DNS
   end
 
   def remove_lines_from_file(regex,file)
-      found = 0
-      tmp_file = Tempfile.new('remove_temp')
-      File.open(file, 'r') do |f|
-        f.each_line{|line|
-          matching_line = line =~ regex
-          matching_line ? (found+=1) : (tmp_file.puts line)
-        }
-      end
-      tmp_file.close
-      File.new(tmp_file.path, 'a').chmod(0644)
-      found > 0 ? FileUtils.mv(tmp_file.path, file) : false
-      puts "#{found} lines removed from #{file}"
-      return found
+    found = 0
+    tmp_file = Tempfile.new('remove_temp')
+    File.open(file, 'r') do |f|
+      f.each_line{|line|
+        matching_line = line =~ regex
+        matching_line ? (found+=1) : (tmp_file.puts line)
+      }
+    end
+    tmp_file.close
+    File.new(tmp_file.path, 'a').chmod(0644)
+    found > 0 ? FileUtils.mv(tmp_file.path, file) : false
+    puts "#{found} lines removed from #{file}"
+    return found
   end
 
   def remove_ip_for(spec)
@@ -51,7 +58,7 @@ class Provision::DNS::DNSMasq < Provision::DNS
       puts "Removing ip allocation (#{ip}) for #{hn}"
       hosts_removed = remove_lines_from_file(/^#{ip}.+$/,@hosts_file)
       ethers_removed = remove_lines_from_file(/^.+#{ip}$/,@ethers_file)
-      hosts_removed > 0 || ethers_removed > 0 ?  reload_dnsmasq : false
+        hosts_removed > 0 || ethers_removed > 0 ?  reload_dnsmasq : false
       return true
     else
       puts "No ip allocation found for #{hn}, not removing"
@@ -71,6 +78,9 @@ class Provision::DNS::DNSMasq < Provision::DNS
     if @by_name[hn]
       puts "No new allocation for #{hn}, already allocated to #{@by_name[hn]}"
       ip = @by_name[hn]
+      return {"mgmt"=>{
+        :ipaddress=>ip,
+        :subnetmask=>@network.subnet_mask}}
     else
       # FIXME - THERE IS NO CHECKING HERE - THIS WILL ALLOCATE THE BROADCAST ADDRESS...
 
@@ -85,30 +95,32 @@ class Provision::DNS::DNSMasq < Provision::DNS
         f.chmod(0644)
       }
       reload_dnsmasq
-      @max_ip
+
+      return {"mgmt"=>{
+        :ipaddress=>@max_ip,
+        :subnetmask=>@network.subnet_mask}}
     end
   end
 
   private
 
   def parse_hosts
-    network = IPAddr.new("192.168.5.0/24")
     @by_name = {}
     @max_ip = IPAddr.new("192.168.5.1")
 
     File.open(@hosts_file).each { |l|
       next if l =~ /^#/
-      next if l =~ /^\s*$/
-      next unless l =~ /^\d+\.\d+\.\d+\.\d+/
-      splits = l.split("\s")
+        next if l =~ /^\s*$/
+        next unless l =~ /^\d+\.\d+\.\d+\.\d+/
+        splits = l.split("\s")
       ip = splits[0]
       names = splits[1..-1]
-      next unless network.include?(ip)
+      next unless @network.include?(ip)
       if IPAddr.new(ip) > @max_ip
         @max_ip = IPAddr.new(ip)
       end
       names.each { |n|
-         @by_name[n] = ip
+        @by_name[n] = ip
       }
     }
   end
