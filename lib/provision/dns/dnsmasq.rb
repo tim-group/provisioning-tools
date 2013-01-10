@@ -65,9 +65,9 @@ class Provision::DNS::DNSMasq < Provision::DNS
 
       File.open(@hosts_file).each { |l|
         next if l =~ /^#/
-        next if l =~ /^\s*$/
-        next unless l =~ /^\d+\.\d+\.\d+\.\d+/
-        splits = l.split("\s")
+          next if l =~ /^\s*$/
+          next unless l =~ /^\d+\.\d+\.\d+\.\d+/
+          splits = l.split("\s")
         ip = splits[0]
         names = splits[1..-1]
         next unless @subnet.include?(ip)
@@ -105,6 +105,7 @@ class Provision::DNS::DNSMasq < Provision::DNS
         Process.kill("HUP", pid)
       end
     end
+
     def remove_lines_from_file(regex,file)
       found = 0
       tmp_file = Tempfile.new('remove_temp')
@@ -136,9 +137,9 @@ class Provision::DNS::DNSMasq < Provision::DNS
     subnet = @network = IPAddr.new("192.168.5.0/24")
     subnet.extend(IPAddrExtensions)
     @networks['mgmt'] = Network.new(subnet,
-                            :hosts_file=>@hosts_file,
-                            :ethers_file=>@ethers_file,
-                            :dnsmasq_pid_file=>@dnsmasq_pid_file)
+                                    :hosts_file=>@hosts_file,
+                                    :ethers_file=>@ethers_file,
+                                    :dnsmasq_pid_file=>@dnsmasq_pid_file)
     @networks['mgmt'].parse_hosts
   end
 
@@ -156,13 +157,15 @@ class Provision::DNS::DNSMasq < Provision::DNS
     @networks.each do |name, net|
       allocations[name] = net.allocate_ip_for(spec)
     end
-#    return @networks['mgmt'].allocate_ip_for(spec)
 
     return allocations
   end
 
   def remove_ips_for(spec)
-    return @networks['mgmt'].remove_ip_for(spec)
+    @networks.each do |name, net|
+
+      return net.remove_ip_for(spec)
+    end
   end
 end
 
