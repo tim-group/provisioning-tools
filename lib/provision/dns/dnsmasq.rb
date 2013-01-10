@@ -106,7 +106,7 @@ class Provision::DNS::DNSMasq < Provision::DNS
 
   def parse_hosts
     @by_name = {}
-    @max_ip = IPAddr.new("192.168.5.1")
+    @max_ip = @network.to_range.first.succ
 
     File.open(@hosts_file).each { |l|
       next if l =~ /^#/
