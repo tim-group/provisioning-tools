@@ -14,8 +14,8 @@ module RSpec::Mocks::ArgumentMatchers
       end
 
       def ==(actual)
-        return true if actual.spec['networking'] == @expected
-        raise "expecting networking :#{PP.pp(actual.spec['networking'],"")} to match #{PP.pp(@expected,"")}"
+        return true if actual.spec[:networking] == @expected
+        raise "expecting networking :#{PP.pp(actual.spec[:networking],"")} to match #{PP.pp(@expected,"")}"
       end
 
       def description
@@ -76,7 +76,7 @@ describe Provision::Core::ProvisioningService do
   end
 
   it 'allows the user to clean up vms' do
-    @numbering_service.should_receive(:remove_ip_for)
+    @numbering_service.should_receive(:remove_ips_for)
     @vm_service.should_receive(:destroy_vm).ordered
     @vm_service.should_receive(:undefine_vm).ordered
     @provisioning_service.clean_vm(:hostname=>"vmx1",:template=>"ubuntuprecise")

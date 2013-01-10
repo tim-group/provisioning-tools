@@ -15,14 +15,13 @@ class Provision::Core::ProvisioningService
     spec = Provision::Core::MachineSpec.new(spec_hash)
     @vm_service.destroy_vm(spec)
     @vm_service.undefine_vm(spec)
-    @numbering_service.remove_ip_for(spec)
+    @numbering_service.remove_ips_for(spec)
   end
 
   def provision_vm(spec_hash)
     clean_vm(spec_hash)
-    # FIXME - numbering_service to potentially move out of here? (When we do dynamic dns)
     spec = Provision::Core::MachineSpec.new(spec_hash)
-    spec['networking'] =  @numbering_service.allocate_ips_for(spec)
+    spec[:networking] =  @numbering_service.allocate_ips_for(spec)
     @image_service.build_image(spec[:template], spec)
     @vm_service.define_vm(spec)
     @vm_service.start_vm(spec)

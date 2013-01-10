@@ -46,11 +46,17 @@ auto lo
 iface lo inet loopback
     "
 
+    require 'pp'
     spec.interfaces.each do |nic|
-      f.puts "
+      config = spec[:networking][nic[:network]]
+      if config != nil
+        f.puts "
 auto #{nic[:network]}
-iface #{nic[:network]} inet dhcp
+iface #{nic[:network]} inet static
+address #{config[:address]}
+netmask   #{config[:netmask]}
 "
+      end
     end
   }
 
