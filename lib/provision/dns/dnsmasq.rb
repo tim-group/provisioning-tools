@@ -131,15 +131,15 @@ class Provision::DNS::DNSMasq < Provision::DNS
     @hosts_file = "#{@@files_dir}/etc/hosts"
     @ethers_file = "#{@@files_dir}/etc/ethers"
     @dnsmasq_pid_file = "#{@@files_dir}/var/run/dnsmasq.pid"
-
+    @networks = {}
 
     subnet = @network = IPAddr.new("192.168.5.0/24")
     subnet.extend(IPAddrExtensions)
-    @networkx = Network.new(subnet,
+    @networks['mgmt'] = Network.new(subnet,
                             :hosts_file=>@hosts_file,
                             :ethers_file=>@ethers_file,
                             :dnsmasq_pid_file=>@dnsmasq_pid_file)
-    @networkx.parse_hosts
+    @networks['mgmt'].parse_hosts
   end
 
   def reload_dnsmasq
@@ -151,11 +151,11 @@ class Provision::DNS::DNSMasq < Provision::DNS
   end
 
   def allocate_ips_for(spec)
-    return @networkx.allocate_ip_for(spec)
+    return @networks['mgmt'].allocate_ip_for(spec)
   end
 
   def remove_ips_for(spec)
-    return @networkx.remove_ip_for(spec)
+    return @networks['mgmt'].remove_ip_for(spec)
   end
 end
 
