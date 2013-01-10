@@ -33,9 +33,9 @@ class Provision::DNS::DNSMasq < Provision::DNS
       if @by_name[hn]
         puts "No new allocation for #{hn}, already allocated to #{@by_name[hn]}"
         ip = @by_name[hn]
-        return {"mgmt"=>{
+        return {
           :address=>ip,
-          :netmask=>@subnet.subnet_mask}}
+          :netmask=>@subnet.subnet_mask}
       else
         # FIXME - THERE IS NO CHECKING HERE - THIS WILL ALLOCATE THE BROADCAST ADDRESS...
 
@@ -52,9 +52,9 @@ class Provision::DNS::DNSMasq < Provision::DNS
 
         reload_dnsmasq
 
-        return {"mgmt"=>{
+        return {
           :address=>@max_ip,
-          :netmask=>@subnet.subnet_mask}}
+          :netmask=>@subnet.subnet_mask}
       end
     end
 
@@ -151,7 +151,14 @@ class Provision::DNS::DNSMasq < Provision::DNS
   end
 
   def allocate_ips_for(spec)
-    return @networks['mgmt'].allocate_ip_for(spec)
+    allocations = {}
+
+    @networks.each do |name, net|
+      allocations[name] = net.allocate_ip_for(spec)
+    end
+#    return @networks['mgmt'].allocate_ip_for(spec)
+
+    return allocations
   end
 
   def remove_ips_for(spec)
