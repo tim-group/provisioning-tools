@@ -50,7 +50,7 @@ describe Provision::Core::ProvisioningService do
   end
 
   it 'allows the user to define vm from an image catalogue and vmdescription catalogue' do
-    @numbering_service.should_receive(:allocate_ip_for)
+    @numbering_service.should_receive(:allocate_ips_for)
     @provisioning_service.should_receive(:clean_vm).with(:hostname=>"vmx1",:template=>"ubuntuprecise")
     @image_service.should_receive(:build_image).with("ubuntuprecise",anything).ordered
     @vm_service.should_receive(:define_vm).ordered
@@ -65,7 +65,7 @@ describe Provision::Core::ProvisioningService do
         :netmask=>"255.255.255.0"
       }
     }
-    @numbering_service.stub(:allocate_ip_for).and_return(network_address)
+    @numbering_service.stub(:allocate_ips_for).and_return(network_address)
 
     @provisioning_service.should_receive(:clean_vm).with(:hostname=>"vmx1",:template=>"ubuntuprecise")
 

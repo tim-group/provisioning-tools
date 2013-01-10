@@ -62,7 +62,7 @@ class Provision::DNS::DDNS < Provision::DNS
     send_update(reverse_zone, update)
   end
 
-  def allocate_ip_for(spec)
+  def allocate_ips_for(spec)
     ip = nil
 
     hn = spec[:fqdn]

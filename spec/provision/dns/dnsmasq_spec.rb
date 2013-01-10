@@ -26,16 +26,16 @@ describe Provision::DNS::DNSMasq do
       Provision::DNS::DNSMasq.files_dir = dir
       File.open("#{dir}/etc/hosts", 'w') { |f| f.write "# Example hosts file\n127.0.0.1 localhost\n" }
       thing = Provision::DNS.get_backend("DNSMasq")
-      ip = thing.allocate_ip_for(Provision::Core::MachineSpec.new(:hostname => "example", :domain => "youdevise.com"))["mgmt"][:ipaddress]
+      ip = thing.allocate_ips_for(Provision::Core::MachineSpec.new(:hostname => "example", :domain => "youdevise.com"))["mgmt"][:ipaddress]
       ip.to_s.should eql("192.168.5.2")
-      other = thing.allocate_ip_for(Provision::Core::MachineSpec.new(:hostname => "example2", :domain => "youdevise.com"))["mgmt"][:ipaddress]
+      other = thing.allocate_ips_for(Provision::Core::MachineSpec.new(:hostname => "example2", :domain => "youdevise.com"))["mgmt"][:ipaddress]
       other.to_s.should eql("192.168.5.3")
-      first_again = thing.allocate_ip_for(Provision::Core::MachineSpec.new(:hostname => "example", :domain => "youdevise.com"))["mgmt"][:ipaddress]
+      first_again = thing.allocate_ips_for(Provision::Core::MachineSpec.new(:hostname => "example", :domain => "youdevise.com"))["mgmt"][:ipaddress]
 
       first_again.to_s.should eql("192.168.5.2")
 
       new_thing = Provision::DNS.get_backend("DNSMasq")
-      new_thing_ip = new_thing.allocate_ip_for(Provision::Core::MachineSpec.new(:hostname => "example", :domain => "youdevise.com"))["mgmt"][:ipaddress]
+      new_thing_ip = new_thing.allocate_ips_for(Provision::Core::MachineSpec.new(:hostname => "example", :domain => "youdevise.com"))["mgmt"][:ipaddress]
       new_thing_ip.to_s.should eql("192.168.5.2")
 
       new_thing.max_ip.should eql("192.168.5.3")
@@ -69,7 +69,7 @@ describe Provision::DNS::DNSMasq do
       Provision::DNS::DNSMasq.files_dir = dir
       File.open("#{dir}/etc/hosts", 'w') { |f| f.write "\n" }
       thing = Provision::DNS.get_backend("DNSMasq")
-      thing.allocate_ip_for(
+      thing.allocate_ips_for(
         Provision::Core::MachineSpec.new(
           :hostname => "example",
           :domain   => "youdevise.com",
@@ -103,10 +103,10 @@ describe Provision::DNS::DNSMasq do
           :domain   => "youdevise.com",
           :aliases  => ["puppet", "broker"]
       )
-      thing.allocate_ip_for(spec1)
-      thing.allocate_ip_for(spec2)
-      thing.remove_ip_for(spec1).should eql true
-      thing.remove_ip_for(spec2).should eql true
+      thing.allocate_ips_for(spec1)
+      thing.allocate_ips_for(spec2)
+      thing.remove_ips_for(spec1).should eql true
+      thing.remove_ips_for(spec2).should eql true
 
       File.open("#{dir}/etc/ethers", 'r') { |f| f.read.should eql("") }
       File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("") }

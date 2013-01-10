@@ -48,7 +48,7 @@ class Provision::DNS::DNSMasq < Provision::DNS
     return found
   end
 
-  def remove_ip_for(spec)
+  def remove_ips_for(spec)
     ip = nil
     parse_hosts
 
@@ -66,7 +66,7 @@ class Provision::DNS::DNSMasq < Provision::DNS
     end
   end
 
-  def allocate_ip_for(spec)
+  def allocate_ips_for(spec)
     ip = nil
     # Note that we re-parse the hosts file on every allocation
     # to avoid multiple simultaneous allocators from being able
