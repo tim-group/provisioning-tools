@@ -20,12 +20,18 @@ describe Provision::DNS::DNSMasq do
     Dir.mkdir("#{dir}/var/run")
   end
 
+  def undertest()
+    dnsmasq = Provision::DNS.get_backend("DNSMasq")
+    dnsmasq.add_network("mgmt", "192.168.5.0/24")
+    return dnsmasq
+  end
+
   it 'constructs once' do
     Dir.mktmpdir {|dir|
       mksubdirs(dir)
       Provision::DNS::DNSMasq.files_dir = dir
       File.open("#{dir}/etc/hosts", 'w') { |f| f.write "# Example hosts file\n127.0.0.1 localhost\n" }
-      thing = Provision::DNS.get_backend("DNSMasq")
+      thing = undertest()
       ip = thing.allocate_ips_for(Provision::Core::MachineSpec.new(:hostname => "example", :domain => "youdevise.com"))["mgmt"][:address]
       ip.to_s.should eql("192.168.5.2")
       other = thing.allocate_ips_for(Provision::Core::MachineSpec.new(:hostname => "example2", :domain => "youdevise.com"))["mgmt"][:address]
@@ -34,7 +40,7 @@ describe Provision::DNS::DNSMasq do
 
       first_again.to_s.should eql("192.168.5.2")
 
-      new_thing = Provision::DNS.get_backend("DNSMasq")
+      new_thing = undertest()
       new_thing_ip = new_thing.allocate_ips_for(Provision::Core::MachineSpec.new(:hostname => "example", :domain => "youdevise.com"))["mgmt"][:address]
       new_thing_ip.to_s.should eql("192.168.5.2")
 
@@ -51,7 +57,7 @@ describe Provision::DNS::DNSMasq do
       mksubdirs(dir)
       Provision::DNS::DNSMasq.files_dir = dir
       File.open("#{dir}/etc/hosts", 'w') { |f| f.write "192.168.5.5\t    fnar fnar.example.com\n192.168.5.2   \t boo.example.com\tboo   \n# Example hosts file\n192.168.5.1 flib   \n" }
-      thing = Provision::DNS.get_backend("DNSMasq")
+      thing = undertest()
       thing.hosts_by_name('mgmt').should eql({
         "fnar" => "192.168.5.5",
         "fnar.example.com" => "192.168.5.5",
@@ -68,7 +74,7 @@ describe Provision::DNS::DNSMasq do
       mksubdirs(dir)
       Provision::DNS::DNSMasq.files_dir = dir
       File.open("#{dir}/etc/hosts", 'w') { |f| f.write "\n" }
-      thing = Provision::DNS.get_backend("DNSMasq")
+      thing = undertest()
       thing.allocate_ips_for(
         Provision::Core::MachineSpec.new(
           :hostname => "example",
@@ -83,7 +89,7 @@ describe Provision::DNS::DNSMasq do
 
       File.open("#{dir}/etc/ethers", 'r') {
         |f| f.read.should eql("#{mac} 192.168.5.2\n") }
-      File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("\n192.168.5.2 example.youdevise.com puppet.youdevise.com broker.youdevise.com\n") }
+        File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("\n192.168.5.2 example.youdevise.com puppet.youdevise.com broker.youdevise.com\n") }
     }
   end
 
@@ -93,16 +99,16 @@ describe Provision::DNS::DNSMasq do
       Provision::DNS::DNSMasq.files_dir = dir
       File.open("#{dir}/etc/hosts", 'w') { |f| f.write "" }
       File.open("#{dir}/etc/ethers", 'w') { |f| f.write "" }
-      thing = Provision::DNS.get_backend("DNSMasq")
+      thing = undertest()
       spec1 = Provision::Core::MachineSpec.new(
-          :hostname => "example",
-          :domain   => "youdevise.com",
-          :aliases  => ["puppet", "broker"]
+        :hostname => "example",
+        :domain   => "youdevise.com",
+        :aliases  => ["puppet", "broker"]
       )
       spec2 = Provision::Core::MachineSpec.new(
-          :hostname => "example2",
-          :domain   => "youdevise.com",
-          :aliases  => ["puppet", "broker"]
+        :hostname => "example2",
+        :domain   => "youdevise.com",
+        :aliases  => ["puppet", "broker"]
       )
       thing.allocate_ips_for(spec1)
       thing.allocate_ips_for(spec2)

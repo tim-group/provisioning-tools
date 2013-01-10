@@ -128,19 +128,18 @@ class Provision::DNS::DNSMasq < Provision::DNS
     @@files_dir = f
   end
 
-  def initialize(network_ranges={"mgmt"=>"192.168.5.0/24"})
+  def initialize()
     @hosts_file = "#{@@files_dir}/etc/hosts"
     @ethers_file = "#{@@files_dir}/etc/ethers"
     @dnsmasq_pid_file = "#{@@files_dir}/var/run/dnsmasq.pid"
     @networks = {}
+  end
 
-    network_ranges.each do |name,range|
-      @networks[name] = Network.new(range,
-                                    :hosts_file=>@hosts_file,
-                                    :ethers_file=>@ethers_file,
-                                    :dnsmasq_pid_file=>@dnsmasq_pid_file)
-    end
-
+  def add_network(name, range)
+    @networks[name] = Network.new(range,
+                                  :hosts_file=>@hosts_file,
+                                  :ethers_file=>@ethers_file,
+                                  :dnsmasq_pid_file=>@dnsmasq_pid_file)
   end
 
   def reload_dnsmasq
