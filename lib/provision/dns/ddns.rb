@@ -41,7 +41,7 @@ class Provision::DNS::DDNS < Provision::DNS
     ok
   end
 
-  def remove_ip_for(spec)
+  def remove_ips_for(spec)
     ip = nil
     hn = spec[:fqdn]
     if @by_name[hn]
