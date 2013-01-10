@@ -81,7 +81,8 @@ describe Provision::DNS::DNSMasq do
       bytes = sha1.digest("example.youdevise.com.mgmt"+Socket.gethostname)
       mac = "52:54:00:%s" % bytes.unpack('H2x9H2x8H2').join(':')
 
-      File.open("#{dir}/etc/ethers", 'r') { |f| f.read.should eql("#{mac} 192.168.5.2\n") }
+      File.open("#{dir}/etc/ethers", 'r') {
+        |f| f.read.should eql("#{mac} 192.168.5.2\n") }
       File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("\n192.168.5.2 example.youdevise.com puppet.youdevise.com broker.youdevise.com\n") }
     }
   end

@@ -14,11 +14,13 @@ class Provision::DNS::DNSMasq < Provision::DNS
     attr_reader :max_ip
     attr_reader :by_name
 
-    def initialize(subnet, options)
-      @subnet = subnet
+    def initialize(subnet_string, options)
       @hosts_file = options[:hosts_file]
       @ethers_file = options[:ethers_file]
       @dnsmasq_pid_file = options[:dnsmasq_pid_file]
+      @subnet = IPAddr.new(subnet_string)
+      @subnet.extend(IPAddrExtensions)
+      parse_hosts
     end
 
     def allocate_ip_for(spec)
@@ -57,7 +59,6 @@ class Provision::DNS::DNSMasq < Provision::DNS
           :netmask=>@subnet.subnet_mask}
       end
     end
-
 
     def parse_hosts
       @by_name = {}
@@ -127,20 +128,19 @@ class Provision::DNS::DNSMasq < Provision::DNS
     @@files_dir = f
   end
 
-  def initialize()
-    super
+  def initialize(network_ranges={"mgmt"=>"192.168.5.0/24"})
     @hosts_file = "#{@@files_dir}/etc/hosts"
     @ethers_file = "#{@@files_dir}/etc/ethers"
     @dnsmasq_pid_file = "#{@@files_dir}/var/run/dnsmasq.pid"
     @networks = {}
 
-    subnet = @network = IPAddr.new("192.168.5.0/24")
-    subnet.extend(IPAddrExtensions)
-    @networks['mgmt'] = Network.new(subnet,
+    network_ranges.each do |name,range|
+      @networks[name] = Network.new(range,
                                     :hosts_file=>@hosts_file,
                                     :ethers_file=>@ethers_file,
                                     :dnsmasq_pid_file=>@dnsmasq_pid_file)
-    @networks['mgmt'].parse_hosts
+    end
+
   end
 
   def reload_dnsmasq
