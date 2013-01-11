@@ -1,8 +1,10 @@
+
 require 'provision/image/service'
 require 'provision/vm/virsh'
 require 'provision/core/provisioning_service'
 require 'provision/workqueue'
 require 'provision/dns'
+require 'yaml'
 
 module Provision
   @@config = nil
