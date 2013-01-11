@@ -13,6 +13,7 @@ module Provision
     if File.exists?(file)
       @@config = YAML.load(IO.read(file))
     else
+      print "unable to locate config file #{file} so using default values"
       nil
     end
   end
