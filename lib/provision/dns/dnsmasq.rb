@@ -155,8 +155,9 @@ class Provision::DNS::DNSMasq < Provision::DNS
   def allocate_ips_for(spec)
     allocations = {}
 
-    @networks.each do |name, net|
-      allocations[name] = net.allocate_ip_for(spec)
+    spec[:networks].each do |network|
+      next unless @networks.has_key?(network)
+      allocations[network] = @networks[network].allocate_ip_for(spec)
     end
 
     return allocations

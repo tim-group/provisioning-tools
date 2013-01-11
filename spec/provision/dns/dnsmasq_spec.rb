@@ -151,6 +151,31 @@ describe Provision::DNS::DNSMasq do
       Process.waitpid(pid)
       process_running(pid).should eql false
     }
+
   end
+
+  it 'only allocates an address if the network has been asked for' do
+    Dir.mktmpdir {|dir|
+      mksubdirs(dir)
+      Provision::DNS::DNSMasq.files_dir = dir
+      File.open("#{dir}/etc/hosts", 'w') { |f| f.write "" }
+      File.open("#{dir}/etc/ethers", 'w') { |f| f.write "" }
+
+      thing = undertest()
+      spec1 = Provision::Core::MachineSpec.new(
+        :hostname => "example",
+        :domain   => "youdevise.com",
+        :aliases  => ["puppet", "broker"],
+        :networks => ['noexist']
+      )
+
+      thing.allocate_ips_for(spec1).should eql({})
+
+      File.open("#{dir}/etc/ethers", 'r') { |f| f.read.should eql("") }
+      File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("") }
+    }
+  end
+
+
 end
 
