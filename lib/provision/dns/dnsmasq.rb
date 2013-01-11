@@ -14,12 +14,13 @@ class Provision::DNS::DNSMasq < Provision::DNS
     attr_reader :max_ip
     attr_reader :by_name
 
-    def initialize(subnet_string, options)
+    def initialize(subnet_string, start_ip, options)
       @hosts_file = options[:hosts_file]
       @ethers_file = options[:ethers_file]
       @dnsmasq_pid_file = options[:dnsmasq_pid_file]
       @subnet = IPAddr.new(subnet_string)
       @subnet.extend(IPAddrExtensions)
+      @start_ip = IPAddr.new(start_ip)
       parse_hosts
     end
 
@@ -62,7 +63,7 @@ class Provision::DNS::DNSMasq < Provision::DNS
 
     def parse_hosts
       @by_name = {}
-      @max_ip = @subnet.to_range.first.succ
+      @max_ip = @start_ip
 
       File.open(@hosts_file).each { |l|
         next if l =~ /^#/
@@ -135,8 +136,9 @@ class Provision::DNS::DNSMasq < Provision::DNS
     @networks = {}
   end
 
-  def add_network(name, range)
-    @networks[name] = Network.new(range,
+  def add_network(name, net, start)
+    @networks[name] = Network.new(net,
+                                  start,
                                   :hosts_file=>@hosts_file,
                                   :ethers_file=>@ethers_file,
                                   :dnsmasq_pid_file=>@dnsmasq_pid_file)

@@ -22,7 +22,7 @@ describe Provision::DNS::DNSMasq do
 
   def undertest()
     dnsmasq = Provision::DNS.get_backend("DNSMasq")
-    dnsmasq.add_network("mgmt", "192.168.5.0/24")
+    dnsmasq.add_network("mgmt", "192.168.5.0/24", "192.168.5.1")
     return dnsmasq
   end
 

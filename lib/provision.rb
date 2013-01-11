@@ -5,6 +5,7 @@ require 'provision/core/provisioning_service'
 require 'provision/workqueue'
 require 'provision/dns'
 require 'yaml'
+require 'pp'
 
 module Provision
   @@config = nil
@@ -29,21 +30,21 @@ module Provision
   end
 
   def self.config()
-    return @@config || {"networks"=>{"mgmt" => "192.168.5.0/24",
-      "prod" => "192.168.6.0/24"
-    }}
+   return @@config || {
+      "networks"=>{"mgmt" => {
+      "net"=>"192.168.5.0/24",
+      "start"=>"192.168.5.100"},
+      "prod" => {
+      "net"=>"192.168.6.0/24",
+      "start"=>"192.168.6.100"}}
+    }
   end
 
   def self.numbering_service()
     numbering_service = Provision::DNS.get_backend("DNSMasq")
 
-    require 'pp'
-    self.config()["networks"].each do |name, r|
-      pp name
-      pp r
-    end
-    self.config()["networks"].each do |name, range|
-      numbering_service.add_network(name, range)
+    self.config()["networks"].each do |name, net_config|
+      numbering_service.add_network(name, net_config["net"], net_config["start"])
     end
 
     return numbering_service
