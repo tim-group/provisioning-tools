@@ -10,7 +10,11 @@ module Provision
   end
 
   def self.loadconfig(file="/etc/provision/config.yaml")
-    @@config = YAML.load(IO.read(file))
+    if File.exists?(file)
+      @@config = YAML.load(IO.read(file))
+    else
+      nil
+    end
   end
 
   def self.home(dir="")
