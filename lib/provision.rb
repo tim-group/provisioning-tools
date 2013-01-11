@@ -9,23 +9,43 @@ module Provision
     return File.expand_path(File.join(File.dirname(__FILE__), "../#{dir}"))
   end
 
+  def self.loadconfig(file="/etc/provision/config.yaml")
+    @@config = YAML.load(IO.read(file))
+  end
+
   def self.home(dir="")
     return File.expand_path(File.join(File.dirname(__FILE__), "../home/#{dir}"))
+  end
+
+  def self.config()
+    return @@config || {:networks=>{"mgmt" => "192.168.5.0/24",
+      "prod" => "192.168.6.0/24"
+    }}
+  end
+
+  def self.numbering_service()
+    numbering_service = Provision::DNS.get_backend("DNSMasq")
+
+    require 'pp'
+    self.config()[:networks].each do |name, r|
+      pp name
+      pp r
+    end
+    self.config()[:networks].each do |name, range|
+      numbering_service.add_network(name, range)
+    end
+
+    return numbering_service
   end
 
   def self.create_provisioning_service()
     targetdir = File.join(File.dirname(__FILE__), "../target")
 
-    numbering_service = Provision::DNS.get_backend("DNSMasq")
-
-    numbering_service.add_network("mgmt", "192.168.5.0/24")
-    numbering_service.add_network("prod", "192.168.6.0/24")
-
     return provisioning_service = Provision::Core::ProvisioningService.new(
       :image_service     => Provision::Image::Service.new(
-          :configdir => home("image_builders"),
-          :targetdir => targetdir
-      ),
+        :configdir => home("image_builders"),
+        :targetdir => targetdir
+    ),
       :vm_service        => Provision::VM::Virsh.new(),
       :numbering_service => numbering_service
     )
@@ -41,7 +61,7 @@ module Provision
       :listener=>options[:listener],
       :provisioning_service => Provision.create_provisioning_service(),
       :worker_count=> options[:worker_count])
-    return work_queue
+      return work_queue
   end
 
   def self.create_gold_image(spec_hash)
