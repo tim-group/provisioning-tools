@@ -5,11 +5,13 @@ require 'provision/workqueue'
 require 'provision/dns'
 
 module Provision
+  @@config = nil
+
   def self.base(dir="")
     return File.expand_path(File.join(File.dirname(__FILE__), "../#{dir}"))
   end
 
-  def self.loadconfig(file="/etc/provision/config.yaml")
+  def self.configure(file="/etc/provision/config.yaml")
     if File.exists?(file)
       @@config = YAML.load(IO.read(file))
     else
@@ -17,6 +19,8 @@ module Provision
       nil
     end
   end
+
+  Provision.configure("/etc/provision/config.yaml")
 
   def self.home(dir="")
     return File.expand_path(File.join(File.dirname(__FILE__), "../home/#{dir}"))
