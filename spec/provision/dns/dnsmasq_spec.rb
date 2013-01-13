@@ -80,7 +80,7 @@ describe Provision::DNS::DNSMasq do
           :hostname => "example",
           :domain   => "youdevise.com",
           :aliases  => ["puppet", "broker"]
-      )
+        )
       )
 
       sha1  = Digest::SHA1.new
@@ -175,7 +175,5 @@ describe Provision::DNS::DNSMasq do
       File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("") }
     }
   end
-
-
 end
 
