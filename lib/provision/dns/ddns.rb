@@ -1,6 +1,6 @@
 require 'ipaddr'
 require 'rubygems'
-#require 'Dnsruby'
+require 'Dnsruby'
 require 'provision/dns'
 
 class Provision::DNS::DDNS < Provision::DNS
