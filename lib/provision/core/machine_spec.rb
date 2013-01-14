@@ -19,7 +19,6 @@ class Provision::Core::MachineSpec
     @log_dir = spec[:log_dir] || "#{build_dir}/logs"
     Dir.mkdir(@log_dir) if ! File.directory? @log_dir
     @spec = spec
-    @@lease_file = "/tmp/dhcp.leases"
     apply_conventions()
   end
 
@@ -62,10 +61,6 @@ class Provision::Core::MachineSpec
 
   def get_logger(fn)
     Logger.new("#{@log_dir}/#{fn}-#{@thread_number}.log")
-  end
-
-  def self.lease_file=(lease_file)
-    @@lease_file = lease_file
   end
 
   def interfaces()
