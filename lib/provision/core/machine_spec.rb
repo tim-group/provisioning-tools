@@ -6,7 +6,6 @@ require 'digest/sha1'
 require 'socket'
 
 class Provision::Core::MachineSpec
-  attr_accessor :spec
   attr_reader :thread_number, :build_dir, :log_dir
 
   def initialize(spec)
@@ -91,8 +90,8 @@ class Provision::Core::MachineSpec
 
   def all_hostnames
     hn = [ @spec[:fqdn] ]
-    if (!spec[:aliases].nil?)
-      hn << spec[:aliases].collect {|a| a + '.' + @spec[:domain] }
+    if (!@spec[:aliases].nil?)
+      hn << @spec[:aliases].collect {|a| a + '.' + @spec[:domain] }
     end
     hn
   end

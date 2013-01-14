@@ -14,7 +14,7 @@ module RSpec::Mocks::ArgumentMatchers
       end
 
       def ==(actual)
-        return true if actual.spec[:networking] == @expected
+        return true if actual[:networking] == @expected
         raise "expecting networking :#{PP.pp(actual.spec[:networking],"")} to match #{PP.pp(@expected,"")}"
       end
 
