@@ -1,5 +1,6 @@
 require 'provision/image/namespace'
 require 'provision/image/commands'
+require 'provision/log'
 
 describe Provision::Image::Commands do
   it 'times out when condition never comes true' do

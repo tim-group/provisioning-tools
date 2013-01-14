@@ -1,6 +1,7 @@
 $: << File.join(File.dirname(__FILE__), "..", "../lib")
 require 'rubygems'
 require 'rspec'
+require 'provision/core/machine_spec'
 
 class XYZ
 end
