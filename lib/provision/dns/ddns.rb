@@ -1,8 +1,8 @@
 require 'ipaddr'
 require 'rubygems'
-require 'Dnsruby'
 require 'tempfile'
 require 'provision/dns'
+require 'resolv'
 
 class Provision::DNS::DDNS < Provision::DNS
   class Network
@@ -89,16 +89,12 @@ class Provision::DNS::DDNS < Provision::DNS
     end
 
     def lookup_ip_for(hn)
-      res = Dnsruby::Resolver.new(:nameserver => "127.0.0.1")
+      res = Resolv::DNS.open({:nameserver=>["127.0.0.1"]})
       begin
-        ret = res.query(hn) # Defaults to A record
-        IPAddr.new(ret.answer.rrset(hn).rrs[0].data)
-      rescue Dnsruby::NXDomain
+        IPAddr.new(res.query(hn))
+      rescue Resolv::ResolvError
         puts "Could not find #{hn}"
-        return false
-      rescue Dnsruby::ServFail
-        puts "Could not find #{hn}"
-        return false
+        false
       end
     end
 
