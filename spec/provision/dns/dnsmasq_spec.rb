@@ -33,7 +33,7 @@ describe Provision::DNS::DNSMasq do
       File.open("#{dir}/etc/hosts", 'w') { |f| f.write "# Example hosts file\n127.0.0.1 localhost\n" }
       thing = undertest()
       ip = thing.allocate_ips_for(Provision::Core::MachineSpec.new(:hostname => "example", :domain => "youdevise.com"))["mgmt"][:address]
-      expect( ip.kind_of?(IPAddr) ).to eq(true)
+      ip.kind_of?(IPAddr).should eql(true)
       ip.to_s.should eql("192.168.5.2")
       other = thing.allocate_ips_for(Provision::Core::MachineSpec.new(:hostname => "example2", :domain => "youdevise.com"))["mgmt"][:address]
       other.to_s.should eql("192.168.5.3")
