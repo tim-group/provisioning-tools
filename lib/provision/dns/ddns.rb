@@ -92,7 +92,7 @@ class Provision::DNS::DDNS < Provision::DNS
     res = Dnsruby::Resolver.new(:nameserver => "127.0.0.1")
     begin
       ret = res.query(hn) # Defaults to A record
-      ret.answer.rrset(hn).rrs[0].data
+      IPAddr.new(ret.answer.rrset(hn).rrs[0].data)
     rescue Dnsruby::NXDomain
       puts "Could not find #{hn}"
       return false
@@ -121,7 +121,7 @@ class Provision::DNS::DDNS < Provision::DNS
       end
       add_forward_lookup(ip, hn)
     end
-    ip
+    IPAddr.new(ip)
   end
 end
 

@@ -37,8 +37,9 @@ class Provision::DNS::DNSMasq < Provision::DNS
         puts "No new allocation for #{hn}, already allocated to #{@by_name[hn]}"
         ip = @by_name[hn]
         return {
-          :address=>ip.to_s,
-          :netmask=>@subnet.subnet_mask}
+          :address => ip.to_s,
+          :netmask => @subnet.subnet_mask
+        }
       else
         # FIXME - THERE IS NO CHECKING HERE - THIS WILL ALLOCATE THE BROADCAST ADDRESS...
 
