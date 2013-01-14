@@ -32,10 +32,10 @@ describe Provision::DNS::DDNS do
       :network_range => '192.168.1.0/24',
       :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw=="
     )
-    expect(dns.network.to_s).to eq('192.168.1.0')
-    expect(dns.broadcast.to_s).to eq('192.168.1.255')
-    expect(dns.min_allocation.to_s).to eq('192.168.1.10')
-    expect(dns.max_allocation.to_s).to eq('192.168.1.254')
+    dns.network.to_s.should eql('192.168.1.0')
+    dns.broadcast.to_s.should eql('192.168.1.255')
+    dns.min_allocation.to_s.should eql('192.168.1.10')
+    dns.max_allocation.to_s.should eql('192.168.1.254')
   end
 
   it 'is mocked in subclass as expected' do
@@ -47,8 +47,8 @@ describe Provision::DNS::DDNS do
         'foo.example.com' => '172.16.0.1',
       }
     )
-    expect( dns.lookup_ip_for('foo.example.com') ).to eq('172.16.0.1')
-    expect( dns.lookup_ip_for('foo2example.com') ).to eq(false)
+    dns.lookup_ip_for('foo.example.com').should eql('172.16.0.1')
+    dns.lookup_ip_for('foo2example.com').should eql(false)
   end
 end
 
