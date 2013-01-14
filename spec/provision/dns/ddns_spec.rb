@@ -3,11 +3,11 @@ require 'provision/dns/ddns'
 require 'tmpdir'
 require 'provision/core/machine_spec'
 
-class Provision::DNS::DDNS
+class Provision::DNS::DDNS::Network
   attr_reader :network, :broadcast, :min_allocation, :max_allocation
 end
 
-class MockProvision < Provision::DNS::DDNS
+class MockProvision < Provision::DNS::DDNS::Network
   attr_reader :update_files
   def initialize(options={})
     super
@@ -28,7 +28,7 @@ end
 
 describe Provision::DNS::DDNS do
   it 'constructs once' do
-    dns = Provision::DNS::DDNS.new(
+    dns = Provision::DNS::DDNS::Network.new(
       :network_range => '192.168.1.0/24',
       :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw=="
     )

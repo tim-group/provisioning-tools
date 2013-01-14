@@ -131,10 +131,10 @@ class Provision::DNS::DNSMasq < Provision::DNS
   end
 
   def initialize()
+    super
     @hosts_file = "#{@@files_dir}/etc/hosts"
     @ethers_file = "#{@@files_dir}/etc/ethers"
     @dnsmasq_pid_file = "#{@@files_dir}/var/run/dnsmasq.pid"
-    @networks = {}
   end
 
   def add_network(name, net, start)
@@ -153,25 +153,5 @@ class Provision::DNS::DNSMasq < Provision::DNS
     end
   end
 
-  def allocate_ips_for(spec)
-    allocations = {}
-
-    spec[:networks].each do |network|
-      next unless @networks.has_key?(network)
-      allocations[network] = @networks[network].allocate_ip_for(spec)
-    end
-
-    return allocations
-  end
-
-  def remove_ips_for(spec)
-    remove_results = {}
-
-    @networks.each do |name, net|
-      remove_results[name] = net.remove_ip_for(spec)
-    end
-
-    return remove_results
-  end
 end
 
