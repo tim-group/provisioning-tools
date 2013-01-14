@@ -4,7 +4,7 @@ require 'tmpdir'
 require 'provision/core/machine_spec'
 
 class Provision::DNS::DDNS
-  attr_reader :network, :broadcast, :min_allocation
+  attr_reader :network, :broadcast, :min_allocation, :max_allocation
 end
 
 describe Provision::DNS::DDNS do
@@ -13,6 +13,7 @@ describe Provision::DNS::DDNS do
     expect(dns.network.to_s).to eq('192.168.1.0')
     expect(dns.broadcast.to_s).to eq('192.168.1.255')
     expect(dns.min_allocation.to_s).to eq('192.168.1.10')
+    expect(dns.max_allocation.to_s).to eq('192.168.1.254')
   end
 end
 
