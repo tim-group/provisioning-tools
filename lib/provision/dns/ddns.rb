@@ -36,7 +36,7 @@ class Provision::DNS::DDNS < Provision::DNS
       '127.0.0.1'
     end
 
-    def remove_ips_for(spec)
+    def remove_ip_for(spec)
       hn = spec[:fqdn]
       puts "Not ability to remove DNS for #{hn}, not removing"
       return false
@@ -98,7 +98,7 @@ class Provision::DNS::DDNS < Provision::DNS
       end
     end
 
-    def allocate_ips_for(spec)
+    def allocate_ip_for(spec)
       ip = nil
 
       hn = spec[:fqdn]
