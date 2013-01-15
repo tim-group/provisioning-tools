@@ -31,12 +31,16 @@ module Provision
 
   def self.config()
    return @@config || {
-      "networks"=>{"mgmt" => {
-      "net"=>"192.168.5.0/24",
-      "start"=>"192.168.5.100"},
-      "prod" => {
-      "net"=>"192.168.6.0/24",
-      "start"=>"192.168.6.100"}}
+      "networks" => {
+         "mgmt" => {
+           "net"=>"192.168.5.0/24",
+           "start"=>"192.168.5.100"
+          },
+          "prod" => {
+            "net"=>"192.168.6.0/24",
+            "start"=>"192.168.6.100"
+          }
+       }
     }
   end
 
@@ -57,7 +61,7 @@ module Provision
       :image_service     => Provision::Image::Service.new(
         :configdir => home("image_builders"),
         :targetdir => targetdir
-    ),
+      ),
       :vm_service        => Provision::VM::Virsh.new(),
       :numbering_service => numbering_service
     )
@@ -69,11 +73,11 @@ module Provision
   end
 
   def self.work_queue(options)
-    work_queue = Provision::WorkQueue.new(
+    Provision::WorkQueue.new(
       :listener=>options[:listener],
       :provisioning_service => Provision.create_provisioning_service(),
-      :worker_count=> options[:worker_count])
-      return work_queue
+      :worker_count=> options[:worker_count]
+    )
   end
 
   def self.create_gold_image(spec_hash)
@@ -84,5 +88,5 @@ module Provision
     image_service.build_image("ubuntuprecise", spec)
     image_service.build_image("shrink", spec)
   end
-
 end
+
