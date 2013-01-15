@@ -33,7 +33,7 @@ describe Provision::DNS::DNSMasq do
       File.open("#{dir}/etc/hosts", 'w') { |f| f.write "# Example hosts file\n127.0.0.1 localhost\n" }
       thing = undertest()
       ip = thing.allocate_ips_for(Provision::Core::MachineSpec.new(:hostname => "example", :domain => "youdevise.com"))["mgmt"][:address]
-      ip.kind_of?(IPAddr).should eql(true)
+      ip.kind_of?(IPAddr).should eql(false)
       ip.to_s.should eql("192.168.5.2")
       other = thing.allocate_ips_for(Provision::Core::MachineSpec.new(:hostname => "example2", :domain => "youdevise.com"))["mgmt"][:address]
       other.to_s.should eql("192.168.5.3")
@@ -111,7 +111,14 @@ describe Provision::DNS::DNSMasq do
         :domain   => "youdevise.com",
         :aliases  => ["puppet", "broker"]
       )
-      thing.allocate_ips_for(spec1)
+      require 'yaml'
+      ip_spec = thing.allocate_ips_for(spec1)
+      ip_spec.should eql({
+        "mgmt" => {
+          :netmask => '255.255.255.0',
+          :address => '192.168.5.2'
+        }
+      })
       thing.allocate_ips_for(spec2)
       thing.remove_ips_for(spec1)['mgmt'].should eql true
       thing.remove_ips_for(spec2)['mgmt'].should eql true

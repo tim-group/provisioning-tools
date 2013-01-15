@@ -57,7 +57,7 @@ class Provision::DNS::DNSMasq < Provision::DNS
         reload_dnsmasq
 
         return {
-          :address=>@max_ip,
+          :address=>@max_ip.to_s,
           :netmask=>@subnet.subnet_mask}
       end
     end
