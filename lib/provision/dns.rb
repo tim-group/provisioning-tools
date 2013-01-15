@@ -2,13 +2,13 @@ require 'ipaddr'
 require 'provision/namespace'
 
 class Provision::DNS
-  def self.get_backend(name)
+  def self.get_backend(name, options={})
     require "provision/dns/#{name.downcase}"
     classname = "Provision::DNS::#{name}"
-    Provision::DNS.const_get(name).new()
+    Provision::DNS.const_get(name).new(options)
   end
 
-  def initialize
+  def initialize(options={})
     @networks = {}
   end
 

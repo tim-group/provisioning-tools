@@ -31,6 +31,8 @@ module Provision
 
   def self.config()
    return @@config || {
+      "dns_backend" => "DNSMasq",
+      "dns_backend_options" => {},
       "networks" => {
          "mgmt" => {
            "net"=>"192.168.5.0/24",
@@ -45,7 +47,7 @@ module Provision
   end
 
   def self.numbering_service()
-    numbering_service = Provision::DNS.get_backend("DNSMasq")
+    numbering_service = Provision::DNS.get_backend(self.config()["dns_backend"], self.config()["dns_backend_options"])
 
     self.config()["networks"].each do |name, net_config|
       numbering_service.add_network(name, net_config["net"], net_config["start"])

@@ -130,7 +130,7 @@ class Provision::DNS::DNSMasq < Provision::DNS
     @@files_dir = f
   end
 
-  def initialize()
+  def initialize(options={})
     super
     @hosts_file = "#{@@files_dir}/etc/hosts"
     @ethers_file = "#{@@files_dir}/etc/ethers"
