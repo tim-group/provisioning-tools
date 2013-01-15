@@ -13,6 +13,7 @@ class Provision::DNS::DDNS < Provision::DNS
         raise(":network_range must be of the format X.X.X.X/Y")
       end
       broadcast_mask = (IPAddr::IN4MASK >> parts[1].to_i)
+      @subnet_mask = IPAddr.new(IPAddr::IN4MASK ^ broadcast_mask, Socket::AF_INET)
       @network = IPAddr.new(parts[0]).mask(parts[1])
       @broadcast = @network | IPAddr.new(broadcast_mask, Socket::AF_INET)
       @max_allocation = IPAddr.new(@broadcast.to_i - 1, Socket::AF_INET)
@@ -127,8 +128,10 @@ class Provision::DNS::DDNS < Provision::DNS
         end
         add_forward_lookup(ip, hn)
       end
-      puts "IP IS #{ip}"
-      IPAddr.new(ip, Socket::AF_INET)
+      {
+          :netmask => @subnet_mask.to_s,
+          :address => ip
+      }
     end
   end
 
