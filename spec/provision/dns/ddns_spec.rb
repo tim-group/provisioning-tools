@@ -47,8 +47,20 @@ describe Provision::DNS::DDNS do
         'foo.example.com' => '172.16.0.1',
       }
     )
+    dns.reverse_zone.should eql('1.168.192.in-addr.arpa')
     dns.lookup_ip_for('foo.example.com').should eql('172.16.0.1')
     dns.lookup_ip_for('foo2example.com').should eql(false)
+  end
+
+  it 'calculates /16 reverse zones right' do
+    dns = MockProvision.new(
+      :network_range => '192.168.1.0/16',
+      :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
+      :nsupdate_replies => [],
+      :lookup_table => {
+      }
+    )
+    dns.reverse_zone.should eql('168.192.in-addr.arpa')
   end
 end
 

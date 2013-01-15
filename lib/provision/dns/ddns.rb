@@ -23,7 +23,7 @@ class Provision::DNS::DDNS < Provision::DNS
 
     def reverse_zone
       parts = @network.to_s.split('.').reverse
-      while parts[0] == 0
+      while parts[0] == "0"
         parts.shift
       end
       "#{parts.join('.')}.in-addr.arpa"
