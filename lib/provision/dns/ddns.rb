@@ -31,7 +31,7 @@ class Provision::DNS::DDNS < Provision::DNS
       tmp_file
     end
 
-    def get_primary_nameserver_for(zone)
+    def get_primary_nameserver
 #    '172.16.16.5'
       '127.0.0.1'
     end
@@ -45,7 +45,7 @@ class Provision::DNS::DDNS < Provision::DNS
     def try_add_reverse_lookup(ip, fqdn)
       ip_rev = ip.to_s.split('.').reverse.join('.')
       tmp_file = Tempfile.new('remove_temp')
-      tmp_file.puts "server 127.0.0.1"
+      tmp_file.puts "server #{get_primary_nameserver}"
       tmp_file.puts "zone 16.16.172.in-addr.arpa"
       tmp_file.puts "prereq nxdomain #{ip_rev}.in-addr.arpa"
       tmp_file.puts "update add #{ip_rev}.in-addr.arpa. 86400 PTR #{fqdn}."
@@ -75,7 +75,7 @@ class Provision::DNS::DDNS < Provision::DNS
       hn = zone_s.shift
       zone = zone_s.join('.')
       tmp_file = Tempfile.new('remove_temp')
-      tmp_file.puts "server 127.0.0.1"
+      tmp_file.puts "server #{get_primary_nameserver}"
       tmp_file.puts "zone #{zone}"
       tmp_file.puts "update add #{fqdn}. 86400 A #{ip}"
       tmp_file.puts "send"
@@ -89,7 +89,7 @@ class Provision::DNS::DDNS < Provision::DNS
     end
 
     def lookup_ip_for(hn)
-      res = Resolv::DNS.open({:nameserver=>["127.0.0.1"]})
+      res = Resolv::DNS.open({:nameserver=>[get_primary_nameserver]})
       begin
         IPAddr.new(res.query(hn))
       rescue Resolv::ResolvError
