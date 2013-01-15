@@ -121,8 +121,16 @@ class Provision::DNS::DDNS < Provision::DNS
     end
   end
 
+  def initialize(options={})
+    super
+    @rndc_key = options["rndc_key"]
+  end
+
   def add_network(name, net, start)
-    @networks[name] = Network.new()
+    @networks[name] = Network.new(
+      :network_range => net,
+      :rndc_key => @rndc_key
+    )
   end
 end
 
