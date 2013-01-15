@@ -55,8 +55,12 @@ class Provision::DNS::DDNS < Provision::DNS
         puts "FAILED TO ADD #{ip_rev}.in-addr.arpa. PTR #{fqdn}. IP already used"
         return false
       else
-        puts "ADD OK for reverse of #{ip} to #{fqdn} => #{out}"
-        return true
+        if out =~ /update failed/
+          raise("Adding lookup from #{ip} to #{fqdn} failed: #{out}")
+        else
+          puts "ADD OK for reverse of #{ip} to #{fqdn} => #{out}"
+          return true
+        end
       end
     end
 
