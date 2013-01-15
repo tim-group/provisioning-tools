@@ -20,7 +20,6 @@ class Provision::VM::Virsh
   end
 
   def define_vm(spec)
-
     template = ERB.new(File.read(@template))
     to = "#{spec[:libvirt_dir]}/#{spec[:hostname]}.xml"
     begin

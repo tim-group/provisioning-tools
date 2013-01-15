@@ -6,7 +6,7 @@ require 'digest/sha1'
 require 'socket'
 
 class Provision::Core::MachineSpec
-  attr_reader :thread_number, :build_dir, :log_dir
+  attr_reader :thread_number, :build_dir, :log_dir, :spec
 
   def initialize(spec)
     @thread_number = spec[:thread_number] || 0
