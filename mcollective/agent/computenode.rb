@@ -20,10 +20,13 @@ module MCollective
         end
       end
 
+      def listener
+        NoopListener.new(:logger => logger)
+      end
+
       action "launch" do
         with_lock do
           specs = request[:specs]
-          listener = NoopListener.new
           queue = prepare_work_queue(specs, listener)
 
           logger.info("Launching #{specs.size} nodes")
@@ -35,7 +38,6 @@ module MCollective
       action "clean" do
         with_lock do
           specs = request[:specs]
-          listener = NoopListener.new
           queue = prepare_work_queue(specs, listener)
 
           logger.info("Cleaning #{specs.size} nodes")
@@ -46,3 +48,4 @@ module MCollective
     end
   end
 end
+
