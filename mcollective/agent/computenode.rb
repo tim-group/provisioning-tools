@@ -26,7 +26,7 @@ module MCollective
           listener = NoopListener.new
           queue = prepare_work_queue(specs, listener)
 
-          puts "Launching #{specs.size} nodes"
+          logger.info("Launching #{specs.size} nodes")
           queue.process()
           reply.data = listener.results
         end
@@ -38,7 +38,7 @@ module MCollective
           listener = NoopListener.new
           queue = prepare_work_queue(specs, listener)
 
-          puts "Cleaning #{specs.size} nodes"
+          logger.info("Cleaning #{specs.size} nodes")
           queue.clean()
           reply.data = listener.results
         end
