@@ -1,3 +1,5 @@
+*.gem
+*.deb
 *.log
 *.img
 .*.sw[a-z]
