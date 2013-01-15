@@ -32,8 +32,7 @@ class Provision::DNS::DDNS < Provision::DNS
     end
 
     def get_primary_nameserver
-#    '172.16.16.5'
-      '127.0.0.1'
+      '172.16.16.5'
     end
 
     def remove_ip_for(spec)
@@ -89,9 +88,8 @@ class Provision::DNS::DDNS < Provision::DNS
     end
 
     def lookup_ip_for(hn)
-      res = Resolv::DNS.open({:nameserver=>[get_primary_nameserver]})
       begin
-        IPAddr.new(res.query(hn))
+        IPAddr.new(Resolv.getaddress(hn))
       rescue Resolv::ResolvError
         puts "Could not find #{hn}"
         false
@@ -117,7 +115,8 @@ class Provision::DNS::DDNS < Provision::DNS
         end
         add_forward_lookup(ip, hn)
       end
-      IPAddr.new(ip)
+      puts "IP IS #{ip}"
+      IPAddr.new(ip, Socket::AF_INET)
     end
   end
 
