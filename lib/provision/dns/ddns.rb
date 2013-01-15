@@ -115,7 +115,10 @@ class Provision::DNS::DDNS < Provision::DNS
       hn = spec[:fqdn]
       if lookup_ip_for(hn)
         puts "No new allocation for #{hn}, already allocated"
-        return lookup_ip_for(hn)
+        return {
+          :netmask => @subnet_mask.to_s,
+          :address => lookup_ip_for(hn)
+        }
       else
 
         max_ip = @max_allocation
