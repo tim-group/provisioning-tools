@@ -21,6 +21,14 @@ class Provision::DNS::DDNS < Provision::DNS
       @rndc_key = options[:rndc_key] || raise("No :rndc_key supplied")
     end
 
+    def reverse_zone
+      parts = @network.to_s.split('.').reverse
+      while parts[0] == 0
+        parts.shift
+      end
+      "#{parts.join('.')}.in-addr.arpa"
+    end
+
     def write_rndc_key
       tmp_file = Tempfile.new('remove_temp')
       tmp_file.puts "key \"rndc-key\" {"
@@ -45,7 +53,7 @@ class Provision::DNS::DDNS < Provision::DNS
       ip_rev = ip.to_s.split('.').reverse.join('.')
       tmp_file = Tempfile.new('remove_temp')
       tmp_file.puts "server #{get_primary_nameserver}"
-      tmp_file.puts "zone 16.16.172.in-addr.arpa"
+      tmp_file.puts "zone #{reverse_zone}"
       tmp_file.puts "prereq nxdomain #{ip_rev}.in-addr.arpa"
       tmp_file.puts "update add #{ip_rev}.in-addr.arpa. 86400 PTR #{fqdn}."
       tmp_file.puts "send"
