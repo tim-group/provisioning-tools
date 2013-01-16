@@ -17,7 +17,12 @@ class Provision::DNS
 
     spec[:networks].each do |network|
       next unless @networks.has_key?(network)
-      hostname = "#{spec[:hostname]}.#{network}.#{spec[:domain]}" # probably wrong
+      # probably wrong, and not nice to have to special-case prod here
+      if network == 'prod'
+        hostname = "#{spec[:hostname]}.#{spec[:domain]}"
+      else
+        hostname = "#{spec[:hostname]}.#{network}.#{spec[:domain]}"
+      end
       mac = spec.interfaces[0][:mac]
       all_hostnames = spec.all_hostnames
       allocations[network] = @networks[network].allocate_ip_for(hostname, all_hostnames, network, mac)
