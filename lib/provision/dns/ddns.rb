@@ -45,8 +45,9 @@ class Provision::DNS::DDNS < Provision::DNS
     end
 
     def remove_ip_for(spec)
-      hn = spec[:fqdn]
-      puts "Not ability to remove DNS for #{hn}, not removing"
+      # we need to know *which* IP, so we need the name of the network too
+      # this can't be done purely on the basis of the spec
+      puts "Not ability to remove DNS for #{spec[:hostname]}, not removing"
       return false
     end
 
@@ -109,27 +110,26 @@ class Provision::DNS::DDNS < Provision::DNS
       end
     end
 
-    def allocate_ip_for(spec)
+    def allocate_ip_for(hostname, all_hostnames, network, mac)
       ip = nil
 
-      hn = spec[:fqdn]
-      if lookup_ip_for(hn)
-        puts "No new allocation for #{hn}, already allocated"
+      if lookup_ip_for(hostname)
+        puts "No new allocation for #{hostname}, already allocated"
         return {
           :netmask => @subnet_mask.to_s,
-          :address => lookup_ip_for(hn)
+          :address => lookup_ip_for(hostname)
         }
       else
 
         max_ip = @max_allocation
         ip = @min_allocation
-        while !try_add_reverse_lookup(ip, hn)
+        while !try_add_reverse_lookup(ip, hostname)
           ip = IPAddr.new(ip.to_i + 1, Socket::AF_INET)
           if ip >= max_ip
             raise("Ran out of ips")
           end
         end
-        add_forward_lookup(ip, hn)
+        add_forward_lookup(ip, hostname)
       end
       {
           :netmask => @subnet_mask.to_s,

@@ -17,7 +17,10 @@ class Provision::DNS
 
     spec[:networks].each do |network|
       next unless @networks.has_key?(network)
-      allocations[network] = @networks[network].allocate_ip_for(spec)
+      hostname = spec[:fqdn]
+      mac = spec.interfaces[0][:mac]
+      all_hostnames = spec.all_hostnames
+      allocations[network] = @networks[network].allocate_ip_for(hostname, all_hostnames, network, mac)
     end
 
     return allocations
