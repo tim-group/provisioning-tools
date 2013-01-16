@@ -32,6 +32,11 @@ class Provision::DNS::DNSMasq < Provision::DNS
       # FIXME - There is still a race condition here with other processes
       parse_hosts
 
+      # <bodge degree="hideous">
+      unless all_hostnames.include?(hostname)
+        all_hostnames = [hostname] + all_hostnames
+      end
+
       if @by_name[hostname]
         puts "No new allocation for #{hostname}, already allocated to #{@by_name[hostname]}"
         ip = @by_name[hostname]

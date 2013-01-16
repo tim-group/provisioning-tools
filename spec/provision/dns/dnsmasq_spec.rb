@@ -47,7 +47,9 @@ describe Provision::DNS::DNSMasq do
 
       new_thing.max_ip('mgmt').should eql("192.168.5.3")
       new_thing.hosts_by_name('mgmt').should eql({
+        "example.mgmt.youdevise.com" => "192.168.5.2",
         "example.youdevise.com" => "192.168.5.2",
+        "example2.mgmt.youdevise.com" => "192.168.5.3",
         "example2.youdevise.com" => "192.168.5.3"
       })
     }
@@ -90,7 +92,7 @@ describe Provision::DNS::DNSMasq do
 
       File.open("#{dir}/etc/ethers", 'r') {
         |f| f.read.should eql("#{mac} 192.168.5.2\n") }
-        File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("\n192.168.5.2 example.youdevise.com puppet.youdevise.com broker.youdevise.com\n") }
+        File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("\n192.168.5.2 example.mgmt.youdevise.com example.youdevise.com puppet.youdevise.com broker.youdevise.com\n") }
     }
   end
 
