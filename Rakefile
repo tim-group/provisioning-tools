@@ -30,6 +30,19 @@ task :network do
   sh "sudo bash 'networking/numbering_service.sh'"
 end
 
+desc "Build Gold Image"
+task :build_gold do
+  sh "mkdir -p build/gold"
+  $: << File.join(File.dirname(__FILE__), "..", "lib")
+  require 'yaml'
+  require 'provision'
+  require 'pp'
+
+  dest = File.dirname(__FILE__) + '/build/gold'
+  result = Provision.create_gold_image({:spindle=>dest,:hostname=>"generic"})
+
+end
+
 desc "Run puppet"
 task :run_puppet do
   sh "ssh-keygen -R $(dig dev-puppetmaster-001.dev.net.local @192.168.5.1 +short)"
@@ -65,6 +78,27 @@ task :package_main do
   sh "if [ -f *.gem ]; then rm *.gem; fi"
   sh "gem build provisioning-tools.gemspec && mv provisioning-tools-*.gem build/"
   sh "cd build && fpm -s gem -t deb -n provisioning-tools provisioning-tools-*.gem"
+end
+
+desc "Generate deb file for the Gold image"
+task :package_gold do
+  hash = `git rev-parse --short HEAD`.chomp
+  v_part= ENV['BUILD_NUMBER'] || "0.pre.#{hash}"
+  version = "0.0.#{v_part}"
+
+  commandLine  = "fpm",
+    "-s", "dir",
+    "-t", "deb",
+    "-n", "provisioning-tools-gold-image",
+    "-v", version,
+    "-d", "provisioning-tools",
+    "-a", "all",
+    "-C", "build",
+    "-p", "build/provisioning-tools-gold-image_#{version}.deb",
+    "--prefix", "/var/local/images/",
+    "gold"
+
+  sh commandLine.join(' ')
 end
 
 desc "Generate deb file for the MCollective agent"
