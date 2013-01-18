@@ -49,7 +49,7 @@ define "ubuntuprecise" do
   }
 
   run("running debootstrap") {
-    cmd "debootstrap --no-check-certificate --arch amd64 --exclude=resolvconf,ubuntu-minimal precise #{spec[:temp_dir]} http://aptproxy:3142/ubuntu"
+    cmd "debootstrap --arch amd64 --exclude=resolvconf,ubuntu-minimal precise #{spec[:temp_dir]} http://aptproxy:3142/ubuntu"
     cmd "mkdir -p #{spec[:temp_dir]}/etc/default"
   }
 
