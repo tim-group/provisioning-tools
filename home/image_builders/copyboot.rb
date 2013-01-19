@@ -24,18 +24,30 @@ define "copyboot" do
     open("#{spec[:temp_dir]}/etc/hostname", 'w') { |f|
       f.puts "#{spec[:hostname]}"
     }
-  open("#{spec[:temp_dir]}/etc/dhcp/dhclient.conf", 'w') { |f|
-    f.puts "
-option rfc3442-classless-static-routes code 121 = array of unsigned integer 8;
-send host-name \"<hostname>\";
-request subnet-mask, broadcast-address, time-offset, routers, domain-name, domain-name-servers, domain-search, host-name, netbios-name-servers, netbios-scope, interface-mtu, rfc3442-classless-static-routes, ntp-servers;
-    "
-  }
-  #    chroot "hostname -F /etc/hostname"
-  open("#{spec[:temp_dir]}/etc/hosts", 'a') { |f|
-    f.puts "\n127.0.0.1		localhost\n"
-    f.puts "127.0.1.1		#{spec[:fqdn]}	#{spec[:hostname]}\n"
-  }
+
+    open("#{spec[:temp_dir]}/etc/resolv.conf", 'w') { |f|
+      f.puts %[domain mgmt.#{spec[:domain]}
+nameserver #{spec[:nameserver]}
+]
+    }
+
+    open("#{spec[:temp_dir]}/etc/dhcp/dhclient.conf", 'w') { |f|
+      f.puts ""
+    }
+
+    open("#{spec[:temp_dir]}/etc/network/if-up.d/routes_mgmt", 'w') { |f|
+      f.puts %[%#!/bin/bash\nif [ "${IFACE}" == "mgmt" ]; then\n]
+      spec[:routes].each do |route|
+        f.puts %[ip route add #{route}]
+      end
+      f.puts %[end]
+    }
+
+    #   chroot "hostname -F /etc/hostname"
+    open("#{spec[:temp_dir]}/etc/hosts", 'a') { |f|
+      f.puts "\n127.0.0.1		localhost\n"
+      f.puts "127.0.1.1		#{spec[:fqdn]}	#{spec[:hostname]}\n"
+    }
   }
 
   run("setup networking") {
@@ -46,7 +58,6 @@ auto lo
 iface lo inet loopback
     "
 
-    require 'pp'
     spec.interfaces.each do |nic|
       config = spec[:networking][nic[:network]]
       if config != nil
@@ -58,6 +69,10 @@ netmask   #{config[:netmask]}
 "
       end
     end
+  }
+
+  open("#{spec[:temp_dir]}/etc/udev/rules.d/70-persistent-net.rules", 'w') { |f|
+
   }
 
   open("#{spec[:temp_dir]}/etc/udev/rules.d/70-persistent-net.rules", 'w') { |f|

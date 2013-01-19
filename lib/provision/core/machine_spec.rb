@@ -40,6 +40,7 @@ class Provision::Core::MachineSpec
 
     if_nil_define_var(:networks, ["mgmt","prod"])
     if_nil_define_var(:aptproxy, 'aptproxy.net.local')
+    if_nil_define_var(:routes, [])
   end
 
   def if_nil_define_var(var,value)
