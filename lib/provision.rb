@@ -62,7 +62,8 @@ module Provision
     return provisioning_service = Provision::Core::ProvisioningService.new(
       :image_service     => Provision::Image::Service.new(
         :configdir => home("image_builders"),
-        :targetdir => targetdir
+        :targetdir => targetdir,
+        :defaults => config()["defaults"]
       ),
       :vm_service        => Provision::VM::Virsh.new(),
       :numbering_service => numbering_service

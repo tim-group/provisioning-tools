@@ -9,6 +9,7 @@ class Provision::Core::ProvisioningService
     @vm_service = options[:vm_service] || raise("No :vm_service option passed")
     @image_service = options[:image_service] || raise("No :image_service option passed")
     @numbering_service = options[:numbering_service] || raise("No :numbering_service option passed")
+    @machinespec_defaults = options[:defaults] || {}
   end
 
   def clean_vm(spec_hash)
@@ -19,6 +20,7 @@ class Provision::Core::ProvisioningService
   end
 
   def provision_vm(spec_hash)
+    spec_hash = @machinespec_defaults.merge(spec_hash)
     clean_vm(spec_hash)
     spec = Provision::Core::MachineSpec.new(spec_hash)
     spec[:networking] =  @numbering_service.allocate_ips_for(spec)
