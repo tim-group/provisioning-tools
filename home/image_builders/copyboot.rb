@@ -43,6 +43,8 @@ nameserver #{spec[:nameserver]}
       f.puts %[fi]
     }
 
+    cmd "chmod a+x #{spec[:temp_dir]}/etc/network/if-up.d/routes_mgmt"
+
     #   chroot "hostname -F /etc/hostname"
     open("#{spec[:temp_dir]}/etc/hosts", 'a') { |f|
       f.puts "\n127.0.0.1		localhost\n"
