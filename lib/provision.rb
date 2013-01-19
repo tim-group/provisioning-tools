@@ -59,14 +59,16 @@ module Provision
   def self.create_provisioning_service()
     targetdir = File.join(File.dirname(__FILE__), "../target")
 
+    defaults = self.config()["defaults"]
+
     return provisioning_service = Provision::Core::ProvisioningService.new(
       :image_service     => Provision::Image::Service.new(
         :configdir => home("image_builders"),
-        :targetdir => targetdir,
-        :defaults => config()["defaults"]
+        :targetdir => targetdir
       ),
       :vm_service        => Provision::VM::Virsh.new(),
-      :numbering_service => numbering_service
+      :numbering_service => numbering_service,
+      :defaults => defaults
     )
   end
 
