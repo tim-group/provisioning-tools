@@ -36,11 +36,11 @@ nameserver #{spec[:nameserver]}
     }
 
     open("#{spec[:temp_dir]}/etc/network/if-up.d/routes_mgmt", 'w') { |f|
-      f.puts %[%#!/bin/bash\nif [ "${IFACE}" == "mgmt" ]; then\n]
+      f.puts %[#!/bin/bash\nif [ "${IFACE}" == "mgmt" ]; then\n]
       spec[:routes].each do |route|
         f.puts %[ip route add #{route}]
       end
-      f.puts %[end]
+      f.puts %[fi]
     }
 
     #   chroot "hostname -F /etc/hostname"
