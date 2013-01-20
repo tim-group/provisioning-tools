@@ -114,13 +114,32 @@ task :package_agent do
     "-n", "provisioning-tools-mcollective-plugin",
     "-v", version,
     "-d", "provisioning-tools",
+    "-d", "provisioning-tools-mcollective-plugin-ddl",
     "-a", "all",
     "-C", "build",
     "-p", "build/provisioning-tools-mcollective-plugin_#{version}.deb",
     "--prefix", "/usr/share/mcollective/plugins/mcollective",
+    "-x", "computenode.ddl",
     "../mcollective/agent"
 
   sh commandLine.join(' ')
+
+  commandLine  = "fpm",
+    "-s", "dir",
+    "-t", "deb",
+    "-n", "provisioning-tools-mcollective-plugin-ddl",
+    "-v", version,
+    "-d", "provisioning-tools",
+    "-a", "all",
+    "-C", "build",
+    "-p", "build/provisioning-tools-mcollective-plugin-ddl_#{version}.deb",
+    "--prefix", "/usr/share/mcollective/plugins/mcollective",
+    "-x", "computenode.rb",
+    "../mcollective/agent"
+
+  sh commandLine.join(' ')
+
+
 
   #      '-m',"youDevise <support@timgroup.com>",
   #      '--description',"TIM Account Management Report Tool (Import)",
