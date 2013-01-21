@@ -10,6 +10,10 @@ class Provision::DNS::DNSMasq
   def hosts_by_name(network)
     @networks[network].by_name
   end
+  def reload(network)
+    reload_dnsmasq
+
+  end
 end
 
 describe Provision::DNS::DNSMasq do
@@ -154,7 +158,7 @@ describe Provision::DNS::DNSMasq do
       process_running(pid).should eql true
       File.open("#{dir}/var/run/dnsmasq.pid", 'w') { |f| f.write "#{pid}\n" }
       thing = undertest(dir)
-      thing.reload_dnsmasq()
+      thing.reload("mgmt")
       Process.waitpid(pid)
       process_running(pid).should eql false
     }
