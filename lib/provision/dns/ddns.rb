@@ -82,14 +82,25 @@ class Provision::DNS::DDNS < Provision::DNS
       out
     end
 
-    def add_forward_lookup(ip, fqdn)
+    def get_hostname(fqdn)
+      fqdn_s = fqdn.split "."
+      zone_s = fqdn_s.clone
+      hn = zone_s.shift
+      return hn
+    end
+
+    def get_zone(fqdn)
       fqdn_s = fqdn.split "."
       zone_s = fqdn_s.clone
       hn = zone_s.shift
       zone = zone_s.join('.')
+      return zone
+    end
+
+    def add_forward_lookup(ip, fqdn)
       tmp_file = Tempfile.new('remove_temp')
       tmp_file.puts "server #{get_primary_nameserver}"
-      tmp_file.puts "zone #{zone}"
+      tmp_file.puts "zone #{get_zone(fqdn)}"
       tmp_file.puts "update add #{fqdn}. 86400 A #{ip}"
       tmp_file.puts "send"
       tmp_file.close
@@ -101,11 +112,26 @@ class Provision::DNS::DDNS < Provision::DNS
       end
     end
 
-    def lookup_ip_for(hn)
+    def remove_forward_lookup(fqdn)
+      tmp_file = Tempfile.new('remove_temp')
+      tmp_file.puts "server #{get_primary_nameserver}"
+      tmp_file.puts "zone #{get_zone(fqdn)}"
+      tmp_file.puts "update delete #{get_hostname(fqdn)}"
+      tmp_file.puts "send"
+      tmp_file.close
+      out = exec_nsupdate(tmp_file)
+      if out =~ /^$/
+        return true
+      else
+        raise("Could not remove forward lookup #{fqdn}: #{out}")
+      end
+    end
+
+    def lookup_ip_for(fqdn)
       begin
-        IPAddr.new(Resolv.getaddress(hn))
+        IPAddr.new(Resolv.getaddress(fqdn))
       rescue Resolv::ResolvError
-        puts "Could not find #{hn}"
+        puts "Could not find #{fqdn}"
         false
       end
     end
@@ -136,7 +162,41 @@ class Provision::DNS::DDNS < Provision::DNS
           :address => ip
       }
     end
+
+    def unallocate_ip_for(hostname)
+      ip = nil
+
+      if lookup_ip_for(hostname)
+        forward_lookup_moved = remove_forward_lookup(fqdn)
+        if forward_lookup_removed
+
+        end
+
+        return {
+          :netmask => @subnet_mask.to_s,
+          :address => lookup_ip_for(hostname)
+        }
+      else
+        puts "No allocation for #{hostname}, nothing to remove"
+        max_ip = @max_allocation
+        ip = @min_allocation
+        while !try_add_reverse_lookup(ip, hostname)
+          ip = IPAddr.new(ip.to_i + 1, Socket::AF_INET)
+          if ip >= max_ip
+            raise("Ran out of ips")
+          end
+        end
+        add_forward_lookup(ip, hostname)
+      end
+      {
+          :netmask => @subnet_mask.to_s,
+          :address => ip
+      }
+     return true
+    end
+
   end
+
 
   def initialize(options={})
     super
