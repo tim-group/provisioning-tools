@@ -11,8 +11,7 @@ class Provision::DNS::DNSMasq
     @networks[network].by_name
   end
   def reload(network)
-    reload_dnsmasq
-
+    @networks[network].reload_dnsmasq
   end
 end
 

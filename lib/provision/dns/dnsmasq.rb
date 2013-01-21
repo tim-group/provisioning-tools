@@ -128,6 +128,13 @@ class Provision::DNS::DNSMasq < Provision::DNS
       puts "#{found} lines removed from #{file}"
       return found
     end
+    def reload_dnsmasq
+      if (File.exists?(@dnsmasq_pid_file))
+        pid = File.open(@dnsmasq_pid_file).first.to_i
+        puts "Reloading dnsmasq (#{pid})"
+        Process.kill("HUP", pid)
+      end
+    end
   end
 
   def initialize(options={})
@@ -145,13 +152,4 @@ class Provision::DNS::DNSMasq < Provision::DNS
                                   :dnsmasq_pid_file=>@dnsmasq_pid_file)
   end
 
-  def reload_dnsmasq
-    if (File.exists?(@dnsmasq_pid_file))
-      pid = File.open(@dnsmasq_pid_file).first.to_i
-      puts "Reloading dnsmasq (#{pid})"
-      Process.kill("HUP", pid)
-    end
-  end
-
 end
-
