@@ -132,9 +132,9 @@ class Provision::DNS::DNSMasq < Provision::DNS
 
   def initialize(options={})
     super
-    @hosts_file = options[:hosts_file]
-    @ethers_file = options[:ethers_file]
-    @dnsmasq_pid_file = options[:pid_file]
+    @hosts_file = options[:hosts_file] || "/etc/hosts"
+    @ethers_file = options[:ethers_file] || "/etc/ethers"
+    @dnsmasq_pid_file = options[:pid_file] || "/var/run/dnsmasq.pid"
   end
 
   def add_network(name, net, start)

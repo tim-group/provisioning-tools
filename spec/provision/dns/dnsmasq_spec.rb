@@ -24,8 +24,7 @@ describe Provision::DNS::DNSMasq do
     dnsmasq = Provision::DNS.get_backend("DNSMasq",
                                           :hosts_file=>"#{dir}/etc/hosts",
                                           :ethers_file=>"#{dir}/etc/ethers",
-                                          :pid_file=>"#{dir}/var/run/dnsmasq.pid"
-                                        )
+                                          :pid_file=>"#{dir}/var/run/dnsmasq.pid")
     dnsmasq.add_network("mgmt", "192.168.5.0/24", "192.168.5.1")
     return dnsmasq
   end
