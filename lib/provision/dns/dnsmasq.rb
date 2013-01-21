@@ -15,9 +15,9 @@ class Provision::DNS::DNSMasq < Provision::DNS
     attr_reader :by_name
 
     def initialize(subnet_string, start_ip, options)
-      @hosts_file = options[:hosts_file]
-      @ethers_file = options[:ethers_file]
-      @dnsmasq_pid_file = options[:dnsmasq_pid_file]
+      @hosts_file = options[:hosts_file] || "/etc/hosts"
+      @ethers_file = options[:ethers_file] || "/etc/ethers"
+      @dnsmasq_pid_file = options[:pid_file] || "/var/run/dnsmasq.pid"
       @subnet = IPAddr.new(subnet_string)
       @subnet.extend(IPAddrExtensions)
       @start_ip = IPAddr.new(start_ip)
@@ -139,6 +139,7 @@ class Provision::DNS::DNSMasq < Provision::DNS
 
   def initialize(options={})
     super
+    @options = options
     @hosts_file = options[:hosts_file] || "/etc/hosts"
     @ethers_file = options[:ethers_file] || "/etc/ethers"
     @dnsmasq_pid_file = options[:pid_file] || "/var/run/dnsmasq.pid"
@@ -147,9 +148,7 @@ class Provision::DNS::DNSMasq < Provision::DNS
   def add_network(name, net, start)
     @networks[name] = Network.new(net,
                                   start,
-                                  :hosts_file=>@hosts_file,
-                                  :ethers_file=>@ethers_file,
-                                  :dnsmasq_pid_file=>@dnsmasq_pid_file)
+                                  @options)
   end
 
 end
