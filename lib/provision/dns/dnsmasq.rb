@@ -130,15 +130,11 @@ class Provision::DNS::DNSMasq < Provision::DNS
     end
   end
 
-  def self.files_dir=(f)
-    @@files_dir = f
-  end
-
   def initialize(options={})
     super
-    @hosts_file = "#{@@files_dir}/etc/hosts"
-    @ethers_file = "#{@@files_dir}/etc/ethers"
-    @dnsmasq_pid_file = "#{@@files_dir}/var/run/dnsmasq.pid"
+    @hosts_file = options[:hosts_file]
+    @ethers_file = options[:ethers_file]
+    @dnsmasq_pid_file = options[:pid_file]
   end
 
   def add_network(name, net, start)
