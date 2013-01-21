@@ -10,6 +10,11 @@ class Provision::DNS
 
   def initialize(options={})
     @networks = {}
+    @options = options
+  end
+
+  def add_network(name, net, start)
+    @networks[name] = Network.new(net,start,options)
   end
 
   def allocate_ips_for(spec)

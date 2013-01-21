@@ -6,8 +6,8 @@ require 'resolv'
 
 class Provision::DNS::DDNS < Provision::DNS
   class Network
-    def initialize(options={})
-      range = options[:network_range] || raise("No :network_range supplied")
+    def initialize(net, start, options={})
+      range = net
       parts = range.split('/')
       if parts.size != 2
         raise(":network_range must be of the format X.X.X.X/Y")
@@ -197,17 +197,5 @@ class Provision::DNS::DDNS < Provision::DNS
 
   end
 
-
-  def initialize(options={})
-    super
-    @rndc_key = options["rndc_key"]
-  end
-
-  def add_network(name, net, start)
-    @networks[name] = Network.new(
-      :network_range => net,
-      :rndc_key => @rndc_key
-    )
-  end
 end
 
