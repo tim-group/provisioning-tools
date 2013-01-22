@@ -3,7 +3,6 @@ require 'fileutils'
 require 'tempfile'
 
 class Provision::DNS::DNSMasq < Provision::DNS
-  @@files_dir = ""
   module IPAddrExtensions
     def subnet_mask
       return _to_string(@mask_addr)

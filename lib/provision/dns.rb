@@ -2,10 +2,15 @@ require 'ipaddr'
 require 'provision/namespace'
 
 class Provision::DNS
+
+  attr_accessor :backend
+
   def self.get_backend(name, options={})
     require "provision/dns/#{name.downcase}"
     classname = "Provision::DNS::#{name}"
-    Provision::DNS.const_get(name).new(options)
+    instance = Provision::DNS.const_get(name).new(options)
+    instance.backend = name
+    instance
   end
 
   def initialize(options={})
@@ -14,7 +19,9 @@ class Provision::DNS
   end
 
   def add_network(name, net, start)
-    @networks[name] = Network.new(net,start,options)
+    classname = "Provision::DNS::#{backend}Network"
+    @networks[name] = Provision.const_get(classname).new(net,start,options)
+#    @networks[name] = Network.new(net,start,options)
   end
 
   def allocate_ips_for(spec)
