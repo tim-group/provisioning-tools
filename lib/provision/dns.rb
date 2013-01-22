@@ -7,7 +7,6 @@ class Provision::DNS
 
   def self.get_backend(name, options={})
     require "provision/dns/#{name.downcase}"
-    classname = "Provision::DNS::#{name}"
     instance = Provision::DNS.const_get(name).new(options)
     instance.backend = name
     instance
@@ -19,9 +18,8 @@ class Provision::DNS
   end
 
   def add_network(name, net, start)
-    classname = "Provision::DNS::#{backend}Network"
-    @networks[name] = Provision.const_get(classname).new(net,start,options)
-#    @networks[name] = Network.new(net,start,options)
+    classname = "#{backend}Network"
+    @networks[name] = Provision::DNS.const_get(classname).new(net,start,@options)
   end
 
   def allocate_ips_for(spec)
