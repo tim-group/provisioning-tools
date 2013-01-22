@@ -8,29 +8,37 @@ require 'yaml'
 require 'pp'
 
 module Provision
-  @@config = nil
+  class Config
+    def initialize(options={:configfile=>"/etc/provision/config.yaml"})
+      @configfile = options[:configfile]
+    end
+
+    def load()
+      return YAML.load(IO.read(@configfile))
+    end
+
+    def get()
+      config = load()
+
+      raise "#{@configfile} has missing properties" unless config.has_key?("dns_backend_options")
+
+      return config
+    end
+
+  end
 
   def self.base(dir="")
     return File.expand_path(File.join(File.dirname(__FILE__), "../#{dir}"))
   end
 
-  def self.configure(file="/etc/provision/config.yaml")
-    if File.exists?(file)
-      @@config = YAML.load(IO.read(file))
-    else
-      print "unable to locate config file #{file} so using default values"
-      nil
-    end
-  end
-
-  Provision.configure("/etc/provision/config.yaml")
+  @@config = Config.new()
 
   def self.home(dir="")
     return File.expand_path(File.join(File.dirname(__FILE__), "../home/#{dir}"))
   end
 
   def self.config()
-   return @@config || {
+   return @@config.get() || {
       "dns_backend" => "DNSMasq",
       "dns_backend_options" => {},
       "networks" => {

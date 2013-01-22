@@ -10,11 +10,24 @@ module MCollective
         config.pluginconf["provision.lockfile"] || "/var/lock/provision.lock"
       end
 
-
       def prepare_work_queue(specs, listener)
         work_queue = Provision.work_queue(:worker_count=>1, :listener=>listener)
         work_queue.fill(specs)
         return work_queue
+      end
+
+      def provision(specs, listener)
+        queue = prepare_work_queue(specs, listener)
+        logger.info("Launching #{specs.size} nodes")
+        queue.process()
+        return listener.results
+      end
+
+      def clean(specs, listener)
+        queue = prepare_work_queue(specs, listener)
+        logger.info("Cleaning #{specs.size} nodes")
+        queue.clean()
+        return listener.results
       end
 
       def with_lock(&action)
@@ -31,31 +44,21 @@ module MCollective
         end
       end
 
-      def listener
+      def new_listener
         NoopListener.new(:logger => logger)
       end
 
       action "launch" do
         with_lock do
           specs = request[:specs]
-          queue = prepare_work_queue(specs, listener)
-
-          logger.info("Launching #{specs.size} nodes")
-          queue.process()
-          reply.data = listener.results
+          reply.data = provision(specs, new_listener())
         end
       end
 
       action "clean" do
-
         with_lock do
           specs = request[:specs]
-
-          queue = prepare_work_queue(specs, listener)
-
-          logger.info("Cleaning #{specs.size} nodes")
-          queue.clean()
-          reply.data = listener.results
+          reply.data = clean(specs, new_listener())
         end
       end
     end

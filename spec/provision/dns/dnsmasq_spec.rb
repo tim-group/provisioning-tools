@@ -32,6 +32,13 @@ describe Provision::DNS::DNSMasq do
     return dnsmasq
   end
 
+  it 'throws an appropriate error when nil options are passed to it' do
+
+    expect {
+        Provision::DNS::DNSMasqNetwork.new('192.168.0.0/5', '192.168.0.1', nil)
+    }.to raise_error "options must not be nil"
+  end
+
   it 'constructs once' do
     Dir.mktmpdir {|dir|
       mksubdirs(dir)
