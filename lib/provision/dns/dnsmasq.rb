@@ -5,27 +5,23 @@ require 'tempfile'
 class Provision::DNS::DNSMasq < Provision::DNS
 end
 
-module IPAddrExtensions
-  def subnet_mask
-    return _to_string(@mask_addr)
-  end
-end
-class Provision::DNS::DNSMasqNetwork
+class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
   attr_reader :max_ip
   attr_reader :by_name
 
-  def initialize(subnet_string, start_ip, options)
+  def initialize(name, subnet_string, start_ip, options)
+    super
     raise "options must not be nil" if options.nil?
     @hosts_file = options[:hosts_file] || "/etc/hosts"
     @ethers_file = options[:ethers_file] || "/etc/ethers"
     @dnsmasq_pid_file = options[:pid_file] || "/var/run/dnsmasq.pid"
-    @subnet = IPAddr.new(subnet_string)
-    @subnet.extend(IPAddrExtensions)
-    @start_ip = IPAddr.new(start_ip)
     parse_hosts
   end
 
-  def allocate_ip_for(hostname, all_hostnames, network, mac)
+  def allocate_ip_for(spec)
+    mac = spec.interfaces[0][:mac]
+    all_hostnames = spec.all_hostnames
+    hostname = spec.hostname_on(@name)
     ip = nil
     # Note that we re-parse the hosts file on every allocation
     # to avoid multiple simultaneous allocators from being able

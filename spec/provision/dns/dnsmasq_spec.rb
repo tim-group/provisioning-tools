@@ -34,19 +34,19 @@ describe Provision::DNS::DNSMasq do
 
   it 'throws an appropriate error when nil options are passed to it' do
     expect {
-        Provision::DNS::DNSMasqNetwork.new('192.168.0.0/5', '192.168.0.1', nil)
+        Provision::DNS::DNSMasqNetwork.new('foo', '192.168.0.0/5', '192.168.0.1', nil)
     }.to raise_error "options must not be nil"
   end
 
   it 'throws an appropriate error when subnet is invalid' do
     expect {
-        Provision::DNS::DNSMasqNetwork.new('biscuits', '192.168.0.1', {})
+        Provision::DNS::DNSMasqNetwork.new('foo', 'biscuits', '192.168.0.1', {})
     }.to raise_exception(ArgumentError,'invalid address')
   end
 
   it 'throws an appropriate error when the start ip is invalid' do
     expect {
-        Provision::DNS::DNSMasqNetwork.new('192.168.0.0/5', 'biscuits', {})
+        Provision::DNS::DNSMasqNetwork.new('foo', '192.168.0.0/5', 'biscuits', {})
     }.to raise_exception(ArgumentError,'invalid address')
   end
 

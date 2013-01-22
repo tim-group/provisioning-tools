@@ -7,8 +7,9 @@ require 'resolv'
 class Provision::DNS::DDNS < Provision::DNS
 end
 
-class Provision::DNS::DDNSNetwork
-  def initialize(range, start, options={})
+class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
+  def initialize(name, range, start, options={})
+    super(name, range, start, options)
     parts = range.split('/')
     if parts.size != 2
       raise(":network_range must be of the format X.X.X.X/Y")
@@ -137,7 +138,8 @@ class Provision::DNS::DDNSNetwork
     end
   end
 
-  def allocate_ip_for(hostname, all_hostnames, network, mac)
+  def allocate_ip_for(spec)
+    hostname = spec.hostname_on(@name)
     ip = nil
 
     if lookup_ip_for(hostname)

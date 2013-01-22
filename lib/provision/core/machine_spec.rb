@@ -78,6 +78,15 @@ class Provision::Core::MachineSpec
     nics
   end
 
+  def hostname_on(network)
+    # probably wrong, and not nice to have to special-case prod here
+    if network == 'prod'
+      "#{self[:hostname]}.#{self[:domain]}"
+    else
+      "#{self[:hostname]}.#{network}.#{self[:domain]}"
+    end
+  end
+
   def mac(fqdn = @spec[:fqdn])
     host = Socket.gethostname
     raise 'kvm_mac(): Requires a string type ' +

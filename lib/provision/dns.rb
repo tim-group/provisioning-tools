@@ -1,6 +1,21 @@
 require 'ipaddr'
 require 'provision/namespace'
 
+module IPAddrExtensions
+  def subnet_mask
+    return _to_string(@mask_addr)
+  end
+end
+
+class Provision::DNSNetwork
+  def initialize(name, subnet_string, start_ip, options)
+    @name = name
+    @subnet = IPAddr.new(subnet_string)
+    @subnet.extend(IPAddrExtensions)
+    @start_ip = IPAddr.new(start_ip, Socket::AF_INET)
+  end
+end
+
 class Provision::DNS
 
   attr_accessor :backend
@@ -19,23 +34,16 @@ class Provision::DNS
 
   def add_network(name, net, start)
     classname = "#{backend}Network"
-    @networks[name] = Provision::DNS.const_get(classname).new(net,start,@options)
+    @networks[name] = Provision::DNS.const_get(classname).new(name,net,start,@options)
   end
 
   def allocate_ips_for(spec)
     allocations = {}
 
+    # Should the rest of this allocation loop be folded into the machine spec?
     spec[:networks].each do |network|
       next unless @networks.has_key?(network)
-      # probably wrong, and not nice to have to special-case prod here
-      if network == 'prod'
-        hostname = "#{spec[:hostname]}.#{spec[:domain]}"
-      else
-        hostname = "#{spec[:hostname]}.#{network}.#{spec[:domain]}"
-      end
-      mac = spec.interfaces[0][:mac]
-      all_hostnames = spec.all_hostnames
-      allocations[network] = @networks[network].allocate_ip_for(hostname, all_hostnames, network, mac)
+      allocations[network] = @networks[network].allocate_ip_for(spec)
     end
 
     return allocations
