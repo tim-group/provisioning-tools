@@ -13,14 +13,18 @@ module Provision
       @configfile = options[:configfile]
     end
 
+    def required_config_keys
+      ['dns_backend','dns_backend_options','networks']
+    end
+
     def load()
       return YAML.load(IO.read(@configfile))
     end
 
     def get()
       config = load()
-
-      raise "#{@configfile} has missing properties" unless config.has_key?("dns_backend_options")
+      missing_keys = required_config_keys - config.keys
+      raise "#{@configfile} has missing properties (#{missing_keys.join(', ')})" unless missing_keys.empty?
 
       return config
     end
@@ -62,6 +66,7 @@ module Provision
     end
 
     return numbering_service
+
   end
 
   def self.create_provisioning_service()
