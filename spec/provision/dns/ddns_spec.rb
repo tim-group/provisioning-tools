@@ -10,7 +10,6 @@ end
 class MockProvision < Provision::DNS::DDNSNetwork
   attr_reader :update_files
   def initialize(net,start,options={})
-    super
     @nsupdate_replies = options[:nsupdate_replies] || raise("Need :nsupdate_replies")
     @lookup_table = options[:lookup_table] || raise("Need :lookup_table")
     @update_files = []
