@@ -1,6 +1,5 @@
 require 'mcollective'
 require 'provision'
-require 'provision/inventory'
 require 'provision/workqueue'
 
 module MCollective

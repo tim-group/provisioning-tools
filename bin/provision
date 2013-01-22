@@ -7,7 +7,6 @@ target_dir = File.join(File.dirname(__FILE__), "../target")
 
 require 'optparse'
 require 'provision'
-require 'provision/inventory'
 require 'provision/workqueue'
 
 specs = YAML::load($stdin.read())
