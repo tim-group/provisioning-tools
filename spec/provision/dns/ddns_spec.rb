@@ -3,13 +3,14 @@ require 'provision/dns/ddns'
 require 'tmpdir'
 require 'provision/core/machine_spec'
 
-class Provision::DNS::DDNSNetwork
+class Provision::DNS::DDNS::Network
   attr_reader :network, :broadcast, :min_allocation, :max_allocation
 end
 
-class MockProvision < Provision::DNS::DDNSNetwork
+class MockProvision < Provision::DNS::DDNS::Network
   attr_reader :update_files
-  def initialize(net,start,options={})
+  def initialize(options={})
+    super
     @nsupdate_replies = options[:nsupdate_replies] || raise("Need :nsupdate_replies")
     @lookup_table = options[:lookup_table] || raise("Need :lookup_table")
     @update_files = []
@@ -27,7 +28,8 @@ end
 
 describe Provision::DNS::DDNS do
   it 'constructs once' do
-    dns = Provision::DNS::DDNSNetwork.new('192.168.1.0/24',nil,
+    dns = Provision::DNS::DDNS::Network.new(
+      :network_range => '192.168.1.0/24',
       :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw=="
     )
     dns.network.to_s.should eql('192.168.1.0')
@@ -37,7 +39,8 @@ describe Provision::DNS::DDNS do
   end
 
   it 'is mocked in subclass as expected' do
-    dns = MockProvision.new('192.168.1.0/24',nil,
+    dns = MockProvision.new(
+      :network_range => '192.168.1.0/24',
       :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
       :nsupdate_replies => [],
       :lookup_table => {
@@ -50,7 +53,8 @@ describe Provision::DNS::DDNS do
   end
 
   it 'calculates /16 reverse zones right' do
-    dns = MockProvision.new('192.168.1.0/16',nil,
+    dns = MockProvision.new(
+      :network_range => '192.168.1.0/16',
       :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
       :nsupdate_replies => [],
       :lookup_table => {
