@@ -14,7 +14,7 @@ module Provision
     end
 
     def required_config_keys
-      ['dns_backend','dns_backend_options','networks']
+      [:dns_backend, :dns_backend_options, :networks]
     end
 
     def load()
@@ -22,11 +22,19 @@ module Provision
     end
 
     def get()
-      config = load()
+      config = sym_hash(load())
       missing_keys = required_config_keys - config.keys
       raise "#{@configfile} has missing properties (#{missing_keys.join(', ')})" unless missing_keys.empty?
 
       return config
+    end
+
+    private
+
+    def sym_hash(h)
+      n = Hash.new
+      h.each { |k, v| n[k.to_sym] = v.is_a?(Hash) ? sym_hash(v) : v }
+      n
     end
 
   end
@@ -43,9 +51,9 @@ module Provision
 
   def self.config()
    return @@config.get() || {
-      "dns_backend" => "DNSMasq",
-      "dns_backend_options" => {},
-      "networks" => {
+      :dns_backend => "DNSMasq",
+      :dns_backend_options => {},
+      :networks => {
          "mgmt" => {
            "net"=>"192.168.5.0/24",
            "start"=>"192.168.5.100"
