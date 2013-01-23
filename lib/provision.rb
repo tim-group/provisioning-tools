@@ -67,10 +67,10 @@ module Provision
   end
 
   def self.numbering_service()
-    numbering_service = Provision::DNS.get_backend(self.config()["dns_backend"], self.config()["dns_backend_options"])
+    numbering_service = Provision::DNS.get_backend(self.config()[:dns_backend], self.config()[:dns_backend_options])
 
-    self.config()["networks"].each do |name, net_config|
-      numbering_service.add_network(name, net_config["net"], net_config["start"])
+    self.config()[:networks].each do |name, net_config|
+      numbering_service.add_network(name, net_config[:net], net_config[:start])
     end
 
     return numbering_service

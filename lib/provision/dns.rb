@@ -21,6 +21,7 @@ class Provision::DNS
   attr_accessor :backend
 
   def self.get_backend(name, options={})
+    raise("get_backend not supplied a name, cannot continue.") if name.nil? or name == false
     require "provision/dns/#{name.downcase}"
     instance = Provision::DNS.const_get(name).new(options)
     instance.backend = name
