@@ -77,6 +77,7 @@ class Provision::Factory
     options[:logger] = @logger
     numbering_service = Provision::DNS.get_backend(config()[:dns_backend], options)
 
+    logger.info("Making networks for numbering service: #{config()[:networks].to_yaml}")
     config()[:networks].each do |name, net_config|
       numbering_service.add_network(name, net_config[:net], net_config[:start])
     end
