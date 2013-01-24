@@ -19,6 +19,7 @@ end
 class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
   def initialize(name, range, start, options={})
     super(name, range, start, options)
+    @debug = true
     parts = range.split('/')
     if parts.size != 2
       raise(":network_range must be of the format X.X.X.X/Y")
@@ -77,12 +78,14 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
   def exec_nsupdate(update_file)
     rndc_tmp = write_rndc_key
     out = `cat #{update_file.path} | nsupdate -k #{rndc_tmp.path} 2>&1`
+    logger.info("nsupdate OUT #{out}") if @debug
     update_file.unlink
     rndc_tmp.unlink
     out
   end
 
   def nsupdate(update_file, txt)
+    logger.info("about to nsupdate for #{txt}") if @debug
     out = exec_nsupdate(update_file)
     check_nsupdate_output(out, txt)
   end
