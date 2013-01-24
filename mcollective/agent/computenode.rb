@@ -11,7 +11,7 @@ module MCollective
       end
 
       def provisioner
-        Provision.new(:logger => logger)
+        Provision::Factory.new(:logger => logger)
       end
 
       def prepare_work_queue(specs, listener)

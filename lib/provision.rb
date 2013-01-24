@@ -1,4 +1,4 @@
-
+require 'provision/namespace'
 require 'provision/image/service'
 require 'provision/vm/virsh'
 require 'provision/core/provisioning_service'
@@ -8,7 +8,15 @@ require 'yaml'
 require 'pp'
 
 module Provision
-  class Config
+  def self.base(dir="")
+    return File.expand_path(File.join(File.dirname(__FILE__), "../#{dir}"))
+  end
+  def self.home(dir="")
+    return File.expand_path(File.join(File.dirname(__FILE__), "../home/#{dir}"))
+  end
+end
+
+class Provision::Config
     def initialize(options={:configfile=>"/etc/provision/config.yaml"})
       @configfile = options[:configfile]
     end
@@ -37,20 +45,13 @@ module Provision
       n
     end
 
-  end
+end
 
-  def self.base(dir="")
-    return File.expand_path(File.join(File.dirname(__FILE__), "../#{dir}"))
-  end
-
-  def initialize(options)
+class Provision::Factory
+  def initialize(options={})
    configfile = options[:configfile] || "/etc/provision/config.yaml"
    @logger = options[:logger] || Logger.new(STDOUT)
-   @config = Config.new(:configfile => configfile)
-  end
-
-  def self.home(dir="")
-    return File.expand_path(File.join(File.dirname(__FILE__), "../home/#{dir}"))
+   @config = Provision::Config.new(:configfile => configfile)
   end
 
   def config()

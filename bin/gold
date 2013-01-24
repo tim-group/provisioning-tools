@@ -5,7 +5,7 @@ $: << File.join(File.dirname(__FILE__), "..", "lib")
 require 'provision'
 require 'pp'
 
-result = Provision.new.create_gold_image({
+result = Provision::Factory.new.create_gold_image({
   :spindle=>"/mnt",
   :hostname=>"generic"
 })
