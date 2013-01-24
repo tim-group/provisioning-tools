@@ -84,6 +84,14 @@ class Provision::Factory
 
   end
 
+  def home(dir="")
+    Provision.home(dir)
+  end
+
+  def base(dir="")
+    Provision.base(dir)
+  end
+
   def provisioning_service()
     targetdir = File.join(File.dirname(__FILE__), "../target")
 
