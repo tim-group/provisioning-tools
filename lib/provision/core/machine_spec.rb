@@ -79,9 +79,9 @@ class Provision::Core::MachineSpec
   end
 
   def hostname_on(network)
-    # probably wrong, and not nice to have to special-case prod here
-    if network == 'prod'
-      "#{self[:hostname]}.#{self[:domain]}"
+    # VERY VERY WRONG!!! hostname / domain concept totally needs fixing and the prod case is broken here.
+    if network == :prod or network == :mgmt
+      name = "#{self[:hostname]}.#{self[:domain]}"
     else
       "#{self[:hostname]}.#{network}.#{self[:domain]}"
     end
