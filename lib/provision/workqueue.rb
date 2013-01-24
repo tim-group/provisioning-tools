@@ -1,3 +1,4 @@
+require 'logger'
 require 'provision/namespace'
 require 'thread'
 require 'provision/workqueue/noop_listener'
@@ -9,9 +10,11 @@ class Provision::WorkQueue
     @worker_count = args[:worker_count]
     @listener = args[:listener]
     @queue = Queue.new
+    @logger = args[:logger] || Logger.new(STDERR)
   end
 
   def fill(specs)
+    @logger.info("Fill work queue")
     raise "an array of machine specifications is expected" unless specs.kind_of?(Array)
     specs.each do |spec|
       add(spec)
@@ -48,6 +51,7 @@ class Provision::WorkQueue
   end
 
   def process()
+    @logger.info("Process work queue")
     threads = []
     total = @queue.size()
     @worker_count.times {|i|
@@ -58,6 +62,7 @@ class Provision::WorkQueue
           require 'yaml'
           error = nil
           begin
+            @logger.info("Provisioning a VM")
             @provisioning_service.provision_vm(spec)
           rescue Exception => e
             print e.backtrace

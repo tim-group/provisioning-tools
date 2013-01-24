@@ -48,6 +48,7 @@ class Provision::Config
 end
 
 class Provision::Factory
+  attr_reader :logger
   def initialize(options={})
    configfile = options[:configfile] || "/etc/provision/config.yaml"
    @logger = options[:logger] || Logger.new(STDOUT)
@@ -104,7 +105,8 @@ class Provision::Factory
       ),
       :vm_service        => Provision::VM::Virsh.new(),
       :numbering_service => numbering_service,
-      :defaults => defaults
+      :defaults => defaults,
+      :logger => @logger
     )
   end
 
@@ -113,10 +115,12 @@ class Provision::Factory
   end
 
   def work_queue(options)
+    logger.info("Building work queue")
     Provision::WorkQueue.new(
-      :listener=>options[:listener],
+      :listener             => options[:listener],
       :provisioning_service => provisioning_service(),
-      :worker_count=> options[:worker_count]
+      :worker_count         => options[:worker_count],
+      :logger               => logger
     )
   end
 
