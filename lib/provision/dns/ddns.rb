@@ -43,7 +43,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
   end
 
   def get_primary_nameserver
-    '172.16.16.5'
+    '172.19.0.5'
   end
 
   def remove_ip_for(spec)
