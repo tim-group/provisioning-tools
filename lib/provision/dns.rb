@@ -1,6 +1,7 @@
 require 'ipaddr'
 require 'provision/namespace'
 require 'logger'
+require 'yaml'
 
 module IPAddrExtensions
   def subnet_mask

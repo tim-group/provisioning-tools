@@ -4,8 +4,8 @@ ddns = Provision::DNS.get_backend('DDNS', {
     :rndc_key => '6KBvyA/FS8CyaXCxfhPRzg=='
 })
 #ddns.add_network(name, net, start)
-ddns.add_network('mgmt', '172.19.0.0/24', '172.19.0.10')
-ddns.add_network('prod', '10.3.0.0/16', '10.3.0.10')
+ddns.add_network(:mgmt, '172.19.0.0/24', '172.19.0.10')
+ddns.add_network(:prod, '10.3.0.0/16', '10.3.0.10')
 
 class MySpec
   def initialize(spec)
