@@ -44,7 +44,7 @@ class Provision::DNS
   def allocate_ips_for(spec)
     allocations = {}
 
-    raise("No networks for this machine, cannot allocate any IPs") unless spec[:networks].empty?
+    raise("No networks for this machine, cannot allocate any IPs") if spec[:networks].empty?
 
     # Should the rest of this allocation loop be folded into the machine spec?
     spec[:networks].each do |network|
@@ -53,6 +53,8 @@ class Provision::DNS
       allocations[network] = @networks[network].allocate_ip_for(spec)
       @logger.info("Allocated #{allocations[network].to_yaml}")
     end
+
+    raise("No networks allocated for this machine, cannot be sane") if allocations.empty?
 
     return allocations
   end
