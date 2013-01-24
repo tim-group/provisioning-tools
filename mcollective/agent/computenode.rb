@@ -10,8 +10,12 @@ module MCollective
         config.pluginconf["provision.lockfile"] || "/var/lock/provision.lock"
       end
 
+      def provisioner
+        Provision.new(:logger => logger)
+      end
+
       def prepare_work_queue(specs, listener)
-        work_queue = Provision.work_queue(:worker_count=>1, :listener=>listener)
+        work_queue = provisioner.work_queue(:worker_count=>1, :listener=>listener)
         work_queue.fill(specs)
         return work_queue
       end

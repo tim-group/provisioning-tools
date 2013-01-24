@@ -43,14 +43,18 @@ module Provision
     return File.expand_path(File.join(File.dirname(__FILE__), "../#{dir}"))
   end
 
-  @@config = Config.new()
+  def initialize(options)
+   configfile = options[:configfile] || "/etc/provision/config.yaml"
+   @logger = options[:logger] || Logger.new(STDOUT)
+   @config = Config.new(:configfile => configfile)
+  end
 
   def self.home(dir="")
     return File.expand_path(File.join(File.dirname(__FILE__), "../home/#{dir}"))
   end
 
-  def self.config()
-   return @@config.get() || {
+  def config()
+   return @config.get() || {
       :dns_backend => "DNSMasq",
       :dns_backend_options => {},
       :networks => {
@@ -66,10 +70,12 @@ module Provision
     }
   end
 
-  def self.numbering_service()
-    numbering_service = Provision::DNS.get_backend(self.config()[:dns_backend], self.config()[:dns_backend_options])
+  def numbering_service()
+    options = config()[:dns_backend_options]
+    options[:logger] = @logger
+    numbering_service = Provision::DNS.get_backend(config()[:dns_backend], options)
 
-    self.config()[:networks].each do |name, net_config|
+    config()[:networks].each do |name, net_config|
       numbering_service.add_network(name, net_config[:net], net_config[:start])
     end
 
@@ -77,12 +83,12 @@ module Provision
 
   end
 
-  def self.create_provisioning_service()
+  def provisioning_service()
     targetdir = File.join(File.dirname(__FILE__), "../target")
 
-    defaults = self.config()["defaults"]
+    defaults = config()["defaults"]
 
-    return provisioning_service = Provision::Core::ProvisioningService.new(
+    @provisioning_service ||= Provision::Core::ProvisioningService.new(
       :image_service     => Provision::Image::Service.new(
         :configdir => home("image_builders"),
         :targetdir => targetdir
@@ -93,20 +99,19 @@ module Provision
     )
   end
 
-  def self.vm(options)
-    provisioning_service = Provision.create_provisioning_service()
+  def vm(options)
     provisioning_service.provision_vm(options)
   end
 
-  def self.work_queue(options)
+  def work_queue(options)
     Provision::WorkQueue.new(
       :listener=>options[:listener],
-      :provisioning_service => Provision.create_provisioning_service(),
+      :provisioning_service => provisioning_service(),
       :worker_count=> options[:worker_count]
     )
   end
 
-  def self.create_gold_image(spec_hash)
+  def create_gold_image(spec_hash)
     spec_hash[:thread_number] = 0
     spec = Provision::Core::MachineSpec.new(spec_hash)
     targetdir = File.join(File.dirname(__FILE__), "../target")

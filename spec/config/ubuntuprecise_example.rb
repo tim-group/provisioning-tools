@@ -23,7 +23,7 @@ describe Provision do
   end
 
   it 'after building a test vm I am able to login and the hostname is correct' do
-    descriptor = Provision.vm(:imagesdir=>"build/images", :hostname=>"RANDOMX", :template=>"ubuntuprecise",:thread_number=>1)
+    descriptor = Provision.new.vm(:imagesdir=>"build/images", :hostname=>"RANDOMX", :template=>"ubuntuprecise",:thread_number=>1)
     wait_for_vm(descriptor.ip_address)
     ssh(descriptor.ip_address, "hostname").should eql("RANDOMX")
   end
