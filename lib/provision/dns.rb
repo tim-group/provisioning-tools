@@ -50,8 +50,8 @@ class Provision::DNS
     # Should the rest of this allocation loop be folded into the machine spec?
     spec[:networks].each do |network|
       @logger.info("Trying to allocate IP for network #{network}")
-      next unless @networks.has_key?(network)
-      allocations[network] = @networks[network].allocate_ip_for(spec)
+      next unless @networks.has_key?(network.to_sym)
+      allocations[network] = @networks[network.to_sym].allocate_ip_for(spec)
       @logger.info("Allocated #{allocations[network].to_yaml}")
     end
 
