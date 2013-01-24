@@ -10,6 +10,10 @@ end
 module Provision::DNS::DDNS::Exception
     class BadKey < Exception
     end
+    class Timeout < Exception
+    end
+    class UnknownError < Exception
+    end
 end
 
 class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
@@ -69,14 +73,17 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     tmp_file.close
     out = exec_nsupdate(tmp_file)
     puts "OUT: #{out}"
+    failure = "Adding lookup from #{ip} to #{fqdn} failed: '#{out}'"
     case out
     when /update failed: YXDOMAIN/
       puts "FAILED TO ADD #{ip_rev}.in-addr.arpa. PTR #{fqdn}. IP already used"
       return false
     when /update failed: NOTAUTH\(BADKEY\)/
-      raise(Provision::DNS::DDNS::Exception::BadKey.new("Adding lookup from #{ip} to #{fqdn} failed: '#{out}'"))
+      raise(Provision::DNS::DDNS::Exception::BadKey.new(failure))
+    when /Communication with server failed: timed out/
+      raise(Provision::DNS::DDNS::Exception::Timeout.new(failure))
     when /update failed/
-      raise("Adding lookup from #{ip} to #{fqdn} failed: '#{out}'")
+      raise(Provision::DNS::DDNS::Exception::UnknownError.new(failure))
     else
       puts "ADD OK for reverse of #{ip} to #{fqdn} => #{out}"
       return true

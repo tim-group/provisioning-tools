@@ -76,6 +76,15 @@ update failed: NOTAUTH(BADKEY)
     )
     expect { dns.allocate_ip_for(get_spec()) }.to raise_error(Provision::DNS::DDNS::Exception::BadKey)
   end
+
+  it 'raises an exception if we get a timeout' do
+    dns = MockProvision.new('prod', '192.168.1.0/16','192.168.1.10',
+      :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
+      :nsupdate_replies => ['; Communication with server failed: timed out'],
+      :lookup_table => {}
+    )
+    expect { dns.allocate_ip_for(get_spec()) }.to raise_error(Provision::DNS::DDNS::Exception::Timeout)
+  end
 end
 
 
