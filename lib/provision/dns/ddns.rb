@@ -7,6 +7,11 @@ require 'resolv'
 class Provision::DNS::DDNS < Provision::DNS
 end
 
+module Provision::DNS::DDNS::Exception
+    class BadKey < Exception
+    end
+end
+
 class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
   def initialize(name, range, start, options={})
     super(name, range, start, options)
@@ -63,16 +68,18 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     tmp_file.puts "send"
     tmp_file.close
     out = exec_nsupdate(tmp_file)
-    if out =~ /update failed: YXDOMAIN/
+    puts "OUT: #{out}"
+    case out
+    when /update failed: YXDOMAIN/
       puts "FAILED TO ADD #{ip_rev}.in-addr.arpa. PTR #{fqdn}. IP already used"
       return false
+    when /update failed: NOTAUTH\(BADKEY\)/
+      raise(Provision::DNS::DDNS::Exception::BadKey.new("Adding lookup from #{ip} to #{fqdn} failed: '#{out}'"))
+    when /update failed/
+      raise("Adding lookup from #{ip} to #{fqdn} failed: '#{out}'")
     else
-      if out =~ /update failed/
-        raise("Adding lookup from #{ip} to #{fqdn} failed: #{out}")
-      else
-        puts "ADD OK for reverse of #{ip} to #{fqdn} => #{out}"
-        return true
-      end
+      puts "ADD OK for reverse of #{ip} to #{fqdn} => #{out}"
+      return true
     end
   end
 

@@ -17,8 +17,8 @@ class MockProvision < Provision::DNS::DDNSNetwork
   end
 
   def exec_nsupdate(update_file)
-    @nsupdate_replies.shift
     @update_files.push(update_file)
+    @nsupdate_replies.shift
   end
 
   def lookup_ip_for(hn)
@@ -27,6 +27,12 @@ class MockProvision < Provision::DNS::DDNSNetwork
 end
 
 describe Provision::DNS::DDNS do
+  def get_spec
+    spec = double()
+    spec.stub(:hostname_on).and_return('st-testmachine-001.mgmt.st.net.local')
+    spec
+  end
+
   it 'constructs once' do
     dns = Provision::DNS::DDNSNetwork.new('prod', '192.168.1.0/24', '192.168.1.10',
       :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw=="
@@ -58,6 +64,17 @@ describe Provision::DNS::DDNS do
       }
     )
     dns.reverse_zone.should eql('168.192.in-addr.arpa')
+  end
+
+  it 'raises an exception if we get bad rndc key' do
+    dns = MockProvision.new('prod', '192.168.1.0/16','192.168.1.10',
+      :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
+      :nsupdate_replies => ['; TSIG error with server: tsig indicates error (RuntimeError)
+update failed: NOTAUTH(BADKEY)
+'],
+      :lookup_table => {}
+    )
+    expect { dns.allocate_ip_for(get_spec()) }.to raise_error(Provision::DNS::DDNS::Exception::BadKey)
   end
 end
 
