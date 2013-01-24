@@ -5,13 +5,13 @@ require 'provision/core/machine_spec'
 
 class Provision::DNS::DNSMasq
   def max_ip(network)
-    @networks[network].max_ip.to_s
+    @networks[network.to_sym].max_ip.to_s
   end
   def hosts_by_name(network)
-    @networks[network].by_name
+    @networks[network.to_sym].by_name
   end
   def reload(network)
-    @networks[network].reload_dnsmasq
+    @networks[network.to_sym].reload_dnsmasq
   end
 end
 
@@ -28,7 +28,7 @@ describe Provision::DNS::DNSMasq do
                                           :hosts_file=>"#{dir}/etc/hosts",
                                           :ethers_file=>"#{dir}/etc/ethers",
                                           :pid_file=>"#{dir}/var/run/dnsmasq.pid")
-    dnsmasq.add_network("mgmt", "192.168.5.0/24", "192.168.5.1")
+    dnsmasq.add_network(:mgmt, "192.168.5.0/24", "192.168.5.1")
     return dnsmasq
   end
 
@@ -136,14 +136,14 @@ describe Provision::DNS::DNSMasq do
       require 'yaml'
       ip_spec = thing.allocate_ips_for(spec1)
       ip_spec.should eql({
-        "mgmt" => {
+        'mgmt' => {
           :netmask => '255.255.255.0',
           :address => '192.168.5.2'
         }
       })
       thing.allocate_ips_for(spec2)
-      thing.remove_ips_for(spec1)['mgmt'].should eql true
-      thing.remove_ips_for(spec2)['mgmt'].should eql true
+      thing.remove_ips_for(spec1)[:mgmt].should eql true
+      thing.remove_ips_for(spec2)[:mgmt].should eql true
 
       File.open("#{dir}/etc/ethers", 'r') { |f| f.read.should eql("") }
       File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("") }
