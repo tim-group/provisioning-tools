@@ -10,8 +10,8 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
   attr_reader :by_name
 
   def initialize(name, subnet_string, start_ip, options)
-    super
     raise "options must not be nil" if options.nil?
+    super
     @hosts_file = options[:hosts_file] || "/etc/hosts"
     @ethers_file = options[:ethers_file] || "/etc/ethers"
     @dnsmasq_pid_file = options[:pid_file] || "/var/run/dnsmasq.pid"
