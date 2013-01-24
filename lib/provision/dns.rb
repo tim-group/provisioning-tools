@@ -1,5 +1,6 @@
 require 'ipaddr'
 require 'provision/namespace'
+require 'logger'
 
 module IPAddrExtensions
   def subnet_mask
@@ -8,11 +9,13 @@ module IPAddrExtensions
 end
 
 class Provision::DNSNetwork
+  attr_reader :logger
   def initialize(name, subnet_string, start_ip, options)
     @name = name
     @subnet = IPAddr.new(subnet_string)
     @subnet.extend(IPAddrExtensions)
     @start_ip = IPAddr.new(start_ip, Socket::AF_INET)
+    @logger = options[:logger] || Logger.new(STDERR)
   end
 end
 
