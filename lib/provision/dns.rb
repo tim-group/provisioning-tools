@@ -34,6 +34,7 @@ class Provision::DNS
   def initialize(options={})
     @networks = {}
     @options = options
+    @logger = options[:logger] || Logger.new(STDERR)
   end
 
   def add_network(name, net, start)

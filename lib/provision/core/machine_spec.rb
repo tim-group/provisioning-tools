@@ -1,4 +1,5 @@
 require 'provision/core/namespace'
+require 'provision'
 require 'provision/core/machine_spec'
 require 'logger'
 require 'digest/sha1'

@@ -196,7 +196,7 @@ describe Provision::DNS::DNSMasq do
         :networks => ['noexist']
       )
 
-      thing.allocate_ips_for(spec1).should eql({})
+      expect { thing.allocate_ips_for(spec1) }.to raise_exception(Exception, "No networks allocated for this machine, cannot be sane")
 
       File.open("#{dir}/etc/ethers", 'r') { |f| f.read.should eql("") }
       File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("") }
