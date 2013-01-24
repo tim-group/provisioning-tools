@@ -94,7 +94,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     failure = "#{txt} failed: '#{out}'"
     case out
     when /update failed: YXDOMAIN/
-      puts "FAILED TO ADD #{ip_rev}.in-addr.arpa. PTR #{fqdn}. IP already used"
+      puts "FAILED TO ADD #{txt} - IP already used"
       return false
     when /update failed: NOTAUTH\(BADKEY\)/
       raise(Provision::DNS::DDNS::Exception::BadKey.new(failure))
