@@ -71,23 +71,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     tmp_file.puts "update add #{ip_rev}.in-addr.arpa. 86400 PTR #{fqdn}."
     tmp_file.puts "send"
     tmp_file.close
-    out = exec_nsupdate(tmp_file)
-    puts "OUT: #{out}"
-    failure = "Adding lookup from #{ip} to #{fqdn} failed: '#{out}'"
-    case out
-    when /update failed: YXDOMAIN/
-      puts "FAILED TO ADD #{ip_rev}.in-addr.arpa. PTR #{fqdn}. IP already used"
-      return false
-    when /update failed: NOTAUTH\(BADKEY\)/
-      raise(Provision::DNS::DDNS::Exception::BadKey.new(failure))
-    when /Communication with server failed: timed out/
-      raise(Provision::DNS::DDNS::Exception::Timeout.new(failure))
-    when /update failed/
-      raise(Provision::DNS::DDNS::Exception::UnknownError.new(failure))
-    else
-      puts "ADD OK for reverse of #{ip} to #{fqdn} => #{out}"
-      return true
-    end
+    nsupdate(tmp_file, "Add reverse from #{ip.to_s} to #{fqdn}")
   end
 
   def exec_nsupdate(update_file)
@@ -96,6 +80,29 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     update_file.unlink
     rndc_tmp.unlink
     out
+  end
+
+  def nsupdate(update_file, txt)
+    out = exec_nsupdate(update_file)
+    check_nsupdate_output(out, txt)
+  end
+
+  def check_nsupdate_output(out, txt)
+    failure = "#{txt} failed: '#{out}'"
+    case out
+    when /update failed: YXDOMAIN/
+      puts "FAILED TO ADD #{ip_rev}.in-addr.arpa. PTR #{fqdn}. IP already used"
+      return false
+    when /update failed: NOTAUTH\(BADKEY\)/
+      raise(Provision::DNS::DDNS::Exception::BadKey.new(failure))
+    when /Communication with server failed: timed out/
+      raise(Provision::DNS::DDNS::Exception::Timeout.new(failure))
+    when /^$/
+      puts "ADD OK #{txt}"
+      return true
+    else
+      raise(Provision::DNS::DDNS::Exception::UnknownError.new(failure))
+    end
   end
 
   def get_hostname(fqdn)
@@ -120,12 +127,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     tmp_file.puts "update add #{fqdn}. 86400 A #{ip}"
     tmp_file.puts "send"
     tmp_file.close
-    out = exec_nsupdate(tmp_file)
-    if out =~ /^$/
-      return true
-    else
-      raise("Could not add forward lookup #{fqdn} A #{ip}: #{out}")
-    end
+    nsupdate(tmp_file, "Add forward from #{fqdn} to #{ip}")
   end
 
   def remove_forward_lookup(fqdn)
@@ -135,12 +137,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     tmp_file.puts "update delete #{get_hostname(fqdn)}"
     tmp_file.puts "send"
     tmp_file.close
-    out = exec_nsupdate(tmp_file)
-    if out =~ /^$/
-      return true
-    else
-      raise("Could not remove forward lookup #{fqdn}: #{out}")
-    end
+    nsupdate(tmp_file, "Remove forward from #{fqdn} to #{ip}")
   end
 
   def lookup_ip_for(fqdn)
