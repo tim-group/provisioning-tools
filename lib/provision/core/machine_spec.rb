@@ -79,12 +79,7 @@ class Provision::Core::MachineSpec
   end
 
   def hostname_on(network)
-    # VERY VERY WRONG!!! hostname / domain concept totally needs fixing and the prod case is broken here.
-    if network == :prod or network == :mgmt
-      name = "#{self[:hostname]}.#{self[:domain]}"
-    else
-      "#{self[:hostname]}.#{network}.#{self[:domain]}"
-    end
+    spec[:qualified_hostnames][network.to_s]
   end
 
   def mac(fqdn = @spec[:fqdn])

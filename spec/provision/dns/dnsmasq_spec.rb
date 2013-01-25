@@ -55,17 +55,42 @@ describe Provision::DNS::DNSMasq do
       mksubdirs(dir)
       File.open("#{dir}/etc/hosts", 'w') { |f| f.write "# Example hosts file\n127.0.0.1 localhost\n" }
       thing = undertest(dir)
-      ip = thing.allocate_ips_for(Provision::Core::MachineSpec.new(:hostname => "example", :domain => "youdevise.com"))["mgmt"][:address]
+      ip = thing.allocate_ips_for(Provision::Core::MachineSpec.new(
+          :hostname => "example", :domain => "youdevise.com",
+           :qualified_hostnames => {
+            'prod' => 'example.youdevise.com',
+             'mgmt' => 'example.mgmt.youdevise.com'
+           }
+      ))["mgmt"][:address]
       ip.kind_of?(IPAddr).should eql(false)
       ip.to_s.should eql("192.168.5.2")
-      other = thing.allocate_ips_for(Provision::Core::MachineSpec.new(:hostname => "example2", :domain => "youdevise.com"))["mgmt"][:address]
+      other = thing.allocate_ips_for(Provision::Core::MachineSpec.new(
+          :hostname => "example2", :domain => "youdevise.com",
+            :qualified_hostnames => {
+            'prod' => 'example2.youdevise.com',
+             'mgmt' => 'example2.mgmt.youdevise.com'
+          }
+      ))["mgmt"][:address]
       other.to_s.should eql("192.168.5.3")
-      first_again = thing.allocate_ips_for(Provision::Core::MachineSpec.new(:hostname => "example", :domain => "youdevise.com"))["mgmt"][:address]
+      first_again = thing.allocate_ips_for(Provision::Core::MachineSpec.new(
+          :hostname => "example", :domain => "youdevise.com",
+          :qualified_hostnames => {
+            'prod' => 'example.youdevise.com',
+             'mgmt' => 'example.mgmt.youdevise.com'
+           }
+
+      ))["mgmt"][:address]
 
       first_again.to_s.should eql("192.168.5.2")
 
       new_thing = undertest(dir)
-      new_thing_ip = new_thing.allocate_ips_for(Provision::Core::MachineSpec.new(:hostname => "example", :domain => "youdevise.com"))["mgmt"][:address]
+      new_thing_ip = new_thing.allocate_ips_for(Provision::Core::MachineSpec.new(
+          :hostname => "example", :domain => "youdevise.com",
+          :qualified_hostnames => {
+            'prod' => 'example.youdevise.com',
+             'mgmt' => 'example.mgmt.youdevise.com'
+           }
+      ))['mgmt'][:address]
       new_thing_ip.to_s.should eql("192.168.5.2")
 
       new_thing.max_ip('mgmt').should eql("192.168.5.3")
@@ -103,7 +128,11 @@ describe Provision::DNS::DNSMasq do
         Provision::Core::MachineSpec.new(
           :hostname => "example",
           :domain   => "youdevise.com",
-          :aliases  => ["puppet", "broker"]
+          :aliases  => ["puppet", "broker"],
+          :qualified_hostnames => {
+            'prod' => 'example.youdevise.com',
+             'mgmt' => 'example.mgmt.youdevise.com'
+           }
         )
       )
 
@@ -126,13 +155,24 @@ describe Provision::DNS::DNSMasq do
       spec1 = Provision::Core::MachineSpec.new(
         :hostname => "example",
         :domain   => "youdevise.com",
-        :aliases  => ["puppet", "broker"]
+        :aliases  => ["puppet", "broker"],
+        :qualified_hostnames => {
+            'prod' => 'example.youdevise.com',
+             'mgmt' => 'example.mgmt.youdevise.com'
+        }
       )
       spec2 = Provision::Core::MachineSpec.new(
         :hostname => "example2",
         :domain   => "youdevise.com",
-        :aliases  => ["puppet", "broker"]
+        :aliases  => ["puppet", "broker"],
+        :qualified_hostnames => {
+            'prod' => 'example2.youdevise.com',
+            'mgmt' => 'example2.mgmt.youdevise.com'
+        }
       )
+
+      spec1.hostname_on(:mgmt).should eql('example.mgmt.youdevise.com')
+      spec1.hostname_on(:prod).should eql('example.youdevise.com')
       require 'yaml'
       ip_spec = thing.allocate_ips_for(spec1)
       ip_spec.should eql({
