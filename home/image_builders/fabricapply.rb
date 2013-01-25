@@ -4,6 +4,9 @@ define "fabricapply" do
   run("run apt-update ") {
     chroot "apt-get -y --force-yes update"
   }
+  run("install misc packages") {
+    apt_install "rubygem-hiera"
+  }
   run("git clone puppet") {
     cmd "rm -Rf #{spec[:temp_dir]}/etc/puppet/*"
     cmd "git clone http://git.youdevise.com/git/puppet #{spec[:temp_dir]}/etc/puppet"
@@ -20,11 +23,6 @@ ip route add 10.108.0.0/16 via 172.19.0.3
   }
   run("fabricapply") {
     cmd "mkdir #{spec[:temp_dir]}/seed"
-    cmd "cp -r #{File.dirname(__FILE__)}/seed  #{spec[:temp_dir]}/"
-
-    open("#{spec[:temp_dir]}/seed/puppet.yaml", "w") {|f|
-      f.puts YAML.dump(spec[:enc])
-    }
 
     open("#{spec[:temp_dir]}/seed/puppet.sh", 'w') { |f|
       f.puts """#!/bin/sh -e
