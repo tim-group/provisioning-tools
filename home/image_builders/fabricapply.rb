@@ -11,9 +11,7 @@ define "fabricapply" do
   run("temporary route to existing fabric") {
     open("#{spec[:temp_dir]}//etc/network/if-up.d/routes_mgmt", "w") {|f|
       f.puts """
-if [ "${IFACE}" == "mgmt" ]; then
 ip route add 10.108.0.0/16 via 172.19.0.3
-fi
 """
     }
     open("#{spec[:temp_dir]}/etc/hosts", 'a') { |f|
