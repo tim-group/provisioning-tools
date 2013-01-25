@@ -144,14 +144,14 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
   end
 
   def lookup_ip_for(fqdn)
-    resolver = Resolv.new(:resolvers => [DNS.new(
+    resolver = Resolv::DNS.new(
       :nameserver => get_primary_nameserver,
       :search => [],
       :ndots => 1
-    )])
+    )
 
     begin
-      IPAddr.new(resolver.getaddress(fqdn))
+      IPAddr.new(resolver.getaddress(fqdn).to_s, Socket::AF_INET)
     rescue Resolv::ResolvError
       puts "Could not find #{fqdn}"
       false
