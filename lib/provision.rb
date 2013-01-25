@@ -82,7 +82,22 @@ class Provision::Factory
       numbering_service.add_network(name, net_config[:net], net_config[:start])
     end
 
-    return numbering_servicdefaults = config()[:defaults]
+    return numbering_service
+
+  end
+
+  def home(dir="")
+    Provision.home(dir)
+  end
+
+  def base(dir="")
+    Provision.base(dir)
+  end
+
+  def provisioning_service()
+    targetdir = File.join(File.dirname(__FILE__), "../target")
+
+    defaults = config()["defaults"]
 
     @provisioning_service ||= Provision::Core::ProvisioningService.new(
       :image_service     => Provision::Image::Service.new(
