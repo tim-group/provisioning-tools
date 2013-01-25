@@ -97,7 +97,7 @@ class Provision::Factory
   def provisioning_service()
     targetdir = File.join(File.dirname(__FILE__), "../target")
 
-    defaults = config()["defaults"]
+    defaults = config()[:defaults]
 
     @provisioning_service ||= Provision::Core::ProvisioningService.new(
       :image_service     => Provision::Image::Service.new(
