@@ -125,7 +125,7 @@ class puppetmaster::service {
     'apache2-puppetmaster':
       ensure    => 'running',
       notify    => Exec['waitfor_puppetmaster'],
-      require   => [Exec['waitfor_puppetdb'], File['/etc/init.d/apache2-puppetmaster']];
+      require   => [Exec['waitfor_puppetdb'], File['/etc/init.d/apache2-puppetmaster'], Service['puppetmaster']];
 
     'puppetmaster':
       ensure =>'stopped',

@@ -1,19 +1,9 @@
 dnsmasq \
 --log-dhcp \
---dhcp-option option:router \
---dhcp-option option:dns-server,192.168.5.1 \
---dhcp-option option:classless-static-route,10.108.0.0/16,192.168.5.1 \
---dhcp-option option:domain-name,dev.net.local \
---dhcp-option option:domain-search,dev.net.local,net.local \
--s dev.net.local \
+-s mgmt.local.net.local \
 --strict-order \
 --bind-interfaces \
 --pid-file=/var/run/dnsmasq.pid \
 --except-interface lo \
---interface br_mgmt \
---interface br_prod \
---dhcp-range 192.168.5.1,static \
---dhcp-range set:prod,192.168.6.100,192.168.6.254 \
---read-ethers \
 --dhcp-no-override \
 --log-queries

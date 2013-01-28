@@ -9,11 +9,6 @@ define "seedapply" do
     cmd "mkdir #{spec[:temp_dir]}/seed"
     cmd "cp -r #{File.dirname(__FILE__)}/seed  #{spec[:temp_dir]}/"
 
-    if spec[:enc]["classes"].has_key?("puppetmaster")
-      cmd "cp -r #{File.dirname(__FILE__)}/ssl  #{spec[:temp_dir]}/var/lib/puppet/"
-      chroot "chown -R puppet /var/lib/puppet/ssl"
-    end
-
     open("#{spec[:temp_dir]}/seed/puppet.yaml", "w") {|f|
       f.puts YAML.dump(spec[:enc])
     }

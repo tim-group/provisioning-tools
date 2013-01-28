@@ -28,6 +28,7 @@ define "copyboot" do
     open("#{spec[:temp_dir]}/etc/resolv.conf", 'w') { |f|
       f.puts %[domain mgmt.#{spec[:domain]}
 nameserver #{spec[:nameserver]}
+search net.local youdevise.com
 ]
     }
 

@@ -1,4 +1,3 @@
 #!/bin/bash
-rm -rf /etc/puppet && \
-git clone http://git/git/puppet /etc/puppet/ && \
+$(dirname "$0")/git-cloneinto http://git/git/puppet /etc/puppet
 /usr/sbin/puppetdb-ssl-setup
