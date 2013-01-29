@@ -53,7 +53,7 @@ class puppetmaster::install {
   }
 }
 
-class puppetmaster::config {
+class puppetmaster::config($puppetmaster_fqdn = $::fqdn) {
   File {
     require => Class['puppetmaster::install']
   }

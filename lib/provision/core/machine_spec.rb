@@ -10,6 +10,7 @@ class Provision::Core::MachineSpec
 
   def initialize(spec)
     @thread_number = spec[:thread_number] || 0
+    # FIXME: THIS IS A VALUE OBJECT DONT DO SHIT IN HERE - push it up to the factories
     # FIXME - Should we detect if we're a git checkout or a built / installed gem and change
     #         paths as appropriate?
     @build_dir = spec[:build_dir] || ENV['PROVISIONING_TOOLS_BUILD_DIR'] || "#{Provision.base()}/build"
@@ -33,6 +34,9 @@ class Provision::Core::MachineSpec
     if_nil_define_var(:console_log,"#{@build_dir}/logs/console-#{@thread_number}.log")
     if_nil_define_var(:temp_dir, "#{@build_dir}/#{@spec[:hostname]}")
 
+    if (@spec.has_key?(:qualified_hostnames))
+      if_nil_define_var(:fqdn,"#{@spec[:qualified_hostnames]['mgmt']}")
+    end
     if_nil_define_var(:fqdn,"#{@spec[:hostname]}.#{@spec[:domain]}")
 
     if_nil_define_var(:vnc_port,"-1")

@@ -60,12 +60,12 @@ PassengerStatThrottleRate 120
 
 Listen 8140
 <VirtualHost *:8140>
-  ServerName dev-puppetmaster-001.local.net.local
+  ServerName <%=puppetmaster_fqdn%>
   ServerAlias puppet
 
   SSLEngine on
-  SSLCertificateFile      /var/lib/puppet/ssl/certs/dev-puppetmaster-001.local.net.local.pem
-  SSLCertificateKeyFile   /var/lib/puppet/ssl/private_keys/dev-puppetmaster-001.local.net.local.pem
+  SSLCertificateFile      /var/lib/puppet/ssl/certs/<%=puppetmaster_fqdn%>.pem
+  SSLCertificateKeyFile   /var/lib/puppet/ssl/private_keys/<%=puppetmaster_fqdn%>.pem
   SSLCertificateChainFile /var/lib/puppet/ssl/ca/ca_crt.pem
   SSLCACertificateFile    /var/lib/puppet/ssl/ca/ca_crt.pem
   SSLCARevocationFile     /var/lib/puppet/ssl/ca/ca_crl.pem
@@ -101,4 +101,3 @@ Listen 8140
         Allow from all
     </Directory>
 </VirtualHost>
-
