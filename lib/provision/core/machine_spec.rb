@@ -73,7 +73,7 @@ class Provision::Core::MachineSpec
     @spec[:networks].each {|net|
       nics << {
         :slot    => slot,
-        :mac     => mac("#{@spec[:fqdn]}.#{net}"),
+        :mac     => mac("#{@spec[:hostname]}.#{@spec[:domain]}.#{net}"),
         :bridge  => "br_#{net}",
         :network => "#{net}"
       }
