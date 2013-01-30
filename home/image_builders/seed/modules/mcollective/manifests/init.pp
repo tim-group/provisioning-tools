@@ -1,4 +1,4 @@
-class mcollective($broker="dev-puppetmaster-001.local.net.local") {
+class mcollective($broker) {
   include mcollective::install
   class { 'mcollective::config':
     broker     => $broker;
