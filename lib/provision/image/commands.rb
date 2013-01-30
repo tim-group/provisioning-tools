@@ -1,4 +1,7 @@
+require 'util/symbol_utils'
+
 module Provision::Image::Commands
+
   def cmd(cmd, log_file=console_log)
     log.debug("running command #{cmd}")
     if ! system("#{cmd}  >> #{log_file} 2>&1")
@@ -18,7 +21,11 @@ module Provision::Image::Commands
     chroot("DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes remove #{package}")
   end
 
- class Continuation
+  def symbol_utils
+    return Util::SymbolUtils.new
+  end
+
+  class Continuation
       def initialize(target_object, block)
         raise "nil block given " unless block !=nil
         @block = block

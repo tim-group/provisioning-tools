@@ -1,4 +1,5 @@
 define "seedapply" do
+
   copyboot
 
   run("run apt-update ") {
@@ -10,7 +11,7 @@ define "seedapply" do
     cmd "cp -r #{File.dirname(__FILE__)}/seed  #{spec[:temp_dir]}/"
 
     open("#{spec[:temp_dir]}/seed/puppet.yaml", "w") {|f|
-      f.puts YAML.dump(spec[:enc])
+      f.puts YAML.dump(symbol_utils.stringify_keys(spec[:enc]))
     }
 
     open("#{spec[:temp_dir]}/seed/puppet.sh", 'w') { |f|
