@@ -41,33 +41,16 @@ class Provision::Factory
   attr_reader :logger
   def initialize(options={})
     @logger = options[:logger] || Logger.new(STDOUT)
-    @config = Provision::Config.new(:configfile => options[:configfile])
-  end
-
-  def config()
-    return @config.get() || {
-      :dns_backend => "DNSMasq",
-      :dns_backend_options => {},
-      :networks => {
-        "mgmt" => {
-          "net" => "192.168.5.0/24",
-          "start" => "192.168.5.100"
-        },
-        "prod" => {
-          "net" => "192.168.6.0/24",
-          "start" => "192.168.6.100"
-        }
-      }
-    }
+    @config = Provision::Config.new(:configfile => options[:configfile]).get()
   end
 
   def numbering_service()
-    options = config()[:dns_backend_options]
+    options = @config[:dns_backend_options]
     options[:logger] = @logger
-    numbering_service = Provision::DNS.get_backend(config()[:dns_backend], options)
+    numbering_service = Provision::DNS.get_backend(@config[:dns_backend], options)
 
-    logger.info("Making networks for numbering service: #{config()[:networks].to_yaml}")
-    config()[:networks].each do |name, net_config|
+    logger.info("Making networks for numbering service: #{@config[:networks].to_yaml}")
+    @config[:networks].each do |name, net_config|
       numbering_service.add_network(name, net_config[:net], net_config[:start])
     end
 
@@ -85,7 +68,7 @@ class Provision::Factory
   def provisioning_service()
     targetdir = File.join(File.dirname(__FILE__), "../target")
 
-    defaults = config()[:defaults]
+    defaults = @config[:defaults]
 
     @provisioning_service ||= Provision::Core::ProvisioningService.new(
       :image_service => Provision::Image::Service.new(
