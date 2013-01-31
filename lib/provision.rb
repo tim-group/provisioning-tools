@@ -18,8 +18,8 @@ module Provision
 end
 
 class Provision::Config
-  def initialize(options={:configfile => "/etc/provision/config.yaml"})
-    @configfile = options[:configfile]
+  def initialize(options={})
+    @configfile = options[:configfile] || "/etc/provision/config.yaml"
   end
 
   def required_config_keys
@@ -50,9 +50,8 @@ end
 class Provision::Factory
   attr_reader :logger
   def initialize(options={})
-    configfile = options[:configfile] || "/etc/provision/config.yaml"
     @logger = options[:logger] || Logger.new(STDOUT)
-    @config = Provision::Config.new(:configfile => configfile)
+    @config = Provision::Config.new(:configfile => options[:configfile])
   end
 
   def config()
