@@ -1,0 +1,10 @@
+--- 
+  dns_backend: DNSMasq
+  dns_backend_options: {}
+  networks: 
+    mgmt: 
+      net: 192.168.5.0/24
+      start: 192.168.5.100
+    prod: 
+      net: 192.168.6.0/24
+      start: 192.168.6.100
