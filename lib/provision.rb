@@ -4,6 +4,7 @@ require 'provision/vm/virsh'
 require 'provision/core/provisioning_service'
 require 'provision/workqueue'
 require 'provision/dns'
+require 'util/symbol_utils'
 require 'yaml'
 require 'pp'
 
@@ -20,30 +21,19 @@ end
 class Provision::Config
   def initialize(options={})
     @configfile = options[:configfile] || "/etc/provision/config.yaml"
+    @symbol_utils = Util::SymbolUtils.new
   end
 
   def required_config_keys
     [:dns_backend, :dns_backend_options, :networks]
   end
 
-  def load()
-    return YAML.load(IO.read(@configfile))
-  end
-
   def get()
-    config = sym_hash(load())
+    config = @symbol_utils.symbolize_keys(YAML.load(File.new(@configfile)))
     missing_keys = required_config_keys - config.keys
     raise "#{@configfile} has missing properties (#{missing_keys.join(', ')})" unless missing_keys.empty?
 
     return config
-  end
-
-  private
-
-  def sym_hash(h)
-    n = Hash.new
-    h.each { |k, v| n[k.to_sym] = v.is_a?(Hash) ? sym_hash(v) : v }
-    n
   end
 end
 
