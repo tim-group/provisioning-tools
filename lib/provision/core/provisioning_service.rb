@@ -10,7 +10,7 @@ class Provision::Core::ProvisioningService
     @vm_service = options[:vm_service] || raise("No :vm_service option passed")
     @image_service = options[:image_service] || raise("No :image_service option passed")
     @numbering_service = options[:numbering_service] || raise("No :numbering_service option passed")
-    @machinespec_defaults = options[:defaults] || {}
+    @machinespec_defaults = options[:defaults] || {:enc => {:classes => {}}}
     @logger = options[:logger] || Logger.new(STDERR)
   end
 
@@ -24,6 +24,11 @@ class Provision::Core::ProvisioningService
   def provision_vm(spec_hash)
     @logger.info("Provisioning a VM")
     spec_hash = @machinespec_defaults.merge(spec_hash)
+
+    # this is pretty rancid, but we want to merge the set of classes, not simply overwrite it
+    # the right way to handle this would probably be to do the merging in the MachineSpec constructor
+    spec_hash[:enc] = @machinespec_defaults[:enc].merge(spec_hash[:enc] || {})
+    spec_hash[:enc][:classes] = @machinespec_defaults[:enc][:classes].merge(spec_hash[:enc][:classes] || {})
 
     pp @machinespec_defaults
     clean_vm(spec_hash)

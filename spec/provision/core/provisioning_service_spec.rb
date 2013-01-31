@@ -50,7 +50,7 @@ describe Provision::Core::ProvisioningService do
 
   it 'allows the user to define vm from an image catalogue and vmdescription catalogue' do
     @numbering_service.should_receive(:allocate_ips_for)
-    @provisioning_service.should_receive(:clean_vm).with(:hostname => "vmx1", :template => "ubuntuprecise")
+    @provisioning_service.should_receive(:clean_vm).with(:hostname => "vmx1", :template => "ubuntuprecise", :enc => {:classes => {}})
     @image_service.should_receive(:build_image).with("ubuntuprecise", anything).ordered
     @vm_service.should_receive(:define_vm).ordered
     @vm_service.should_receive(:start_vm).ordered
@@ -66,7 +66,7 @@ describe Provision::Core::ProvisioningService do
     }
     @numbering_service.stub(:allocate_ips_for).and_return(network_address)
 
-    @provisioning_service.should_receive(:clean_vm).with(:hostname => "vmx1", :template => "ubuntuprecise")
+    @provisioning_service.should_receive(:clean_vm).with(:hostname => "vmx1", :template => "ubuntuprecise", :enc => {:classes => {}})
 
     @image_service.should_receive(:build_image).with("ubuntuprecise", network_config(network_address)).ordered
     @vm_service.should_receive(:define_vm).ordered
@@ -87,11 +87,12 @@ describe Provision::Core::ProvisioningService do
       :vm_service => @vm_service,
       :numbering_service => @numbering_service,
       :defaults => {
-        :template => "ubuntuprecise"
+        :template => "ubuntuprecise",
+        :enc => {:classes => {}}
       }
     )
     @numbering_service.should_receive(:allocate_ips_for)
-    @provisioning_service.should_receive(:clean_vm).with(:hostname => "vmx1", :template => "ubuntuprecise")
+    @provisioning_service.should_receive(:clean_vm).with(:hostname => "vmx1", :template => "ubuntuprecise", :enc => {:classes => {}})
     @image_service.should_receive(:build_image).with("ubuntuprecise", anything).ordered
     @vm_service.should_receive(:define_vm).ordered
     @vm_service.should_receive(:start_vm).ordered
@@ -104,11 +105,12 @@ describe Provision::Core::ProvisioningService do
       :vm_service => @vm_service,
       :numbering_service => @numbering_service,
       :defaults => {
-        :template => "blah"
+        :template => "blah",
+        :enc => {:classes => {}}
       }
     )
     @numbering_service.should_receive(:allocate_ips_for)
-    @provisioning_service.should_receive(:clean_vm).with(:hostname => "vmx1", :template => "ubuntuprecise")
+    @provisioning_service.should_receive(:clean_vm).with(:hostname => "vmx1", :template => "ubuntuprecise", :enc => {:classes => {}})
     @image_service.should_receive(:build_image).with("ubuntuprecise", anything).ordered
     @vm_service.should_receive(:define_vm).ordered
     @vm_service.should_receive(:start_vm).ordered
