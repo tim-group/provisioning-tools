@@ -1,11 +1,11 @@
 [main]
-logdir=/var/log/puppet
-vardir=/var/lib/puppet
-ssldir=/var/lib/puppet/ssl
-rundir=/var/run/puppet
-factpath=$vardir/lib/facter
-templatedir=$confdir/templates
-server = <%=puppetmaster%>
-pluginsync = true
+    vardir                         = /var/lib/puppet
+    logdir                         = /var/log/puppet
+    rundir                         = /var/run/puppet
+    ssldir                         = $vardir/ssl
+    factpath                       = $vardir/lib/facter
+    templatedir                    = $confdir/templates
+    server                         = <%= puppetmaster %>
+    pluginsync                     = true
 
 [agent]
