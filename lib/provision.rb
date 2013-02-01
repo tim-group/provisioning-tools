@@ -82,10 +82,6 @@ class Provision::Factory
     )
   end
 
-  def vm(options)
-    provisioning_service.provision_vm(options)
-  end
-
   def work_queue(options)
     logger.info("Building work queue")
     Provision::WorkQueue.new(
