@@ -55,36 +55,36 @@ search net.local youdevise.com
 
   run("setup networking") {
     open("#{spec[:temp_dir]}/etc/network/interfaces", 'w') { |f|
-    f.puts "
+      f.puts "
 # The loopback network interface
 auto lo
 iface lo inet loopback
     "
 
-    spec.interfaces.each do |nic|
-      config = spec[:networking][nic[:network]]
-      if config != nil
-        f.puts "
+      spec.interfaces.each do |nic|
+        config = spec[:networking][nic[:network].to_sym]
+        if config != nil
+          f.puts "
 auto #{nic[:network]}
 iface #{nic[:network]} inet static
 address #{config[:address]}
 netmask   #{config[:netmask]}
 "
+        end
       end
-    end
-  }
+    }
 
-  open("#{spec[:temp_dir]}/etc/udev/rules.d/70-persistent-net.rules", 'w') { |f|
+    open("#{spec[:temp_dir]}/etc/udev/rules.d/70-persistent-net.rules", 'w') { |f|
 
-  }
+    }
 
-  open("#{spec[:temp_dir]}/etc/udev/rules.d/70-persistent-net.rules", 'w') { |f|
-    spec.interfaces.each do |nic|
-      f.puts %[
+    open("#{spec[:temp_dir]}/etc/udev/rules.d/70-persistent-net.rules", 'w') { |f|
+      spec.interfaces.each do |nic|
+        f.puts %[
 SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="#{nic[:mac]}", ATTR{type}=="1",  NAME="#{nic[:network]}"\n
       ]
-    end
-  }
+      end
+    }
   }
 
   run("configure aptproxy") {
