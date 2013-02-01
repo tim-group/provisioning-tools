@@ -20,5 +20,3 @@ class Util::SymbolUtils
     end]
   end
 end
-
-

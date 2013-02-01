@@ -1,11 +1,11 @@
 require 'mcollective'
 require 'provision'
 require 'provision/workqueue'
+require 'util/symbol_utils'
 
 module MCollective
   module Agent
     class Computenode < RPC::Agent
-
       def lockfile
         config.pluginconf["provision.lockfile"] || "/var/lock/provision.lock"
       end
@@ -15,7 +15,13 @@ module MCollective
       end
 
       def prepare_work_queue(specs, listener)
-        work_queue = provisioner.work_queue(:worker_count=>1, :listener=>listener)
+        work_queue = provisioner.work_queue(:worker_count => 1, :listener => listener)
+        
+        symbol_utils = ::Util::SymbolUtils.new()
+        specs = specs.map do |spec|
+          symbol_utils.symbolize_keys(spec)
+        end
+
         work_queue.fill(specs)
         return work_queue
       end
@@ -41,7 +47,7 @@ module MCollective
             f.flock(File::LOCK_EX)
             action.call
           end
-        rescue Exception=>e
+        rescue Exception => e
           logger.error(e)
           reply.data = {"error" => e.message, "backtrace" => e.backtrace}
           raise e
@@ -68,4 +74,3 @@ module MCollective
     end
   end
 end
-

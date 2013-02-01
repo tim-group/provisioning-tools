@@ -1,5 +1,7 @@
-#!/usr/bin/ruby
+#! /usr/bin/ruby
+
 require 'yaml'
+
 $: << File.join(File.dirname(__FILE__), "..", "lib")
 
 configdir = File.join(File.dirname(__FILE__), "../lib/config")
@@ -8,18 +10,21 @@ target_dir = File.join(File.dirname(__FILE__), "../target")
 require 'optparse'
 require 'provision'
 require 'provision/workqueue'
+require 'util/symbol_utils'
 
-specs = YAML::load($stdin.read())
+symbol_utils = Util::SymbolUtils.new()
+specs = YAML::load($stdin).map do |spec|
+  symbol_utils.symbolize_keys(spec)
+end
 
 listener = NoopListener.new()
-work_queue = Provision::Factory.new().work_queue( :worker_count => 4, :listener => listener)
+work_queue = Provision::Factory.new().work_queue(:worker_count => 4, :listener => listener)
 work_queue.fill(specs)
 
 work_queue.process()
 
-if (listener.has_errors?)
+if listener.has_errors?
   exit(1)
 else
   exit(0)
 end
-

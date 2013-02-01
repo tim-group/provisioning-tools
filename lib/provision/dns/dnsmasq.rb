@@ -20,19 +20,14 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
 
   def allocate_ip_for(spec)
     mac = spec.interfaces[0][:mac]
-    all_hostnames = spec.all_hostnames
-    hostname = spec.hostname_on(@name)
+    all_hostnames = spec.all_hostnames_on(@name)
+    hostname = all_hostnames[0]
     ip = nil
     # Note that we re-parse the hosts file on every allocation
     # to avoid multiple simultaneous allocators from being able
     # to allocate the same IP
     # FIXME - There is still a race condition here with other processes
     parse_hosts
-
-    # <bodge degree="hideous">
-    unless all_hostnames.include?(hostname)
-      all_hostnames = [hostname] + all_hostnames
-    end
 
     if @by_name[hostname]
       puts "No new allocation for #{hostname}, already allocated to #{@by_name[hostname]}"
@@ -58,8 +53,9 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
       reload_dnsmasq
 
       return {
-        :address=>@max_ip.to_s,
-        :netmask=>@subnet.subnet_mask}
+        :address => @max_ip.to_s,
+        :netmask => @subnet.subnet_mask
+      }
     end
   end
 
@@ -88,7 +84,7 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
     ip = nil
     parse_hosts
 
-    hn = spec[:fqdn]
+    hn = spec.hostname_on(@name)
     if @by_name[hn]
       ip = @by_name[hn]
       puts "Removing ip allocation (#{ip}) for #{hn}"

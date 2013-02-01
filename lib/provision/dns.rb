@@ -11,6 +11,7 @@ end
 
 class Provision::DNSNetwork
   attr_reader :logger
+  
   def initialize(name, subnet_string, start_ip, options)
     @name = name
     @subnet = IPAddr.new(subnet_string)
@@ -21,9 +22,8 @@ class Provision::DNSNetwork
 end
 
 class Provision::DNS
-
   attr_accessor :backend
-
+  
   def self.get_backend(name, options={})
     raise("get_backend not supplied a name, cannot continue.") if name.nil? or name == false
     require "provision/dns/#{name.downcase}"
@@ -40,7 +40,7 @@ class Provision::DNS
 
   def add_network(name, net, start)
     classname = "#{backend}Network"
-    @networks[name] = Provision::DNS.const_get(classname).new(name,net,start,@options)
+    @networks[name] = Provision::DNS.const_get(classname).new(name, net, start, @options)
   end
 
   def allocate_ips_for(spec)
@@ -49,10 +49,11 @@ class Provision::DNS
     raise("No networks for this machine, cannot allocate any IPs") if spec[:networks].empty?
 
     # Should the rest of this allocation loop be folded into the machine spec?
-    spec[:networks].each do |network|
+    spec[:networks].each do |network_name|
+      network = network_name.to_sym
       @logger.info("Trying to allocate IP for network #{network}")
-      next unless @networks.has_key?(network.to_sym)
-      allocations[network] = @networks[network.to_sym].allocate_ip_for(spec)
+      next unless @networks.has_key?(network)
+      allocations[network] = @networks[network].allocate_ip_for(spec)
       @logger.info("Allocated #{allocations[network].to_yaml}")
     end
 
@@ -72,4 +73,3 @@ class Provision::DNS
   end
 
 end
-
