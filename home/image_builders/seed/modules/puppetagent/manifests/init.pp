@@ -1,11 +1,14 @@
 class puppetagent($puppetmaster) {
-  
-  class { 'puppetmaster::wait_for':
-    puppetmaster => $puppetmaster
-  }
 
-  file { '/etc/puppet/puppet.conf':
-    content => template('puppetagent/puppet.conf.erb')
+  if defined(Class['puppetmaster']) {
+    require puppetmaster
+  } else {
+    class { 'puppetmaster::wait_for':
+      puppetmaster => $puppetmaster
+    }
+    file { '/etc/puppet/puppet.conf':
+      content => template('puppetagent/puppet.conf.erb')
+    }
   }
 
   exec { 'generate_csr':
