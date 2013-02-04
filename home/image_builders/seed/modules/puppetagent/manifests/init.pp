@@ -1,10 +1,10 @@
 class puppetagent($puppetmaster) {
-  class {'puppetmaster::wait_for':
+  
+  class { 'puppetmaster::wait_for':
     puppetmaster => $puppetmaster
   }
 
-  file {'puppet_conf':
-    path    => '/etc/puppet/puppet.conf',
+  file { '/etc/puppet/puppet.conf':
     content => template('puppetagent/puppet.conf.erb')
   }
 
@@ -12,7 +12,7 @@ class puppetagent($puppetmaster) {
     cwd       => '/tmp',
     command   => "puppetd -t",
     path      => '/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin',
-    require   => [Class['puppetmaster::wait_for'], File['puppet_conf']],
+    require   => [Class['puppetmaster::wait_for'], File['/etc/puppet/puppet.conf']],
     returns   => 1,
     logoutput => true
   }
