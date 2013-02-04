@@ -3,6 +3,7 @@ require 'provision/namespace'
 require 'thread'
 require 'provision/workqueue/noop_listener'
 require 'provision/workqueue/curses_listener'
+require 'provision/vm/virsh'
 
 class Provision::WorkQueue
   def initialize(args)
@@ -11,6 +12,7 @@ class Provision::WorkQueue
     @listener = args[:listener]
     @queue = Queue.new
     @logger = args[:logger] || Logger.new(STDERR)
+    @virsh = args[:virsh] || Provision::VM::Virsh.new()
   end
 
   def fill(specs)
@@ -32,11 +34,12 @@ class Provision::WorkQueue
       threads << Thread.new {
         while(not @queue.empty?)
           spec = @queue.pop(true)
+          next unless (@virsh.is_active(spec))
           spec[:thread_number] = i
           require 'yaml'
           error = nil
           begin
-            @provisioning_service.clean_vm(spec)
+           @provisioning_service.clean_vm(spec)
           rescue Exception => e
             print e.backtrace
             @listener.error(e, spec)

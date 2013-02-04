@@ -7,6 +7,12 @@ class Provision::VM::Virsh
     @template = "#{Provision.base}/templates/kvm.template"
   end
 
+  def is_active(spec)
+    vm_name=spec[:hostname]
+    result=`virsh list | grep #{vm_name} | wc -l`
+    return result.match(/1/)
+  end
+
   def undefine_vm(spec)
     system("virsh undefine #{spec[:hostname]} > /dev/null 2>&1")
   end

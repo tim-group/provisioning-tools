@@ -52,12 +52,36 @@ describe Provision::WorkQueue do
 
   it 'cleans up vms' do
     @provisioning_service = double()
-    @workqueue = Provision::WorkQueue.new(:provisioning_service=>@provisioning_service,:worker_count=>1, :listener=>@listener)
-    spec = {:hostname => "myvm1",
-      :ram => "256Mb"}
+    mock_virsh = double()
+    mock_virsh.stub(:is_active).and_return(true)
+    @workqueue = Provision::WorkQueue.new(:provisioning_service=>@provisioning_service,:worker_count=>1, :listener=>@listener, :virsh => mock_virsh)
+    spec = {:hostname => "myvm1", :ram => "256Mb"}
     @provisioning_service.should_receive(:clean_vm).with(spec)
     @workqueue.add(spec)
     @workqueue.clean()
+  end
+
+  it 'cleans only vms this compute node houses' do
+    @provisioning_service = double()
+    mock_virsh = double()
+    @workqueue = Provision::WorkQueue.new(
+                    :provisioning_service=>@provisioning_service,
+                    :worker_count=>1,
+                    :listener=>@listener,
+                    :virsh=> mock_virsh)
+
+    spec = {:hostname => "myvm1", :thread_number => 0}
+    spec2 = {:hostname => "myvm2", :thread_number => 0}
+    mock_virsh.stub(:is_active).with(spec).and_return(true)
+    mock_virsh.stub(:is_active).with(spec2).and_return(false)
+
+
+    @provisioning_service.should_receive(:clean_vm)
+    @workqueue.add(spec)
+    @workqueue.add(spec2)
+    @workqueue.clean()
+
+    @listener.results.should eql({"myvm1"=> "success"})
   end
 
 end
