@@ -28,7 +28,7 @@ module MCollective
       end
 
       def provision(specs, listener)
-       logger.info("Launching #{specs.size} nodes")
+        logger.info("Launching #{specs.size} nodes")
         queue = prepare_work_queue(specs, listener)
         queue.launch_all(specs)
         return listener.results
