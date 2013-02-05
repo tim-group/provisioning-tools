@@ -32,6 +32,7 @@ class Provision::WorkQueue
     specs.each do |spec|
       launch(spec)
     end
+    process()
   end
 
   def destroy_all(specs)
@@ -39,6 +40,7 @@ class Provision::WorkQueue
     specs.each do |spec|
       destroy(spec)
     end
+    process()
   end
 
   def launch(spec)
