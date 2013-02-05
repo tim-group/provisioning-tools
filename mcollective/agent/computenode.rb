@@ -15,7 +15,9 @@ module MCollective
       end
 
       def prepare_work_queue(specs, listener)
-        work_queue = provisioner.work_queue(:worker_count => 1, :listener => listener)
+        work_queue = provisioner.work_queue(
+                        :worker_count => 1,
+                        :listener => listener)
 
         symbol_utils = ::Util::SymbolUtils.new()
         specs = specs.map do |spec|
@@ -26,13 +28,9 @@ module MCollective
       end
 
       def provision(specs, listener)
+       logger.info("Launching #{specs.size} nodes")
         queue = prepare_work_queue(specs, listener)
-        queue.launch_all(specs) do
-
-        end
-
-        logger.info("Launching #{specs.size} nodes")
-        queue.process()
+        queue.launch_all(specs)
         return listener.results
       end
 
@@ -40,7 +38,6 @@ module MCollective
         queue = prepare_work_queue(specs, listener)
         logger.info("Cleaning #{specs.size} nodes")
         queue.destroy_all(specs)
-        queue.process()
         return listener.results
       end
 

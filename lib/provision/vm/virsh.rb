@@ -1,4 +1,5 @@
 require 'provision/vm/namespace'
+require 'provision'
 require 'erb'
 require 'ostruct'
 

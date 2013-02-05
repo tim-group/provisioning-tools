@@ -43,8 +43,7 @@ describe Provision::WorkQueue do
     @provisioning_service = double()
     @workqueue = Provision::WorkQueue.new(:provisioning_service=>@provisioning_service,:worker_count=>1, :listener=>@listener)
     10.times { |i|
-      spec = {:hostname => "myvm_#{i}",
-        :ram => "256Mb"}
+      spec = {:hostname => "myvm_#{i}", :ram => "256Mb"}
       @workqueue.launch(spec)
       @provisioning_service.should_receive(:provision_vm).with(spec)
     }
