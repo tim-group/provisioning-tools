@@ -15,7 +15,7 @@ describe Provision::WorkQueue do
       :ram => "256Mb"}
 
     @provisioning_service.should_receive(:provision_vm).with(spec)
-    @workqueue.add(spec)
+    @workqueue.launch(spec)
     @workqueue.process()
   end
 
@@ -25,7 +25,7 @@ describe Provision::WorkQueue do
     10.times { |i|
       spec = {:hostname => "myvm_#{i}",
         :ram => "256Mb"}
-      @workqueue.add(spec)
+      @workqueue.launch(spec)
       @provisioning_service.should_receive(:provision_vm).with(spec)
     }
     @workqueue.process()
@@ -41,7 +41,7 @@ describe Provision::WorkQueue do
     10.times { |i|
       spec = {:hostname => "myvm_#{i}",
         :ram => "256Mb"}
-      @workqueue.add(spec)
+      @workqueue.launch(spec)
       completed = i+1
       @provisioning_service.should_receive(:provision_vm)
       @listener.should_receive(:passed)
@@ -57,8 +57,8 @@ describe Provision::WorkQueue do
     @workqueue = Provision::WorkQueue.new(:provisioning_service=>@provisioning_service,:worker_count=>1, :listener=>@listener, :virsh => mock_virsh)
     spec = {:hostname => "myvm1", :ram => "256Mb"}
     @provisioning_service.should_receive(:clean_vm).with(spec)
-    @workqueue.add(spec)
-    @workqueue.clean()
+    @workqueue.destroy(spec)
+    @workqueue.process()
   end
 
   it 'cleans only vms this compute node houses' do
@@ -75,11 +75,10 @@ describe Provision::WorkQueue do
     mock_virsh.stub(:is_active).with(spec).and_return(true)
     mock_virsh.stub(:is_active).with(spec2).and_return(false)
 
-
     @provisioning_service.should_receive(:clean_vm)
-    @workqueue.add(spec)
-    @workqueue.add(spec2)
-    @workqueue.clean()
+    @workqueue.destroy(spec)
+    @workqueue.destroy(spec2)
+    @workqueue.process()
 
     @listener.results.should eql({"myvm1"=> "success"})
   end

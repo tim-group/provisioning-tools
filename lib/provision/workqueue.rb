@@ -6,6 +6,18 @@ require 'provision/workqueue/curses_listener'
 require 'provision/vm/virsh'
 
 class Provision::WorkQueue
+  class SpecTask
+    attr_reader :spec
+    def initialize(spec, &block)
+      @spec = spec
+      @block = block
+    end
+
+    def execute
+      @block.call
+    end
+  end
+
   def initialize(args)
     @provisioning_service = args[:provisioning_service]
     @worker_count = args[:worker_count]
@@ -19,38 +31,23 @@ class Provision::WorkQueue
     @logger.info("Fill work queue")
     raise "an array of machine specifications is expected" unless specs.kind_of?(Array)
     specs.each do |spec|
-      add(spec)
+      launch(spec)
     end
   end
 
-  def add(spec)
-    @queue << spec
+  def launch(spec)
+    @queue << SpecTask.new(spec) do
+      @logger.info("Provisioning a VM")
+      @provisioning_service.provision_vm(spec)
+    end
   end
 
-  def clean()
-    threads = []
-    total = @queue.size()
-    @worker_count.times {|i|
-      threads << Thread.new {
-        while(not @queue.empty?)
-          spec = @queue.pop(true)
-          next unless (@virsh.is_active(spec))
-          spec[:thread_number] = i
-          require 'yaml'
-          error = nil
-          begin
-           @provisioning_service.clean_vm(spec)
-          rescue Exception => e
-            print e.backtrace
-            @listener.error(e, spec)
-            error = e
-          ensure
-             @listener.passed(spec) if error.nil?
-          end
-        end
-      }
-    }
-    threads.each {|thread| thread.join()}
+  def destroy(spec)
+    if (@virsh.is_active(spec))
+      @queue << SpecTask.new(spec) do
+        @provisioning_service.clean_vm(spec)
+      end
+    end
   end
 
   def process()
@@ -60,19 +57,18 @@ class Provision::WorkQueue
     @worker_count.times {|i|
       threads << Thread.new {
         while(not @queue.empty?)
-          spec = @queue.pop(true)
-          spec[:thread_number] = i
+          task = @queue.pop(true)
+          task.spec[:thread_number] = i
           require 'yaml'
           error = nil
           begin
-            @logger.info("Provisioning a VM")
-            @provisioning_service.provision_vm(spec)
+            task.execute()
           rescue Exception => e
             print e.backtrace
-            @listener.error(e, spec)
+            @listener.error(e, task.spec)
             error = e
           ensure
-             @listener.passed(spec) if error.nil?
+            @listener.passed(task.spec) if error.nil?
           end
         end
       }
