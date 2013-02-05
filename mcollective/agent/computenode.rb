@@ -16,18 +16,21 @@ module MCollective
 
       def prepare_work_queue(specs, listener)
         work_queue = provisioner.work_queue(:worker_count => 1, :listener => listener)
-        
+
         symbol_utils = ::Util::SymbolUtils.new()
         specs = specs.map do |spec|
           symbol_utils.symbolize_keys(spec)
         end
 
-        work_queue.fill(specs)
         return work_queue
       end
 
       def provision(specs, listener)
         queue = prepare_work_queue(specs, listener)
+        queue.launch_all(specs) do
+
+        end
+
         logger.info("Launching #{specs.size} nodes")
         queue.process()
         return listener.results
@@ -36,12 +39,12 @@ module MCollective
       def clean(specs, listener)
         queue = prepare_work_queue(specs, listener)
         logger.info("Cleaning #{specs.size} nodes")
-        queue.clean()
+        queue.destroy_all(specs)
+        queue.process()
         return listener.results
       end
 
       def with_lock(&action)
-
         begin
           File.open(lockfile(), "w") do |f|
             f.flock(File::LOCK_EX)

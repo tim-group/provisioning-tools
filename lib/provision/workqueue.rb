@@ -27,11 +27,17 @@ class Provision::WorkQueue
     @virsh = args[:virsh] || Provision::VM::Virsh.new()
   end
 
-  def fill(specs)
-    @logger.info("Fill work queue")
+  def launch_all(specs)
     raise "an array of machine specifications is expected" unless specs.kind_of?(Array)
     specs.each do |spec|
       launch(spec)
+    end
+  end
+
+  def destroy_all(specs)
+    raise "an array of machine specifications is expected" unless specs.kind_of?(Array)
+    specs.each do |spec|
+      destroy(spec)
     end
   end
 

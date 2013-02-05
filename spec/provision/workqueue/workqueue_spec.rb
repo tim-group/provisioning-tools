@@ -11,6 +11,7 @@ describe Provision::WorkQueue do
   it 'processes work items' do
     @provisioning_service = double()
     @workqueue = Provision::WorkQueue.new(:provisioning_service=>@provisioning_service,:worker_count=>1, :listener=>@listener)
+
     spec = {:hostname => "myvm1",
       :ram => "256Mb"}
 
