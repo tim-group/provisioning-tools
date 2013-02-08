@@ -25,10 +25,6 @@ class Provision::Core::ProvisioningService
     @logger.info("Provisioning a VM")
     spec_hash = @machinespec_defaults.merge(spec_hash)
 
-    # this is pretty rancid, but we want to merge the set of classes, not simply overwrite it
-    # the right way to handle this would probably be to do the merging in the MachineSpec constructor
-    spec_hash[:enc] = @machinespec_defaults[:enc].merge(spec_hash[:enc] || {})
-    spec_hash[:enc][:classes] = @machinespec_defaults[:enc][:classes].merge(spec_hash[:enc][:classes] || {})
     clean_vm(spec_hash)
     spec = Provision::Core::MachineSpec.new(spec_hash)
     @logger.info("Getting numbering for spec #{spec.to_yaml}")
