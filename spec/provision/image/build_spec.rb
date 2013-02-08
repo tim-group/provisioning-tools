@@ -227,10 +227,10 @@ describe XYZ do
       }
       cleanup {
         keep_doing {
-	  supress_error.die("this line should throw an error and be swallowed")
-	  something = returns_something()
-          print "something = #{something} \n"
-	}.until {something=="something"}
+        supress_error.die("this line should throw an error and be swallowed")
+        something = returns_something()
+        print "something = #{something} \n"
+      }.until {something=="something"}
       }
     end
 
@@ -239,4 +239,12 @@ describe XYZ do
 
     something.should eql("something")
   end
+
+  it 'raises a meaningful error when a non-existent template is defined' do
+    require 'provision/image/catalogue'
+    expect {
+      Provision::Image::Catalogue::build("noexist", Provision::Core::MachineSpec.new({}))
+    }.to raise_error("attempt to execute a template that is not in the catalogue: noexist")
+  end
+
 end
