@@ -39,8 +39,7 @@ task :build_gold do
   require 'pp'
 
   dest = File.dirname(__FILE__) + '/build/gold'
-  result = Provision.create_gold_image({:spindle=>dest,:hostname=>"generic"})
-
+  result = Provision::Factory.new.create_gold_image({:spindle=>dest, :hostname=>"generic"})
 end
 
 desc "Run puppet"
