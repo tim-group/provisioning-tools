@@ -35,7 +35,8 @@ describe Provision::DNS::DDNS do
 
   it 'constructs once' do
     dns = Provision::DNS::DDNSNetwork.new('prod', '192.168.1.0/24', '192.168.1.10',
-      :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw=="
+      :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
+      :primary_nameserver => "mars"
     )
     dns.network.to_s.should eql('192.168.1.0')
     dns.broadcast.to_s.should eql('192.168.1.255')
@@ -49,7 +50,8 @@ describe Provision::DNS::DDNS do
       :nsupdate_replies => [],
       :lookup_table => {
         'foo.example.com' => '172.16.0.1',
-      }
+      },
+      :primary_nameserver => "mars"
     )
     dns.reverse_zone.should eql('1.168.192.in-addr.arpa')
     dns.lookup_ip_for('foo.example.com').should eql('172.16.0.1')
@@ -61,7 +63,8 @@ describe Provision::DNS::DDNS do
       :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
       :nsupdate_replies => [],
       :lookup_table => {
-      }
+      },
+      :primary_nameserver => "mars"
     )
     dns.reverse_zone.should eql('168.192.in-addr.arpa')
   end
@@ -72,7 +75,8 @@ describe Provision::DNS::DDNS do
       :nsupdate_replies => ['; TSIG error with server: tsig indicates error (RuntimeError)
 update failed: NOTAUTH(BADKEY)
 '],
-      :lookup_table => {}
+      :lookup_table => {},
+      :primary_nameserver => "mars"
     )
     expect { dns.allocate_ip_for(get_spec()) }.to raise_error(Provision::DNS::DDNS::Exception::BadKey)
   end
@@ -81,7 +85,8 @@ update failed: NOTAUTH(BADKEY)
     dns = MockProvision.new('prod', '192.168.1.0/16','192.168.1.10',
       :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
       :nsupdate_replies => ['; Communication with server failed: timed out'],
-      :lookup_table => {}
+      :lookup_table => {},
+      :primary_nameserver => "mars"
     )
     expect { dns.allocate_ip_for(get_spec()) }.to raise_error(Provision::DNS::DDNS::Exception::Timeout)
   end

@@ -32,6 +32,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     min_allocation = options[:min_allocation] || 10
     @min_allocation = IPAddr.new(min_allocation.to_i + @network.to_i, Socket::AF_INET)
     @rndc_key = options[:rndc_key] || raise("No :rndc_key supplied")
+    @primary_nameserver = options[:primary_nameserver] || raise("must specify a primary_nameserver")
   end
 
   def reverse_zone
@@ -53,7 +54,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
   end
 
   def get_primary_nameserver
-    '172.19.0.5'
+    return @primary_nameserver
   end
 
   def remove_ip_for(spec)
