@@ -6,6 +6,11 @@ define "seedapply" do
     chroot "apt-get -y --force-yes update"
   }
 
+  run("temp fix to update ssl packages for puppet to run") {
+    apt_install "openssl"
+    apt_install "libssl1.0.0"
+  }
+
   run("seedapply") {
     cmd "mkdir #{spec[:temp_dir]}/seed"
     cmd "cp -r #{File.dirname(__FILE__)}/seed  #{spec[:temp_dir]}/"
