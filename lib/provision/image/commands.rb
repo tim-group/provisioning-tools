@@ -17,6 +17,10 @@ module Provision::Image::Commands
     chroot("DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install #{package}")
   end
 
+  def apt_download(package)
+    chroot("DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes -d install #{package}")
+  end
+
   def apt_remove(package)
     chroot("DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes remove #{package}")
   end

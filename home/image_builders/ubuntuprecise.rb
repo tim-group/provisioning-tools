@@ -93,48 +93,9 @@ define "ubuntuprecise" do
     open("#{spec[:temp_dir]}/etc/hostname", 'w') { |f|
       f.puts "#{spec[:hostname]}"
     }
-  #    chroot "hostname -F /etc/hostname"
     open("#{spec[:temp_dir]}/etc/dhcp/dhclient.conf", 'w') { |f|
-f.puts "
-option rfc3442-classless-static-routes code 121 = array of unsigned integer 8;
-send host-name \"<hostname>\";
-request subnet-mask, broadcast-address, time-offset, routers, domain-name, domain-name-servers, domain-search, host-name, netbios-name-servers, netbios-scope, interface-mtu, rfc3442-classless-static-routes, ntp-servers;
-"
+f.puts ""
     }
-  }
-
-  run("install kernel and grub") {
-    chroot "apt-get -y --force-yes update"
-    apt_install "linux-image-virtual"
-    apt_install "grub-pc"
-    cmd "mkdir -p #{spec[:temp_dir]}/boot/grub"
-    cmd "tune2fs -Lmain /dev/#{spec[:loop1]}"
-
-    open("#{spec[:temp_dir]}/boot/grub/device.map", 'w') { |f|
-      f.puts "(hd0) /dev/#{spec[:loop0]}"
-      f.puts "(hd0,1) /dev/#{spec[:loop1]}"
-    }
-
-    kernel_version = "3.2.0-23-virtual"
-    kernel = "/boot/vmlinuz-#{kernel_version}"
-    initrd = "/boot/initrd.img-#{kernel_version}"
-    uuid = `blkid -o value /dev/mapper/#{spec[:loop0]}p1 | head -n1`.chomp
-
-    open("#{spec[:temp_dir]}/boot/grub/grub.cfg", 'w') { |f|
-      f.puts "
-          set default=\"0\"
-          set timeout=1
-          menuentry 'Ubuntu, with Linux #{kernel_version}' --class ubuntu --class gnu-linux --class gnu --class os {
-          insmod part_msdos
-          insmod ext2
-          set root='(hd0,1)'
-          search --label --no-floppy --set=root main
-          linux #{kernel} root=/dev/disk/by-label/main ro
-          initrd #{initrd}
-          }"
-    }
-
-    chroot "grub-install --no-floppy --grub-mkdevicemap=/boot/grub/device.map /dev/#{spec[:loop0]}"
   }
 
   run("set root password") {
@@ -144,31 +105,6 @@ request subnet-mask, broadcast-address, time-offset, routers, domain-name, domai
   run("deploy the root key") {
     cmd "mkdir -p #{spec[:temp_dir]}/root/.ssh/"
     #    cmd "cp #{Dir.pwd}/files/id_rsa.pub #{spec[:temp_dir]}/root/.ssh/authorized_keys"
-  }
-
-  run("set up basic networking") {
-    open("#{spec[:temp_dir]}/etc/network/interfaces", 'w') { |f|
-      f.puts "
-# The loopback network interface
-auto lo
-iface lo inet loopback
-"
-
-      spec.interfaces.each do |nic|
-        f.puts "
-auto #{nic[:network]}
-iface #{nic[:network]} inet dhcp
-"
-      end
-    }
-
-    open("#{spec[:temp_dir]}/etc/udev/rules.d/70-persistent-net.rules", 'w') { |f|
-      spec.interfaces.each do |nic|
-        f.puts %[
-SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="#{nic[:mac]}", ATTR{type}=="1",  NAME="#{nic[:network]}"\n
-        ]
-      end
-    }
   }
 
   run("enable serial so we can use virsh console") {
@@ -191,6 +127,7 @@ exec /sbin/getty -L ttyS0 115200 vt102
     chroot "/etc/init.d/dbus stop"
     chroot "/etc/init.d/acpid stop"
     chroot "/etc/init.d/cron stop"
+    chroot "/etc/init.d/udev stop"
   }
 
   run("configure precise repo") {
@@ -216,16 +153,21 @@ exec /sbin/getty -L ttyS0 115200 vt102
     }
   }
 
+  run("configure aptproxy") {
+    open("#{spec[:temp_dir]}/etc/apt/apt.conf.d/01proxy", 'w') { |f|
+      f.puts "Acquire::http::Proxy \"http://#{spec[:aptproxy]}:3142\";\n"
+    }
+  }
+
   run("run apt-update ") {
     chroot "apt-get -y --force-yes update"
   }
 
-  cleanup {
-    chroot "rm -rf /var/cache/apt/archives/*"
+  run("temp fix to update ssl packages for puppet to run") {
+    chroot "DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes dist-upgrade"
   }
 
   run("install some other useful stuff") {
-    apt_install "puppet"
     apt_install "nagios-nrpe-server"
     apt_install "psmisc"
     apt_install "vim"
@@ -237,11 +179,57 @@ exec /sbin/getty -L ttyS0 115200 vt102
     apt_install "git-core"
     apt_install "rubygems"
     apt_install "libstomp-ruby"
-    apt_install "mcollective"
+    apt_install "iptables"
+    apt_install "telnet"
+  }
+
+  run("download packages that we would like") {
+    apt_download "mcollective"
+    apt_download "puppet"
   }
 
   cleanup {
-    chroot "/etc/init.d/mcollective stop"
+#    chroot "rm -rf /var/cache/apt/archives/*"
   }
+
+  run("install kernel and grub") {
+    chroot "apt-get -y --force-yes update"
+    apt_install "linux-image-virtual"
+    apt_install "grub-pc"
+    cmd "mkdir -p #{spec[:temp_dir]}/boot/grub"
+    cmd "tune2fs -Lmain /dev/#{spec[:loop1]}"
+
+    open("#{spec[:temp_dir]}/boot/grub/device.map", 'w') { |f|
+      f.puts "(hd0) /dev/#{spec[:loop0]}"
+      f.puts "(hd0,1) /dev/#{spec[:loop1]}"
+    }
+
+    find_kernel = `ls -c #{spec[:temp_dir]}/boot/vmlinuz-* | head -1`.chomp
+    find_kernel =~ /vmlinuz-(.+)/
+    kernel_version = $1
+
+puts "KERNEL FOUND IS #{kernel_version} ****************"
+
+    kernel = "/boot/vmlinuz-#{kernel_version}"
+    initrd = "/boot/initrd.img-#{kernel_version}"
+    uuid = `blkid -o value /dev/mapper/#{spec[:loop0]}p1 | head -n1`.chomp
+
+    open("#{spec[:temp_dir]}/boot/grub/grub.cfg", 'w') { |f|
+      f.puts "
+          set default=\"0\"
+          set timeout=1
+          menuentry 'Ubuntu, with Linux #{kernel_version}' --class ubuntu --class gnu-linux --class gnu --class os {
+          insmod part_msdos
+          insmod ext2
+          set root='(hd0,1)'
+          search --label --no-floppy --set=root main
+          linux #{kernel} root=/dev/disk/by-label/main ro
+          initrd #{initrd}
+          }"
+    }
+
+    chroot "grub-install --no-floppy --grub-mkdevicemap=/boot/grub/device.map /dev/#{spec[:loop0]}"
+  }
+
 
 end

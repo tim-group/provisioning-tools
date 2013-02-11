@@ -19,9 +19,8 @@ end
 
 listener = NoopListener.new()
 work_queue = Provision::Factory.new().work_queue(:worker_count => 4, :listener => listener)
-work_queue.fill(specs)
+work_queue.launch_all(specs)
 
-work_queue.process()
 
 if listener.has_errors?
   exit(1)
