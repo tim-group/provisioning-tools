@@ -41,7 +41,10 @@ class Provision::Factory
   attr_reader :logger
   def initialize(options={})
     @logger = options[:logger] || Logger.new(STDOUT)
-    @config = Provision::Config.new(:configfile => options[:configfile]).get()
+
+    if !options[:configfile].nil?
+      @config = Provision::Config.new(:configfile => options[:configfile]).get()
+    end
   end
 
   def numbering_service()
