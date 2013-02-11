@@ -183,15 +183,6 @@ exec /sbin/getty -L ttyS0 115200 vt102
     apt_install "telnet"
   }
 
-  run("download packages that we would like") {
-    apt_download "mcollective"
-    apt_download "puppet"
-  }
-
-  cleanup {
-#    chroot "rm -rf /var/cache/apt/archives/*"
-  }
-
   run("install kernel and grub") {
     chroot "apt-get -y --force-yes update"
     apt_install "linux-image-virtual"
@@ -231,5 +222,14 @@ puts "KERNEL FOUND IS #{kernel_version} ****************"
     chroot "grub-install --no-floppy --grub-mkdevicemap=/boot/grub/device.map /dev/#{spec[:loop0]}"
   }
 
+  run("remove cached packages") {
+#    chroot "rm -rf /var/cache/apt/archives/*"
+    chroot "DEBIAN_FRONTEND=noninteractive apt-get clean"
+  }
+
+  run("download packages that we would like") {
+    apt_download "mcollective"
+    apt_download "puppet"
+  }
 
 end
