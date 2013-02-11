@@ -41,8 +41,9 @@ class Provision::Factory
   attr_reader :logger
   def initialize(options={})
     @logger = options[:logger] || Logger.new(STDOUT)
-
+    if !options[:configfile].nil?
       @config = Provision::Config.new(:configfile => options[:configfile]).get()
+    end
   end
 
   def numbering_service()
@@ -75,7 +76,7 @@ class Provision::Factory
       :image_service => Provision::Image::Service.new(
         :configdir => home("image_builders"),
         :targetdir => targetdir
-      ),
+    ),
       :vm_service => Provision::VM::Virsh.new(),
       :numbering_service => numbering_service,
       :defaults => defaults,
