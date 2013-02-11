@@ -29,6 +29,7 @@ class Provision::Config
   end
 
   def get()
+    return nil unless File.exists? @configfile
     config = @symbol_utils.symbolize_keys(YAML.load(File.new(@configfile)))
     missing_keys = required_config_keys - config.keys
     raise "#{@configfile} has missing properties (#{missing_keys.join(', ')})" unless missing_keys.empty?
@@ -41,9 +42,7 @@ class Provision::Factory
   attr_reader :logger
   def initialize(options={})
     @logger = options[:logger] || Logger.new(STDOUT)
-    if !options[:configfile].nil?
-      @config = Provision::Config.new(:configfile => options[:configfile]).get()
-    end
+    @config = Provision::Config.new(:configfile => options[:configfile]).get()
   end
 
   def numbering_service()
