@@ -94,11 +94,19 @@ task :package_gold do
     "-d", "provisioning-tools",
     "-a", "all",
     "-C", "build",
-    "-p", "build/provisioning-tools-gold-image_#{version}.deb",
+    "-p", "build/provisioning-tools-gold-image.deb",
     "--prefix", "/var/local/images/",
     "gold"
 
   sh commandLine.join(' ')
+end
+
+task :package_upload_unstable do
+  sh "scp -o 'StrictHostKeyChecking no' -i /home/ci/.ssh/debrepo_upload.key build/provisioning-tools-gold-image.deb debrepo@apt.youdevise.com:/tmp"
+  sh "ssh -i /home/ci/.ssh/debrepo_upload.key debrepo@apt.youdevise.com sudo /usr/local/bin/freight-package.rb -c main -d unstable /tmp/provisioning-tools-gold-image.deb"
+  sh "export MCOLLECTIVE_SSL_PRIVATE=/home/ci/.mc/jenkins-private.pem"
+  sh "export MCOLLECTIVE_SSL_PUBLIC=/etc/mcollective/ssl/clients/jenkins.pem"
+  sh "mco debrepoupdate -t 999"
 end
 
 desc "Generate deb file for the MCollective agent"
