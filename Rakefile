@@ -40,6 +40,7 @@ task :build_gold do
 
   dest = File.dirname(__FILE__) + '/build/gold'
   result = Provision::Factory.new.create_gold_image({:spindle=>dest, :hostname=>"generic"})
+  sh "chmod a+w -R build"
 end
 
 desc "Run puppet"
