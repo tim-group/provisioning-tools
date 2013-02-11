@@ -5,7 +5,7 @@ define "grow" do
   extend Provision::Image::Commands
 
   run("grow the partition table and filesystem") {
-    cmd "cp /mnt/generic.img #{spec[:image_path]}"
+    cmd "cp #{spec[:images_dir]}/gold/generic.img #{spec[:image_path]}"
     cmd "losetup /dev/#{spec[:loop0]} #{spec[:image_path]}"
     cmd "qemu-img resize #{spec[:image_path]} #{spec[:image_size]}"
     cmd "losetup -c /dev/#{spec[:loop0]}"
