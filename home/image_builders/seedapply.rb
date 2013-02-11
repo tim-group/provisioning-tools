@@ -2,6 +2,11 @@ define "seedapply" do
 
   copyboot
 
+
+  run("install puppet") {
+    apt_install "puppet"
+  }
+
   run("seedapply") {
     cmd "mkdir #{spec[:temp_dir]}/seed"
     cmd "cp -r #{File.dirname(__FILE__)}/seed  #{spec[:temp_dir]}/"
