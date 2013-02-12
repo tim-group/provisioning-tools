@@ -9,7 +9,7 @@ class mcollective::install {
        ensure => installed;
 
      [ 'mcollective', 'mcollective-common' ]:
-       ensure  => '2.2.0-2',
+       ensure  => latest,
        require => Package['libstomp-ruby1.8', 'libstomp-ruby', 'ruby-stomp'];
 
   }
