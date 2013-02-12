@@ -136,8 +136,8 @@ exec /sbin/getty -L ttyS0 115200 vt102
       f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ precise universe\n"
       f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ precise-updates main\n"
       f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ precise-updates universe\n"
-      f.puts "deb deb http://deb precise main\n"
-      f.puts "deb deb http://deb all main\n"
+      f.puts "deb http://deb.youdevise.com precise main\n"
+      f.puts "deb http://deb.youdevise.com all main\n"
     }
     chroot "curl -Ss http://deb.youdevise.com/pubkey.gpg | apt-key add -"
   }
