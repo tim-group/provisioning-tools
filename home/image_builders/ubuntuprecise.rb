@@ -136,14 +136,10 @@ exec /sbin/getty -L ttyS0 115200 vt102
       f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ precise universe\n"
       f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ precise-updates main\n"
       f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ precise-updates universe\n"
+      f.puts "deb deb http://deb precise main\n"
+      f.puts "deb deb http://deb all main\n"
     }
-  }
-
-  run("configure youdevise apt repo") {
-    open("#{spec[:temp_dir]}/etc/apt/sources.list.d/youdevise.list", 'w') { |f|
-      f.puts "deb http://apt/ubuntu stable main\ndeb-src http://apt/ubuntu stable main\n"
-    }
-    chroot "curl -Ss http://apt/ubuntu/repo.key | apt-key add -"
+    chroot "curl -Ss http://deb/pubkey.gpg| apt-key add -"
   }
 
   run("prevent apt from making stupid suggestions") {
