@@ -139,7 +139,7 @@ exec /sbin/getty -L ttyS0 115200 vt102
       f.puts "deb deb http://deb precise main\n"
       f.puts "deb deb http://deb all main\n"
     }
-    chroot "curl -Ss http://deb/pubkey.gpg| apt-key add -"
+    chroot "curl -Ss http://deb.youdevise.com/pubkey.gpg | apt-key add -"
   }
 
   run("prevent apt from making stupid suggestions") {
