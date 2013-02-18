@@ -79,7 +79,10 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
   end
 
   def nsupdate(update_file, txt)
-    logger.info("about to nsupdate for #{txt}") if @debug
+    if @debug
+      content = IO.read(update_file.path)
+      logger.info("about to nsupdate for #{txt}: #{content}")
+    end
     out = exec_nsupdate(update_file)
     check_nsupdate_output(out, txt)
   end
