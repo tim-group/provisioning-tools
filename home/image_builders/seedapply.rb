@@ -2,7 +2,6 @@ define "seedapply" do
 
   copyboot
 
-
   run("install puppet") {
     apt_install "puppet"
   }
@@ -17,7 +16,7 @@ define "seedapply" do
 
     open("#{spec[:temp_dir]}/seed/puppet.sh", 'w') { |f|
       f.puts """#!/bin/sh -e
-puppet apply /seed/manifests/seed.pp --node_terminus exec --external_nodes /seed/enc.sh --modulepath=/seed/modules 2>&1 | tee /seed/init.log
+puppet agent --waitforcert 10 -t 2>&1 | tee /seed/init.log
       """
     }
 
