@@ -134,7 +134,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     tmp_file = Tempfile.new('remove_temp')
     tmp_file.puts "server #{get_primary_nameserver}"
     tmp_file.puts "zone #{get_zone(fqdn)}"
-    tmp_file.puts "update delete #{get_hostname(fqdn)} A"
+    tmp_file.puts "update delete #{fqdn}. A"
     tmp_file.puts "send"
     tmp_file.close
     nsupdate(tmp_file, "Remove forward from #{fqdn}")
