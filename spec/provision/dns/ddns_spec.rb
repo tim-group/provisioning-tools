@@ -111,7 +111,7 @@ update failed: NOTAUTH(BADKEY)
       :primary_nameserver => "mars"
     )
     ip = dns.allocate_ip_for(get_spec())
-    dns.remove_ips_for(get_spec())
+    dns.remove_ip_for(get_spec())
     dns.update_files.size.should eql(2)
     dns.update_files[0].should =~ /update delete st-testmachine-001\n/
     dns.update_files[1].should =~ /update delete 10\.0\.168\.192\.in-addr\.arpa\.\n/
@@ -124,7 +124,7 @@ update failed: NOTAUTH(BADKEY)
       :lookup_table => {},
       :primary_nameserver => "mars"
     )
-    dns.remove_ips_for(get_spec())
+    dns.remove_ip_for(get_spec())
     dns.update_files.size.should eql(0)
   end
 

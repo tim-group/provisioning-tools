@@ -195,7 +195,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     }
   end
 
-  def remove_ips_for(spec)
+  def remove_ip_for(spec)
     hostname = hostname_from_spec spec
     ip = lookup_ip_for(hostname)
     if ip
