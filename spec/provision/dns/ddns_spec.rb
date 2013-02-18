@@ -113,8 +113,8 @@ update failed: NOTAUTH(BADKEY)
     ip = dns.allocate_ip_for(get_spec())
     dns.remove_ip_for(get_spec())
     dns.update_files.size.should eql(2)
-    dns.update_files[0].should =~ /update delete st-testmachine-001\n/
-    dns.update_files[1].should =~ /update delete 10\.0\.168\.192\.in-addr\.arpa\.\n/
+    dns.update_files[0].should =~ /update delete st-testmachine-001\.mgmt\.st\.net\.local\. A\n/
+    dns.update_files[1].should =~ /update delete 10\.0\.168\.192\.in-addr\.arpa\. PTR\n/
   end
 
   it 'can de-allocate a not already allocated name' do
