@@ -11,7 +11,9 @@ class Provision::Image::Service
   end
 
   def remove_image(spec)
-    File.delete(spec[:image_path])
+    if File.exists?(spec[:image_path])
+      File.delete(spec[:image_path])
+    end
   end
 end
 
