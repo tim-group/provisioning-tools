@@ -134,7 +134,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     tmp_file = Tempfile.new('remove_temp')
     tmp_file.puts "server #{get_primary_nameserver}"
     tmp_file.puts "zone #{get_zone(fqdn)}"
-    tmp_file.puts "update delete #{get_hostname(fqdn)}"
+    tmp_file.puts "update delete #{get_hostname(fqdn)} A"
     tmp_file.puts "send"
     tmp_file.close
     nsupdate(tmp_file, "Remove forward from #{fqdn}")
@@ -145,7 +145,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     tmp_file = Tempfile.new('remove_temp')
     tmp_file.puts "server #{get_primary_nameserver}"
     tmp_file.puts "zone #{reverse_zone}"
-    tmp_file.puts "update delete #{ip_rev}.in-addr.arpa."
+    tmp_file.puts "update delete #{ip_rev}.in-addr.arpa. PTR"
     tmp_file.puts "send"
     tmp_file.close
     nsupdate(tmp_file, "Remove reverse for #{ip.to_s}")
