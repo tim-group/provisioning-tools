@@ -18,6 +18,7 @@ class Provision::Core::ProvisioningService
     spec = Provision::Core::MachineSpec.new(spec_hash)
     @vm_service.destroy_vm(spec)
     @vm_service.undefine_vm(spec)
+    @vm_service.remove_image(spec)
     @numbering_service.remove_ips_for(spec)
   end
 

@@ -9,5 +9,9 @@ class Provision::Image::Service
   def build_image(template, options)
     Provision::Image::Catalogue.build(template, options).execute()
   end
+
+  def remove_image(spec)
+    File.delete(spec[:image_path])
+  end
 end
 

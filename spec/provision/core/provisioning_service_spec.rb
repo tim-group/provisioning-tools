@@ -78,6 +78,7 @@ describe Provision::Core::ProvisioningService do
     @numbering_service.should_receive(:remove_ips_for)
     @vm_service.should_receive(:destroy_vm).ordered
     @vm_service.should_receive(:undefine_vm).ordered
+    @vm_service.should_receive(:remove_image)
     @provisioning_service.clean_vm(:hostname => "vmx1", :template => "ubuntuprecise")
   end
 
