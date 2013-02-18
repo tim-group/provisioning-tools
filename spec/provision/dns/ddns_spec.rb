@@ -17,7 +17,7 @@ class MockProvision < Provision::DNS::DDNSNetwork
   end
 
   def exec_nsupdate(update_file)
-    @update_files.push(update_file)
+    @update_files.push(IO.read(update_file.path))
     @nsupdate_replies.shift
   end
 
@@ -90,6 +90,44 @@ update failed: NOTAUTH(BADKEY)
     )
     expect { dns.allocate_ip_for(get_spec()) }.to raise_error(Provision::DNS::DDNS::Exception::Timeout)
   end
+
+  it 'can allocate a name' do
+    dns = MockProvision.new('prod', '192.168.1.0/16','192.168.1.10',
+      :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
+      :nsupdate_replies => ['', ''],
+      :lookup_table => {},
+      :primary_nameserver => "mars"
+    )
+    ip = dns.allocate_ip_for(get_spec())
+    ip[:address].to_s.should eql('192.168.0.10')
+    ip[:netmask].should eql('255.255.0.0')
+  end
+
+  it 'can de-allocate an already allocated name' do
+    dns = MockProvision.new('prod', '192.168.1.0/16','192.168.1.10',
+      :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
+      :nsupdate_replies => ['', '', '', ''],
+      :lookup_table => {'st-testmachine-001.mgmt.st.net.local' => '192.168.0.10'},
+      :primary_nameserver => "mars"
+    )
+    ip = dns.allocate_ip_for(get_spec())
+    dns.remove_ips_for(get_spec())
+    dns.update_files.size.should eql(2)
+    dns.update_files[0].should =~ /update delete st-testmachine-001\n/
+    dns.update_files[1].should =~ /update delete 10\.0\.168\.192\.in-addr\.arpa\.\n/
+  end
+
+  it 'can de-allocate a not already allocated name' do
+    dns = MockProvision.new('prod', '192.168.1.0/16','192.168.1.10',
+      :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
+      :nsupdate_replies => [],
+      :lookup_table => {},
+      :primary_nameserver => "mars"
+    )
+    dns.remove_ips_for(get_spec())
+    dns.update_files.size.should eql(0)
+  end
+
 end
 
 

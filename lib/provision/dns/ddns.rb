@@ -57,13 +57,6 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     return @primary_nameserver
   end
 
-  def remove_ip_for(spec)
-    # we need to know *which* IP, so we need the name of the network too
-    # this can't be done purely on the basis of the spec
-    puts "Not ability to remove DNS for #{spec[:hostname]}, not removing"
-    return false
-  end
-
   def try_add_reverse_lookup(ip, fqdn)
     ip_rev = ip.to_s.split('.').reverse.join('.')
     tmp_file = Tempfile.new('remove_temp')
@@ -141,7 +134,18 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     tmp_file.puts "update delete #{get_hostname(fqdn)}"
     tmp_file.puts "send"
     tmp_file.close
-    nsupdate(tmp_file, "Remove forward from #{fqdn} to #{ip}")
+    nsupdate(tmp_file, "Remove forward from #{fqdn}")
+  end
+
+  def remove_reverse_lookup(ip)
+    ip_rev = ip.to_s.split('.').reverse.join('.')
+    tmp_file = Tempfile.new('remove_temp')
+    tmp_file.puts "server #{get_primary_nameserver}"
+    tmp_file.puts "zone #{reverse_zone}"
+    tmp_file.puts "update delete #{ip_rev}.in-addr.arpa."
+    tmp_file.puts "send"
+    tmp_file.close
+    nsupdate(tmp_file, "Remove reverse for #{ip.to_s}")
   end
 
   def lookup_ip_for(fqdn)
@@ -159,8 +163,12 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     end
   end
 
+  def hostname_from_spec(spec)
+    spec.hostname_on(@name)
+  end
+
   def allocate_ip_for(spec)
-    hostname = spec.hostname_on(@name)
+    hostname = hostname_from_spec spec
     ip = nil
 
     if lookup_ip_for(hostname)
@@ -187,36 +195,18 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     }
   end
 
-  def unallocate_ip_for(hostname)
-    ip = nil
-
-    if lookup_ip_for(hostname)
-      forward_lookup_moved = remove_forward_lookup(fqdn)
-      if forward_lookup_removed
-
-      end
-
-      return {
-        :netmask => @subnet_mask.to_s,
-        :address => lookup_ip_for(hostname)
-      }
-    else
-      puts "No allocation for #{hostname}, nothing to remove"
-      max_ip = @max_allocation
-      ip = @min_allocation
-      while !try_add_reverse_lookup(ip, hostname)
-        ip = IPAddr.new(ip.to_i + 1, Socket::AF_INET)
-        if ip >= max_ip
-          raise("Ran out of ips")
-        end
-      end
-      add_forward_lookup(ip, hostname)
+  def remove_ips_for(spec)
+    hostname = hostname_from_spec spec
+    ip = lookup_ip_for(hostname)
+    if ip
+      remove_forward_lookup(hostname)
+      remove_reverse_lookup ip
     end
-    {
+
+    return {
       :netmask => @subnet_mask.to_s,
       :address => ip
     }
-    return true
   end
 
 end
