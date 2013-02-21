@@ -4,6 +4,18 @@ define "seedapply" do
 
   run("install puppet") {
     apt_install "puppet"
+    open("#{spec[:temp_dir]}/etc/puppet/puppet.conf", 'w') { |f|
+      f.puts "[main]
+  vardir                         = /var/lib/puppet
+  logdir                         = /var/log/puppet
+  rundir                         = /var/run/puppet
+  ssldir                         = $vardir/ssl
+  factpath                       = $vardir/lib/facter
+  templatedir                    = $confdir/templates
+  pluginsync                     = true
+  environment                    = masterbranch
+"
+    }
   }
 
   run("seedapply") {
