@@ -1,4 +1,4 @@
-define "seedapply" do
+define "puppetclient" do
 
   copyboot
 
