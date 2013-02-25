@@ -1,5 +1,4 @@
 define "puppetclient" do
-
   copyboot
 
   run("install puppet") {
@@ -20,11 +19,6 @@ define "puppetclient" do
 
   run("seedapply") {
     cmd "mkdir #{spec[:temp_dir]}/seed"
-    cmd "cp -r #{File.dirname(__FILE__)}/seed  #{spec[:temp_dir]}/"
-
-    open("#{spec[:temp_dir]}/seed/puppet.yaml", "w") {|f|
-      f.puts YAML.dump(symbol_utils.stringify_keys(spec[:enc]))
-    }
 
     open("#{spec[:temp_dir]}/seed/puppet.sh", 'w') { |f|
       f.puts """#!/bin/sh -e
@@ -36,6 +30,8 @@ puppet agent --waitforcert 10 -t 2>&1 | tee /seed/init.log
 
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
       f.puts """#!/bin/sh -e
+echo 'Run ntpdate'
+/usr/sbin/ntpdate -s ntp1
 echo 'Running seed puppet'
 /seed/puppet.sh
 echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local
@@ -45,4 +41,3 @@ exit 0
     }
   }
 end
-
