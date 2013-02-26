@@ -71,6 +71,11 @@ iface #{nic[:network]} inet static
 address #{config[:address]}
 netmask   #{config[:netmask]}
 "
+        else
+          f.puts "
+auto #{nic[:network]}
+iface #{nic[:network]} inet manual
+"
         end
       end
     }
