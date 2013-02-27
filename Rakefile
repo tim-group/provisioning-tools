@@ -58,13 +58,13 @@ end
 desc "Run specs"
 RSpec::Core::RakeTask.new() do |t|
   t.rspec_opts = %w[--color]
-  t.pattern = "spec/provision/**/*_spec.rb"
+  t.pattern = "spec/**/*_spec.rb"
 end
 
 desc "MCollective Run specs"
 RSpec::Core::RakeTask.new(:mcollective_spec) do |t|
   t.rspec_opts = %w[--color]
-  t.pattern = "spec/mcollective/**/*_spec.rb"
+  t.pattern = "mcollective/agent/spec/**/*_spec.rb"
 end
 
 desc "Clean everything up"
@@ -126,7 +126,7 @@ task :package_agent do
     "-p", "build/provisioning-tools-mcollective-plugin_#{version}.deb",
     "--prefix", "/usr/share/mcollective/plugins/mcollective",
     "-x", "computenode.ddl",
-    "../mcollective/agent"
+    "../mcollective/agent/lib"
 
   sh commandLine.join(' ')
 
@@ -140,7 +140,7 @@ task :package_agent do
     "-p", "build/provisioning-tools-mcollective-plugin-ddl_#{version}.deb",
     "--prefix", "/usr/share/mcollective/plugins/mcollective",
     "-x", "computenode.rb",
-    "../mcollective/agent"
+    "../mcollective/agent/lib"
 
   sh commandLine.join(' ')
 
