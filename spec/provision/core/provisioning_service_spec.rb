@@ -121,4 +121,11 @@ describe Provision::Core::ProvisioningService do
     @vm_service.should_receive(:start_vm).ordered
     @provisioning_service.provision_vm(:hostname => "vmx1", :template => "ubuntuprecise")
   end
+
+  it 'will allocate you an IP for a name without doing anything else, like for a VIP' do
+    # this test is pretty pointless
+    @numbering_service.should_receive(:allocate_ips_for).with(spec_with(:networks => ['mtv'], :qualified_hostnames => {'mtv' => 'beavis.mtv.cable.net.local'}))
+    @provisioning_service.allocate_ip(:networks => ['mtv'], :qualified_hostnames => {'mtv' => 'beavis.mtv.cable.net.local'})
+    # dnsmasq calls spec.interfaces[0][:mac] which may fail, may not
+  end
 end

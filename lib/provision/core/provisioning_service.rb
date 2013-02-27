@@ -35,4 +35,10 @@ class Provision::Core::ProvisioningService
     @vm_service.define_vm(spec)
     @vm_service.start_vm(spec)
   end
+
+  def allocate_ip(spec_hash)
+    spec = Provision::Core::MachineSpec.new(spec_hash)
+    networking = @numbering_service.allocate_ips_for(spec)
+    @logger.info("Allocated #{networking} to #{spec}")
+  end
 end
