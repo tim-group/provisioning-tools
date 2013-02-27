@@ -27,6 +27,15 @@ describe Provision::WorkQueue do
     @workqueue.destroy_all([spec])
   end
 
+  it 'processes many allocate IP requests' do
+    mock_virsh = double()
+    @provisioning_service = double()
+    @workqueue = Provision::WorkQueue.new(:provisioning_service=>@provisioning_service,:worker_count=>1, :listener=>@listener, :virsh=>mock_virsh)
+    spec = {:hostname => "myvm1", :thread_number=>1}
+    @provisioning_service.should_receive(:allocate_ip).with(spec)
+    @workqueue.allocate_ip_all([spec])
+  end
+
   it 'processes work items' do
     @provisioning_service = double()
     @workqueue = Provision::WorkQueue.new(:provisioning_service=>@provisioning_service,:worker_count=>1, :listener=>@listener)

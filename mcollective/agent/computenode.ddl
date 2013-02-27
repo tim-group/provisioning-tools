@@ -13,3 +13,7 @@ end
 action "clean", :description => "" do
     display :always
 end
+
+action "allocate_ips", :description => "" do
+    display :always
+end

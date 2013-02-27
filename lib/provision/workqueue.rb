@@ -43,6 +43,14 @@ class Provision::WorkQueue
     process()
   end
 
+  def allocate_ip_all(specs)
+    raise "an array of machine specifications is expected" unless specs.kind_of?(Array)
+    specs.each do |spec|
+      allocate_ip(spec)
+    end
+    process()
+  end
+
   def launch(spec)
     @queue << SpecTask.new(spec) do
       @logger.info("Provisioning a VM")
@@ -55,6 +63,12 @@ class Provision::WorkQueue
       @queue << SpecTask.new(spec) do
         @provisioning_service.clean_vm(spec)
       end
+    end
+  end
+
+  def allocate_ip(spec)
+    @queue << SpecTask.new(spec) do
+      @provisioning_service.allocate_ip(spec)
     end
   end
 

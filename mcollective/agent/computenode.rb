@@ -41,6 +41,13 @@ module MCollective
         return listener.results
       end
 
+      def allocate_ips(specs, listener)
+        queue = prepare_work_queue(specs, listener)
+        logger.info("Allocating IP addresses for #{specs.size} nodes")
+        queue.allocate_ip_all(specs)
+        return listener.results
+      end
+
       def with_lock(&action)
         begin
           File.open(lockfile(), "w") do |f|
@@ -70,6 +77,11 @@ module MCollective
           specs = request[:specs]
           reply.data = clean(specs, new_listener())
         end
+      end
+
+      action "allocate_ips" do
+        specs = request[:specs]
+        reply.data = allocate_ips(specs, new_listener())
       end
     end
   end
