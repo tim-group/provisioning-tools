@@ -6,7 +6,7 @@ require 'provision'
 describe 'provisionvm', :mcollective => true do
 
   before do
-    agent_file = File.join([File.dirname(__FILE__)], '../../../mcollective/agent/lib/computenode.rb')
+    agent_file = File.join([File.dirname(__FILE__)], '../../mcollective/agent/computenode.rb')
     @agent = MCollective::Test::LocalAgentTest.new("computenode", :agent_file =>  agent_file).plugin
     @agent.config.pluginconf["provision.lockfile"] = "/tmp/provision.lock"
   end
