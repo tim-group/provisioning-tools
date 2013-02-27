@@ -8,23 +8,27 @@ require 'pp'
 
 module RSpec::Mocks::ArgumentMatchers
   module MachineSpecMatchers
-    class HasNetworkConfig
+    class HasSpecEntries
       def initialize(expected)
         @expected = expected
       end
 
       def ==(actual)
-        return true if actual[:networking] == @expected
-        raise "expecting networking :#{PP.pp(actual.spec[:networking], "")} to match #{PP.pp(@expected, "")}"
+        mismatches = []
+        @expected.keys.each do |key|
+          mismatches << "expected #{key} to be #{@expected[key].inspect} but it was #{actual[key].inspect}" unless actual[key] == @expected[key]
+        end
+        raise mismatches.join("\n") unless mismatches.empty?
+        return true
       end
 
       def description
-        "expecting networking to match #{@expected}"
+        "expecting spec to match #{@expected.inspect}"
       end
     end
 
-    def network_config(expected)
-      return HasNetworkConfig.new(expected)
+    def spec_with(expected)
+      return HasSpecEntries.new(expected)
     end
   end
 end
@@ -68,7 +72,7 @@ describe Provision::Core::ProvisioningService do
 
     @provisioning_service.should_receive(:clean_vm).with(:hostname => "vmx1", :template => "ubuntuprecise", :enc => {:classes => {}})
 
-    @image_service.should_receive(:build_image).with("ubuntuprecise", network_config(network_address)).ordered
+    @image_service.should_receive(:build_image).with("ubuntuprecise", spec_with(:networking => network_address)).ordered
     @vm_service.should_receive(:define_vm).ordered
     @vm_service.should_receive(:start_vm).ordered
     @provisioning_service.provision_vm(:hostname => "vmx1", :template => "ubuntuprecise")
