@@ -67,10 +67,14 @@ class Provision::Core::MachineSpec
     Logger.new("#{@log_dir}/#{fn}-#{@thread_number}.log")
   end
 
-  def interfaces()
+  def networks
+    return @spec[:networks]
+  end
+
+  def interfaces
     nics = []
     slot = 6
-    @spec[:networks].each {|net|
+    networks.each {|net|
       nics << {
         :slot => slot,
         :mac => mac("#{@spec[:hostname]}.#{@spec[:domain]}.#{net}"),
