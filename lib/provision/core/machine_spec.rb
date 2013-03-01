@@ -42,7 +42,7 @@ class Provision::Core::MachineSpec
     if_nil_define_var(:vnc_port, "-1")
     if_nil_define_var(:ram, "2097152")
 
-    if_nil_define_var(:networks, ["mgmt", "prod"])
+    if_nil_define_var(:networks, [:mgmt, :prod])
     if_nil_define_var(:aptproxy, 'aptproxy.net.local')
     if_nil_define_var(:routes, [])
   end

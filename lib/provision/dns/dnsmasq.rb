@@ -19,7 +19,11 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
   end
 
   def allocate_ip_for(spec)
-    mac = spec.interfaces[0][:mac]
+    interface = spec.interfaces.find do |interface|
+      interface[:network].to_sym == @name
+    end
+    mac = interface[:mac]
+
     all_hostnames = spec.all_hostnames_on(@name)
     hostname = all_hostnames[0]
     ip = nil

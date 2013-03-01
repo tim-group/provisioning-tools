@@ -65,8 +65,8 @@ class Provision::DNS
   def remove_ips_for(spec)
     remove_results = {}
 
-    @networks.each do |name, net|
-      remove_results[name] = net.remove_ip_for(spec)
+    spec.networks.each do |name|
+      remove_results[name] = @networks[name].remove_ip_for(spec)
     end
 
     return remove_results

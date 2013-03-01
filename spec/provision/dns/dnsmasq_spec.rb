@@ -32,6 +32,7 @@ describe Provision::DNS::DNSMasq do
       :pid_file => "#{dir}/var/run/dnsmasq.pid"
     )
     dnsmasq.add_network(:mgmt, "192.168.5.0/24", "192.168.5.1")
+    dnsmasq.add_network(:prod, "192.168.6.0/24", "192.168.6.1")
     return dnsmasq
   end
 
@@ -141,13 +142,16 @@ describe Provision::DNS::DNSMasq do
 
       thing.allocate_ips_for(spec)
 
-      sha1 = Digest::SHA1.new
-      bytes = sha1.digest("example.youdevise.com.mgmt"+Socket.gethostname)
-      mac = "52:54:00:%s" % bytes.unpack('H2x9H2x8H2').join(':')
-
-      File.open("#{dir}/etc/ethers", 'r') { |f| f.read.should eql("#{mac} 192.168.5.2\n") }
-      File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("\n192.168.5.2 example.mgmt.youdevise.com puppet.youdevise.com broker.youdevise.com\n") }
+      File.open("#{dir}/etc/ethers", 'r') { |f| f.read.should eql("#{mac_for("example.youdevise.com.mgmt")} 192.168.5.2\n#{mac_for("example.youdevise.com.prod")} 192.168.6.2\n") }
+      File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("\n192.168.5.2 example.mgmt.youdevise.com puppet.youdevise.com broker.youdevise.com\n192.168.6.2 example.youdevise.com\n") }
     }
+  end
+
+  def mac_for(hostname)
+    sha1 = Digest::SHA1.new
+    bytes = sha1.digest(hostname + Socket.gethostname)
+    mac = "52:54:00:%s" % bytes.unpack('H2x9H2x8H2').join(':')
+    mac
   end
 
   it 'removes entries from hosts and ethers file' do
@@ -183,6 +187,10 @@ describe Provision::DNS::DNSMasq do
         :mgmt => {
           :netmask => '255.255.255.0',
           :address => '192.168.5.2'
+        },
+        :prod => {
+          :netmask => '255.255.255.0',
+          :address => '192.168.6.2'
         }
       })
       thing.allocate_ips_for(spec2)
