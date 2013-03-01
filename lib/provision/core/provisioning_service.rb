@@ -41,4 +41,10 @@ class Provision::Core::ProvisioningService
     networking = @numbering_service.allocate_ips_for(spec)
     @logger.info("Allocated #{networking} to #{spec}")
   end
+
+  def free_ip(spec_hash)
+    spec = Provision::Core::MachineSpec.new(spec_hash)
+    @numbering_service.remove_ips_for(spec)
+    @logger.info("Freed IP address for #{spec}")
+  end
 end

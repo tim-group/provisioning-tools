@@ -51,6 +51,14 @@ class Provision::WorkQueue
     process()
   end
 
+  def free_ip_all(specs)
+    raise "an array of machine specifications is expected" unless specs.kind_of?(Array)
+    specs.each do |spec|
+      free_ip(spec)
+    end
+    process()
+  end
+
   def launch(spec)
     @queue << SpecTask.new(spec) do
       @logger.info("Provisioning a VM")
@@ -69,6 +77,12 @@ class Provision::WorkQueue
   def allocate_ip(spec)
     @queue << SpecTask.new(spec) do
       @provisioning_service.allocate_ip(spec)
+    end
+  end
+
+  def free_ip(spec)
+    @queue << SpecTask.new(spec) do
+      @provisioning_service.free_ip(spec)
     end
   end
 

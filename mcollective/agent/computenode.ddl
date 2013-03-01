@@ -17,3 +17,7 @@ end
 action "allocate_ips", :description => "" do
     display :always
 end
+
+action "free_ips", :description => "" do
+    display :always
+end
