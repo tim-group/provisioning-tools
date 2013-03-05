@@ -177,6 +177,7 @@ exec /sbin/getty -L ttyS0 115200 vt102
     apt_install "libstomp-ruby"
     apt_install "iptables"
     apt_install "telnet"
+    apt_install "postfix"
   }
 
   run("install kernel and grub") {
