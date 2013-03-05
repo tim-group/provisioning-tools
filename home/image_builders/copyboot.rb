@@ -76,6 +76,14 @@ netmask   #{config[:netmask]}
 auto #{nic[:network]}
 iface #{nic[:network]} inet manual
 "
+          open("#{spec[:temp_dir]}/etc/network/if-up.d/manual_up_#{nic[:network]}", 'w') { |fo|
+          fo.puts "
+#!/bin/bash
+if [\"${IFACE}\" == \"#{nic[:network]}\" ]; then
+ip link set dev #{nic[:network]} up
+fi
+"
+          }
         end
       end
     }
