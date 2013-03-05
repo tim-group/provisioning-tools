@@ -33,7 +33,7 @@ end
 desc "Build Gold Image"
 task :build_gold do
   sh "mkdir -p build/gold"
-  $: << File.join(File.dirname(__FILE__), "..", "lib")
+  $: << File.join(File.dirname(__FILE__), "./lib")
   require 'yaml'
   require 'provision'
   require 'pp'
