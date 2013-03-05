@@ -11,7 +11,7 @@ end
 
 class Provision::DNSNetwork
   attr_reader :logger
-  
+
   def initialize(name, subnet_string, start_ip, options)
     @name = name
     @subnet = IPAddr.new(subnet_string)
@@ -23,7 +23,7 @@ end
 
 class Provision::DNS
   attr_accessor :backend
-  
+
   def self.get_backend(name, options={})
     raise("get_backend not supplied a name, cannot continue.") if name.nil? or name == false
     require "provision/dns/#{name.downcase}"
@@ -66,7 +66,7 @@ class Provision::DNS
     remove_results = {}
 
     spec.networks.each do |name|
-      remove_results[name] = @networks[name].remove_ip_for(spec)
+      remove_results[name] = @networks[name.to_sym].remove_ip_for(spec)
     end
 
     return remove_results
