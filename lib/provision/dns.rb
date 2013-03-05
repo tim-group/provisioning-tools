@@ -12,12 +12,27 @@ end
 class Provision::DNSNetwork
   attr_reader :logger
 
-  def initialize(name, subnet_string, start_ip, options)
+  def initialize(name, range, options)
     @name = name
-    @subnet = IPAddr.new(subnet_string)
+    @subnet = IPAddr.new(range)
     @subnet.extend(IPAddrExtensions)
-    @start_ip = IPAddr.new(start_ip, Socket::AF_INET)
     @logger = options[:logger] || Logger.new(STDERR)
+
+    parts = range.split('/')
+    if parts.size != 2
+      raise(":network_range must be of the format X.X.X.X/Y")
+    end
+    broadcast_mask = (IPAddr::IN4MASK >> parts[1].to_i)
+    @subnet_mask = IPAddr.new(IPAddr::IN4MASK ^ broadcast_mask, Socket::AF_INET)
+    @network = IPAddr.new(parts[0]).mask(parts[1])
+    @broadcast = @network | IPAddr.new(broadcast_mask, Socket::AF_INET)
+
+    min_allocation = options[:min_allocation] ||  @network.to_i + 10
+    @min_allocation = IPAddr.new(min_allocation, Socket::AF_INET)
+
+    max_allocation = options[:max_allocation] || @broadcast.to_i - 1
+    @max_allocation = IPAddr.new(max_allocation, Socket::AF_INET)
+
   end
 end
 
@@ -38,9 +53,9 @@ class Provision::DNS
     @logger = options[:logger] || Logger.new(STDERR)
   end
 
-  def add_network(name, net, start)
+  def add_network(name, range, options)
     classname = "#{backend}Network"
-    @networks[name] = Provision::DNS.const_get(classname).new(name, net, start, @options)
+    @networks[name] = Provision::DNS.const_get(classname).new(name, range, options)
   end
 
   def allocate_ips_for(spec)

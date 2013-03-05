@@ -3,7 +3,9 @@ require 'provision/dns/dnsmasq'
 require 'tmpdir'
 require 'provision/core/machine_spec'
 
-class Provision::DNS::DNSMasq
+class Provision::DNS::DNSMasqNetwork
+  attr_reader :network, :broadcast, :min_allocation, :max_allocation
+
   def max_ip(network)
     @networks[network.to_sym].max_ip.to_s
   end
@@ -31,27 +33,34 @@ describe Provision::DNS::DNSMasq do
       :ethers_file => "#{dir}/etc/ethers",
       :pid_file => "#{dir}/var/run/dnsmasq.pid"
     )
-    dnsmasq.add_network(:mgmt, "192.168.5.0/24", "192.168.5.1")
-    dnsmasq.add_network(:prod, "192.168.6.0/24", "192.168.6.1")
+    dnsmasq.add_network(:mgmt, "192.168.5.0/24", :min_allocation => "192.168.5.1")
+    dnsmasq.add_network(:prod, "192.168.6.0/24", :min_allocation => "192.168.6.1")
     return dnsmasq
   end
 
-  it 'throws an appropriate error when nil options are passed to it' do
-    expect {
-      Provision::DNS::DNSMasqNetwork.new('foo', '192.168.0.0/5', '192.168.0.1', nil)
-    }.to raise_error "options must not be nil"
+  it 'will restrict ip allocations to min and max allocations' do
+    dns = Provision::DNS::DNSMasqNetwork.new('prod', '192.168.1.0/24',
+      :min_allocation => "192.168.1.99",
+      :max_allocation => "192.168.1.150"
+   )
+    dns.network.to_s.should eql('192.168.1.0')
+    dns.broadcast.to_s.should eql('192.168.1.255')
+    dns.min_allocation.to_s.should eql('192.168.1.99')
+    dns.max_allocation.to_s.should eql('192.168.1.150')
   end
 
   it 'throws an appropriate error when subnet is invalid' do
     expect {
-      Provision::DNS::DNSMasqNetwork.new('foo', 'biscuits', '192.168.0.1', {})
+      Provision::DNS::DNSMasqNetwork.new('foo', 'biscuits', {})
     }.to raise_exception(ArgumentError, 'invalid address')
   end
 
-  it 'throws an appropriate error when the start ip is invalid' do
-    expect {
-      Provision::DNS::DNSMasqNetwork.new('foo', '192.168.0.0/5', 'biscuits', {})
-    }.to raise_exception(ArgumentError, 'invalid address')
+  it 'will restrict ip allocations to min and max allocations' do
+    dns = Provision::DNS::DNSMasqNetwork.new('prod', '192.168.1.0/24')
+    dns.network.to_s.should eql('192.168.1.0')
+    dns.broadcast.to_s.should eql('192.168.1.255')
+    dns.min_allocation.to_s.should eql('192.168.1.10')
+    dns.max_allocation.to_s.should eql('192.168.1.254')
   end
 
   it 'constructs once' do

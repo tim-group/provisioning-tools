@@ -17,20 +17,13 @@ module Provision::DNS::DDNS::Exception
 end
 
 class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
-  def initialize(name, range, start, options={})
-    super(name, range, start, options)
+  def initialize(name, range, options={})
+    super(name, range, options)
     @debug = true
     parts = range.split('/')
     if parts.size != 2
       raise(":network_range must be of the format X.X.X.X/Y")
     end
-    broadcast_mask = (IPAddr::IN4MASK >> parts[1].to_i)
-    @subnet_mask = IPAddr.new(IPAddr::IN4MASK ^ broadcast_mask, Socket::AF_INET)
-    @network = IPAddr.new(parts[0]).mask(parts[1])
-    @broadcast = @network | IPAddr.new(broadcast_mask, Socket::AF_INET)
-    @max_allocation = IPAddr.new(@broadcast.to_i - 1, Socket::AF_INET)
-    min_allocation = options[:min_allocation] || 10
-    @min_allocation = IPAddr.new(min_allocation.to_i + @network.to_i, Socket::AF_INET)
     @rndc_key = options[:rndc_key] || raise("No :rndc_key supplied")
     @primary_nameserver = options[:primary_nameserver] || raise("must specify a primary_nameserver")
   end
