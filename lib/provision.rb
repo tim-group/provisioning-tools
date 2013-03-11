@@ -52,13 +52,13 @@ class Provision::Factory
 
     logger.info("Making networks for numbering service: #{@config[:networks].to_yaml}")
     @config[:networks].each do |name, net_config|
-      options = {}
+      my_options = options.clone
       ['min', 'max'].each do |type|
         if net_config["#{type}_allocation".to_s]
-          options["#{type}_allocation".to_s] = net_config["#{type}_allocation".to_s]
+          my_options["#{type}_allocation".to_s] = net_config["#{type}_allocation".to_s]
         end
       end
-      numbering_service.add_network(name, net_config[:net], options)
+      numbering_service.add_network(name, net_config[:net], my_options)
     end
 
     return numbering_service
