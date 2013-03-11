@@ -17,49 +17,31 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
     parse_hosts
   end
 
+  def lookup_ip_for(hostname)
+  end
+
+  def try_add_reverse_lookup(ip, hostname)
+  end
+
+  # This does nothing in this class
+  def add_forward_lookup(ip, hostname)
+  end
+
   def allocate_ip_for(spec)
+    ret = super(spec)
+
     interface = spec.interfaces.find do |interface|
       interface[:network].to_sym == @name
     end
     mac = interface[:mac]
-
-    all_hostnames = spec.all_hostnames_on(@name)
-    hostname = all_hostnames[0]
-    ip = nil
-    # Note that we re-parse the hosts file on every allocation
-    # to avoid multiple simultaneous allocators from being able
-    # to allocate the same IP
-    # FIXME - There is still a race condition here with other processes
-    parse_hosts
-
-    if @by_name[hostname]
-      puts "No new allocation for #{hostname}, already allocated to #{@by_name[hostname]}"
-      ip = @by_name[hostname]
-      return {
-        :address => ip.to_s,
-        :netmask => @subnet.subnet_mask
-      }
-    else
-      # FIXME - THERE IS NO CHECKING HERE - THIS WILL ALLOCATE THE BROADCAST ADDRESS...
-
-      @max_ip = IPAddr.new(@max_ip.to_i + 1, Socket::AF_INET)
-      puts "Allocated IP #{@max_ip} to host #{hostname}"
-      File.open(@hosts_file, 'a') { |f|
-        f.write "#{@max_ip.to_s} #{all_hostnames.join(" ")}\n"
-        f.chmod(0644)
-      }
-      File.open(@ethers_file, 'a') { |f|
-        f.write "#{mac} #{@max_ip.to_s}\n"
-        f.chmod(0644)
-      }
-
-      reload_dnsmasq
-
-      return {
-        :address => @max_ip.to_s,
-        :netmask => @subnet.subnet_mask
-      }
+    File.open(@ethers_file, 'a') do |f|
+      f.write "#{mac} #{ret[:address]}\n"
+      f.chmod(0644)
     end
+
+    reload_dnsmasq
+
+    return ret
   end
 
   def parse_hosts

@@ -5,18 +5,6 @@ require 'provision/core/machine_spec'
 
 class Provision::DNS::DNSMasqNetwork
   attr_reader :network, :broadcast, :min_allocation, :max_allocation
-
-  def max_ip(network)
-    @networks[network.to_sym].max_ip.to_s
-  end
-
-  def hosts_by_name(network)
-    @networks[network.to_sym].by_name
-  end
-
-  def reload(network)
-    @networks[network.to_sym].reload_dnsmasq
-  end
 end
 
 describe Provision::DNS::DNSMasq do
@@ -28,13 +16,10 @@ describe Provision::DNS::DNSMasq do
 
   def undertest(dir)
     dnsmasq = Provision::DNS.get_backend(
-      "DNSMasq",
-      :hosts_file => "#{dir}/etc/hosts",
-      :ethers_file => "#{dir}/etc/ethers",
-      :pid_file => "#{dir}/var/run/dnsmasq.pid"
+      "DNSMasq"
     )
-    dnsmasq.add_network(:mgmt, "192.168.5.0/24", :min_allocation => "192.168.5.1")
-    dnsmasq.add_network(:prod, "192.168.6.0/24", :min_allocation => "192.168.6.1")
+    dnsmasq.add_network(:mgmt, "192.168.5.0/24", :min_allocation => "192.168.5.1", :hosts_file => "#{dir}/etc/hosts", :ethers_file => "#{dir}/etc/ethers", :pid_file => "#{dir}/var/run/dnsmasq.pid")
+    dnsmasq.add_network(:prod, "192.168.6.0/24", :min_allocation => "192.168.6.1", :hosts_file =>"#{dir}/etc/hosts", :ethers_file => "#{dir}/etc/ethers", :pid_file => "#{dir}/var/run/dnsmasq.pid")
     return dnsmasq
   end
 
@@ -110,7 +95,7 @@ describe Provision::DNS::DNSMasq do
       new_thing_ip.to_s.should eql("192.168.5.2")
 
       new_thing.max_ip(:mgmt).should eql("192.168.5.3")
-      new_thing.hosts_by_name(:mgmt).should eql({
+      new_thing.by_name(:mgmt).should eql({
         "example.mgmt.youdevise.com" => "192.168.5.2",
         "example2.mgmt.youdevise.com" => "192.168.5.3",
       })
@@ -122,7 +107,7 @@ describe Provision::DNS::DNSMasq do
       mksubdirs(dir)
       File.open("#{dir}/etc/hosts", 'w') { |f| f.write "192.168.5.5\t    fnar fnar.example.com\n192.168.5.2   \t boo.example.com\tboo   \n# Example hosts file\n192.168.5.1 flib   \n" }
       thing = undertest(dir)
-      thing.hosts_by_name(:mgmt).should eql({
+      thing.by_name(:mgmt).should eql({
         "fnar" => "192.168.5.5",
         "fnar.example.com" => "192.168.5.5",
         "boo.example.com" => "192.168.5.2",

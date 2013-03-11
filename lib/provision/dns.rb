@@ -34,6 +34,68 @@ class Provision::DNSNetwork
     @max_allocation = IPAddr.new(max_allocation, Socket::AF_INET)
 
   end
+
+  def lookup_ip_for(fqdn)
+     resolver = Resolv::DNS.new(
+       :nameserver => get_primary_nameserver,
+       :search => [],
+       :ndots => 1
+     )
+
+     begin
+       IPAddr.new(resolver.getaddress(fqdn).to_s, Socket::AF_INET)
+     rescue Resolv::ResolvError
+       puts "Could not find #{fqdn}"
+       false
+     end
+  end
+
+  def hostname_from_spec(spec)
+     spec.hostname_on(@name)
+  end
+
+  def allocate_ip_for(spec)
+     hostname = hostname_from_spec spec
+     ip = nil
+
+     if lookup_ip_for(hostname)
+       puts "No new allocation for #{hostname}, already allocated"
+       return {
+         :netmask => @subnet_mask.to_s,
+         :address => lookup_ip_for(hostname)
+       }
+     else
+
+       max_ip = @max_allocation
+       ip = @min_allocation
+       while !try_add_reverse_lookup(ip, hostname)
+         ip = IPAddr.new(ip.to_i + 1, Socket::AF_INET)
+         if ip >= max_ip
+           raise("Ran out of ips")
+         end
+       end
+       add_forward_lookup(ip, hostname)
+     end
+     sleep 2 # Avoid race conditions with re-reading from a DNS slave which has not updated
+     {
+       :netmask => @subnet_mask.to_s,
+       :address => ip
+     }
+  end
+
+  def remove_ip_for(spec)
+     hostname = hostname_from_spec spec
+     ip = lookup_ip_for(hostname)
+     if ip
+       remove_forward_lookup(hostname)
+       remove_reverse_lookup ip
+     end
+
+     return {
+       :netmask => @subnet_mask.to_s,
+       :address => ip
+     }
+  end
 end
 
 class Provision::DNS
@@ -69,7 +131,7 @@ class Provision::DNS
       @logger.info("Trying to allocate IP for network #{network}")
       next unless @networks.has_key?(network)
       allocations[network] = @networks[network].allocate_ip_for(spec)
-      @logger.info("Allocated #{allocations[network].to_yaml}")
+      @logger.info("Allocated #{allocations[network][:address]}")
     end
 
     raise("No networks allocated for this machine, cannot be sane") if allocations.empty?
