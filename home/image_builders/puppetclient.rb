@@ -13,6 +13,7 @@ define "puppetclient" do
   templatedir                    = $confdir/templates
   pluginsync                     = true
   environment                    = masterbranch
+  configtimeout                  = 3000
 "
     }
   }
