@@ -1,0 +1,58 @@
+#!/usr/bin/env ruby
+
+$: << File.join(File.dirname(__FILE__), "..", "lib")
+
+require 'provision'
+
+class MySpec
+   def initialize(spec)
+     @spec = spec
+   end
+   def networks
+     @spec[:networks]
+   end
+   def [](name)
+     @spec[name]
+   end
+   def all_hostnames_on(network)
+     [hostname_on network]
+   end
+   def hostname_on(network)
+     if network == 'prod'
+       "#{@spec[:hostname]}.#{@spec[:domain]}"
+     else
+       "#{@spec[:hostname]}.#{network}.#{@spec[:domain]}"
+     end
+   end
+end
+
+class CLI
+  def initialize
+    f = Provision::Factory.new
+    @ns = f.numbering_service
+    @name = ARGV.shift
+    raise("No name given to allocate") unless @name
+  end
+
+  def get_spec
+    md = /(\w+)\.(?:(\w+)\.)?(\w\w)\.net\.local$/.match(@name)
+    if !md
+      raise("Cannot understand that name! Must be xxxx.yyy.zz.net.local")
+    end
+    puts md.to_a.inspect
+    network = md.to_a[2].nil? ? 'prod' : md.to_a[2]
+    MySpec.new(
+      :hostname => md.to_a[1],
+      :domain => "#{md.to_a[3]}.net.local",
+      :networks => ['mgmt', 'prod']
+    )
+  end
+
+  def run
+
+    puts @ns.allocate_ips_for(get_spec).to_yaml
+  end
+end
+
+CLI.new.run
+
