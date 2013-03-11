@@ -33,21 +33,7 @@ class Provision::DNSNetwork
     max_allocation = options[:max_allocation] || @broadcast.to_i - 1
     @max_allocation = IPAddr.new(max_allocation, Socket::AF_INET)
 
-  end
-
-  def lookup_ip_for(fqdn)
-     resolver = Resolv::DNS.new(
-       :nameserver => get_primary_nameserver,
-       :search => [],
-       :ndots => 1
-     )
-
-     begin
-       IPAddr.new(resolver.getaddress(fqdn).to_s, Socket::AF_INET)
-     rescue Resolv::ResolvError
-       puts "Could not find #{fqdn}"
-       false
-     end
+    @primary_nameserver = options[:primary_nameserver] || raise("must specify a primary_nameserver")
   end
 
   def hostname_from_spec(spec)
@@ -56,6 +42,7 @@ class Provision::DNSNetwork
 
   def allocate_ip_for(spec)
      hostname = hostname_from_spec spec
+     all_hostnames = spec.all_hostnames_on(@name)
      ip = nil
 
      if lookup_ip_for(hostname)
@@ -68,7 +55,7 @@ class Provision::DNSNetwork
 
        max_ip = @max_allocation
        ip = @min_allocation
-       while !try_add_reverse_lookup(ip, hostname)
+       while !try_add_reverse_lookup(ip, hostname, all_hostnames)
          ip = IPAddr.new(ip.to_i + 1, Socket::AF_INET)
          if ip >= max_ip
            raise("Ran out of ips")
@@ -76,10 +63,9 @@ class Provision::DNSNetwork
        end
        add_forward_lookup(ip, hostname)
      end
-     sleep 2 # Avoid race conditions with re-reading from a DNS slave which has not updated
      {
        :netmask => @subnet_mask.to_s,
-       :address => ip
+       :address => ip.to_s
      }
   end
 

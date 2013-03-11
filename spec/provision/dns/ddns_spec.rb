@@ -29,6 +29,7 @@ end
 describe Provision::DNS::DDNS do
   def get_spec
     spec = double()
+    spec.stub(:all_hostnames_on).and_return('st-testmachine-001.mgmt.st.net.local')
     spec.stub(:hostname_on).and_return('st-testmachine-001.mgmt.st.net.local')
     spec
   end

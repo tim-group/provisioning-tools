@@ -18,6 +18,9 @@ end
 
 class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
   def initialize(name, range, options={})
+    if !options[:primary_nameserver]
+      options[:primary_nameserver] = '127.0.0.1'
+    end
     super(name, range, options)
     @debug = true
     parts = range.split('/')
@@ -25,7 +28,25 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
       raise(":network_range must be of the format X.X.X.X/Y")
     end
     @rndc_key = options[:rndc_key] || raise("No :rndc_key supplied")
-    @primary_nameserver = options[:primary_nameserver] || raise("must specify a primary_nameserver")
+  end
+
+  def get_primary_nameserver
+    @primary_nameserver
+  end
+
+  def lookup_ip_for(fqdn)
+    resolver = Resolv::DNS.new(
+      :nameserver => get_primary_nameserver,
+      :search => [],
+      :ndots => 1
+    )
+
+    begin
+      IPAddr.new(resolver.getaddress(fqdn).to_s, Socket::AF_INET)
+    rescue Resolv::ResolvError
+      puts "Could not find #{fqdn}"
+      false
+    end
   end
 
   def reverse_zone
@@ -50,7 +71,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     return @primary_nameserver
   end
 
-  def try_add_reverse_lookup(ip, fqdn)
+  def try_add_reverse_lookup(ip, fqdn, all_hostnames)
     ip_rev = ip.to_s.split('.').reverse.join('.')
     tmp_file = Tempfile.new('remove_temp')
     tmp_file.puts "server #{get_primary_nameserver}"

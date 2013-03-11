@@ -6,10 +6,12 @@ class Provision::DNS::DNSMasq < Provision::DNS
 end
 
 class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
-  attr_reader :max_ip
   attr_reader :by_name
 
   def initialize(name, range, options={})
+    if !options[:primary_nameserver]
+      options[:primary_nameserver] = '127.0.0.1'
+    end
     super(name, range, options)
     @hosts_file = options[:hosts_file] || "/etc/hosts"
     @ethers_file = options[:ethers_file] || "/etc/ethers"
@@ -17,10 +19,16 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
     parse_hosts
   end
 
-  def lookup_ip_for(hostname)
+  def lookup_ip_for(fqdn)
+    @by_name[fqdn]
   end
 
-  def try_add_reverse_lookup(ip, hostname)
+  def try_add_reverse_lookup(ip, hostname, all_hostnames)
+    return if @by_ip[ip.to_s]
+    File.open(@hosts_file, 'a') { |f|
+      f.write "#{ip.to_s} #{all_hostnames.join(" ")}\n"
+      f.chmod(0644)
+    }
   end
 
   # This does nothing in this class
@@ -28,6 +36,7 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
   end
 
   def allocate_ip_for(spec)
+    parse_hosts
     ret = super(spec)
 
     interface = spec.interfaces.find do |interface|
@@ -46,8 +55,7 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
 
   def parse_hosts
     @by_name = {}
-    @max_ip = @start_ip
-
+    @by_ip = {}
     File.open(@hosts_file).each { |l|
       next if l =~ /^#/
         next if l =~ /^\s*$/
@@ -56,11 +64,9 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
       ip = splits[0]
       names = splits[1..-1]
       next unless @subnet.include?(ip)
-      if IPAddr.new(ip) > @max_ip
-        @max_ip = IPAddr.new(ip)
-      end
       names.each { |n|
         @by_name[n] = ip
+        @by_ip[ip] = n
       }
     }
   end
