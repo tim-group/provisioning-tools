@@ -192,6 +192,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
       end
       add_forward_lookup(ip, hostname)
     end
+    sleep 2 # Avoid race conditions with re-reading from a DNS slave which has not updated
     {
       :netmask => @subnet_mask.to_s,
       :address => ip
