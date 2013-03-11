@@ -19,7 +19,7 @@ describe Provision::WorkQueue do
 
   it 'processes many clean requests' do
     mock_virsh = double()
-    mock_virsh.stub(:is_active).and_return(true)
+    mock_virsh.stub(:is_defined).and_return(true)
     @provisioning_service = double()
     @workqueue = Provision::WorkQueue.new(:provisioning_service=>@provisioning_service,:worker_count=>1, :listener=>@listener, :virsh=>mock_virsh)
     spec = {:hostname => "myvm1", :thread_number=>1}
@@ -81,7 +81,7 @@ describe Provision::WorkQueue do
   it 'cleans up vms' do
     @provisioning_service = double()
     mock_virsh = double()
-    mock_virsh.stub(:is_active).and_return(true)
+    mock_virsh.stub(:is_defined).and_return(true)
     @workqueue = Provision::WorkQueue.new(:provisioning_service=>@provisioning_service,:worker_count=>1, :listener=>@listener, :virsh => mock_virsh)
     spec = {:hostname => "myvm1", :ram => "256Mb"}
     @provisioning_service.should_receive(:clean_vm).with(spec)
@@ -100,8 +100,8 @@ describe Provision::WorkQueue do
 
     spec = {:hostname => "myvm1", :thread_number => 0}
     spec2 = {:hostname => "myvm2", :thread_number => 0}
-    mock_virsh.stub(:is_active).with(spec).and_return(true)
-    mock_virsh.stub(:is_active).with(spec2).and_return(false)
+    mock_virsh.stub(:is_defined).with(spec).and_return(true)
+    mock_virsh.stub(:is_defined).with(spec2).and_return(false)
 
     @provisioning_service.should_receive(:clean_vm)
     @workqueue.destroy(spec)
