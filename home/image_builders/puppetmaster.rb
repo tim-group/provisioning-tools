@@ -8,8 +8,6 @@ define 'puppetmaster' do
   run('clone puppet') {
     cmd "rm -rf #{spec[:temp_dir]}/etc/puppet"
     cmd "git clone http://git.youdevise.com/git/puppet #{spec[:temp_dir]}/etc/puppet"
-    # FIXME Remove this once the code has been merged
-    cmd "cd #{spec[:temp_dir]}/etc/puppet && git checkout puppetmaster_apply"
   }
 
   run('deploy puppetmaster') {
