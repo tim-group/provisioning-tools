@@ -14,8 +14,9 @@ define 'puppetmaster' do
 
   run('deploy puppetmaster') {
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
-      f.puts '#!/bin/sh -e
-/usr/bin/puppet apply --pluginsync --modulepath=/etc/puppet/modules --logdest=syslog /etc/puppet/modules/puppetmaster/site.pp'
+      f.puts "#!/bin/sh -e
+/usr/bin/puppet apply --pluginsync --modulepath=/etc/puppet/modules --logdest=syslog /etc/puppet/modules/puppetmaster/site.pp
+echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local"
     }
   }
 end
