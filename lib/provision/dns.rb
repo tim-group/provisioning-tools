@@ -129,6 +129,12 @@ class Provision::DNS
     remove_results = {}
 
     spec.networks.each do |name|
+
+      if not @networks.has_key?(name.to_sym)
+        @logger.warn "can't allocate an address on #{name} because there is no config on the compute node. Known networks #{@networks.keys.inspect}"
+        next
+      end
+
       remove_results[name] = @networks[name.to_sym].remove_ip_for(spec)
     end
 

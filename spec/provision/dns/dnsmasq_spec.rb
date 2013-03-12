@@ -24,13 +24,36 @@ describe Provision::DNS::DNSMasq do
     Dir.mkdir("#{dir}/var/run")
   end
 
-  def undertest(dir)
+  def undertest(dir, options={})
     dnsmasq = Provision::DNS.get_backend(
-      "DNSMasq"
+      "DNSMasq", options
     )
     dnsmasq.add_network(:mgmt, "192.168.5.0/24", :min_allocation => "192.168.5.2", :hosts_file => "#{dir}/etc/hosts", :ethers_file => "#{dir}/etc/ethers", :pid_file => "#{dir}/var/run/dnsmasq.pid")
     dnsmasq.add_network(:prod, "192.168.6.0/24", :min_allocation => "192.168.6.2", :hosts_file =>"#{dir}/etc/hosts", :ethers_file => "#{dir}/etc/ethers", :pid_file => "#{dir}/var/run/dnsmasq.pid")
     return dnsmasq
+  end
+
+  it 'will raise exception when allocating address for non existing network' do
+    Dir.mktmpdir { |dir|
+      mksubdirs(dir)
+      File.open("#{dir}/etc/hosts", 'w') { |f| f.write "# Example hosts file\n127.0.0.1 localhost\n" }
+
+      mock_logger = double()
+      mock_logger.should_receive(:warn).with(/[:prod,:noexist]/)
+
+      thing = undertest(dir, :logger=>mock_logger)
+
+      thing.remove_ips_for(Provision::Core::MachineSpec.new(
+        :hostname => "example",
+        :domain => "youdevise.com",
+        :qualified_hostnames => {
+          :prod => 'example.youdevise.com',
+          :noexist => 'example.mgmt.youdevise.com'
+        },
+        :networks => [:prod,:noexist]
+      ))
+
+   }
   end
 
   it 'will restrict ip allocations to min and max allocations' do
