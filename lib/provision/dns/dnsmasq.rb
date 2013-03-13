@@ -23,6 +23,10 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
     @by_name[fqdn]
   end
 
+  # This does nothing in this class
+  def add_forward_lookup(ip, hostname)
+  end
+
   def try_add_reverse_lookup(ip, hostname, all_hostnames)
     parse_hosts
     return false if @by_ip[ip.to_s]
@@ -32,10 +36,6 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
     }
     reload_dnsmasq
     return true
-  end
-
-  # This does nothing in this class
-  def add_forward_lookup(ip, hostname)
   end
 
   def parse_hosts
@@ -56,28 +56,14 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
     }
   end
 
-  def remove_ip_for(spec)
-    ip = nil
-    parse_hosts
+  # This does nothing in this class
+  def remove_forward_lookup(fqdn)
+  end
 
-    hn = spec.hostname_on(@name)
-    if @by_name[hn]
-      ip = @by_name[hn]
-      puts "Removing ip allocation (#{ip}) for #{hn}"
-      hosts_removed = remove_lines_from_file(/^#{ip}.+$/, @hosts_file)
-      ethers_removed = remove_lines_from_file(/^.+#{ip}$/, @ethers_file)
-      hosts_removed > 0 || ethers_removed > 0 ? reload_dnsmasq : false
-      return {
-        :netmask => @subnet_mask.to_s,
-        :address => ip
-      }
-    else
-      puts "No ip allocation found for #{hn}, not removing"
-      return {
-        :netmask => @subnet_mask.to_s,
-        :address => nil
-      }
-    end
+  def remove_reverse_lookup(ip)
+    parse_hosts
+    hosts_removed = remove_lines_from_file(/^#{ip}.+$/, @hosts_file)
+    hosts_removed > 0 ? reload_dnsmasq : false
   end
 
   def reload_dnsmasq
