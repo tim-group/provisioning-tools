@@ -10,13 +10,19 @@ class Provision::Core::MachineSpec
   def initialize(spec)
     @thread_number = spec[:thread_number] || 0
     # FIXME: THIS IS A VALUE OBJECT DONT DO SHIT IN HERE - push it up to the factories
-    # FIXME - Should we detect if we're a git checkout or a built / installed gem and change
-    #         paths as appropriate?
     @build_dir = spec[:build_dir] || ENV['PROVISIONING_TOOLS_BUILD_DIR'] || "#{Provision.base()}/build"
     #puts "Allocated build dir of #{@build_dir} spec is #{spec[:build_dir]} ENV is #{ENV['PROVISIONING_TOOLS_BUILD_DIR']}"
     Dir.mkdir(@build_dir) if ! File.directory? @build_dir
-    @log_dir = spec[:log_dir] || "#{build_dir}/logs"
-    Dir.mkdir(@log_dir) if ! File.directory? @log_dir
+
+    default_log_dir = '/var/log/provisioning-tools'
+    if File.directory?(default_log_dir) and File.writable?(default_log_dir)
+      @log_dir = default_log_dir
+    else
+      @log_dir = '/tmp/provisioning-tools/log'
+      Dir.mkdir('/tmp/provisioning-tools') unless File.directory?('/tmp/provisioning-tools')
+      Dir.mkdir(@log_dir) unless File.directory?(@log_dir)
+    end
+
     @spec = spec
     apply_conventions()
   end
@@ -31,7 +37,7 @@ class Provision::Core::MachineSpec
     if_nil_define_var(:loop0, "loop#{@thread_number*2}")
     if_nil_define_var(:loop1, "loop#{@thread_number*2+1}")
 
-    if_nil_define_var(:console_log, "#{@build_dir}/logs/console-#{@thread_number}.log")
+    if_nil_define_var(:console_log, "#{@log_dir}/console-#{@thread_number}.log")
     if_nil_define_var(:temp_dir, "#{@build_dir}/#{@spec[:hostname]}")
 
     if (@spec.has_key?(:qualified_hostnames))
