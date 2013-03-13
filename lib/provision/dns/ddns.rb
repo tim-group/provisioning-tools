@@ -22,7 +22,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
       options[:primary_nameserver] = '127.0.0.1'
     end
     super(name, range, options)
-    @debug = true
+    @debug = false
     parts = range.split('/')
     if parts.size != 2
       raise(":network_range must be of the format X.X.X.X/Y")
@@ -112,7 +112,6 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     when /Communication with server failed: timed out/
       raise(Provision::DNS::DDNS::Exception::Timeout.new(failure))
     when /^$/
-      puts "ADD OK #{txt}"
       return true
     else
       raise(Provision::DNS::DDNS::Exception::UnknownError.new(failure))
