@@ -9,9 +9,11 @@ end
 
 class Provision::DNS::DNSMasq
   attr_reader :networks
+
   def reload(network)
     @networks[network.to_sym].reload_dnsmasq
   end
+
   def hosts_by_name(network)
     @networks[network.to_sym].by_name
   end
@@ -53,14 +55,14 @@ describe Provision::DNS::DNSMasq do
         :networks => [:prod,:noexist]
       ))
 
-   }
+    }
   end
 
   it 'will restrict ip allocations to min and max allocations' do
     dns = Provision::DNS::DNSMasqNetwork.new('prod', '192.168.1.0/24',
       :min_allocation => "192.168.1.99",
       :max_allocation => "192.168.1.150"
-   )
+    )
     dns.network.to_s.should eql('192.168.1.0')
     dns.broadcast.to_s.should eql('192.168.1.255')
     dns.min_allocation.to_s.should eql('192.168.1.99')
@@ -168,7 +170,6 @@ describe Provision::DNS::DNSMasq do
 
       thing.allocate_ips_for(spec)
 
-      File.open("#{dir}/etc/ethers", 'r') { |f| f.read.should eql("#{mac_for("example.youdevise.com.mgmt")} 192.168.5.2\n#{mac_for("example.youdevise.com.prod")} 192.168.6.2\n") }
       File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("\n192.168.5.2 example.mgmt.youdevise.com puppet.youdevise.com broker.youdevise.com\n192.168.6.2 example.youdevise.com\n") }
     }
   end

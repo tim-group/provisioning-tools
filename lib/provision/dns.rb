@@ -52,7 +52,6 @@ class Provision::DNSNetwork
          :address => lookup_ip_for(hostname)
        }
      else
-
        max_ip = @max_allocation
        ip = @min_allocation
        while !try_add_reverse_lookup(ip, hostname, all_hostnames)
@@ -63,7 +62,8 @@ class Provision::DNSNetwork
        end
        add_forward_lookup(ip, hostname)
      end
-     {
+
+     return {
        :netmask => @subnet_mask.to_s,
        :address => ip.to_s
      }

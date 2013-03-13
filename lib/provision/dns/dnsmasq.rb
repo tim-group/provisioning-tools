@@ -24,33 +24,18 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
   end
 
   def try_add_reverse_lookup(ip, hostname, all_hostnames)
-    return if @by_ip[ip.to_s]
+    parse_hosts
+    return false if @by_ip[ip.to_s]
     File.open(@hosts_file, 'a') { |f|
       f.write "#{ip.to_s} #{all_hostnames.join(" ")}\n"
       f.chmod(0644)
     }
+    reload_dnsmasq
+    return true
   end
 
   # This does nothing in this class
   def add_forward_lookup(ip, hostname)
-  end
-
-  def allocate_ip_for(spec)
-    parse_hosts
-    ret = super(spec)
-
-    interface = spec.interfaces.find do |interface|
-      interface[:network].to_sym == @name
-    end
-    mac = interface[:mac]
-    File.open(@ethers_file, 'a') do |f|
-      f.write "#{mac} #{ret[:address]}\n"
-      f.chmod(0644)
-    end
-
-    reload_dnsmasq
-
-    return ret
   end
 
   def parse_hosts
@@ -58,9 +43,9 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
     @by_ip = {}
     File.open(@hosts_file).each { |l|
       next if l =~ /^#/
-        next if l =~ /^\s*$/
-        next unless l =~ /^\d+\.\d+\.\d+\.\d+/
-        splits = l.split("\s")
+      next if l =~ /^\s*$/
+      next unless l =~ /^\d+\.\d+\.\d+\.\d+/
+      splits = l.split("\s")
       ip = splits[0]
       names = splits[1..-1]
       next unless @subnet.include?(ip)
@@ -79,9 +64,9 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
     if @by_name[hn]
       ip = @by_name[hn]
       puts "Removing ip allocation (#{ip}) for #{hn}"
-      hosts_removed = remove_lines_from_file(/^#{ip}.+$/,@hosts_file)
-      ethers_removed = remove_lines_from_file(/^.+#{ip}$/,@ethers_file)
-        hosts_removed > 0 || ethers_removed > 0 ?  reload_dnsmasq : false
+      hosts_removed = remove_lines_from_file(/^#{ip}.+$/, @hosts_file)
+      ethers_removed = remove_lines_from_file(/^.+#{ip}$/, @ethers_file)
+      hosts_removed > 0 || ethers_removed > 0 ? reload_dnsmasq : false
       return {
         :netmask => @subnet_mask.to_s,
         :address => ip
@@ -118,6 +103,7 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
     puts "#{found} lines removed from #{file}"
     return found
   end
+
   def reload_dnsmasq
     if (File.exists?(@dnsmasq_pid_file))
       pid = File.open(@dnsmasq_pid_file).first.to_i
