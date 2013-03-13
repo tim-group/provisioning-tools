@@ -7,6 +7,7 @@ require 'socket'
 
 class Provision::Core::MachineSpec
   attr_reader :thread_number, :build_dir, :log_dir, :spec
+
   def initialize(spec)
     @thread_number = spec[:thread_number] || 0
     # FIXME: THIS IS A VALUE OBJECT DONT DO SHIT IN HERE - push it up to the factories
@@ -25,6 +26,22 @@ class Provision::Core::MachineSpec
 
     @spec = spec
     apply_conventions()
+  end
+
+  def self.spec_for_name(fqdn)
+    _, hostname, network, fabric = /(\w+)\.(?:(\w+)\.)?(\w+)\.net\.local$/.match(fqdn).to_a
+    raise "the alleged FQDN '#{fqdn}' must look like <hostname>.[<network>.]<fabric>.net.local" unless _
+
+    network ||= 'prod'
+
+    new(
+      :hostname => hostname,
+      :domain => "#{fabric}.net.local",
+      :networks => [network.to_sym],
+      :qualified_hostnames => {
+        network.to_sym => fqdn
+      }
+    )
   end
 
   def apply_conventions()

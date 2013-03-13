@@ -13,19 +13,7 @@ class CLI
   end
 
   def get_spec
-    _, hostname, network, fabric = /(\w+)\.(?:(\w+)\.)?(\w+)\.net\.local$/.match(@name).to_a
-    raise("Cannot understand the name '#{@name}'! Must be xxxx.yyy.zz.net.local") unless _
-
-    network ||= 'prod'
-
-    Provision::Core::MachineSpec.new(
-      :hostname => hostname,
-      :domain => "#{fabric}.net.local",
-      :networks => [network.to_sym],
-      :qualified_hostnames => {
-        network.to_sym => @name
-      }
-    )
+    Provision::Core::MachineSpec.spec_for_name(@name)
   end
 
   def invoke(selector)
