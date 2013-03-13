@@ -30,8 +30,8 @@ describe Provision::DNS::DNSMasq do
     dnsmasq = Provision::DNS.get_backend(
       "DNSMasq", options
     )
-    dnsmasq.add_network(:mgmt, "192.168.5.0/24", :min_allocation => "192.168.5.2", :hosts_file => "#{dir}/etc/hosts", :ethers_file => "#{dir}/etc/ethers", :pid_file => "#{dir}/var/run/dnsmasq.pid")
-    dnsmasq.add_network(:prod, "192.168.6.0/24", :min_allocation => "192.168.6.2", :hosts_file =>"#{dir}/etc/hosts", :ethers_file => "#{dir}/etc/ethers", :pid_file => "#{dir}/var/run/dnsmasq.pid")
+    dnsmasq.add_network(:mgmt, "192.168.5.0/24", :min_allocation => "192.168.5.2", :hosts_file => "#{dir}/etc/hosts", :pid_file => "#{dir}/var/run/dnsmasq.pid")
+    dnsmasq.add_network(:prod, "192.168.6.0/24", :min_allocation => "192.168.6.2", :hosts_file =>"#{dir}/etc/hosts", :pid_file => "#{dir}/var/run/dnsmasq.pid")
     return dnsmasq
   end
 
@@ -152,7 +152,7 @@ describe Provision::DNS::DNSMasq do
     }
   end
 
-  it 'writes hosts and ethers out' do
+  it 'writes hosts out' do
     Dir.mktmpdir { |dir|
       mksubdirs(dir)
       File.open("#{dir}/etc/hosts", 'w') { |f| f.write "\n" }
@@ -174,18 +174,10 @@ describe Provision::DNS::DNSMasq do
     }
   end
 
-  def mac_for(hostname)
-    sha1 = Digest::SHA1.new
-    bytes = sha1.digest(hostname + Socket.gethostname)
-    mac = "52:54:00:%s" % bytes.unpack('H2x9H2x8H2').join(':')
-    mac
-  end
-
-  it 'removes entries from hosts and ethers file' do
+  it 'removes entries from hosts file' do
     Dir.mktmpdir { |dir|
       mksubdirs(dir)
       File.open("#{dir}/etc/hosts", 'w') { |f| f.write "" }
-      File.open("#{dir}/etc/ethers", 'w') { |f| f.write "" }
       thing = undertest(dir)
       spec1 = Provision::Core::MachineSpec.new(
         :hostname => "example",
@@ -224,7 +216,6 @@ describe Provision::DNS::DNSMasq do
       thing.remove_ips_for(spec1)[:mgmt].should eql({:netmask => '255.255.255.0', :address => '192.168.5.2'})
       thing.remove_ips_for(spec2)[:mgmt].should eql({:netmask => '255.255.255.0', :address => '192.168.5.3'})
 
-      File.open("#{dir}/etc/ethers", 'r') { |f| f.read.should eql("") }
       File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("") }
     }
   end
@@ -252,12 +243,12 @@ describe Provision::DNS::DNSMasq do
         end
       end
 
-      process_running(pid).should eql true
+      process_running(pid).should eql(true)
       File.open("#{dir}/var/run/dnsmasq.pid", 'w') { |f| f.write "#{pid}\n" }
       thing = undertest(dir)
       thing.reload(:mgmt)
       Process.waitpid(pid)
-      process_running(pid).should eql false
+      process_running(pid).should eql(false)
     }
 
   end
@@ -266,7 +257,6 @@ describe Provision::DNS::DNSMasq do
     Dir.mktmpdir { |dir|
       mksubdirs(dir)
       File.open("#{dir}/etc/hosts", 'w') { |f| f.write "" }
-      File.open("#{dir}/etc/ethers", 'w') { |f| f.write "" }
 
       thing = undertest(dir)
       spec1 = Provision::Core::MachineSpec.new(
@@ -278,7 +268,6 @@ describe Provision::DNS::DNSMasq do
 
       expect { thing.allocate_ips_for(spec1) }.to raise_exception(Exception, "No networks allocated for this machine, cannot be sane")
 
-      File.open("#{dir}/etc/ethers", 'r') { |f| f.read.should eql("") }
       File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("") }
     }
   end

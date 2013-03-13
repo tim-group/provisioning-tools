@@ -14,7 +14,6 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
     end
     super(name, range, options)
     @hosts_file = options[:hosts_file] || "/etc/hosts"
-    @ethers_file = options[:ethers_file] || "/etc/ethers"
     @dnsmasq_pid_file = options[:pid_file] || "/var/run/dnsmasq.pid"
     parse_hosts
   end
