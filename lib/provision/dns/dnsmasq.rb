@@ -82,10 +82,16 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
       hosts_removed = remove_lines_from_file(/^#{ip}.+$/,@hosts_file)
       ethers_removed = remove_lines_from_file(/^.+#{ip}$/,@ethers_file)
         hosts_removed > 0 || ethers_removed > 0 ?  reload_dnsmasq : false
-      return true
+      return {
+        :netmask => @subnet_mask.to_s,
+        :address => ip
+      }
     else
       puts "No ip allocation found for #{hn}, not removing"
-      return false
+      return {
+        :netmask => @subnet_mask.to_s,
+        :address => nil
+      }
     end
   end
 

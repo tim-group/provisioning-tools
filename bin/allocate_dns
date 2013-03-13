@@ -4,31 +4,6 @@ $: << File.join(File.dirname(__FILE__), "..", "lib")
 
 require 'provision'
 
-class MySpec
-   def initialize(spec)
-     @spec = spec
-   end
-   def network
-     networks[0]
-   end
-   def networks
-     @spec[:networks]
-   end
-   def [](name)
-     @spec[name]
-   end
-   def all_hostnames_on(network)
-     [hostname_on network]
-   end
-   def hostname_on(network)
-     if network == 'prod'
-       "#{@spec[:hostname]}.#{@spec[:domain]}"
-     else
-       "#{@spec[:hostname]}.#{network}.#{@spec[:domain]}"
-     end
-   end
-end
-
 class CLI
   def initialize
     f = Provision::Factory.new
@@ -42,23 +17,28 @@ class CLI
     if !md
       raise("Cannot understand that name! Must be xxxx.yyy.zz.net.local")
     end
+    hostname = md.to_a[1]
     network = md.to_a[2].nil? ? 'prod' : md.to_a[2]
-    MySpec.new(
-      :hostname => md.to_a[1],
-      :domain => "#{md.to_a[3]}.net.local",
-      :networks => [network]
-    )
+    fabric = md.to_a[3]
+
+    Provision::Core::MachineSpec.new(
+      :hostname => hostname,
+      :domain => "#{fabric}.net.local",
+      :networks => [network.to_sym],
+      :qualified_hostnames => {
+        network.to_sym => @name
+    })
   end
 
   def allocate 
     s = get_spec
-    puts @ns.allocate_ips_for(s)[s.network.to_sym][:address].to_s
+    puts @ns.allocate_ips_for(s)[s.networks[0].to_sym][:address].to_s
   end
 
   def deallocate
     s = get_spec
     res = @ns.remove_ips_for(s)
-    if res[s.network.to_sym] && res[s.network.to_sym][:address]
+    if res[s.networks[0].to_sym] && res[s.networks[0].to_sym][:address]
       puts "Removed"
     else
       puts "Did not exist"
@@ -72,4 +52,3 @@ if File.basename($0) == 'allocate_dns'
 else
   c.deallocate
 end
-

@@ -220,8 +220,8 @@ describe Provision::DNS::DNSMasq do
         }
       })
       thing.allocate_ips_for(spec2)
-      thing.remove_ips_for(spec1)[:mgmt].should eql true
-      thing.remove_ips_for(spec2)[:mgmt].should eql true
+      thing.remove_ips_for(spec1)[:mgmt].should eql({:netmask => '255.255.255.0', :address => '192.168.5.2'})
+      thing.remove_ips_for(spec2)[:mgmt].should eql({:netmask => '255.255.255.0', :address => '192.168.5.3'})
 
       File.open("#{dir}/etc/ethers", 'r') { |f| f.read.should eql("") }
       File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("") }
