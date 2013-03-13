@@ -22,15 +22,14 @@ class NoopListener
     @logger.info("#{spec[:hostname]} [passed]")
   end
 
-  def error(e,spec)
-    @results[spec[:hostname]] = "failed"
-    @errors=@errors+1
+  def error(e, spec)
+    @results[spec[:hostname]] = "failed: #{e.to_s}"
+    @errors = @errors + 1
     @logger.warn("#{spec[:hostname]} [failed] - #{e}")
     @logger.warn(e.backtrace)
   end
 
   def has_errors?
-    return @errors>0
+    return @errors > 0
   end
 end
-
