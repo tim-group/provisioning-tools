@@ -229,10 +229,12 @@ puts "KERNEL FOUND IS #{kernel_version} ****************"
     apt_download "puppet"
   }
 
-  # This will get overridden by the local logcollector when puppet runs, but that's fine.
-  # In the meantime, we throw syslogd at a CNAME whilst we bootstrap
-  open("#{spec[:temp_dir]}/etc/rsyslog.d/00-logcollector.conf", 'w') { |f|
-    f.puts '*.* @logs'
+  run("Fix up remote logging") {
+    # This will get overridden by the local logcollector when puppet runs, but that's fine.
+    # In the meantime, we throw syslogd at a CNAME whilst we bootstrap
+    open("#{spec[:temp_dir]}/etc/rsyslog.d/00-logcollector.conf", 'w') { |f|
+      f.puts '*.* @logs'
+    }
   }
 end
 
