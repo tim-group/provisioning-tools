@@ -1,1 +1,39 @@
-allocate_dns
+#!/usr/bin/env ruby
+
+$: << File.join(File.dirname(__FILE__), "..", "lib")
+
+require 'provision'
+
+class CLI
+  def initialize
+    f = Provision::Factory.new
+    @ns = f.numbering_service
+    @name = ARGV.shift
+    raise("No name given to allocate") unless @name
+  end
+
+  def get_spec
+    md = /(\w+)\.(?:(\w+)\.)?(\w+)\.net\.local$/.match(@name)
+    if !md
+      raise("Cannot understand that name! Must be xxxx.yyy.zz.net.local")
+    end
+    hostname = md.to_a[1]
+    fabric = md.to_a[3]
+
+    Provision::Core::MachineSpec.new(
+      :hostname => hostname,
+      :domain => "#{fabric}.net.local",
+      :networks => ['mgmt', 'prod'],
+      :qualified_hostnames => {
+        :prod => "#{hostname}.#{fabric}.net.local",
+        :mgmt => "#{hostname}.mgmt.#{fabric}.net.local"
+      }
+    )
+  end
+
+  def run
+    puts @ns.allocate_ips_for(get_spec).to_yaml
+  end
+end
+
+CLI.new.run

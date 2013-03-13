@@ -38,7 +38,7 @@ class CLI
   end
 
   def get_spec
-    md = /(\w+)\.(?:(\w+)\.)?(\w\w)\.net\.local$/.match(@name)
+    md = /(\w+)\.(?:(\w+)\.)?(\w+)\.net\.local$/.match(@name)
     if !md
       raise("Cannot understand that name! Must be xxxx.yyy.zz.net.local")
     end
