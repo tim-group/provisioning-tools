@@ -28,26 +28,25 @@ class CLI
     )
   end
 
-  def allocate
+  def invoke(selector)
     s = get_spec
-    res = @ns.allocate_ips_for(s)
-    puts res[s.networks[0].to_sym][:address].to_s
+    res = @ns.send(selector, s)
+    network = s.networks[0].to_sym
+    res.fetch(network, {})[:address] || "<did not exist>"
+  end
+  
+  def allocate
+    invoke(:allocate_ips_for)
   end
 
   def deallocate
-    s = get_spec
-    res = @ns.remove_ips_for(s)
-    if res[s.networks[0].to_sym] && res[s.networks[0].to_sym][:address]
-      puts "Removed"
-    else
-      puts "Did not exist"
-    end
+    invoke(:remove_ips_for)
   end
 end
 
 c = CLI.new
 if File.basename($0) == 'allocate_dns'
-  c.allocate
+  puts c.allocate
 else
-  c.deallocate
+  puts c.deallocate
 end
