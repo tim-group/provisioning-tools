@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 
 $: << File.join(File.dirname(__FILE__), "..", "lib")
 
@@ -13,13 +13,10 @@ class CLI
   end
 
   def get_spec
-    md = /(\w+)\.(?:(\w+)\.)?(\w+)\.net\.local$/.match(@name)
-    if !md
-      raise("Cannot understand that name! Must be xxxx.yyy.zz.net.local")
-    end
-    hostname = md.to_a[1]
-    network = md.to_a[2].nil? ? 'prod' : md.to_a[2]
-    fabric = md.to_a[3]
+    _, hostname, network, fabric = /(\w+)\.(?:(\w+)\.)?(\w+)\.net\.local$/.match(@name).to_a
+    raise("Cannot understand the name '#{@name}'! Must be xxxx.yyy.zz.net.local") unless _
+
+    network ||= 'prod'
 
     Provision::Core::MachineSpec.new(
       :hostname => hostname,
@@ -27,12 +24,14 @@ class CLI
       :networks => [network.to_sym],
       :qualified_hostnames => {
         network.to_sym => @name
-    })
+      }
+    )
   end
 
-  def allocate 
+  def allocate
     s = get_spec
-    puts @ns.allocate_ips_for(s)[s.networks[0].to_sym][:address].to_s
+    res = @ns.allocate_ips_for(s)
+    puts res[s.networks[0].to_sym][:address].to_s
   end
 
   def deallocate
