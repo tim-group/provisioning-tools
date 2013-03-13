@@ -50,7 +50,6 @@ class Provision::Factory
     options[:logger] = @logger
     numbering_service = Provision::DNS.get_backend(@config[:dns_backend], options)
 
-    logger.info("Making networks for numbering service: #{@config[:networks].to_yaml}")
     @config[:networks].each do |name, net_config|
       my_options = options.clone
       ['min', 'max'].each do |type|
