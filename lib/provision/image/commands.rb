@@ -4,8 +4,18 @@ module Provision::Image::Commands
 
   def cmd(cmd, log_file=console_log)
     log.debug("running command #{cmd}")
-    if ! system("#{cmd}  >> #{log_file} 2>&1")
-      raise Exception.new("command #{cmd} returned non-zero error code")
+
+    IO.popen("#{cmd} 2>&1", "w+") do |pipe|
+      # open in write mode and then close the output stream so that the subprocess doesn't capture our STDIN
+      pipe.close_write
+      pipe.each_line do |line|
+        log.debug("> " + line.chomp)
+      end
+    end
+
+    exit_status = $?
+    if exit_status != 0
+      raise "command #{cmd} returned non-zero error code #{exit_status}"
     end
   end
 
