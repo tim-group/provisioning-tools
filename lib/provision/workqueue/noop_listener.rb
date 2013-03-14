@@ -12,6 +12,7 @@ class NoopListener
   end
 
   def initialize(options={})
+    @errors = 0
     @results = {}
     @logger = options[:logger] || InternalLogger.new
   end
@@ -23,7 +24,12 @@ class NoopListener
 
   def error(e, spec)
     @results[spec[:hostname]] = "failed: #{e.to_s}"
+    @errors = @errors + 1
     @logger.warn("#{spec[:hostname]} [failed] - #{e}")
     @logger.warn(e.backtrace)
+  end
+
+  def has_errors?
+    return @errors > 0
   end
 end
