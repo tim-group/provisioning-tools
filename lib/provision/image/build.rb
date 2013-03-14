@@ -104,16 +104,6 @@ class CatchAndIgnore
     return "#{spec[:console_log]}.suppressed"
   end
 
-#  def cmd(cmd)
- #    begin
-  #    return @build.cmd(cmd,console_log)
-   # rescue Exception=>e
-#      cleanup_log.error("error sending #{name}")
-#3      cleanup_log.error(e)
-#      return nil
-#    end
-# end
-
   def method_missing(name,*args,&block)
     begin
       result = @build.send name, *args, &block
