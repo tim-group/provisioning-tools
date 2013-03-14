@@ -14,10 +14,6 @@ class Provision::Image::Build
     @supress_error = CatchAndIgnore.new(self)
   end
 
-  def console_log()
-    return spec[:console_log] || "console.log"
-  end
-
   def run(txt, &block)
     @commands << {:txt=>txt, :block=>block}
   end
@@ -98,10 +94,6 @@ class CatchAndIgnore
   attr_accessor :build
   def initialize(build)
     @build = build
-  end
-
-  def console_log()
-    return "#{spec[:console_log]}.suppressed"
   end
 
   def method_missing(name,*args,&block)

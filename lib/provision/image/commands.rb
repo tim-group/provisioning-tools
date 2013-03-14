@@ -2,7 +2,7 @@ require 'util/symbol_utils'
 
 module Provision::Image::Commands
 
-  def cmd(cmd, log_file=console_log)
+  def cmd(cmd)
     log.debug("running command #{cmd}")
 
     IO.popen("#{cmd} 2>&1", "w+") do |pipe|

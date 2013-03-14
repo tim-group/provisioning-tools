@@ -54,7 +54,6 @@ class Provision::Core::MachineSpec
     if_nil_define_var(:loop0, "loop#{@thread_number*2}")
     if_nil_define_var(:loop1, "loop#{@thread_number*2+1}")
 
-    if_nil_define_var(:console_log, "#{@log_dir}/console-#{@thread_number}.log")
     if_nil_define_var(:temp_dir, "#{@build_dir}/#{@spec[:hostname]}")
 
     if (@spec.has_key?(:qualified_hostnames))
