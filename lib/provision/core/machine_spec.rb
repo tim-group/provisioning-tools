@@ -4,6 +4,7 @@ require 'provision/core/machine_spec'
 require 'logger'
 require 'digest/sha1'
 require 'socket'
+require 'tmpdir'
 
 class Provision::Core::MachineSpec
   attr_reader :thread_number, :build_dir, :log_dir, :spec
@@ -11,7 +12,7 @@ class Provision::Core::MachineSpec
   def initialize(spec)
     @thread_number = spec[:thread_number] || 0
     # FIXME: THIS IS A VALUE OBJECT DONT DO SHIT IN HERE - push it up to the factories
-    @build_dir = spec[:build_dir] || ENV['PROVISIONING_TOOLS_BUILD_DIR'] || "#{Provision.base()}/build"
+    @build_dir = spec[:build_dir] || ENV['PROVISIONING_TOOLS_BUILD_DIR'] || Dir.mktmpdir
     #puts "Allocated build dir of #{@build_dir} spec is #{spec[:build_dir]} ENV is #{ENV['PROVISIONING_TOOLS_BUILD_DIR']}"
     Dir.mkdir(@build_dir) if ! File.directory? @build_dir
 
