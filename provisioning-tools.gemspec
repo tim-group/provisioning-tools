@@ -19,5 +19,6 @@ Gem::Specification.new do |s|
     'templates/**/*',
     '[A-Z]*',
     'test/**/*'].to_a
+  s.executables << 'dns', 'gold', 'provision'
 end
 
