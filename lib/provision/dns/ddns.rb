@@ -51,7 +51,9 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
 
   def reverse_zone
     parts = @network.to_s.split('.').reverse
-    while parts[0] == "0"
+    smparts = @subnet_mask.to_s.split('.').reverse
+    while smparts[0].to_i < 255
+      smparts.shift
       parts.shift
     end
     "#{parts.join('.')}.in-addr.arpa"
