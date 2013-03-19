@@ -170,7 +170,7 @@ describe Provision::DNS::DNSMasq do
 
       thing.allocate_ips_for(spec)
 
-      File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("\n192.168.5.2 example.mgmt.youdevise.com puppet.youdevise.com broker.youdevise.com\n192.168.6.2 example.youdevise.com\n") }
+      File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("\n192.168.5.2 example.mgmt.youdevise.com puppet.mgmt.youdevise.com broker.mgmt.youdevise.com\n192.168.6.2 example.youdevise.com\n") }
     }
   end
 

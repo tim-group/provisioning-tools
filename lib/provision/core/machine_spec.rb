@@ -116,7 +116,7 @@ class Provision::Core::MachineSpec
     hostnames = [hostname_on(network)]
     # the way we do aliases is pretty feeble; these should be per-interface
     if (network == :mgmt and !@spec[:aliases].nil?)
-      hostnames << @spec[:aliases].collect {|a| a + '.' + @spec[:domain] }
+      hostnames << @spec[:aliases].collect { |a| "#{a}.#{network.to_s}.#{@spec[:domain]}" }
     end
     return hostnames
   end
