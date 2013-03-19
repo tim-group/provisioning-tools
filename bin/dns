@@ -14,7 +14,7 @@ actions = {
 
 action, fqdn = ARGV
 selector = actions[action]
-raise "unknown action: #{action}" unless selector
+raise "unknown action: '#{action}', not one of: #{actions.keys.join(', ')}" unless selector
 raise "no name given to allocate" unless fqdn
 
 spec = Provision::Core::MachineSpec.spec_for_name(fqdn)
