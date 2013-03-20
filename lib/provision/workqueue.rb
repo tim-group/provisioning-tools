@@ -8,6 +8,7 @@ require 'provision/vm/virsh'
 class Provision::WorkQueue
   class SpecTask
     attr_reader :spec
+
     def initialize(spec, &block)
       @spec = spec
       @block = block
@@ -101,7 +102,7 @@ class Provision::WorkQueue
             task.execute()
           rescue Exception => e
             print e.backtrace
-            @listener.error(e, task.spec)
+            @listener.error(task.spec, e)
             error = e
           ensure
             @listener.passed(task.spec) if error.nil?
@@ -109,6 +110,6 @@ class Provision::WorkQueue
         end
       }
     }
-    threads.each {|thread| thread.join()}
+    threads.each { |thread| thread.join() }
   end
 end
