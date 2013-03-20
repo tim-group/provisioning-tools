@@ -25,7 +25,7 @@ define "shrink" do
 
   cleanup {
     keep_doing {
-      supress_error.cmd "kpartx -d /dev/#{spec[:loop0]}"
+      suppress_error.cmd "kpartx -d /dev/#{spec[:loop0]}"
     }.until {`dmsetup ls | grep #{spec[:loop0]}p1 | wc -l`.chomp == "0"}
 
     cmd "losetup -d /dev/#{spec[:loop0]}"

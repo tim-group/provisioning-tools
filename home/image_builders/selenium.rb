@@ -23,7 +23,7 @@ define "selenium" do
     }
 
     chroot "curl -Ss https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -"
-    supress_error.chroot "apt-get update"
+    suppress_error.chroot "apt-get update"
   }
 
   run("place the selenium node config") {

@@ -9,25 +9,25 @@ define "ubuntuprecise" do
     cmd "kvm-img create -fraw #{spec[:image_path]} 3G"
     cmd "losetup /dev/#{spec[:loop0]} #{spec[:image_path]}"
     cmd "parted -sm /dev/#{spec[:loop0]} mklabel msdos"
-    supress_error.cmd "parted -sm /dev/#{spec[:loop0]} mkpart primary ext3 1 100%"
+    suppress_error.cmd "parted -sm /dev/#{spec[:loop0]} mkpart primary ext3 1 100%"
     cmd "kpartx -a -v /dev/#{spec[:loop0]}"
     cmd "mkfs.ext4 /dev/mapper/#{spec[:loop0]}p1"
   }
 
   cleanup {
     keep_doing {
-    supress_error.cmd "kpartx -d /dev/#{spec[:loop0]}"
+    suppress_error.cmd "kpartx -d /dev/#{spec[:loop0]}"
   }.until {`dmsetup ls | grep #{spec[:loop0]}p1 | wc -l`.chomp == "0"}
 
   cmd "udevadm settle"
 
   keep_doing {
-    supress_error.cmd "losetup -d /dev/#{spec[:loop0]}"
+    suppress_error.cmd "losetup -d /dev/#{spec[:loop0]}"
   }.until {`losetup -a | grep /dev/#{spec[:loop0]} | wc -l`.chomp == "0"}
 
   keep_doing {
-    supress_error.cmd "umount #{spec[:temp_dir]}"
-    supress_error.cmd "rmdir #{spec[:temp_dir]}"
+    suppress_error.cmd "umount #{spec[:temp_dir]}"
+    suppress_error.cmd "rmdir #{spec[:temp_dir]}"
   }.until {`ls -d  #{spec[:temp_dir]} 2> /dev/null | wc -l`.chomp == "0"}
 
   cmd "udevadm settle"
@@ -41,8 +41,8 @@ define "ubuntuprecise" do
 
   cleanup {
     keep_doing {
-      supress_error.cmd "umount -d /dev/#{spec[:loop1]}"
-      supress_error.cmd "losetup -d /dev/#{spec[:loop1]}"
+      suppress_error.cmd "umount -d /dev/#{spec[:loop1]}"
+      suppress_error.cmd "losetup -d /dev/#{spec[:loop1]}"
     }.until {
       `losetup -a | grep /dev/#{spec[:loop1]} | wc -l`.chomp == "0"
     }
@@ -63,15 +63,15 @@ define "ubuntuprecise" do
     log.debug("cleaning up procs")
     log.debug(`mount -l | grep #{spec[:hostname]}/proc | wc -l`.chomp)
     keep_doing {
-      supress_error.cmd "umount -l #{spec[:temp_dir]}/proc"
+      suppress_error.cmd "umount -l #{spec[:temp_dir]}/proc"
     }.until {`mount -l | grep #{spec[:hostname]}/proc | wc -l`.chomp == "0"}
 
     keep_doing {
-      supress_error.cmd "umount -l #{spec[:temp_dir]}/sys"
+      suppress_error.cmd "umount -l #{spec[:temp_dir]}/sys"
     }.until {`mount -l | grep #{spec[:hostname]}/sys | wc -l`.chomp == "0"}
 
     keep_doing {
-      supress_error.cmd "umount -l #{spec[:temp_dir]}/dev"
+      suppress_error.cmd "umount -l #{spec[:temp_dir]}/dev"
     }.until {`mount -l | grep #{spec[:hostname]}/dev | wc -l`.chomp == "0"}
   }
 

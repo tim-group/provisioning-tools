@@ -18,7 +18,7 @@ define "copyboot" do
 
   cleanup {
     cmd "umount #{spec[:temp_dir]}"
-    supress_error.cmd "rmdir #{spec[:temp_dir]}"
+    suppress_error.cmd "rmdir #{spec[:temp_dir]}"
   }
 
   run("set hostname") {

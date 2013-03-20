@@ -116,7 +116,7 @@ describe XYZ do
     define "vanillavm" do
       extend MockFunctions
       run("do stuff") {
-        supress_error.die("6")
+        suppress_error.die("6")
         action("5")
       }
     end
@@ -202,13 +202,13 @@ describe XYZ do
 
   end
 
-  it 'passes through the result when using supress_error' do
+  it 'passes through the result when using suppress_error' do
     require 'provision/image/catalogue'
     something = nil
     define "defaults" do
       extend MockFunctions
       run("configure defaults") {
-        something = supress_error.returns_something()
+        something = suppress_error.returns_something()
       }
     end
 
@@ -227,7 +227,7 @@ describe XYZ do
       }
       cleanup {
         keep_doing {
-        supress_error.die("this line should throw an error and be swallowed")
+        suppress_error.die("this line should throw an error and be swallowed")
         something = returns_something()
         print "something = #{something} \n"
       }.until {something=="something"}

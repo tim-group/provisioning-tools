@@ -4,23 +4,23 @@ require 'provision/log'
 class Provision::Image::Build
   include Provision::Log
   attr_accessor :spec
-  attr_accessor :supress_error
+  attr_accessor :suppress_error
 
   def initialize(name, spec)
     @name = name
     @spec = spec
     @commands = []
     @cleanups = []
-    @supress_error = CatchAndIgnore.new(self)
+    @suppress_error = CatchAndIgnore.new(self)
   end
 
   def run(txt, &block)
-    @commands << {:txt=>txt, :block=>block}
+    @commands << {:txt => txt, :block => block}
   end
 
   def cleanup(&block)
-    @cleanups <<  lambda {
-      supress_error.instance_eval(&block)
+    @cleanups << lambda {
+      suppress_error.instance_eval(&block)
     }
   end
 
@@ -28,7 +28,7 @@ class Provision::Image::Build
     call_define(method, self)
   end
 
-  def method_missing(name,*args,&block)
+  def method_missing(name, *args, &block)
     call(name.to_s())
   end
 
@@ -38,46 +38,45 @@ class Provision::Image::Build
     trap("SIGINT") { throw :ctrl_c }
 
     begin
-      @commands.each {|command|
+      @commands.each do |command|
         txt = command[:txt]
-        padding =  position - txt.length
+        padding = position - txt.length
         summary_log.info "#{txt}"
         start = Time.new
 
         begin
           command[:block].call()
-        rescue Exception=>e
+        rescue Exception => e
           error = e
           raise e
         ensure
-          if (not error.nil?)
-            summary_log.info "[\e[0;31mFAILED\e[0m]\n"
+          if error
+            summary_log.info("[\e[0;31mFAILED\e[0m]\n")
             raise error
           else
-            elapsed_time = Time.now-start
-            summary_log.info "[\e[0;32mDONE in #{elapsed_time*1000}ms\e[0m]\n"
+            elapsed_time = Time.now - start
+            summary_log.info("[\e[0;32mDONE in #{elapsed_time*1000} ms\e[0m]\n")
           end
         end
-      }
-    rescue Exception=>e
-      summary_log.info e
+      end
+    rescue Exception => e
+      summary_log.info(e)
       log.error(e)
     end
 
     txt = "cleaning up #{@cleanups.size} blocks"
     summary_log.info "#{txt}"
-    padding =  position - txt.length
-    @cleanups.reverse.each {|command|
+    padding = position - txt.length
+    @cleanups.reverse.each do |command|
       begin
         command.call()
-      rescue Exception=>e
+      rescue Exception => e
         cleanup_log.error(e)
-      ensure
       end
-    }
-    summary_log.info "[\e[0;32mDONE\e[0m]\n"
+    end
+    summary_log.info("[\e[0;32mDONE\e[0m]\n")
 
-    if error!=nil
+    if error != nil
       raise error
     end
   end
@@ -85,6 +84,7 @@ class Provision::Image::Build
   def summary_log()
     @summary_log ||= @spec.get_logger('summary')
   end
+
   def cleanup_log()
     @cleanup_log ||= @spec.get_logger('cleanup_provision')
   end
@@ -92,19 +92,19 @@ end
 
 class CatchAndIgnore
   attr_accessor :build
+
   def initialize(build)
     @build = build
   end
 
-  def method_missing(name,*args,&block)
+  def method_missing(name, *args, &block)
     begin
-      result = @build.send name, *args, &block
+      result = @build.send(name, *args, &block)
       return result
-    rescue Exception=>e
+    rescue Exception => e
       cleanup_log.error("error sending #{name}")
       cleanup_log.error(e)
       return nil
     end
   end
 end
-
