@@ -123,8 +123,9 @@ describe Provision::Core::ProvisioningService do
   end
 
   it 'will allocate you an IP for a name without doing anything else, like for a VIP' do
-    # this test is pretty pointless
-    @numbering_service.should_receive(:allocate_ips_for).with(spec_with(:networks => ['mtv'], :qualified_hostnames => {'mtv' => 'beavis.mtv.cable.net.local'}))
-    @provisioning_service.allocate_ip(:networks => ['mtv'], :qualified_hostnames => {'mtv' => 'beavis.mtv.cable.net.local'})
+    spec = {:networks => ['mtv'], :qualified_hostnames => {'mtv' => 'beavis.mtv.cable.net.local'}}
+    networking = {:mtv => {:netmask => "0.0.0.0", :address => "1.2.3.4"}}
+    @numbering_service.should_receive(:allocate_ips_for).with(spec_with(spec)).and_return(networking)
+    @provisioning_service.allocate_ip(spec)
   end
 end

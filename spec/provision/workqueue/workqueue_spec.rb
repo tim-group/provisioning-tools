@@ -108,7 +108,20 @@ describe Provision::WorkQueue do
     @workqueue.destroy(spec2)
     @workqueue.process()
 
-    @listener.results.should eql({"myvm1"=> ["success", ""]})
+    @listener.results.should eql({"myvm1"=> ["success", nil]})
+  end
+
+  it 'passes the message returned from the provisioning service to the listener' do
+    @provisioning_service = double("provisioning_service")
+    @workqueue = Provision::WorkQueue.new(:provisioning_service => @provisioning_service, :worker_count => 1, :listener => @listener)
+
+    spec = {:hostname => "my_vip"}
+    @provisioning_service.stub(:allocate_ip).and_return("1.2.3.4")
+
+    @workqueue.allocate_ip_all([spec])
+    @workqueue.process()
+
+    @listener.results.should eql({"my_vip" => ["success", "1.2.3.4"]})
   end
 
 end

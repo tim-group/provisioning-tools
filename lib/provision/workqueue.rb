@@ -98,13 +98,13 @@ class Provision::WorkQueue
           require 'yaml'
           error = nil
           begin
-            task.execute()
+            msg = task.execute()
           rescue Exception => e
             print e.backtrace
             @listener.error(task.spec, e)
             error = e
           ensure
-            @listener.passed(task.spec) if error.nil?
+            @listener.passed(task.spec, msg) if error.nil?
           end
         end
       }
