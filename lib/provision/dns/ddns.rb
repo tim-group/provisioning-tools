@@ -87,7 +87,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
 
   def exec_nsupdate(update_file)
     rndc_tmp = write_rndc_key
-    out = `cat #{update_file.path} | nsupdate -k #{rndc_tmp.path} 2>&1`
+    out = `cat #{update_file.path} | nsupdate -r 10 -u 1 -t 12 -k #{rndc_tmp.path} 2>&1`
     logger.info("nsupdate OUT #{out}") if @debug
     update_file.unlink
     rndc_tmp.unlink
