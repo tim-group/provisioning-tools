@@ -21,13 +21,14 @@ listener = NoopListener.new()
 work_queue = Provision::Factory.new().work_queue(:worker_count => 4, :listener => listener)
 work_queue.launch_all(specs)
 
-failures = listener.results.select { |k, v| v != 'success' }
+failures = listener.failures
 if failures.empty?
   exit(0)
 else
   puts "FAILURES:"
   failures.each do |hostname, result|
-    puts "#{hostname}: #{result}"
+    state, msg = result
+    puts "#{hostname}: #{msg}"
   end
   exit(1)
 end

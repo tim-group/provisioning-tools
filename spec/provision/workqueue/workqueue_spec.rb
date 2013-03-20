@@ -108,7 +108,7 @@ describe Provision::WorkQueue do
     @workqueue.destroy(spec2)
     @workqueue.process()
 
-    @listener.results.should eql({"myvm1"=> "success"})
+    @listener.results.should eql({"myvm1"=> ["success", ""]})
   end
 
 end

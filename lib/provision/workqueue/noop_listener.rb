@@ -16,14 +16,18 @@ class NoopListener
     @logger = options[:logger] || InternalLogger.new
   end
 
-  def passed(spec)
-    @results[spec[:hostname]] = "success"
-    @logger.info("#{spec[:hostname]} [passed]")
+  def passed(spec, msg="")
+    @results[spec[:hostname]] = ["success", msg]
+    @logger.info("#{spec[:hostname]} [passed] #{msg}")
   end
 
   def error(spec, e)
-    @results[spec[:hostname]] = "failed: #{e.to_s}"
-    @logger.warn("#{spec[:hostname]} [failed] - #{e}")
+    @results[spec[:hostname]] = ["failed", e.to_s]
+    @logger.warn("#{spec[:hostname]} [failed] #{e}")
     @logger.warn(e.backtrace)
+  end
+
+  def failures
+    return results.select { |k, v| v[0] == "failed" }
   end
 end
