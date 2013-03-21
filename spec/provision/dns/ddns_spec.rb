@@ -9,6 +9,8 @@ end
 
 class MockProvision < Provision::DNS::DDNSNetwork
   attr_reader :update_files
+  attr_accessor :checker
+
   def initialize(name, net, options={})
     super(name, net, options)
     @nsupdate_replies = options[:nsupdate_replies] || raise("Need :nsupdate_replies")
@@ -123,6 +125,9 @@ update failed: NOTAUTH(BADKEY)
       :lookup_table => {},
       :primary_nameserver => "mars"
     )
+    dns.checker = double()
+    dns.checker.should_receive(:resolve_forward).with('st-testmachine-001.mgmt.st.net.local').and_return(['192.168.0.10'])
+    dns.checker.should_receive(:resolve_reverse).with('192.168.0.10').and_return(['st-testmachine-001.mgmt.st.net.local'])
     ip = dns.allocate_ip_for(get_spec())
     ip[:address].to_s.should eql('192.168.0.10')
     ip[:netmask].should eql('255.255.0.0')
@@ -153,6 +158,18 @@ update failed: NOTAUTH(BADKEY)
     dns.update_files.size.should eql(0)
   end
 
+  it 'fails if a freshly-allocated name cannot be resolved' do
+    dns = MockProvision.new('prod', '192.168.1.0/16',
+      :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
+      :nsupdate_replies => ['', ''],
+      :lookup_table => {},
+      :primary_nameserver => "mars"
+    )
+    dns.checker = double()
+    dns.checker.should_receive(:resolve_forward).with('st-testmachine-001.mgmt.st.net.local').and_return([])
+    expect {
+      dns.allocate_ip_for(get_spec())
+    }.to raise_error("unable to resolve forward st-testmachine-001.mgmt.st.net.local -> 192.168.0.10")
+  end
+
 end
-
-

@@ -2,10 +2,21 @@ require 'ipaddr'
 require 'provision/namespace'
 require 'logger'
 require 'yaml'
+require 'set'
 
 module IPAddrExtensions
   def subnet_mask
     return _to_string(@mask_addr)
+  end
+end
+
+class Provision::DNSChecker
+  def resolve_forward(hostname)
+    Set.new(Socket.getaddrinfo(hostname, nil).map { |a| a[3] })
+  end
+
+  def resolve_reverse(ip)
+    Set.new(Socket.getaddrinfo(ip, nil).map { |a| a[2] })
   end
 end
 
@@ -17,6 +28,7 @@ class Provision::DNSNetwork
     @subnet = IPAddr.new(range)
     @subnet.extend(IPAddrExtensions)
     @logger = options[:logger] || Logger.new(STDERR)
+    @checker = options[:checker] || Provision::DNSChecker.new()
 
     parts = range.split('/')
     if parts.size != 2
@@ -62,6 +74,9 @@ class Provision::DNSNetwork
        end
        add_forward_lookup(ip, hostname)
      end
+
+     raise "unable to resolve forward #{hostname} -> #{ip.to_s}" unless @checker.resolve_forward(hostname).include?(ip.to_s)
+     raise "unable to resolve reverse #{ip.to_s} -> #{hostname}" unless @checker.resolve_reverse(ip.to_s).include?(hostname)
 
      return {
        :netmask => @subnet_mask.to_s,
