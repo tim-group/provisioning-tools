@@ -24,19 +24,21 @@ class Provision::Core::ProvisioningService
   end
 
   def provision_vm(spec_hash)
-    @logger.info("Provisioning a VM")
-    spec_hash = @machinespec_defaults.merge(spec_hash)
-
-    clean_vm(spec_hash)
-    spec = Provision::Core::MachineSpec.new(spec_hash)
-    @logger.info("Getting numbering for spec #{spec.inspect}")
-    spec[:networking] =  @numbering_service.allocate_ips_for(spec)
-    @logger.info("Numbering is #{spec[:networking].inspect}")
-    @image_service.build_image(spec[:template], spec)
-    @vm_service.define_vm(spec)
-    @vm_service.start_vm(spec)
-    return nil
-  end
+    if @vm_service.is_defined(spec_hash)
+      @logger.info("Provisioning a VM")
+      spec_hash = @machinespec_defaults.merge(spec_hash)
+      spec = Provision::Core::MachineSpec.new(spec_hash)
+      @logger.info("Getting numbering for spec #{spec.inspect}")
+      spec[:networking] =  @numbering_service.allocate_ips_for(spec)
+      @logger.info("Numbering is #{spec[:networking].inspect}")
+      @image_service.build_image(spec[:template], spec)
+      @vm_service.define_vm(spec)
+      @vm_service.start_vm(spec)
+      return "success"
+    else
+      return "noaction"
+    end
+ end
 
   def allocate_ip(spec_hash)
     spec = Provision::Core::MachineSpec.new(spec_hash)
