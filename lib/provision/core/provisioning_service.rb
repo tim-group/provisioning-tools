@@ -24,7 +24,7 @@ class Provision::Core::ProvisioningService
   end
 
   def provision_vm(spec_hash)
-    if @vm_service.is_defined(spec_hash)
+    if not @vm_service.is_defined(spec_hash)
       @logger.info("Provisioning a VM")
       spec_hash = @machinespec_defaults.merge(spec_hash)
       spec = Provision::Core::MachineSpec.new(spec_hash)

@@ -47,11 +47,11 @@ describe Provision::Core::ProvisioningService do
       :vm_service => @vm_service,
       :numbering_service => @numbering_service
     )
-     @vm_service.stub(:is_defined).and_return(true)
+     @vm_service.stub(:is_defined).and_return(false)
   end
 
   it 'reports noaction if the machine already existed' do
-    @vm_service.stub(:is_defined).and_return(false)
+    @vm_service.stub(:is_defined).and_return(true)
     @provisioning_service.provision_vm(:hostname => "vmx1", :template => "ubuntuprecise").should eql("noaction")
   end
 
