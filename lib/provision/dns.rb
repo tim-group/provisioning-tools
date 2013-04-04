@@ -11,13 +11,34 @@ module IPAddrExtensions
 end
 
 class Provision::DNSChecker
+
+ def resolve(record, element, max_attempts=10)
+    attempt = 1
+    addrinfo = []
+    while (attempt <= max_attempts)
+      begin
+        msg = "Lookup #{record} (#{attempt}/#{max_attempts})"
+        addrinfo = Set.new(Socket.getaddrinfo(record, nil)).map { |a| a[element] }
+        break
+      rescue Exception => e
+       puts "FAILURE: #{msg} - #{e.inspect}"
+       sleep 1
+      end
+      attempt = attempt +1
+    end
+    attempt >= max_attempts ? (raise "Lookup #{record} failed after #{max_attempts} attempts") : false
+    puts "SUCCESS: #{msg} resolved to #{addrinfo.join(' ')}"
+    addrinfo
+  end
+
   def resolve_forward(hostname)
-    Set.new(Socket.getaddrinfo(hostname, nil).map { |a| a[3] })
+     resolve(hostname, 3)
   end
 
   def resolve_reverse(ip)
-    Set.new(Socket.getaddrinfo(ip, nil).map { |a| a[2] })
+    resolve(ip, 2)
   end
+
 end
 
 class Provision::DNSNetwork
