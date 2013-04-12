@@ -29,7 +29,7 @@ class Provision::Core::MachineSpec
   end
 
   def self.spec_for_name(fqdn)
-    _, hostname, network, fabric = /(\w+)\.(?:(\w+)\.)?(\w+)\.net\.local$/.match(fqdn).to_a
+    _, hostname, network, fabric = /([\w-]+)\.(?:(\w+)\.)?([\w-]+)\.net\.local$/.match(fqdn).to_a
     raise "the alleged FQDN '#{fqdn}' must look like <hostname>.[<network>.]<fabric>.net.local" unless _
 
     network ||= 'prod'
