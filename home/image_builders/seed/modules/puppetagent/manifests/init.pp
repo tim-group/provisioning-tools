@@ -13,7 +13,7 @@ class puppetagent($puppetmaster) {
 
   exec { 'generate_csr':
     cwd       => '/tmp',
-    command   => "puppetd -t",
+    command   => "puppet agent -t",
     path      => '/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin',
     require   => [Class['puppetmaster::wait_for'], File['/etc/puppet/puppet.conf']],
     returns   => 1,
