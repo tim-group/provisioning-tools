@@ -17,4 +17,9 @@ define 'puppetmaster' do
 echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local"
     }
   }
+  run('install ruby') {
+    apt_install 'ruby1.8'
+    apt_install 'rubygems'
+  }
+
 end
