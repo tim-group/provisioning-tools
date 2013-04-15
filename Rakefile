@@ -154,6 +154,9 @@ task :package_agent do
 end
 
 task :package => [:package_main, :package_agent]
-
+task :install => [:package] do
+   sh "sudo dpkg -i build/*.deb"
+   sh "sudo /etc/init.d/mcollective restart;"
+end
 task :test => [:spec, :mcollective_spec]
 
