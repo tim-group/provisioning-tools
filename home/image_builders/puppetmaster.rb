@@ -18,6 +18,7 @@ echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local"
     }
   }
   run('install ruby') {
+    cmd 'mkdir -p /var/lib/gems/1.8'
     apt_install 'ruby1.8'
     apt_install 'rubygems'
   }
