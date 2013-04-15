@@ -153,7 +153,7 @@ task :package_agent do
   #      '-C','build/package',
 end
 
-task :package => [:package_main, :package_agent]
+task :package => [:clean, :package_main, :package_agent]
 task :install => [:package] do
    sh "sudo dpkg -i build/*.deb"
    sh "sudo /etc/init.d/mcollective restart;"
