@@ -10,17 +10,23 @@ define 'puppetmaster' do
     cmd "git clone http://git.youdevise.com/git/puppet #{spec[:temp_dir]}/etc/puppet"
   }
 
+  run('install ruby') {
+    apt_install 'ruby1.8'
+    apt_install 'rubygems'
+    apt_install 'rubygems1.8'
+    apt_install 'rubygem-rspec'
+  }
+
   run('deploy puppetmaster') {
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
+
       f.puts "#!/bin/sh -e
+echo 'Run ntpdate'
+/usr/sbin/ntpdate -s dc-1.net.local
+echo 'Run puppet apply'
 /usr/bin/puppet apply --pluginsync --modulepath=/etc/puppet/modules --logdest=syslog /etc/puppet/manifests/site.pp
 echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local"
     }
-  }
-  run('install ruby') {
-    cmd 'mkdir -p /var/lib/gems/1.8'
-    apt_install 'ruby1.8'
-    apt_install 'rubygems'
   }
 
 end
