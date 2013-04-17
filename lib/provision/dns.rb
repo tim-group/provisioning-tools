@@ -17,10 +17,10 @@ class Provision::DNSChecker
  end
  def resolve(record, element, max_attempts=10)
     attempt = 1
-    addrinfo = []
+    addrinfo = Set.new() 
     while (attempt <= max_attempts)
+      msg = "Lookup #{record} (#{attempt}/#{max_attempts})"
       begin
-        msg = "Lookup #{record} (#{attempt}/#{max_attempts})"
         addrinfo = Set.new(Socket.getaddrinfo(record, nil)).map { |a| a[element] }
         break
       rescue Exception => e
