@@ -11,7 +11,9 @@ module IPAddrExtensions
 end
 
 class Provision::DNSChecker
-
+ def initialize(options)
+   @logger = options[:logger] || Logger.new(STDERR)
+ end
  def resolve(record, element, max_attempts=10)
     attempt = 1
     addrinfo = []
@@ -21,13 +23,13 @@ class Provision::DNSChecker
         addrinfo = Set.new(Socket.getaddrinfo(record, nil)).map { |a| a[element] }
         break
       rescue Exception => e
-       puts "FAILURE: #{msg} - #{e.inspect}"
+       logger.error("DNS RESOLVE FAILURE: #{msg} - #{e.inspect}")
        sleep 1
       end
       attempt = attempt +1
     end
     attempt >= max_attempts ? (raise "Lookup #{record} failed after #{max_attempts} attempts") : false
-    puts "SUCCESS: #{msg} resolved to #{addrinfo.join(' ')}"
+    logger.info("SUCCESS: #{msg} resolved to #{addrinfo.join(' ')}")
     addrinfo
   end
 
@@ -49,7 +51,7 @@ class Provision::DNSNetwork
     @subnet = IPAddr.new(range)
     @subnet.extend(IPAddrExtensions)
     @logger = options[:logger] || Logger.new(STDERR)
-    @checker = options[:checker] || Provision::DNSChecker.new()
+    @checker = options[:checker] || Provision::DNSChecker.new(:logger => @logger)
 
     parts = range.split('/')
     if parts.size != 2
