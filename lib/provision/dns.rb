@@ -11,6 +11,7 @@ module IPAddrExtensions
 end
 
 class Provision::DNSChecker
+ attr_reader :logger
  def initialize(options)
    @logger = options[:logger] || Logger.new(STDERR)
  end
