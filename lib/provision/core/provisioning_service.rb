@@ -29,6 +29,7 @@ class Provision::Core::ProvisioningService
       spec_hash = @machinespec_defaults.merge(spec_hash)
       spec = Provision::Core::MachineSpec.new(spec_hash)
       @logger.info("Getting numbering for spec #{spec.inspect}")
+      # FIXME - We should pull this step out to a rake task in stacks as per 'free' later..
       spec[:networking] =  @numbering_service.allocate_ips_for(spec)
       @logger.info("Numbering is #{spec[:networking].inspect}")
       @image_service.build_image(spec[:template], spec)
