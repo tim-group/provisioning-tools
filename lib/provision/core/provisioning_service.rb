@@ -14,15 +14,6 @@ class Provision::Core::ProvisioningService
     @logger = options[:logger] || Logger.new(STDERR)
   end
 
-  def clean_vm(spec_hash)
-    spec = Provision::Core::MachineSpec.new(spec_hash)
-    @vm_service.destroy_vm(spec)
-    @vm_service.undefine_vm(spec)
-    @image_service.remove_image(spec)
-    @numbering_service.remove_ips_for(spec)
-    return nil
-  end
-
   def provision_vm(spec_hash)
     if not @vm_service.is_defined(spec_hash)
       @logger.info("Provisioning a VM")
@@ -39,7 +30,15 @@ class Provision::Core::ProvisioningService
     else
       return "noaction"
     end
- end
+  end
+
+  def clean_vm(spec_hash)
+    spec = Provision::Core::MachineSpec.new(spec_hash)
+    @vm_service.destroy_vm(spec)
+    @vm_service.undefine_vm(spec)
+    @image_service.remove_image(spec)
+    return nil
+  end
 
   def allocate_ip(spec_hash)
     spec = Provision::Core::MachineSpec.new(spec_hash)

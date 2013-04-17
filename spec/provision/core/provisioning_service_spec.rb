@@ -79,7 +79,6 @@ describe Provision::Core::ProvisioningService do
   end
 
   it 'allows the user to clean up vms' do
-    @numbering_service.should_receive(:remove_ips_for)
     @vm_service.should_receive(:destroy_vm).ordered
     @vm_service.should_receive(:undefine_vm).ordered
     @image_service.should_receive(:remove_image)
