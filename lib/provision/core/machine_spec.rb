@@ -32,11 +32,17 @@ class Provision::Core::MachineSpec
     _, hostname, network, fabric = /([\w-]+)\.(?:(\w+)\.)?([\w-]+)\.net\.local$/.match(fqdn).to_a
     raise "the alleged FQDN '#{fqdn}' must look like <hostname>.[<network>.]<fabric>.net.local" unless _
 
+    suffix = 'net.local'
+    domain = "#{fabric}.#{suffix}"
+    case fabric
+      when 'local'
+        domain = "dev.#{suffix}"
+    end
     network ||= 'prod'
 
     new(
       :hostname => hostname,
-      :domain => "#{fabric}.net.local",
+      :domain => domain,
       :networks => [network.to_sym],
       :qualified_hostnames => {
         network.to_sym => fqdn
