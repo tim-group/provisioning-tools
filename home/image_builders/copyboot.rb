@@ -1,5 +1,6 @@
 require 'provision/image/catalogue'
 require 'provision/image/commands'
+require 'socket'
 
 define "copyboot" do
   extend Provision::Image::Commands
@@ -104,6 +105,13 @@ SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="#{nic[:mac]}", A
   run("configure aptproxy") {
     open("#{spec[:temp_dir]}/etc/apt/apt.conf.d/01proxy", 'w') { |f|
       f.puts "Acquire::http::Proxy \"http://#{spec[:aptproxy]}:3142\";\n"
+    }
+  }
+
+  run("set parent fact") {
+    cmd "mkdir -p #{spec[:temp_dir]}/etc/facts.d"
+    open("#{spec[:temp_dir]}/etc/facts.d/parent.fact", 'w') { |f|
+      f.puts "parent=#{Socket.gethostname}\n"
     }
   }
 
