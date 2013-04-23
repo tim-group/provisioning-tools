@@ -1,0 +1,9 @@
+---
+- :hostname: dev-puppetmaster-001
+  :networks:
+  - :mgmt
+  :domain: dev.net.local
+  :fabric: local
+  :template: puppetmaster
+  :qualified_hostnames:
+    :mgmt: dev-puppetmaster-001.mgmt.dev.net.local
