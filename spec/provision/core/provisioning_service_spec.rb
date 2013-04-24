@@ -52,7 +52,8 @@ describe Provision::Core::ProvisioningService do
 
   it 'reports noaction if the machine already existed' do
     @vm_service.stub(:is_defined).and_return(true)
-    @provisioning_service.provision_vm(:hostname => "vmx1", :template => "ubuntuprecise").should eql("noaction")
+    @vm_service.stub(:start_vm).and_return(true)
+    @provisioning_service.provision_vm(:hostname => "vmx1", :template => "ubuntuprecise").should eql(false)
   end
 
   it 'allows the user to define vm from an image catalogue and vmdescription catalogue' do
@@ -60,7 +61,7 @@ describe Provision::Core::ProvisioningService do
     @image_service.should_receive(:build_image).with("ubuntuprecise", anything).ordered
     @vm_service.should_receive(:define_vm).ordered
     @vm_service.should_receive(:start_vm).ordered
-    @provisioning_service.provision_vm(:hostname => "vmx1", :template => "ubuntuprecise").should eql("success")
+    @provisioning_service.provision_vm(:hostname => "vmx1", :template => "ubuntuprecise").should eql(true)
   end
 
   it 'allows ips to produce' do

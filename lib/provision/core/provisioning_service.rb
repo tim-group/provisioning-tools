@@ -15,10 +15,10 @@ class Provision::Core::ProvisioningService
   end
 
   def provision_vm(spec_hash)
+    spec_hash = @machinespec_defaults.merge(spec_hash)
+    spec = Provision::Core::MachineSpec.new(spec_hash)
     if not @vm_service.is_defined(spec_hash)
-      @logger.info("Provisioning a VM")
-      spec_hash = @machinespec_defaults.merge(spec_hash)
-      spec = Provision::Core::MachineSpec.new(spec_hash)
+      @logger.info("Provisioning a newly allocated VM")
       @logger.info("Getting numbering for spec #{spec.inspect}")
       # FIXME - We should pull this step out to a rake task in stacks as per 'free' later..
       spec[:networking] =  @numbering_service.allocate_ips_for(spec)
@@ -26,9 +26,10 @@ class Provision::Core::ProvisioningService
       @image_service.build_image(spec[:template], spec)
       @vm_service.define_vm(spec)
       @vm_service.start_vm(spec)
-      return "success"
+      true
     else
-      return "noaction"
+      @vm_service.start_vm(spec)
+      false
     end
   end
 

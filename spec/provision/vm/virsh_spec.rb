@@ -23,7 +23,7 @@ describe Provision::VM::Virsh do
     )
 
     virt_manager = Provision::VM::Virsh.new()
-    virt_manager.define_vm(machine_spec)
+    virt_manager.write_virsh_xml(machine_spec)
     File.exist?("#{d}/vmx1.xml").should eql(true)
 
     IO.read("#{d}/vmx1.xml").should match("vmx1")

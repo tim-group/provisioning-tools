@@ -8,6 +8,12 @@ class Provision::VM::Virsh
     @template = "#{Provision.base}/templates/kvm.template"
   end
 
+  def safe_system(cli)
+    if system(cli) != true
+      raise("Failed to run: #{cli}")
+    end
+  end
+
   def is_defined(spec)
     vm_name=spec[:hostname]
     result=`virsh list --all | grep ' #{vm_name} ' | wc -l`
@@ -15,18 +21,18 @@ class Provision::VM::Virsh
   end
 
   def undefine_vm(spec)
-    system("virsh undefine #{spec[:hostname]} > /dev/null 2>&1")
+    safe_system("virsh undefine #{spec[:hostname]} > /dev/null 2>&1")
   end
 
   def destroy_vm(spec)
-    system("virsh destroy #{spec[:hostname]} > /dev/null 2>&1")
+    safe_system("virsh destroy #{spec[:hostname]} > /dev/null 2>&1")
   end
 
   def start_vm(spec)
-    system("virsh start #{spec[:hostname]} > /dev/null 2>&1")
+    safe_system("virsh start #{spec[:hostname]} > /dev/null 2>&1")
   end
 
-  def define_vm(spec)
+  def write_virsh_xml(spec)
     template = ERB.new(File.read(@template))
     to = "#{spec[:libvirt_dir]}/#{spec[:hostname]}.xml"
     begin
@@ -38,6 +44,11 @@ class Provision::VM::Virsh
     File.open to, 'w' do |f|
       f.write template.result(spec.get_binding())
     end
-    system("virsh define #{to} > /dev/null 2>&1")
+  end
+
+  def define_vm(spec)
+    to = write_virsh_xml(spec)
+    safe_system("virsh define #{to} > /dev/null 2>&1")
   end
 end
+
