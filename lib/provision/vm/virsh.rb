@@ -15,8 +15,16 @@ class Provision::VM::Virsh
   end
 
   def is_defined(spec)
+    is_in_virsh_list(spec, '--all')
+  end
+
+  def is_running(spec)
+    is_in_virsh_list(spec)
+  end
+
+  def is_in_virsh_list(spec, extra = '')
     vm_name=spec[:hostname]
-    result=`virsh list --all | grep ' #{vm_name} ' | wc -l`
+    result=`virsh list #{extra} | grep ' #{vm_name} ' | wc -l`
     return result.match(/1/)
   end
 
@@ -29,6 +37,7 @@ class Provision::VM::Virsh
   end
 
   def start_vm(spec)
+    return if is_running(spec)
     safe_system("virsh start #{spec[:hostname]} > /dev/null 2>&1")
   end
 
