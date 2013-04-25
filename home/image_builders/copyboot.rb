@@ -108,11 +108,9 @@ SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="#{nic[:mac]}", A
     }
   }
 
-  run("set parent fact") {
-    cmd "mkdir -p #{spec[:temp_dir]}/etc/facts.d"
-    open("#{spec[:temp_dir]}/etc/facts.d/parent.fact", 'w') { |f|
-      f.puts "parent=#{Socket.gethostname}\n"
-    }
+  run("set owner fact") {
+      cmd "mkdir -p #{spec[:temp_dir]}/etc/facts.d"
+      cmd "cp /etc/facts.d/owner.fact #{spec[:temp_dir]}/etc/facts.d"
   }
 
 end
