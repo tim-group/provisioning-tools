@@ -20,7 +20,7 @@ define 'puppetmaster' do
   run('deploy puppetmaster') {
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
 
-      f.puts "#!/bin/bash -e
+      f.puts "#!/bin/bash
 echo 'Run ntpdate' | logger
 /usr/sbin/ntpdate -s dc-1.net.local | logger 2>&1
 echo 'Run puppet apply' | logger
