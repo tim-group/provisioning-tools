@@ -109,8 +109,11 @@ SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="#{nic[:mac]}", A
   }
 
   run("set owner fact") {
-      cmd "mkdir -p #{spec[:temp_dir]}/etc/facts.d"
-      cmd "cp /etc/facts.d/owner.fact #{spec[:temp_dir]}/etc/facts.d"
+      fact =  '/etc/facts.d/owner.fact'
+      if File.exists?(fact)
+        cmd "mkdir -p #{spec[:temp_dir]}/etc/facts.d"
+        cmd "cp /etc/facts.d/owner.fact #{spec[:temp_dir]}/etc/facts.d"
+      end
   }
 
 end
