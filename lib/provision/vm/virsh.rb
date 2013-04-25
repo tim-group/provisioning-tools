@@ -53,6 +53,7 @@ class Provision::VM::Virsh
     File.open to, 'w' do |f|
       f.write template.result(spec.get_binding())
     end
+    to
   end
 
   def define_vm(spec)
