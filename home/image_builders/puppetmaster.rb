@@ -34,8 +34,10 @@ puppet cert sign dev-puppetmaster-001.mgmt.dev.net.local 2>&1 | logger
 echo 'Running puppet agent against myself for real' | logger
 /usr/bin/puppet agent -t
 echo 'Replacing puppet.conf from template' | logger
-cp /etc/puppet.conf.base /etc/puppet.conf 2>&1 | logger
+cp /etc/puppet/puppet.conf.base /etc/puppet.conf 2>&1 | logger
 /etc/init.d/apache2-puppetmaster restart 2>&1 | logger
+echo 'Sleep whilst apache+puppetdb spins up' | logger 2>&1
+sleep 30;
 echo 'Running puppet agent against myself for real, with indirector' | logger
 /usr/bin/puppet agent -t
 echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local"
