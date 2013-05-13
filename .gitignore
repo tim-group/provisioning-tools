@@ -7,3 +7,11 @@
 /build
 provisioning-tools.iml
 .idea/
+!
+files/files.iml
+home/home.iml
+lib/lib.iml
+mcollective/mcollective.iml
+networking/networking.iml
+spec/spec.iml
+test/prov-tools-test.iml
