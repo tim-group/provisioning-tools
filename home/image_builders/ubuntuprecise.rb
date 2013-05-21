@@ -197,8 +197,6 @@ exec /sbin/getty -L ttyS0 115200 vt102
     find_kernel =~ /vmlinuz-(.+)/
     kernel_version = $1
 
-puts "KERNEL FOUND IS #{kernel_version} ****************"
-
     kernel = "/boot/vmlinuz-#{kernel_version}"
     initrd = "/boot/initrd.img-#{kernel_version}"
     uuid = `blkid -o value /dev/mapper/#{spec[:loop0]}p1 | head -n1`.chomp
