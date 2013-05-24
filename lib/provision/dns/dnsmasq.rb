@@ -1,6 +1,10 @@
 require 'ipaddr'
 require 'fileutils'
 require 'tempfile'
+require 'thread'
+
+$etc_hosts_mutex = Mutex.new
+
 
 class Provision::DNS::DNSMasq < Provision::DNS
 end
@@ -27,14 +31,16 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
   end
 
   def try_add_reverse_lookup(ip, hostname, all_hostnames)
-    parse_hosts
-    return false if @by_ip[ip.to_s]
-    File.open(@hosts_file, 'a') { |f|
-      f.write "#{ip.to_s} #{all_hostnames.join(" ")}\n"
-      f.chmod(0644)
-    }
-    reload_dnsmasq
-    return true
+    $etc_hosts_mutex.synchronize do
+      parse_hosts
+      return false if @by_ip[ip.to_s]
+      File.open(@hosts_file, 'a') { |f|
+        f.write "#{ip.to_s} #{all_hostnames.join(" ")}\n"
+        f.chmod(0644)
+      }
+      reload_dnsmasq
+      return true
+    end
   end
 
   def parse_hosts
