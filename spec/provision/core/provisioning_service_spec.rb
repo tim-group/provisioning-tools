@@ -53,7 +53,10 @@ describe Provision::Core::ProvisioningService do
   it 'reports noaction if the machine already existed' do
     @vm_service.stub(:is_defined).and_return(true)
     @vm_service.stub(:start_vm).and_return(true)
-    @provisioning_service.provision_vm(:hostname => "vmx1", :template => "ubuntuprecise").should eql(false)
+
+    expect {
+      @provisioning_service.provision_vm(:hostname => "vmx1", :template => "ubuntuprecise").should eql(false)
+    }.to raise_error("failed to launch vmx1 already exists")
   end
 
   it 'allows the user to define vm from an image catalogue and vmdescription catalogue' do

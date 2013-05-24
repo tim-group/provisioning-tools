@@ -28,8 +28,7 @@ class Provision::Core::ProvisioningService
       @vm_service.start_vm(spec)
       true
     else
-      @vm_service.start_vm(spec)
-      false
+      raise "failed to launch #{spec_hash[:hostname]} already exists"
     end
   end
 
