@@ -49,10 +49,18 @@ define "xpboot" do
   }
 
   run("configure_launch_script") {
-    start_menu_grid_file = "#{start_menu_location}start-grid.bat"
-    grid_file = File.join(File.dirname(__FILE__), "../../files/selenium/start-grid.bat")
+    xp_files = File.join(File.dirname(__FILE__), "../../files/xpboot/"))
+    start_menu_grid_file = "#{start_menu_location}#{spec[:launch_script]}"
+    launch_script = "#{xp_files_files}/#{spec[:launch_script]}"
+
+    selenium_dir = "#{xp_files}/seleniumx"
+    java_dir     = "#{xp_files}/java"
+
+    FileUtils.cp_r selenium_dir, "#{spec[:temp_dir]}"
+    FileUtils.cp_r java_dir, "#{spec[:temp_dir]}"
+
     FileUtils.rm_rf "#{start_menu_location}/*"
-    FileUtils.cp grid_file, start_menu_location
+    FileUtils.cp launch_script, start_menu_location
 
     spec[:ie_version] = `cat #{spec[:temp_dir]}/ieversion.txt`.chomp unless spec[:ie_version]
 

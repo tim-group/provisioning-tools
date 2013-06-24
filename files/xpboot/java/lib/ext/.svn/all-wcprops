@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/opt/repo/projects/!svn/ver/89441/DevTools/trunk/java/jre1.6.0_29-windows/lib/ext
+END
+dnsns.jar
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/opt/repo/projects/!svn/ver/89441/DevTools/trunk/java/jre1.6.0_29-windows/lib/ext/dnsns.jar
+END
+sunpkcs11.jar
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/opt/repo/projects/!svn/ver/89441/DevTools/trunk/java/jre1.6.0_29-windows/lib/ext/sunpkcs11.jar
+END
+localedata.jar
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/opt/repo/projects/!svn/ver/89441/DevTools/trunk/java/jre1.6.0_29-windows/lib/ext/localedata.jar
+END
+meta-index
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/opt/repo/projects/!svn/ver/89441/DevTools/trunk/java/jre1.6.0_29-windows/lib/ext/meta-index
+END
+sunjce_provider.jar
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/opt/repo/projects/!svn/ver/89441/DevTools/trunk/java/jre1.6.0_29-windows/lib/ext/sunjce_provider.jar
+END
+sunmscapi.jar
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/opt/repo/projects/!svn/ver/89441/DevTools/trunk/java/jre1.6.0_29-windows/lib/ext/sunmscapi.jar
+END
