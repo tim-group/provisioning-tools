@@ -2,11 +2,6 @@ require 'provision/image/catalogue'
 require 'provision/image/commands'
 require 'socket'
 
-# TODO:
-#       stash ieversion in gold image
-#       use ieversion to set in launch
-#       copy all selenium related in xpboot
-#
 define "xpboot" do
   extend Provision::Image::Commands
 
@@ -39,8 +34,6 @@ define "xpboot" do
 
     spec.interfaces.each do |nic|
       config = spec[:networking][nic[:network].to_sym]
-      print "sed -i s/\"<%DNSSERVER%>\"/192.168.5.1/g #{network_file}"
-
       cmd "sed -i s/\"<%DNSSERVER%>\"/192.168.5.1/g #{network_file}"
       cmd "sed -i s/\"<%IPADDRESS%>\"/#{config[:address]}/g #{network_file}"
       cmd "sed -i s/\"<%NETMASK%>\"/#{config[:netmask]}/g #{network_file}"
@@ -49,9 +42,9 @@ define "xpboot" do
   }
 
   run("configure_launch_script") {
-    xp_files = File.join(File.dirname(__FILE__), "../../files/xpboot/"))
+    xp_files = File.join(File.dirname(__FILE__), "../../files/xpboot/")
     start_menu_grid_file = "#{start_menu_location}#{spec[:launch_script]}"
-    launch_script = "#{xp_files_files}/#{spec[:launch_script]}"
+    launch_script = "#{xp_files}/#{spec[:launch_script]}"
 
     selenium_dir = "#{xp_files}/seleniumx"
     java_dir     = "#{xp_files}/java"
@@ -59,7 +52,8 @@ define "xpboot" do
     FileUtils.cp_r selenium_dir, "#{spec[:temp_dir]}"
     FileUtils.cp_r java_dir, "#{spec[:temp_dir]}"
 
-    FileUtils.rm_rf "#{start_menu_location}/*"
+    puts ">>>>#{start_menu_location}"
+    cmd "rm \"#{start_menu_location}\"/*"
     FileUtils.cp launch_script, start_menu_location
 
     spec[:ie_version] = `cat #{spec[:temp_dir]}/ieversion.txt`.chomp unless spec[:ie_version]
