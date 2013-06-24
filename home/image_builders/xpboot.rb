@@ -2,13 +2,13 @@ require 'provision/image/catalogue'
 require 'provision/image/commands'
 require 'socket'
 
-# TODO: no final shutdown -- reboot?
-#       ip injection
-#       hub url injection
+# TODO:
+#       stash ieversion in gold image
+#       use ieversion to set in launch
+#       copy all selenium related in xpboot
 #
 define "xpboot" do
   extend Provision::Image::Commands
-#  extend Provision::Image::WinXP
 
   def mountpoint
     "#{spec[:temp_dir]}"
@@ -37,10 +37,6 @@ define "xpboot" do
     cmd "sed -i s/\"<%COMPUTERNAME%>\"/#{spec[:hostname]}/g #{answer_file}"
     cmd "sed -i s/\"<%PRODUCTKEY%>\"/#{key}/g #{answer_file}"
 
-
-
-    pp "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-
     spec.interfaces.each do |nic|
       config = spec[:networking][nic[:network].to_sym]
       print "sed -i s/\"<%DNSSERVER%>\"/192.168.5.1/g #{network_file}"
@@ -53,8 +49,16 @@ define "xpboot" do
   }
 
   run("configure_launch_script") {
+    start_menu_grid_file = "#{start_menu_location}start-grid.bat"
+    grid_file = File.join(File.dirname(__FILE__), "../../files/selenium/start-grid.bat")
     FileUtils.rm_rf "#{start_menu_location}/*"
-    FileUtils.cp "#{mountpoint}/selenium/#{spec[:launch_script]}", start_menu_location
+    FileUtils.cp grid_file, start_menu_location
+
+    spec[:ie_version] = `cat #{spec[:temp_dir]}/ieversion.txt`.chomp unless spec[:ie_version]
+
+    cmd "sed -i s/\"%HUBHOST%\"/#{spec[:se_hub]}/g \"#{start_menu_grid_file}\""
+    cmd "sed -i s/\"%SEVERSION%\"/#{spec[:se_version]}/g \"#{start_menu_grid_file}\""
+    cmd "sed -i s/\"%IEVERSION%\"/#{spec[:ie_version]}/g \"#{start_menu_grid_file}\""
   }
 
   run("stamp time") {
