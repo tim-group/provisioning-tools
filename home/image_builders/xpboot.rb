@@ -2,6 +2,9 @@ require 'provision/image/catalogue'
 require 'provision/image/commands'
 require 'socket'
 
+### TODO: put product key in the gold.
+##        move gold image production to prov tools
+
 define "xpboot" do
   extend Provision::Image::Commands
 
@@ -46,7 +49,7 @@ define "xpboot" do
     start_menu_grid_file = "#{start_menu_location}#{spec[:launch_script]}"
     launch_script = "#{xp_files}/#{spec[:launch_script]}"
 
-    selenium_dir = "#{xp_files}/seleniumx"
+    selenium_dir = "#{xp_files}/selenium"
     java_dir     = "#{xp_files}/java"
 
     FileUtils.cp_r selenium_dir, "#{spec[:temp_dir]}"
