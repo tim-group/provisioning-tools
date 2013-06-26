@@ -19,7 +19,7 @@ define "xpboot" do
   run("copy gold image") {
 #    spec[:gold_image_path] = "/mnt/dev-seliex-goldtest.img"
     cmd "mkdir -p #{spec[:temp_dir]}"
-    cmd "mv #{spec[:gold_image_path]} #{spec[:image_path]}"
+    cmd "cp #{spec[:gold_image_path]} #{spec[:image_path]}"
     cmd "mount -o offset=32256  #{spec[:image_path]} #{spec[:temp_dir]}"
   }
 
@@ -35,12 +35,21 @@ define "xpboot" do
     cmd "sed -i s/\"<%COMPUTERNAME%>\"/#{spec[:hostname]}/g #{answer_file}"
     cmd "sed -i s/\"<%PRODUCTKEY%>\"/#{key}/g #{answer_file}"
 
+    gateway = "127.0.0.1"
+    spec[:routes].each do |route|
+      route =~ /via (.+)$/
+      gateway = $1
+    end
+
+    dns_domain = spec[:dns_search_path].split(' ')[0]
+
     spec.interfaces.each do |nic|
       config = spec[:networking][nic[:network].to_sym]
-      cmd "sed -i s/\"<%DNSSERVER%>\"/192.168.5.1/g #{network_file}"
+      cmd "sed -i s/\"<%DNSDOMAIN%>\"/#{dns_domain}/g #{network_file}"
+      cmd "sed -i s/\"<%DNSSERVER%>\"/#{spec[:nameserver]}/g #{network_file}"
       cmd "sed -i s/\"<%IPADDRESS%>\"/#{config[:address]}/g #{network_file}"
       cmd "sed -i s/\"<%NETMASK%>\"/#{config[:netmask]}/g #{network_file}"
-      cmd "sed -i s/\"<%GATEWAY%>\"/192.168.5.1/g #{network_file}"
+      cmd "sed -i s/\"<%GATEWAY%>\"/#{gateway}/g #{network_file}"
     end
   }
 
