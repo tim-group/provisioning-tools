@@ -17,7 +17,7 @@ define "xpboot" do
   end
 
   run("copy gold image") {
-    spec[:gold_image_path] = "/mnt/dev-seliex-goldtest.img"
+#    spec[:gold_image_path] = "/mnt/dev-seliex-goldtest.img"
     cmd "mkdir -p #{spec[:temp_dir]}"
     cmd "mv #{spec[:gold_image_path]} #{spec[:image_path]}"
     cmd "mount -o offset=32256  #{spec[:image_path]} #{spec[:temp_dir]}"
@@ -25,7 +25,7 @@ define "xpboot" do
 
   cleanup {
     cmd "umount #{spec[:temp_dir]}"
-    #suppress_error.cmd "rmdir #{spec[:temp_dir]}"
+   # suppress_error.cmd "rmdir #{spec[:temp_dir]}"
   }
 
   run("inject hostname and ip address") {
@@ -55,7 +55,6 @@ define "xpboot" do
     FileUtils.cp_r selenium_dir, "#{spec[:temp_dir]}"
     FileUtils.cp_r java_dir, "#{spec[:temp_dir]}"
 
-    puts ">>>>#{start_menu_location}"
     cmd "rm \"#{start_menu_location}\"/*"
     FileUtils.cp launch_script, start_menu_location
 

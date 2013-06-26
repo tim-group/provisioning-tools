@@ -1,0 +1,3 @@
+[Commands]
+"c:\support\netset.exe c:\sysprep\net.txt"
+"c:\selenium\firstboot.bat"
