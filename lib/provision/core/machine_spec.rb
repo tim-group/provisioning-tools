@@ -56,6 +56,7 @@ class Provision::Core::MachineSpec
     if_nil_define_var(:images_dir, "#{@spec[:spindle]}")
     if_nil_define_var(:image_path, "#{@spec[:images_dir]}/#{@spec[:hostname]}.img")
     if_nil_define_var(:image_size, "3G")
+    if_nil_define_var(:vcpus, "1")
 
     if_nil_define_var(:loop0, "loop#{@thread_number*2}")
     if_nil_define_var(:loop1, "loop#{@thread_number*2+1}")

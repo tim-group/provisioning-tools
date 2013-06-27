@@ -2,7 +2,7 @@
   <name><%= spec[:hostname] %></name>
   <memory><%= spec[:ram] %></memory>
   <currentMemory><%= spec[:ram] %></currentMemory>
-  <vcpu>1</vcpu>
+  <vcpu><%= spec[:vcpu] %></vcpu>
   <os>
     <type arch='x86_64' machine='pc'>hvm</type>
     <boot dev='hd'/>

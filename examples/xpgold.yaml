@@ -1,0 +1,11 @@
+- :domain: dev.net.local
+  :template: xpgold
+  :master_image_url: http://localhost/vm-images/dev-seliex-master.img
+  :ieversion: 8
+  :fabric: local
+  :networks:
+  - :mgmt
+  :ram: "2097152"
+  :hostname: dev-sxp-gold
+  :qualified_hostnames:
+    :mgmt: dev-sxp-gold.mgmt.dev.net.local
