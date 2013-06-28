@@ -23,14 +23,14 @@ define "senode" do
     }.until {`mount -l | grep #{spec[:hostname]}/dev | wc -l`.chomp == "0"}
   }
 
-run("configure google apt repo") {
-    open("#{spec[:temp_dir]}/etc/apt/sources.list.d/google.list", 'w') { |f|
-      f.puts "deb http://dl.google.com/linux/deb/ stable main\n"
-    }
+#run("configure google apt repo") {
+#    open("#{spec[:temp_dir]}/etc/apt/sources.list.d/google.list", 'w') { |f|
+#      f.puts "deb http://dl.google.com/linux/deb/ stable main\n"
+#    }
 
-    chroot "curl -Ss https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -"
-    suppress_error.chroot "apt-get update"
-  }
+#    chroot "curl -Ss https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -"
+#    suppress_error.chroot "apt-get update"
+#  }
 
   run("create ci user") {
     chroot "/usr/sbin/useradd ci -M"
@@ -49,8 +49,7 @@ run("configure google apt repo") {
   }
 
   run("place the selenium node config") {
-    hubparts = spec[:sehub]
-    host = hubparts[0]
+    host = spec[:sehub]
     port = "7799"
 
     cmd "mkdir -p #{spec[:temp_dir]}/etc/default"
