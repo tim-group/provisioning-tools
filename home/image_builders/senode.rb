@@ -49,9 +49,9 @@ run("configure google apt repo") {
   }
 
   run("place the selenium node config") {
-    hubparts = spec[:sehub].split(":")
+    hubparts = spec[:sehub]
     host = hubparts[0]
-    port = hubparts[1]
+    port = "7799"
 
     cmd "mkdir -p #{spec[:temp_dir]}/etc/default"
     open("#{spec[:temp_dir]}/etc/default/selenium-node", 'w') { |f|
