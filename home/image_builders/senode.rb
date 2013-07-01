@@ -46,10 +46,11 @@ define "senode" do
     apt_install "selenium-node"
     chroot "update-rc.d selenium-node defaults"
     chroot "sed -i'.bak' -e 's#^securerandom.source=file:/dev/urandom#securerandom.source=file:/dev/../dev/urandom#g' /etc/java-6-openjdk/security/java.security"
+    chroot "ln -s /usr/lib/firefox/firefox /usr/bin/firefox-bin"
   }
 
   run("place the selenium node config") {
-    host = spec[:sehub]
+    host = spec[:se_hub]
     port = "7799"
 
     cmd "mkdir -p #{spec[:temp_dir]}/etc/default"
