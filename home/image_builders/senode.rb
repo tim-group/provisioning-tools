@@ -33,7 +33,7 @@ define "senode" do
 #  }
 
   run("create ci user") {
-    chroot "/usr/sbin/useradd ci -M"
+    chroot "/usr/sbin/adduser ci"
   }
 
   run("install selenium packages") {
