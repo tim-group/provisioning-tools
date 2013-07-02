@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
     'bin/*',
     'home/**/*',
     'templates/**/*',
+    'files/**/*',
     '[A-Z]*',
     'test/**/*'].to_a
   s.executables << 'dns'
