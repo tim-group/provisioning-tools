@@ -113,6 +113,13 @@ class Provision::Factory
     targetdir = File.join(File.dirname(__FILE__), "../target")
     image_service = Provision::Image::Service.new(:configdir => home("image_builders"), :targetdir => targetdir)
     image_service.build_image("xpgold", spec)
+    virsh = Provision::VM::Virsh.new()
+    virsh.define_vm(spec)
+    virsh.start_vm(spec)
+
+
+
+
   end
 
 end

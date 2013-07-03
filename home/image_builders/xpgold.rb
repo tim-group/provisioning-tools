@@ -27,7 +27,8 @@ define "xpgold" do
   }
 
   cleanup {
-    cmd "umount #{spec[:temp_dir]}"
+    cmd "umount -l #{spec[:temp_dir]}"
+    cmd "sleep 1"
     suppress_error.cmd "rmdir #{spec[:temp_dir]}"
   }
 
