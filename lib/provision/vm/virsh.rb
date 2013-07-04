@@ -41,6 +41,18 @@ class Provision::VM::Virsh
     safe_system("virsh start #{spec[:hostname]} > /dev/null 2>&1")
   end
 
+  def wait_for_shutdown(spec)
+    120.times do
+      if not is_running(spec)
+        return
+      end
+      sleep 1
+    end
+
+    raise "giving up waiting for #{spec[:hostname]} to shutdown"
+  end
+
+
   def write_virsh_xml(spec)
     template = ERB.new(File.read(@template))
     to = "#{spec[:libvirt_dir]}/#{spec[:hostname]}.xml"

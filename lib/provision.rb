@@ -71,6 +71,10 @@ class Provision::Factory
     Provision.base(dir)
   end
 
+  def virsh
+    Provision::VM::Virsh.new()
+  end
+
   def provisioning_service()
     targetdir = File.join(File.dirname(__FILE__), "../target")
 
@@ -81,7 +85,7 @@ class Provision::Factory
         :configdir => home("image_builders"),
         :targetdir => targetdir
     ),
-      :vm_service => Provision::VM::Virsh.new(),
+      :vm_service => virsh,
       :numbering_service => numbering_service,
       :defaults => defaults,
       :logger => @logger
@@ -111,15 +115,17 @@ class Provision::Factory
     spec_hash[:thread_number] = 0
     spec = Provision::Core::MachineSpec.new(spec_hash)
     targetdir = File.join(File.dirname(__FILE__), "../target")
+    virsh = virsh()
     image_service = Provision::Image::Service.new(:configdir => home("image_builders"), :targetdir => targetdir)
     image_service.build_image("xpgold", spec)
-    virsh = Provision::VM::Virsh.new()
+
     virsh.define_vm(spec)
+    puts "starting gold image - prepare for sysprep"
     virsh.start_vm(spec)
 
-
-
-
+    puts "waiting until gold image has shutdown"
+    virsh.wait_for_shutdown(spec)
+    puts "gold image build is complete"
   end
 
 end
