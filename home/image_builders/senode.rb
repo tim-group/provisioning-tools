@@ -52,6 +52,10 @@ define "senode" do
     chroot "ln -s /usr/lib/firefox/firefox /usr/bin/firefox-bin"
   }
 
+  cleanup {
+    chroot "/etc/init.d/dbus stop"
+  }
+
   run("place the selenium node config") {
     host = spec[:se_hub]
     port = "7799"
