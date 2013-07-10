@@ -124,11 +124,7 @@ exec /sbin/getty -L ttyS0 115200 vt102
 
   # A few daemons hang around at the end of the bootstrapping process that prevent us unmounting.
   cleanup {
-    chroot "/etc/init.d/dbus stop"
-    chroot "/etc/init.d/acpid stop"
-    chroot "/etc/init.d/cron stop"
-    chroot "/etc/init.d/udev stop"
-    chroot "/etc/init.d/rsyslogd stop"
+    chroot "/bin/kill 1"
   }
 
   run("configure precise repo") {
