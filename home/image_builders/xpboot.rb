@@ -17,9 +17,8 @@ define "xpboot" do
   end
 
   run("copy gold image") {
-#    spec[:gold_image_path] = "/mnt/dev-seliex-goldtest.img"
     cmd "mkdir -p #{spec[:temp_dir]}"
-    cmd "cp #{spec[:gold_image_path]} #{spec[:image_path]}"
+    cmd "curl --fail -o #{spec[:image_path]} #{spec[:gold_image_url]}"
     cmd "mount -o offset=32256  #{spec[:image_path]} #{spec[:temp_dir]}"
   }
 
