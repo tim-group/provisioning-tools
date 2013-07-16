@@ -1,2 +1,0 @@
-set PATH=C:\selenium;%PATH%
-c:\java\bin\java -Djava.etil.logging.config.file=c:\selenium\logger.properties -jar c:\selenium\selenium-server-standalone-%SEVERSION%.jar -host %COMPUTERNAME% -role node -hubPort 7799 -hubHost %HUBHOST% -maxSession 1 -nodeTimeout=60 -singleWindow -browser "seleniumProtocol=Selenium,browserName=*iexplore%IEVERSION%,version=%IEVERSION%,maxInstances=1" -browser "seleniumProtocol=WebDriver,browserName=internet explorer,version=%IEVERSION%,maxInstances=1"

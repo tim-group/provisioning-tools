@@ -1,0 +1,6 @@
+[submodule "files/xpboot"]
+	path = files/xpboot
+	url = git@git:xpboot.git
+[submodule "files/xpgold"]
+	path = files/xpgold
+	url = git@git:xpgold.git
