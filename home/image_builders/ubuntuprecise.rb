@@ -235,5 +235,12 @@ exec /sbin/getty -L ttyS0 115200 vt102
       f.puts '*.* @logs'
     }
   }
+
+  run("Fix syslog rate limiting") {
+    open("/etc/rsyslog.conf", 'a') { |f|
+      f.puts '$SystemLogRateLimitInterval 0
+      $SystemLogRateLimitBurst 0'
+    }
+  }
 end
 
