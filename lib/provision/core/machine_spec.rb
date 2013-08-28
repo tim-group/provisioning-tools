@@ -102,15 +102,12 @@ class Provision::Core::MachineSpec
 
   def interfaces
     nics = []
-    slot = 6
     networks.each {|net|
       nics << {
-        :slot => slot,
         :mac => mac("#{@spec[:hostname]}.#{@spec[:domain]}.#{net}"),
         :bridge => "br_#{net}",
         :network => "#{net}"
       }
-      slot = slot+1
     }
     nics
   end
