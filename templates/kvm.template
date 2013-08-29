@@ -30,6 +30,9 @@
     <interface type='bridge'>
       <mac address='<%= nic[:mac] %>'/>
       <source bridge='br_<%= nic[:network] %>'/>
+      <model type='virtio'/>
+      <driver name='vhost' txmode='iothread'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x0<%=nic[:slot]%>' function='0x0'/>
     </interface>
     <% end %>
     <serial type='pty'>
