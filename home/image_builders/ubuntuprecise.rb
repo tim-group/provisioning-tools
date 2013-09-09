@@ -129,7 +129,7 @@ exec /sbin/getty -L ttyS0 115200 vt102
     chroot "/etc/init.d/cron stop"
     chroot "/etc/init.d/udev stop"
     chroot "/etc/init.d/rsyslogd stop"
-    chroot "killall -u syslog"
+    chroot "killall -9u syslog"
   }
 
   run("configure precise repo") {
