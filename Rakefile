@@ -94,7 +94,7 @@ task :package_gold do
     "-d", "provisioning-tools",
     "-a", "all",
     "-C", "build",
-    "-p", "build/provisioning-tools-gold-image.deb",
+    "-p", "build/provisioning-tools-gold-image_#{version}.deb",
     "--prefix", "/var/local/images/",
     "gold"
 
