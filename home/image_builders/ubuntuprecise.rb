@@ -128,7 +128,7 @@ exec /sbin/getty -L ttyS0 115200 vt102
     chroot "/etc/init.d/acpid stop"
     chroot "/etc/init.d/cron stop"
     chroot "/etc/init.d/udev stop"
-    chroot "/etc/init.d/rsyslogd stop"
+    chroot "/etc/init.d/rsyslog stop"
     chroot "killall -9u syslog"
   }
 
