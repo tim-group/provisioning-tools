@@ -11,7 +11,8 @@ env="${1:-${env:-dev}}"
 rake network
 bin/dns deallocate "${env}-puppetmaster-001.mgmt.dev.net.local"
 bin/dns allocate "${env}-puppetmaster-001.mgmt.dev.net.local"
-sed -i "s/dev-puppetmaster-001.mgmt.dev.net.local/${env}-puppetmaster-001.mgmt.dev.net.local puppet.mgmt.dev.net.local/g" /etc/hosts
+sed -i 's/^\(.*puppet.mgmt.dev.net.local.*\)$/#\1/' /etc/hosts
+sed -i "s/${env}-puppetmaster-001.mgmt.dev.net.local/${env}-puppetmaster-001.mgmt.dev.net.local puppet.mgmt.dev.net.local/g" /etc/hosts
 rake network
 virsh destroy "${env}-puppetmaster-001"
 virsh undefine "${env}-puppetmaster-001"
