@@ -182,6 +182,33 @@ exec /sbin/getty -L ttyS0 115200 vt102
     apt_install "postfix"
   }
 
+  run("install puppet managed packages to speed up initial runs") {
+    apt_install "collectd"
+    apt_install "dstat"
+    apt_install "git-svn"
+    apt_install "htop"
+    apt_install "iftop"
+    apt_install "iotop"
+    apt_install "libnet-ping-ruby"
+    apt_install "libstomp-ruby1.8"
+    apt_install "lvm2"
+    apt_install "mailutils"
+    apt_install "nagios-nrpe-server"
+    apt_install "nagios-plugins"
+    apt_install "nagios-plugins-standard"
+    apt_install "ntp"
+    apt_install "screen"
+    apt_install "strace"
+    apt_install "subversion"
+    apt_install "sun-java6-jdk"
+    apt_install "sun-java6-jre"
+    apt_install "sysstat"
+    apt_install "tmux"
+    apt_install "unzip"
+    apt_install "zip"
+    apt_install "zsh"
+  }
+
   run("install kernel and grub") {
     chroot "apt-get -y --force-yes update"
     apt_install "linux-image-virtual"
