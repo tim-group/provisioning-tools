@@ -200,13 +200,31 @@ exec /sbin/getty -L ttyS0 115200 vt102
     apt_install "screen"
     apt_install "strace"
     apt_install "subversion"
-    apt_install "sun-java6-jdk"
-    apt_install "sun-java6-jre"
     apt_install "sysstat"
     apt_install "tmux"
     apt_install "unzip"
     apt_install "zip"
     apt_install "zsh"
+  }
+
+  run("pre-accept sun licences") {
+    open("#{spec[:temp_dir]}/var/cache/debconf/java-license.seeds", 'w') { |f|
+      f.puts """
+sun-java6-bin   shared/accepted-sun-dlj-v1-1    boolean true
+sun-java6-jdk   shared/accepted-sun-dlj-v1-1    boolean true
+sun-java6-jre   shared/accepted-sun-dlj-v1-1    boolean true
+sun-java6-jre   sun-java5-jre/stopthread        boolean true
+sun-java6-jre   sun-java5-jre/jcepolicy         note
+sun-java6-bin   shared/present-sun-dlj-v1-1     note
+sun-java6-jdk   shared/present-sun-dlj-v1-1     note
+sun-java6-jre   shared/present-sun-dlj-v1-1     note
+    """
+    }
+
+    chroot "/usr/bin/debconf-set-selections /var/cache/debconf/java-license.seeds"
+
+    apt_install "sun-java6-jdk"
+    apt_install "sun-java6-jre"
   }
 
   run("install kernel and grub") {
