@@ -7,15 +7,25 @@ define "copyboot" do
 
   grow
 
-  run("loopback devices") {
-    cmd "mkdir #{spec[:temp_dir]}"
-    #cmd "cp /mnt/generic.img #{spec[:image_path]}"
-    #    cmd "dd if=/mnt/generic.img of=/dev/mapper/MYMACHINE"
-    #
-    #print "mounting #{spec[:image_path]} to #{spec[:temp_dir]}\n"
-    pp spec
-    cmd "mount -o offset=1048576  #{spec[:image_path]} #{spec[:temp_dir]}"
+  run("create temporary mount directory for VM filesystem") {
+      cmd "mkdir #{spec[:temp_dir]}"
   }
+
+  case spec[:vm_storage_type]
+  when 'image'
+    run("mount loopback device") {
+      #cmd "cp /mnt/generic.img #{spec[:image_path]}"
+      #    cmd "dd if=/mnt/generic.img of=/dev/mapper/MYMACHINE"
+      #
+      #print "mounting #{spec[:image_path]} to #{spec[:temp_dir]}\n"
+#      pp spec
+      cmd "mount -o offset=1048576  #{spec[:image_path]} #{spec[:temp_dir]}"
+    }
+  when 'lvm'
+    run("mount lvm device") {
+      cmd "mount /dev/mapper/#{spec[:lvm_vg]}-#{spec[:hostname].gsub(/-/,'--')}1 #{spec[:temp_dir]}"
+    }
+  end
 
   cleanup {
     cmd "umount #{spec[:temp_dir]}"

@@ -1,4 +1,5 @@
 require 'provision/image/catalogue'
+require 'provision/image/commands'
 
 class Provision::Image::Service
   def initialize(options)
@@ -11,8 +12,16 @@ class Provision::Image::Service
   end
 
   def remove_image(spec)
-    if File.exist?(spec[:image_path])
-      File.delete(spec[:image_path])
+    case spec[:vm_storage_type]
+    when 'image'
+      if File.exist?(spec[:image_path])
+        File.delete(spec[:image_path])
+      end
+    when 'lvm'
+      # lvrmeove ..
+      if File.exist?("/dev/#{spec[:lvm_vg]}/#{spec[:hostname]}")
+        cmd "lvremove -f /dev/#{spec[:lvm_vg]}/#{spec[:hostname]}"
+      end
     end
   end
 end

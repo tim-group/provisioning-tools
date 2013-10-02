@@ -18,11 +18,18 @@
   <on_crash>restart</on_crash>
   <devices>
     <emulator>/usr/bin/kvm</emulator>
+<% case spec[:vm_storage_type] when 'image' %>
     <disk type='file' device='disk'>
       <driver name='qemu' type='raw'/>
       <source file='<%= spec[:image_path] %>'/>
       <target dev='hda' bus='ide'/>
       <address type='drive' controller='0' bus='0' unit='0'/>
+<% when 'lvm' %>
+    <disk type='block' device='disk'>
+      <driver name='qemu' type='raw'/>
+      <source dev='/dev/<%= spec[:lvm_vg] %>/<%= spec[:hostname] %>'/>
+      <target dev='vda' bus='virtio'/>
+<% end %>
     </disk>
     <controller type='ide' index='0'>
     </controller>
