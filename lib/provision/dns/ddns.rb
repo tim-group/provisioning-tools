@@ -145,6 +145,16 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     nsupdate(tmp_file, "Add forward from #{fqdn} to #{ip}")
   end
 
+  def add_cname_lookup(cname_fqdn, fqdn)
+    tmp_file = Tempfile.new('remove_temp')
+    tmp_file.puts "server #{get_primary_nameserver}"
+    tmp_file.puts "zone #{get_zone(cname_fqdn)}"
+    tmp_file.puts "update add #{fqdn}. 86400 CNAME #{cname_fqdn}"
+    tmp_file.puts "send"
+    tmp_file.close
+    nsupdate(tmp_file, "Add CNAME from #{cname_fqdn} to #{fqdn}")
+  end
+
   def remove_forward_lookup(fqdn)
     tmp_file = Tempfile.new('remove_temp')
     tmp_file.puts "server #{get_primary_nameserver}"
@@ -153,6 +163,16 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     tmp_file.puts "send"
     tmp_file.close
     nsupdate(tmp_file, "Remove forward from #{fqdn}")
+  end
+
+  def remove_cname_lookup(cname_fqdn)
+    tmp_file = Tempfile.new('remove_temp')
+    tmp_file.puts "server #{get_primary_nameserver}"
+    tmp_file.puts "zone #{get_zone(cname_fqdn)}"
+    tmp_file.puts "update delete #{cname_fqdn}. CNAME"
+    tmp_file.puts "send"
+    tmp_file.close
+    nsupdate(tmp_file, "Remove forward from #{cname_fqdn}")
   end
 
   def remove_reverse_lookup(ip)
