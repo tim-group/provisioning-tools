@@ -6,4 +6,5 @@ dnsmasq \
 --pid-file=/var/run/dnsmasq.pid \
 --except-interface lo \
 --dhcp-no-override \
---log-queries
+--log-queries \
+-7 /etc/dnsmasq.d,.dpkg-dist,.dpkg-old,.dpkg-new
