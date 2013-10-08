@@ -29,8 +29,9 @@ echo 'Sleep whilst puppetdb spins up' | logger 2>&1
 sleep 30;
 echo 'Run puppet agent first time to ask for cert' | logger
 /usr/bin/puppet agent -t
-echo 'Signing dev-puppetmaster-001.mgmt.dev.net.local cert' | logger
-puppet cert sign dev-puppetmaster-001.mgmt.dev.net.local 2>&1 | logger
+fqdn=$(hostname -f)
+echo \"Signing $fqdn cert\" | logger
+puppet cert sign $fqdn 2>&1 | logger
 echo 'Running puppet agent against myself for real' | logger
 /usr/bin/puppet agent -t
 echo 'Replacing puppet.conf from template' | logger
