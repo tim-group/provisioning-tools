@@ -16,7 +16,6 @@ define 'puppetmaster' do
     apt_install 'rubygems1.8'
     apt_install 'rubygem-rspec'
   }
-
   run('deploy puppetmaster') {
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
 
@@ -25,22 +24,10 @@ echo 'Run ntpdate' | logger
 /usr/sbin/ntpdate -s dc-1.net.local | logger 2>&1
 echo 'Run puppet apply' | logger
 /usr/bin/puppet apply --pluginsync --modulepath=/etc/puppet/modules --logdest=syslog /etc/puppet/manifests/site.pp
-echo 'Sleep whilst puppetdb spins up' | logger 2>&1
-sleep 30;
-echo 'Run puppet agent first time to ask for cert' | logger
-/usr/bin/puppet agent -t
-fqdn=$(hostname -f)
-echo \"Signing $fqdn cert\" | logger
-puppet cert sign $fqdn 2>&1 | logger
-echo 'Running puppet agent against myself for real' | logger
-/usr/bin/puppet agent -t
 echo 'Replacing puppet.conf from template' | logger
 cp /etc/puppet/puppet.conf.base /etc/puppet/puppet.conf 2>&1 | logger
 /etc/init.d/apache2-puppetmaster restart 2>&1 | logger
-echo 'Sleep whilst apache+puppetdb spins up' | logger 2>&1
-sleep 30;
-echo 'Running puppet agent against myself for real, with indirector' | logger
-/usr/bin/puppet agent -t
+puppet agent --debug --waitforcert 10 --onetime 2>&1 | tee /seed/init.log
 echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local"
     }
   }
