@@ -5,11 +5,13 @@ module Provision::Image::Commands
   def cmd(cmd)
     log.debug("running command #{cmd}")
 
+    output = ""
     IO.popen("#{cmd} 2>&1", "w+") do |pipe|
       # open in write mode and then close the output stream so that the subprocess doesn't capture our STDIN
       pipe.close_write
       pipe.each_line do |line|
         log.debug("> " + line.chomp)
+        output = output + line.chomp
       end
     end
 
@@ -17,6 +19,7 @@ module Provision::Image::Commands
     if exit_status != 0
       raise "command #{cmd} returned non-zero error code #{exit_status}"
     end
+    return output
   end
 
   def chroot(cmd)
