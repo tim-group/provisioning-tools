@@ -33,6 +33,7 @@ class Provision::Core::ProvisioningService
   end
 
   def clean_vm(spec_hash)
+    spec_hash = @machinespec_defaults.merge(spec_hash)
     spec = Provision::Core::MachineSpec.new(spec_hash)
     @vm_service.destroy_vm(spec)
     @vm_service.undefine_vm(spec)
