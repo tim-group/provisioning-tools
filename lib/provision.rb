@@ -72,7 +72,7 @@ class Provision::Factory
   end
 
   def virsh
-    Provision::VM::Virsh.new()
+    Provision::VM::Virsh.new(@config)
   end
 
   def provisioning_service()
