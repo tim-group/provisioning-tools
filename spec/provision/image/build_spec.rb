@@ -34,6 +34,27 @@ describe XYZ do
     end
   end
 
+  it 'has access to the config object' do
+    require 'provision/image/catalogue'
+    define "vanillavm" do
+      extend MockFunctions
+      run("do stuff") {
+        action(config[:item])
+      }
+      cleanup {
+        action(config[:item2])
+      }
+   end
+
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({:hostname=>"myfirstmachine"}), {:item=>"run", :item2 => "clean"})
+
+    @commands.should_receive(:action).with("run")
+    @commands.should_receive(:action).with("clean")
+
+    build.execute()
+  end
+
+
   it 'cleanup blocks run after run blocks' do
     require 'provision/image/catalogue'
     define "vanillavm" do
@@ -53,7 +74,7 @@ describe XYZ do
       }
     end
 
-    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({:hostname=>"myfirstmachine"}))
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({:hostname=>"myfirstmachine"}), {})
 
     @commands.should_receive(:action).with("1")
     @commands.should_receive(:action).with("2")
@@ -84,7 +105,7 @@ describe XYZ do
       }
     end
 
-    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({:hostname=>"myfirstmachine"}))
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({:hostname=>"myfirstmachine"}), {})
 
     @commands.should_receive(:action).with("6").ordered
     @commands.should_receive(:action).with("5").ordered
@@ -106,7 +127,7 @@ describe XYZ do
       }
     end
 
-    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({:hostname=>"myfirstmachine"}))
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({:hostname=>"myfirstmachine"}), {})
     @commands.should_receive(:action).with("5")
     build.execute()
   end
@@ -121,7 +142,7 @@ describe XYZ do
       }
     end
 
-    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({:hostname=>"myfirstmachine"}))
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({:hostname=>"myfirstmachine"}), {})
     @commands.should_receive(:action).with("5")
     build.execute()
   end
@@ -136,7 +157,7 @@ describe XYZ do
         action("3")
       }
     end
-    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({:hostname=>"myfirstmachine"}))
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({:hostname=>"myfirstmachine"}), {})
     @commands.should_receive(:action).with("1")
     @commands.should_not_receive(:action).with("3")
 
@@ -153,7 +174,7 @@ describe XYZ do
       }
     end
 
-    build = Provision::Image::Catalogue::build("vanillavm",Provision::Core::MachineSpec.new({:hostname=>"myfirstmachine"}))
+    build = Provision::Image::Catalogue::build("vanillavm",Provision::Core::MachineSpec.new({:hostname=>"myfirstmachine"}), {})
 
     @commands.should_receive(:action).with("myfirstmachine")
 
@@ -177,7 +198,7 @@ describe XYZ do
       }
     end
 
-    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({}))
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({}), {})
     @commands.should_receive(:action).with("3G")
     build.execute()
   end
@@ -195,7 +216,7 @@ describe XYZ do
     end
 
 
-    build = Provision::Image::Catalogue::build("defaults", {})
+    build = Provision::Image::Catalogue::build("defaults", {}, {})
     expect {
       build.execute()
     }.to raise_error NameError
@@ -212,7 +233,7 @@ describe XYZ do
       }
     end
 
-    build = Provision::Image::Catalogue::build("defaults", Provision::Core::MachineSpec.new({}))
+    build = Provision::Image::Catalogue::build("defaults", Provision::Core::MachineSpec.new({}), {})
     build.execute()
 
     something.should eql("something")
@@ -234,7 +255,7 @@ describe XYZ do
       }
     end
 
-    build = Provision::Image::Catalogue::build("defaults", Provision::Core::MachineSpec.new({}))
+    build = Provision::Image::Catalogue::build("defaults", Provision::Core::MachineSpec.new({}), {})
     build.execute()
 
     something.should eql("something")
@@ -243,7 +264,7 @@ describe XYZ do
   it 'raises a meaningful error when a non-existent template is defined' do
     require 'provision/image/catalogue'
     expect {
-      Provision::Image::Catalogue::build("noexist", Provision::Core::MachineSpec.new({}))
+      Provision::Image::Catalogue::build("noexist", Provision::Core::MachineSpec.new({}), {})
     }.to raise_error("attempt to execute a template that is not in the catalogue: noexist")
   end
 
