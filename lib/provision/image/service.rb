@@ -2,6 +2,7 @@ require 'provision/image/catalogue'
 require 'provision/image/commands'
 
 class Provision::Image::Service
+
   def initialize(options)
     @configdir = options[:configdir]
     @config = options[:config]
@@ -21,7 +22,7 @@ class Provision::Image::Service
     when 'lvm'
       # lvrmeove ..
       if File.exist?("/dev/#{spec[:lvm_vg]}/#{spec[:hostname]}")
-        cmd "lvremove -f /dev/#{spec[:lvm_vg]}/#{spec[:hostname]}"
+        system "lvremove -f /dev/#{spec[:lvm_vg]}/#{spec[:hostname]}"
       end
     else
       raise "vm_storage_type '#{@config[:vm_storage_type]}' unknown"
