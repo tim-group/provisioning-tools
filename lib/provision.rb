@@ -83,7 +83,8 @@ class Provision::Factory
     @provisioning_service ||= Provision::Core::ProvisioningService.new(
       :image_service => Provision::Image::Service.new(
         :configdir => home("image_builders"),
-        :targetdir => targetdir
+        :targetdir => targetdir,
+        :config => @config
     ),
       :vm_service => virsh,
       :numbering_service => numbering_service,

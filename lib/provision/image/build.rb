@@ -3,12 +3,13 @@ require 'provision/log'
 
 class Provision::Image::Build
   include Provision::Log
-  attr_accessor :spec
+  attr_accessor :spec,:config
   attr_accessor :suppress_error
 
-  def initialize(name, spec)
+  def initialize(name, spec, config)
     @name = name
     @spec = spec
+    @config = config
     @commands = []
     @cleanups = []
     @suppress_error = CatchAndIgnore.new(self)

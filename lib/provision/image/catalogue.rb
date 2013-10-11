@@ -33,8 +33,8 @@ module Provision::Image::Catalogue
     return build
   end
 
-  def build(name, options)
-    build = Provision::Image::Build.new(name, options)
+  def build(name, options, config)
+    build = Provision::Image::Build.new(name, options, config)
     closure = @@catalogue[name]
     raise "attempt to execute a template that is not in the catalogue: #{name}" if closure.nil?
     build.instance_eval(&closure)
