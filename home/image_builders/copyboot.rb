@@ -24,7 +24,7 @@ define "copyboot" do
   when 'lvm'
     run("mount lvm device") {
       # FIXME: We should probably do this for images too, rather than using an offset.
-      vm_partition_name = cmd "kpartx -l #{vm_disk_location} | awk '{ print $1 }'"
+      vm_partition_name = cmd "kpartx -l /dev/#{spec[:lvm_vg]}/#{spec[:hostname]} | awk '{ print $1 }'"
       cmd "mount /dev/mapper/#{vm_partition_name} #{spec[:temp_dir]}"
     }
   end
