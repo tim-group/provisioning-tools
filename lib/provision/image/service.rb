@@ -13,7 +13,7 @@ class Provision::Image::Service
   end
 
   def remove_image(spec)
-    case spec[:vm_storage_type]
+    case @config[:vm_storage_type]
     when 'image'
       if File.exist?(spec[:image_path])
         File.delete(spec[:image_path])
@@ -23,6 +23,8 @@ class Provision::Image::Service
       if File.exist?("/dev/#{spec[:lvm_vg]}/#{spec[:hostname]}")
         cmd "lvremove -f /dev/#{spec[:lvm_vg]}/#{spec[:hostname]}"
       end
+    else
+      raise "vm_storage_type '#{@config[:vm_storage_type]}' unknown"
     end
   end
 end

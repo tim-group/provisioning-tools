@@ -5,7 +5,7 @@ define "grow" do
   extend Provision::Image::Commands
 
   run("grow the partition table and filesystem") {
-    case spec[:vm_storage_type]
+    case config[:vm_storage_type]
     when 'image'
       cmd "cp #{spec[:images_dir]}/gold/generic.img #{spec[:image_path]}"
       cmd "losetup /dev/#{spec[:loop0]} #{spec[:image_path]}"
@@ -30,7 +30,7 @@ define "grow" do
   }
 
   cleanup {
-    case spec[:vm_storage_type]
+    case config[:vm_storage_type]
     when 'image'
       cmd "kpartx -d /dev/#{spec[:loop0]}"
       cmd "losetup -d /dev/#{spec[:loop0]}"

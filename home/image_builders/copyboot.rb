@@ -11,7 +11,7 @@ define "copyboot" do
       cmd "mkdir #{spec[:temp_dir]}"
   }
 
-  case spec[:vm_storage_type]
+  case config[:vm_storage_type]
   when 'image'
     run("mount loopback device") {
       #cmd "cp /mnt/generic.img #{spec[:image_path]}"
