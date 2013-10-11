@@ -4,8 +4,9 @@ require 'erb'
 require 'ostruct'
 
 class Provision::VM::Virsh
-  def initialize()
+  def initialize(config)
     @template = "#{Provision.base}/templates/kvm.template"
+    @config = config
   end
 
   def safe_system(cli)
@@ -56,14 +57,15 @@ class Provision::VM::Virsh
   def write_virsh_xml(spec)
     template = ERB.new(File.read(@template))
     to = "#{spec[:libvirt_dir]}/#{spec[:hostname]}.xml"
+    binding = VirshBinding.new(spec, @config)
     begin
-      template.result(spec.get_binding())
+      template.result(binding.get_binding())
     rescue Exception=>e
       print e
       print e.backtrace
     end
     File.open to, 'w' do |f|
-      f.write template.result(spec.get_binding())
+      f.write template.result(binding.get_binding())
     end
     to
   end
@@ -73,4 +75,20 @@ class Provision::VM::Virsh
     safe_system("virsh define #{to} > /dev/null 2>&1")
   end
 end
+
+class VirshBinding
+
+  attr_accessor :spec, :config
+
+  def initialize(spec, config)
+    @spec = spec
+    @config = config
+  end
+
+  def get_binding
+    return binding()
+  end
+end
+
+
 

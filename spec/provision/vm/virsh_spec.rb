@@ -22,7 +22,7 @@ describe Provision::VM::Virsh do
       :libvirt_dir => d
     )
 
-    virt_manager = Provision::VM::Virsh.new()
+    virt_manager = Provision::VM::Virsh.new({:vm_storage_type => "image"})
     fn = virt_manager.write_virsh_xml(machine_spec)
     fn.should eql("#{d}/vmx1.xml")
     File.exist?("#{d}/vmx1.xml").should eql(true)
@@ -42,11 +42,13 @@ describe Provision::VM::Virsh do
       :ram => "1G",
       :interfaces => [{:type=>"bridge",:name=>"br0"}, {:type=>"network", :name=>"provnat0"}],
       :images_dir => "build",
-      :vm_storage_type => 'lvm',
       :libvirt_dir => d
     )
 
-    virt_manager = Provision::VM::Virsh.new()
+    config = {
+      :vm_storage_type => 'lvm',
+    }
+    virt_manager = Provision::VM::Virsh.new(config)
     fn = virt_manager.write_virsh_xml(machine_spec)
     fn.should eql("#{d}/vmx-1.xml")
     File.exist?("#{d}/vmx-1.xml").should eql(true)

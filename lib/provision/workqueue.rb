@@ -24,7 +24,8 @@ class Provision::WorkQueue
     @listener = args[:listener]
     @queue = Queue.new
     @logger = args[:logger] || Logger.new(STDERR)
-    @virsh = args[:virsh] || Provision::VM::Virsh.new()
+    @config = args[:config]
+    @virsh = args[:virsh] || Provision::VM::Virsh.new(@config)
   end
 
   def launch_all(specs)
