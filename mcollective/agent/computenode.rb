@@ -55,20 +55,6 @@ module MCollective
         return listener.results
       end
 
-      def allocate_cnames(specs, listener)
-        queue = prepare_work_queue(specs, listener)
-        logger.info("Allocating CNAMEs for #{specs.size} nodes")
-        queue.allocate_cnames(specs)
-        return listener.results
-      end
-
-      def free_cnames(specs, listener)
-        queue = prepare_work_queue(specs, listener)
-        logger.info("Freeing CNAMEs for #{specs.size} nodes")
-        queue.free_cnames(specs)
-        return listener.results
-      end
-
       def with_lock(&action)
         begin
           File.open(lockfile(), "w") do |f|
@@ -109,17 +95,6 @@ module MCollective
         specs = request[:specs]
         reply.data = free_ips(specs, new_listener())
       end
-
-      action "allocate_cnames" do
-        specs = request[:specs]
-        reply.data = allocate_cnames(specs, new_listener())
-      end
-
-      action "free_cnames" do
-        specs = request[:specs]
-        reply.data = free_cnames(specs, new_listener())
-      end
-
     end
   end
 end

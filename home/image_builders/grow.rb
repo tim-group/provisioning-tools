@@ -17,7 +17,7 @@ define "grow" do
       cmd "dd if=#{spec[:images_dir]}/gold/generic.img of=/dev/#{spec[:lvm_vg]}/#{spec[:hostname]}"
       vm_disk_location = "/dev/#{spec[:lvm_vg]}/#{spec[:hostname]}"
     else
-      raise "provisioning tools does not know about vm_storage_type '#{config[:vm_storage_type]}'"
+      raise "provisioning tools does not know about vm_storage_type '#{spec[:vm_storage_type]}'"
     end
 
     cmd "parted -s #{vm_disk_location} rm 1"
@@ -37,7 +37,7 @@ define "grow" do
     when 'lvm'
       cmd "kpartx -d /dev/#{spec[:lvm_vg]}/#{spec[:hostname]}"
     else
-      raise "provisioning tools does not know about vm_storage_type '#{config[:vm_storage_type]}'"
+      raise "provisioning tools does not know about vm_storage_type '#{spec[:vm_storage_type]}'"
     end
   }
 

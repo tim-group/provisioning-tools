@@ -60,20 +60,6 @@ class Provision::WorkQueue
     process()
   end
 
-  def allocate_cnames(cnames)
-    cnames.each do |fqdn, cname|
-      @provisioning_service.allocate_cname(fqdn, cname)
-    end
-    process()
-  end
-
-  def free_cnames(cnames)
-    cnames.each do |fqdn|
-      @provisioning_service.free_cname(fqdn)
-    end
-    process()
-  end
-
   def launch(spec)
     @queue << SpecTask.new(spec) do
       @logger.info("Provisioning a VM")
