@@ -48,6 +48,16 @@ class Provision::Core::ProvisioningService
     return networking.values.map { |n| n[:address] }.sort.join(", ")
   end
 
+  def allocate_cname(fqdn, cname)
+    @numbering_service.allocate_cname_for(fqdn, cname)
+    return nil
+  end
+
+  def free_cname(fqdn)
+    @numbering_service.free_cname_for(fqdn)
+    return nil
+  end
+
   def free_ip(spec_hash)
     spec = Provision::Core::MachineSpec.new(spec_hash)
     @numbering_service.remove_ips_for(spec)

@@ -4,13 +4,14 @@ require 'tempfile'
 require 'thread'
 
 $etc_hosts_mutex = Mutex.new
-
+$etc_dnsmasqd_mutex = Mutex.new
 
 class Provision::DNS::DNSMasq < Provision::DNS
 end
 
 class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
   attr_reader :by_name
+  attr_reader :by_cname
 
   def initialize(name, range, options={})
     if !options[:primary_nameserver]
@@ -18,12 +19,18 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
     end
     super(name, range, options)
     @hosts_file = options[:hosts_file] || "/etc/hosts"
+    @cnames_file = options[:cnames_file] || "/etc/dnsmasq.d/cnames"
     @dnsmasq_pid_file = options[:pid_file] || "/var/run/dnsmasq.pid"
     parse_hosts
+    parse_cnames
   end
 
   def lookup_ip_for(fqdn)
     @by_name[fqdn]
+  end
+
+  def lookup_cname_for(fqdn)
+    @cnames_by_fqdn[fqdn]
   end
 
   # This does nothing in this class
@@ -43,6 +50,23 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
     end
   end
 
+  def add_cname_lookup(fqdn, cname_fqdn)
+    $etc_hosts_mutex.synchronize do
+      parse_cnames
+      cname_by_fqdn = @cnames_by_fqdn[fqdn]
+      if cnames_by_fqd
+        return false if cname_by_fqdn != cname_fqdn
+      else
+        File.open(@cnames_file, 'a') { |f|
+          f.write "cname=#{fqdn},#{cname_fqdn}\n"
+          f.chmod(0644)
+        }
+        reload_dnsmasq
+      end
+      return true
+    end
+  end
+
   def parse_hosts
     @by_name = {}
     @by_ip = {}
@@ -58,6 +82,16 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
         @by_name[n] = ip
         @by_ip[ip] = n
       }
+    }
+  end
+
+  def parse_cnames
+    @cnames_by_fqdn = {}
+    File.open(@cnames_file).each { |l|
+      next unless l =~ /^cname=/
+      splits = l.gsub(/^cname=/, '').split(',')
+      raise("Bad cname entry in #{@cnames_file}, it contains a cname with #{splits.length} entries instead of 2") if splits.length != 2
+      @cnames_by_fqdn[splits[0]] = splits[1]
     }
   end
 

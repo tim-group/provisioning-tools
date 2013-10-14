@@ -17,7 +17,7 @@ class Provision::DNSChecker
  end
  def resolve(record, element, max_attempts=10)
     attempt = 1
-    addrinfo = Set.new() 
+    addrinfo = Set.new()
     while (attempt <= max_attempts)
       msg = "Lookup #{record} (#{attempt}/#{max_attempts})"
       begin
@@ -121,6 +121,7 @@ class Provision::DNSNetwork
        :address => ip
      }
   end
+
 end
 
 class Provision::DNS
@@ -178,6 +179,31 @@ class Provision::DNS
     end
 
     return remove_results
+  end
+
+  def allocate_cname_for(fqdn, cname)
+    existing_cname = backend.lookup_cname_for(fqdn)
+    if existing_cname
+      if existing_cname == cname
+        return nil
+      else
+        # Should be be unallocating here if it's already allocated?
+        raise("fqdn: #{fqdn} is already a cname for: #{existing_cname}")
+      end
+    else
+      backend.add_cname_lookup(fqdn, cname)
+    end
+
+    raise "unable to resolve cname #{fqdn} -> #{cname}" unless @checker.resolve_cname(hostname).include?(cname)
+
+#    return {
+#      :netmask => @subnet_mask.to_s,
+#      :address => ip.to_s
+#    }
+  end
+
+  def free_cname_for(fqdn)
+
   end
 
 end
