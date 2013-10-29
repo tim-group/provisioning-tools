@@ -14,10 +14,12 @@ class Provision::DNSChecker
  attr_reader :logger
  def initialize(options)
    @logger = options[:logger] || Logger.new(STDERR)
+   @primary_nameserver = options[:primary_nameserver] || '192.168.5.1'
  end
+
  def resolve(record, element, max_attempts=10)
     attempt = 1
-    addrinfo = Set.new() 
+    addrinfo = Set.new()
     while (attempt <= max_attempts)
       msg = "Lookup #{record} (#{attempt}/#{max_attempts})"
       begin
@@ -52,8 +54,8 @@ class Provision::DNSNetwork
     @subnet = IPAddr.new(range)
     @subnet.extend(IPAddrExtensions)
     @logger = options[:logger] || Logger.new(STDERR)
-    @checker = options[:checker] || Provision::DNSChecker.new(:logger => @logger)
-
+    @primary_nameserver = options[:primary_nameserver] || raise("must specify a primary_nameserver")
+    @checker = options[:checker] || Provision::DNSChecker.new(:logger => @logger, :primary_nameserver => @primary_nameserver)
     parts = range.split('/')
     if parts.size != 2
       raise(":network_range must be of the format X.X.X.X/Y")
@@ -69,7 +71,6 @@ class Provision::DNSNetwork
     max_allocation = options[:max_allocation] || @broadcast.to_i - 1
     @max_allocation = IPAddr.new(max_allocation, Socket::AF_INET)
 
-    @primary_nameserver = options[:primary_nameserver] || raise("must specify a primary_nameserver")
   end
 
   def hostname_from_spec(spec)
@@ -121,6 +122,53 @@ class Provision::DNSNetwork
        :address => ip
      }
   end
+
+  def add_cnames_for(spec)
+    unwrapped_spec = spec.spec
+    cnames = unwrapped_spec[:cnames]
+
+    result = {}
+    cnames.each do |network_name, records|
+      records.each do |fqdn, cname|
+        existing_cname = lookup_cname_for(fqdn)
+        if existing_cname
+          if existing_cname == cname
+            result.merge!({fqdn => cname})
+            next
+          else
+            # Should we be unallocating here if it's already allocated?
+            raise("fqdn: #{fqdn} is already a cname for: #{existing_cname}")
+          end
+        else
+          add_cname_lookup(fqdn, cname)
+        end
+        result.merge!({fqdn => cname})
+
+        raise "unable to resolve cname #{fqdn} -> #{cname}" unless @checker.resolve_forward(fqdn)
+      end
+    end
+    result
+  end
+
+  def remove_cnames_for(spec)
+    unwrapped_spec = spec.spec
+    cnames = unwrapped_spec[:cnames]
+
+    result = {}
+    cnames.each do |network_name, records|
+      records.each do |fqdn, cname_fqdn|
+        existing_cname = lookup_cname_for(fqdn)
+        if existing_cname == cname_fqdn
+          remove_cname_lookup(fqdn, cname_fqdn)
+          result.merge!({fqdn => cname_fqdn})
+        else
+          raise "#{fqdn} resolves to CNAME: '#{existing_cname}', not CNAME: '#{cname_fqdn}' that was expected, not removing"
+        end
+      end
+    end
+    result
+  end
+
 end
 
 class Provision::DNS
@@ -170,7 +218,7 @@ class Provision::DNS
     spec.networks.each do |name|
 
       if not @networks.has_key?(name.to_sym)
-        @logger.warn "can't allocate an address on #{name} because there is no config on the compute node. Known networks #{@networks.keys.inspect}"
+        @logger.warn "can't remove an ip on #{name} because there is no config on the compute node. Known networks #{@networks.keys.inspect}"
         next
       end
 
@@ -178,6 +226,35 @@ class Provision::DNS
     end
 
     return remove_results
+  end
+
+  def add_cnames_for(spec)
+    raise("No networks for this machine, cannot add any CNAME's") if spec.networks.empty?
+    result = {}
+    spec.networks.each do |network_name|
+      network = network_name.to_sym
+      @logger.info("Trying to add CNAME's for network #{network}")
+      next unless @networks.has_key?(network)
+      next unless spec[:cnames].has_key?(network)
+      result.merge!(@networks[network].add_cnames_for(spec))
+    end
+    @logger.info("Added #{result}")
+    result
+  end
+
+  def remove_cnames_for(spec)
+    raise("No networks for this machine, cannot remove any CNAME's") if spec.networks.empty?
+    result = {}
+    spec.networks.each do |network_name|
+      network = network_name.to_sym
+      @logger.info("Trying to remove CNAME's for network #{network}")
+      next unless @networks.has_key?(network)
+      next unless spec[:cnames].has_key?(network)
+      result.merge!(@networks[network].remove_cnames_for(spec))
+    end
+    @logger.info("Removed #{result}")
+    result
+
   end
 
 end

@@ -91,7 +91,13 @@ describe Provision::DNS::DNSMasq do
       @checker.should_receive(:resolve_reverse).with(ip).and_return([hostname])
     end
   end
-  
+
+  def expect_cname_checks(allocations)
+    allocations.each do |hostname, ip|
+      @checker.should_receive(:resolve_forward).with(hostname).and_return(ip)
+    end
+  end
+
   it 'constructs once' do
     Dir.mktmpdir { |dir|
       mksubdirs(dir)
@@ -282,6 +288,42 @@ describe Provision::DNS::DNSMasq do
       expect { thing.allocate_ips_for(spec1) }.to raise_exception(Exception, "No networks allocated for this machine, cannot be sane")
 
       File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("") }
+    }
+  end
+
+  it 'adds CNAMEs' do
+    Dir.mktmpdir { |dir|
+      mksubdirs(dir)
+      File.open("#{dir}/etc/hosts", 'w') { |f| f.write "\n" }
+      thing = undertest(dir)
+
+      spec = Provision::Core::MachineSpec.new(
+        :hostname => "example",
+        :domain => "youdevise.com",
+        :cnames => {
+          :prod => {
+            'cname1.youdevise.com' => 'example.youdevise.com',
+          }
+        },
+        :qualified_hostnames => {
+          :prod => 'example.youdevise.com',
+          :mgmt => 'example.mgmt.youdevise.com'
+        }
+      )
+
+      expect_checks(
+        'example.mgmt.youdevise.com' => '192.168.5.2',
+        'example.youdevise.com' => '192.168.6.2'
+      )
+
+      expect_cname_checks(
+        'cname1.youdevise.com' => 'example.youdevise.com'
+      )
+
+      thing.allocate_ips_for(spec)
+      thing.add_cnames_for(spec)
+
+      File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("\n192.168.5.2 example.mgmt.youdevise.com\n192.168.6.2 example.youdevise.com cname1.youdevise.com\n") }
     }
   end
 end

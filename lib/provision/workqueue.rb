@@ -60,6 +60,24 @@ class Provision::WorkQueue
     process()
   end
 
+  def add_cnames(specs)
+    specs.each do |spec|
+      @queue << SpecTask.new(spec) do
+        @provisioning_service.add_cnames(spec)
+      end
+    end
+    process()
+  end
+
+  def remove_cnames(specs)
+    specs.each do |spec|
+      @queue << SpecTask.new(spec) do
+        @provisioning_service.remove_cnames(spec)
+      end
+    end
+    process()
+  end
+
   def launch(spec)
     @queue << SpecTask.new(spec) do
       @logger.info("Provisioning a VM")

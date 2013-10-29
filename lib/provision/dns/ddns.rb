@@ -49,6 +49,22 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     end
   end
 
+  def lookup_cname_for(fqdn)
+    resolver = Resolv::DNS.new(
+      :nameserver => get_primary_nameserver,
+      :search => [],
+      :ndots => 1
+    )
+
+    begin
+      cname = resolver.getresource(fqdn, Resolv::DNS::Resource::IN::CNAME)
+      return cname.name.to_s if cname
+    rescue Resolv::ResolvError
+      puts "Could not find cname for #{fqdn}"
+      return nil
+    end
+  end
+
   def reverse_zone
     parts = @network.to_s.split('.').reverse
     smparts = @subnet_mask.to_s.split('.').reverse
@@ -145,14 +161,14 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     nsupdate(tmp_file, "Add forward from #{fqdn} to #{ip}")
   end
 
-  def add_cname_lookup(cname_fqdn, fqdn)
+  def add_cname_lookup(fqdn, cname_fqdn)
     tmp_file = Tempfile.new('remove_temp')
     tmp_file.puts "server #{get_primary_nameserver}"
-    tmp_file.puts "zone #{get_zone(cname_fqdn)}"
+    tmp_file.puts "zone #{get_zone(fqdn)}"
     tmp_file.puts "update add #{fqdn}. 86400 CNAME #{cname_fqdn}"
     tmp_file.puts "send"
     tmp_file.close
-    nsupdate(tmp_file, "Add CNAME from #{cname_fqdn} to #{fqdn}")
+    nsupdate(tmp_file, "Add CNAME entry #{fqdn} -> #{cname_fqdn}")
   end
 
   def remove_forward_lookup(fqdn)
@@ -165,14 +181,14 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     nsupdate(tmp_file, "Remove forward from #{fqdn}")
   end
 
-  def remove_cname_lookup(cname_fqdn)
+  def remove_cname_lookup(fqdn, cname_fqdn)
     tmp_file = Tempfile.new('remove_temp')
     tmp_file.puts "server #{get_primary_nameserver}"
-    tmp_file.puts "zone #{get_zone(cname_fqdn)}"
-    tmp_file.puts "update delete #{cname_fqdn}. CNAME"
+    tmp_file.puts "zone #{get_zone(fqdn)}"
+    tmp_file.puts "update delete #{fqdn}. CNAME"
     tmp_file.puts "send"
     tmp_file.close
-    nsupdate(tmp_file, "Remove forward from #{cname_fqdn}")
+    nsupdate(tmp_file, "Remove CNAME entry #{fqdn} -> #{cname_fqdn}")
   end
 
   def remove_reverse_lookup(ip)

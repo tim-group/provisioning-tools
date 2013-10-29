@@ -55,6 +55,20 @@ module MCollective
         return listener.results
       end
 
+      def add_cnames(specs, listener)
+        queue = prepare_work_queue(specs, listener)
+        logger.info("Adding CNAME's #{specs}")
+        queue.add_cnames(specs)
+        return listener.results
+      end
+
+      def remove_cnames(specs, listener)
+        queue = prepare_work_queue(specs, listener)
+        logger.info("Removing CNAME's for #{specs.size} nodes")
+        queue.remove_cnames(specs)
+        return listener.results
+      end
+
       def with_lock(&action)
         begin
           File.open(lockfile(), "w") do |f|
@@ -95,6 +109,17 @@ module MCollective
         specs = request[:specs]
         reply.data = free_ips(specs, new_listener())
       end
+
+      action "add_cnames" do
+        specs = request[:specs]
+        reply.data = add_cnames(specs, new_listener())
+      end
+
+      action "remove_cnames" do
+        specs = request[:specs]
+        reply.data = remove_cnames(specs, new_listener())
+      end
+
     end
   end
 end

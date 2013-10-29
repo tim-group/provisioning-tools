@@ -5,12 +5,12 @@ require 'thread'
 
 $etc_hosts_mutex = Mutex.new
 
-
 class Provision::DNS::DNSMasq < Provision::DNS
 end
 
 class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
   attr_reader :by_name
+  attr_reader :by_cname
 
   def initialize(name, range, options={})
     if !options[:primary_nameserver]
@@ -18,12 +18,17 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
     end
     super(name, range, options)
     @hosts_file = options[:hosts_file] || "/etc/hosts"
+    @cnames_file = options[:cnames_file] || "/etc/dnsmasq.d/cnames"
     @dnsmasq_pid_file = options[:pid_file] || "/var/run/dnsmasq.pid"
     parse_hosts
   end
 
   def lookup_ip_for(fqdn)
     @by_name[fqdn]
+  end
+
+  def lookup_cname_for(fqdn)
+    @cnames_by_fqdn[fqdn]
   end
 
   # This does nothing in this class
@@ -43,9 +48,72 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
     end
   end
 
+  def add_cname_lookup(fqdn, cname_fqdn)
+    $etc_hosts_mutex.synchronize do
+      parse_hosts
+      return if @cnames_by_fqdn[fqdn] == cname_fqdn
+      ip = @by_name[cname_fqdn]
+      if ip
+        temp_file = Tempfile.new('etc_hosts_update')
+        begin
+          File.open(@hosts_file, 'r') do |file|
+            file.each_line do |line|
+              if line =~ /^#{Regexp.escape(ip)}\s+/
+                temp_file.puts line.strip + " #{fqdn}"
+              else
+                temp_file.puts line
+              end
+            end
+          end
+          temp_file.rewind
+          FileUtils.mv(temp_file.path, @hosts_file)
+          File.chmod(0644, @hosts_file)
+          reload_dnsmasq
+        ensure
+          temp_file.close
+          temp_file.unlink
+        end
+      else
+        raise "Unable to add CNAME for '#{fqdn}' as CNAME: '#{cname_fqdn}' does not have an IP address associated with it"
+      end
+    end
+  end
+
+  def remove_cname_lookup(fqdn, cname_fqdn)
+    $etc_hosts_mutex.synchronize do
+      parse_hosts
+      #return if @cnames_by_fqdn[fqdn] == cname_fqdn
+      ip = @by_name[cname_fqdn]
+      if ip
+        temp_file = Tempfile.new('etc_hosts_update')
+        begin
+          File.open(@hosts_file, 'r') do |file|
+            file.each_line do |line|
+              if line =~ /^#{Regexp.escape(ip)}\s+/
+                temp_file.puts line.gsub(/\s+#{Regexp.escape(fqdn)}/, '').strip
+              else
+                temp_file.puts line
+              end
+            end
+          end
+          temp_file.rewind
+          FileUtils.mv(temp_file.path, @hosts_file)
+          File.chmod(0644, @hosts_file)
+          reload_dnsmasq
+        ensure
+          temp_file.close
+          temp_file.unlink
+        end
+      else
+        raise "Unable to add CNAME for '#{fqdn}' as CNAME: '#{cname_fqdn}' does not have an IP address associated with it"
+      end
+    end
+  end
+
   def parse_hosts
     @by_name = {}
     @by_ip = {}
+    @cnames_by_fqdn = {}
     File.open(@hosts_file).each { |l|
       next if l =~ /^#/
       next if l =~ /^\s*$/
@@ -54,9 +122,11 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
       ip = splits[0]
       names = splits[1..-1]
       next unless @subnet.include?(ip)
-      names.each { |n|
-        @by_name[n] = ip
-        @by_ip[ip] = n
+      names.each_index { |i|
+        name = names[i]
+        @by_name[name] = ip
+        @by_ip[ip] = name if i == 0
+        @cnames_by_fqdn[name] = names[0] if i > 0
       }
     }
   end
@@ -75,7 +145,7 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
     if (File.exists?(@dnsmasq_pid_file))
       pid = File.open(@dnsmasq_pid_file).first.to_i
       puts "Reloading dnsmasq (#{pid})"
-      Process.kill("HUP", pid)
+      Process.kill('HUP', pid)
     end
   end
 
@@ -95,11 +165,4 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
     return found
   end
 
-  def reload_dnsmasq
-    if (File.exists?(@dnsmasq_pid_file))
-      pid = File.open(@dnsmasq_pid_file).first.to_i
-      puts "Reloading dnsmasq (#{pid})"
-      Process.kill("HUP", pid)
-    end
-  end
 end

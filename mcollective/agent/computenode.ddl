@@ -21,3 +21,11 @@ end
 action "free_ips", :description => "" do
     display :always
 end
+
+action "add_cnames", :description => "" do
+    display :always
+end
+
+action "remove_cnames", :description => "" do
+    display :always
+end
