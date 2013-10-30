@@ -129,7 +129,8 @@ class Provision::DNSNetwork
 
     result = {}
     cnames.each do |network_name, records|
-      records.each do |fqdn, cname|
+      records.each do |hostname, cname|
+        fqdn = "#{hostname}.#{spec.domain_on(network_name)}"
         existing_cname = lookup_cname_for(fqdn)
         if existing_cname
           if existing_cname == cname
@@ -156,7 +157,8 @@ class Provision::DNSNetwork
 
     result = {}
     cnames.each do |network_name, records|
-      records.each do |fqdn, cname_fqdn|
+      records.each do |hostname, cname_fqdn|
+        fqdn = "#{hostname}.#{spec.domain_on(network_name)}"
         existing_cname = lookup_cname_for(fqdn)
         if existing_cname == cname_fqdn
           remove_cname_lookup(fqdn, cname_fqdn)

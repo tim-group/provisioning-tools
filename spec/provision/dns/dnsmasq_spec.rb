@@ -302,7 +302,7 @@ describe Provision::DNS::DNSMasq do
         :domain => "youdevise.com",
         :cnames => {
           :prod => {
-            'cname1.youdevise.com' => 'example.youdevise.com',
+            'cname1' => 'example.youdevise.com',
           }
         },
         :qualified_hostnames => {

@@ -3,8 +3,8 @@ require 'mcollective'
 include MCollective::RPC
 
 mc = rpcclient("computenode")
-mc.identity_filter "pg-kvm-005.mgmt.pg.net.local"
-#ldn-dev-rpearce.youdevise.com"
+mc.identity_filter "some-machine-name.youdevise.com"
+domain = "dev.net.local"
 mc.verbose = true
 specs = [
   {
@@ -15,16 +15,16 @@ specs = [
     :hostname => 'dev-tfundsproxy-001-grichards',
     :group => 'dev-tfundsproxy',
     :qualified_hostnames => {
-      :prod => 'dev-tfundsproxy-001-grichards.pg.net.local',
-      :mgmt => 'dev-tfundsproxy-001-grichards.mgmt.pg.net.local',
+      :prod => "dev-tfundsproxy-001-grichards.#{domain}",
+      :mgmt => "dev-tfundsproxy-001-grichards.mgmt.#{domain}",
     },
     :cnames => {
       :prod => {
-        'c.pg.net.local' => 'dev-tfundsproxy-001-grichards.pg.net.local',
+        "c" => "dev-tfundsproxy-001-grichards.#{domain}",
       }
     },
     :ram => '2097152',
-    :domain => 'pg.net.local',
+    :domain => "#{domain}",
     :fabric => 'production'
   },
   {
@@ -35,17 +35,17 @@ specs = [
     :hostname => 'dev-tfundsproxy-002-grichards',
     :group => 'dev-tfundsproxy',
     :qualified_hostnames => {
-      :prod => 'dev-tfundsproxy-002-grichards.pg.net.local',
-      :mgmt => 'dev-tfundsproxy-002-grichards.mgmt.pg.net.local',
+      :prod => "dev-tfundsproxy-002-grichards.#{domain}",
+      :mgmt => "dev-tfundsproxy-002-grichards.mgmt.#{domain}",
     },
     :cnames => {
       :prod => {
-        'a.pg.net.local' => 'dev-tfundsproxy-001-grichards.pg.net.local',
-        'b.pg.net.local' => 'dev-tfundsproxy-001-grichards.pg.net.local',
+        "a" => "dev-tfundsproxy-001-grichards.#{domain}",
+        "b" => "dev-tfundsproxy-001-grichards.#{domain}",
       }
     },
     :ram => '2097152',
-    :domain => 'pg.net.local',
+    :domain => "#{domain}",
     :fabric => 'production'
   },
 ]
@@ -53,5 +53,3 @@ printrpc mc.allocate_ips(:specs => specs)
 printrpc mc.add_cnames(:specs => specs)
 printrpc mc.remove_cnames(:specs => specs)
 printrpc mc.free_ips(:specs => specs)
-#printrpc mc.free_cnames(:specs => specs)
-#printrpc mc.allocate_ips(:specs => [

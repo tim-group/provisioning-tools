@@ -121,6 +121,10 @@ class Provision::Core::MachineSpec
     @spec[:qualified_hostnames][network] || raise("unknown network #{network}")
   end
 
+  def domain_on(network)
+    @spec[:qualified_hostnames][network].gsub(/^#{@spec[:hostname]}\./,'').strip
+  end
+
   def all_hostnames_on(network)
     hostnames = [hostname_on(network)]
     # the way we do aliases is pretty feeble; these should be per-interface
