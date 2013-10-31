@@ -3,8 +3,8 @@ require 'mcollective'
 include MCollective::RPC
 
 mc = rpcclient("computenode")
-mc.identity_filter "some-machine-name.youdevise.com"
-domain = "dev.net.local"
+mc.identity_filter "pg-kvm-005.mgmt.pg.net.local"
+domain = "pg.net.local"
 mc.verbose = true
 specs = [
   {

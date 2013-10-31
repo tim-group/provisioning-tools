@@ -160,11 +160,13 @@ class Provision::DNSNetwork
       records.each do |hostname, cname_fqdn|
         fqdn = "#{hostname}.#{spec.domain_on(network_name)}"
         existing_cname = lookup_cname_for(fqdn)
-        if existing_cname == cname_fqdn
-          remove_cname_lookup(fqdn, cname_fqdn)
-          result.merge!({fqdn => cname_fqdn})
-        else
-          raise "#{fqdn} resolves to CNAME: '#{existing_cname}', not CNAME: '#{cname_fqdn}' that was expected, not removing"
+        if existing_cname
+          if existing_cname == cname_fqdn
+            remove_cname_lookup(fqdn, cname_fqdn)
+            result.merge!({fqdn => cname_fqdn})
+          else
+            raise "#{fqdn} resolves to CNAME: '#{existing_cname}', not CNAME: '#{cname_fqdn}' that was expected, not removing"
+          end
         end
       end
     end
