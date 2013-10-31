@@ -77,7 +77,17 @@ task :package_main do
   sh "mkdir -p build"
   sh "if [ -f *.gem ]; then rm *.gem; fi"
   sh "gem build provisioning-tools.gemspec && mv provisioning-tools-*.gem build/"
-  sh "cd build && fpm -s gem -t deb -n provisioning-tools provisioning-tools-*.gem"
+
+  commandLine = "cd build",
+    "&&",
+    "fpm",
+    "-s", "gem",
+    "-t", "deb",
+    "-n", "provisioning-tools",
+    "-d", "provisioning-tools-gold-image",
+    "provisioning-tools-*.gem"
+
+  sh commandLine.join(' ')
 end
 
 desc "Generate deb file for the Gold image"
@@ -91,7 +101,6 @@ task :package_gold do
     "-t", "deb",
     "-n", "provisioning-tools-gold-image",
     "-v", version,
-    "-d", "provisioning-tools",
     "-a", "all",
     "-C", "build",
     "-p", "build/provisioning-tools-gold-image_#{version}.deb",
