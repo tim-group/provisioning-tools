@@ -16,7 +16,7 @@ define "xpgold" do
   end
 
   def xp_files
-    File.join(File.dirname(__FILE__), "../../files/xpgold/")
+    "/var/lib/provisioning-tools/files/xpgold/"
   end
 
   run ("download master image") {

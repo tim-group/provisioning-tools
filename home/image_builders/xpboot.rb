@@ -53,7 +53,7 @@ define "xpboot" do
   }
 
   run("configure_launch_script") {
-    xp_files = File.join(File.dirname(__FILE__), "../../files/xpboot/")
+    xp_files = "/var/lib/provisioning-tools/files/xpboot/"
     start_menu_grid_file = "#{start_menu_location}#{spec[:launch_script]}"
     launch_script = "#{xp_files}/#{spec[:launch_script]}"
 

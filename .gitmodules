@@ -1,6 +1,0 @@
-[submodule "files/xpboot"]
-	path = files/xpboot
-	url = http://git.youdevise.com/git/xpboot.git
-[submodule "files/xpgold"]
-	path = files/xpgold
-	url = http://git.youdevise.com/git/xpgold.git
