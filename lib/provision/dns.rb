@@ -235,6 +235,7 @@ class Provision::DNS
   def add_cnames_for(spec)
     raise("No networks for this machine, cannot add any CNAME's") if spec.networks.empty?
     result = {}
+    return result if spec[:cnames].nil?
     spec.networks.each do |network_name|
       network = network_name.to_sym
       @logger.info("Trying to add CNAME's for network #{network}")
@@ -249,6 +250,7 @@ class Provision::DNS
   def remove_cnames_for(spec)
     raise("No networks for this machine, cannot remove any CNAME's") if spec.networks.empty?
     result = {}
+    return result if spec[:cnames].nil?
     spec.networks.each do |network_name|
       network = network_name.to_sym
       @logger.info("Trying to remove CNAME's for network #{network}")
