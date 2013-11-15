@@ -32,7 +32,7 @@ puppet agent --debug --waitforcert 10 --onetime 2>&1 | tee /seed/init.log
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
       f.puts """#!/bin/sh -e
 echo 'Run ntpdate'
-/usr/sbin/ntpdate -s dc-1.net.local
+/usr/sbin/ntpdate -b -s dc-1.net.local || exit 0
 echo 'Running seed puppet'
 /seed/puppet.sh
 echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local
