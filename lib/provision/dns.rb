@@ -82,7 +82,8 @@ class Provision::DNSNetwork
      all_hostnames = spec.all_hostnames_on(@name)
      ip = nil
 
-     if lookup_ip_for(hostname)
+     if ip = lookup_ip_for(hostname)
+       @logger.info("No new allocation for #{hostname}, already allocated to #{ip}")
        puts "No new allocation for #{hostname}, already allocated"
        return {
          :netmask => @subnet_mask.to_s,
@@ -91,6 +92,8 @@ class Provision::DNSNetwork
      else
        max_ip = @max_allocation
        ip = @min_allocation
+       @logger.info("Trying to allocate ips #{hostname} between #{ip} and #{max_ip}")
+
        while !try_add_reverse_lookup(ip, hostname, all_hostnames)
          ip = IPAddr.new(ip.to_i + 1, Socket::AF_INET)
          if ip >= max_ip
@@ -202,16 +205,28 @@ class Provision::DNS
 
     raise("No networks for this machine, cannot allocate any IPs") if spec.networks.empty?
 
+    start_time = Time.now
+
     # Should the rest of this allocation loop be folded into the machine spec?
     spec.networks.each do |network_name|
       network = network_name.to_sym
-      @logger.info("Trying to allocate IP for network #{network}")
-      next unless @networks.has_key?(network)
+
+      @logger.info("Trying to allocate IPs for #{spec[:hostname]} in network #{network}")
+
+      unless @networks.has_key?(network)
+        @logger.info("Skipping IP allocation for #{spec[:hostname]} in network #{network}: no such network on this node")
+        next
+      end
+
       allocations[network] = @networks[network].allocate_ip_for(spec)
-      @logger.info("Allocated #{allocations[network][:address]}")
+
+      @logger.info("Allocated #{allocations[network][:address]} in network #{network_name} for node #{spec[:hostname]}")
     end
 
     raise("No networks allocated for this machine, cannot be sane") if allocations.empty?
+
+    elapsed_time = (Time.now - start_time).to_f
+    @logger.info("IP allocation for #{spec[:hostname]} took %.6f seconds" % elapsed_time)
 
     return allocations
   end
