@@ -22,8 +22,7 @@
     <disk type='file' device='disk'>
       <driver name='qemu' type='raw'/>
       <source file='<%= spec[:image_path] %>'/>
-      <target dev='hda' bus='ide'/>
-      <address type='drive' controller='0' bus='0' unit='0'/>
+      <target dev='hda' bus='virtio'/>
 <% when 'lvm' %>
     <disk type='block' device='disk'>
       <driver name='qemu' type='raw'/>
