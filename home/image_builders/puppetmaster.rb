@@ -24,8 +24,6 @@ echo 'Run ntpdate' | logger
 /usr/sbin/ntpdate -s dc-1.net.local | logger 2>&1
 echo 'Run puppet apply' | logger
 /usr/bin/puppet apply --pluginsync --modulepath=/etc/puppet/modules --logdest=syslog /etc/puppet/manifests/site.pp
-echo 'Replacing puppet.conf from template' | logger
-cp /etc/puppet/puppet.conf.base /etc/puppet/puppet.conf 2>&1 | logger
 /etc/init.d/apache2-puppetmaster restart 2>&1 | logger
 puppet agent --debug --waitforcert 10 --onetime 2>&1 | tee /seed/init.log
 echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local"
