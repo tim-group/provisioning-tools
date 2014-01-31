@@ -5,3 +5,5 @@
 .*.sw[a-z]
 /tags
 /build
+provisioning-tools.iml
+.idea/
