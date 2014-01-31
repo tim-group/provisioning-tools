@@ -1,0 +1,14 @@
+- :domain: dev.net.local
+  :template: win7boot
+  :se_hub: dev-sehub-001.mgmt.dev.net.local
+  :se_version: 2.32.0
+  :launch_script: start-grid.bat 
+  :gold_image_url: /mnt/sdb/images/dev-win7-002.img-next
+  :fabric: local
+  :vcpus: 1
+  :networks:
+  - :mgmt
+  :ram: "2097152"
+  :hostname: dev-win7-002
+  :qualified_hostnames:
+    :mgmt: dev-win7-002.mgmt.dev.net.local
