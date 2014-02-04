@@ -2,7 +2,7 @@ require 'provision/image/catalogue'
 require 'provision/image/commands'
 require 'socket'
 
-define "win7boot" do
+define "win7boot_sysprep" do
   extend Provision::Image::Commands
 
   def win7_files
@@ -29,10 +29,6 @@ define "win7boot" do
     cmd "mount -o offset=#{win7_partition_location} #{spec[:image_path]} #{mountpoint}"
   }
 
-  cleanup {
-    cmd "umount #{spec[:temp_dir]}"
-  }
-
   run("install sysprep") {
     FileUtils.cp "#{win7_files}/sysprep/unattend.xml", "#{sysprep_answer_file}"
     FileUtils.cp "#{win7_files}/startmenu/dosysprep.bat", start_menu_location
@@ -56,12 +52,15 @@ define "win7boot" do
     end
   }
 
-  run("configure_launch_script") {
-  }
-
   run("stamp time") {
      tmp_date_file="#{mountpoint}/build-date.txt"
     `date +"%m-%d-%y.%k:%M" > #{tmp_date_file}`
+  }
+
+  cleanup {
+    cmd "umount -l #{mountpoint}"
+    cmd "sleep 1"
+    suppress_error.cmd "rmdir #{mountpoint}"
   }
 
 end
