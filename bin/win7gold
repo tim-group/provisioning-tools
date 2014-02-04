@@ -1,0 +1,39 @@
+#!/usr/bin/ruby
+require 'yaml'
+require 'optparse'
+$: << File.join(File.dirname(__FILE__), "..", "lib")
+
+require 'provision'
+require 'pp'
+
+required_options = [:master_image_url, :ieversion, :image_name]
+options = {}
+
+option_parser = OptionParser.new do |opts|
+  opts.banner = "build a gold image here"
+  opts.on("-m", "--master_image_url URL", "specify the url to download the master image") do |master_image_url|
+    options[:master_image_url] = master_image_url
+  end
+
+  opts.on("-v", "--ieversion VERSION", "specify the version of IE that is on the master image") do |ieversion|
+    options[:ieversion] = ieversion
+  end
+
+  opts.on("-n", "--image_name NAME", "specify what we call the resulting image") do |image_name|
+    options[:image_name] = image_name
+  end
+
+end
+
+option_parser.parse!
+
+if (required_options - options.keys).empty?
+  result = Provision::Factory.new.win7_gold_image({
+    :master_image_url => options[:master_image_url],
+    :ieversion => options[:ieversion],
+    :hostname  => options[:image_name].gsub(/.img$/, "") # Take advantage of convention of using hostname as identity
+  })
+
+else
+  puts option_parser.banner
+end
