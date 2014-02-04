@@ -46,9 +46,9 @@ define "win7gold" do
   }
 
   cleanup {
-    cmd "umount -l #{spec[:temp_dir]}"
+    cmd "umount -l #{mountpoint}"
     cmd "sleep 1"
-    suppress_error.cmd "rmdir #{spec[:temp_dir]}"
+    suppress_error.cmd "rmdir #{mountpoint}"
   }
 
 end
