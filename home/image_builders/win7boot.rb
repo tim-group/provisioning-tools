@@ -2,7 +2,7 @@ require 'provision/image/catalogue'
 require 'provision/image/commands'
 require 'socket'
 
-define "win7boot_sysprep" do
+define "win7boot" do
   extend Provision::Image::Commands
 
   def win7_files
