@@ -53,12 +53,12 @@ define "xpboot" do
   }
 
   run("configure_launch_script") {
-    xp_files = "/var/lib/provisioning-tools/files/xpboot/"
+    common_files = "/var/lib/provisioning-tools/files/common/"
     start_menu_grid_file = "#{start_menu_location}#{spec[:launch_script]}"
-    launch_script = "#{xp_files}/#{spec[:launch_script]}"
+    launch_script = "#{common_files}/selenium/#{spec[:launch_script]}"
 
-    selenium_dir = "#{xp_files}/selenium"
-    java_dir     = "#{xp_files}/java"
+    selenium_dir = "#{common_files}/selenium"
+    java_dir     = "#{common_files}/java"
 
     FileUtils.cp_r selenium_dir, "#{spec[:temp_dir]}"
     FileUtils.cp_r java_dir, "#{spec[:temp_dir]}"
