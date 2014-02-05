@@ -1,14 +1,14 @@
 - :domain: dev.net.local
   :template: win7
-  :master_image_url: /mnt/sdb/images/win7-ie9-master.img
+  :master_image_url: file:///mnt/brixton/master_images/win7-ie9-master.img
   :fabric: local
   :vcpus: 1
   :networks:
   - :mgmt
   :ram: "2097152"
-  :hostname: dev-win7-002
+  :hostname: dev-selie9-001
   :qualified_hostnames:
-    :mgmt: dev-win7-002.mgmt.dev.net.local
+    :mgmt: dev-selie9-001.mgmt.dev.net.local
   :selenium:
     :hub_host: dev-sehub-001.mgmt.dev.net.local
     :version: 2.32.0
