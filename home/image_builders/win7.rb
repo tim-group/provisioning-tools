@@ -9,6 +9,10 @@ define "win7" do
     "/var/lib/provisioning-tools/files/win7gold/"
   end
 
+  def common_files
+    "/var/lib/provisioning-tools/files/common/"
+  end
+
   def mountpoint
     "#{spec[:temp_dir]}"
   end
@@ -50,6 +54,24 @@ define "win7" do
       cmd "sed -i s/%%IPADDRESS%%/#{config[:address]}/g #{sysprep_answer_file}"
       cmd "sed -i s/%%GATEWAY%%/#{gateway}/g #{sysprep_answer_file}"
     end
+  }
+
+  run("install Selenium") {
+    if spec[:se_hub].nil?
+      return
+    end
+
+    start_menu_grid_file = "#{mountpoint}/selenium/start-grid.bat"
+    selenium_dir = "#{common_files}/selenium"
+    java_dir     = "#{common_files}/java"
+
+    FileUtils.cp_r selenium_dir, "#{mountpoint}"
+    FileUtils.cp_r java_dir, "#{mountpoint}"
+
+    spec[:ie_version] = `cat #{mountpoint}/ieversion.txt`.chomp unless spec[:ie_version]
+    cmd "sed -i s/%HUBHOST%/#{spec[:se_hub]}/g \"#{start_menu_grid_file}\""
+    cmd "sed -i s/%SEVERSION%/#{spec[:se_version]}/g \"#{start_menu_grid_file}\""
+    cmd "sed -i s/%IEVERSION%/#{spec[:ie_version]}/g \"#{start_menu_grid_file}\""
   }
 
   run("stamp time") {
