@@ -2,7 +2,7 @@ require 'provision/image/catalogue'
 require 'provision/image/commands'
 require 'socket'
 
-define "win7boot" do
+define "win7" do
   extend Provision::Image::Commands
 
   def win7_files
@@ -14,23 +14,23 @@ define "win7boot" do
   end
 
   def sysprep_answer_file
-    "#{mountpoint}/unattend.xml"
+    "#{mountpoint}/sysprep/unattend.xml"
   end
 
   def start_menu_location
     "#{mountpoint}/ProgramData/Microsoft/Windows/Start\ Menu/Programs/Startup/"
   end
 
-  run("copy gold image") {
+  run("copy master image") {
     win7_partition_location = 105906176
     cmd "mkdir -p #{spec[:temp_dir]}"
-    #cmd "curl --fail -o #{spec[:image_path]} #{spec[:gold_image_url]}"
-    cmd "mv #{spec[:gold_image_url]} #{spec[:image_path]}"
+    #cmd "curl --fail -o #{spec[:image_path]} #{spec[:master_image_url]}"
+    cmd "mv #{spec[:master_image_url]} #{spec[:image_path]}"
     cmd "mount -o offset=#{win7_partition_location} #{spec[:image_path]} #{mountpoint}"
   }
 
   run("install sysprep") {
-    FileUtils.cp "#{win7_files}/sysprep/unattend.xml", "#{sysprep_answer_file}"
+    FileUtils.cp_r "#{win7_files}/sysprep/", "#{mountpoint}"
     FileUtils.cp "#{win7_files}/startmenu/dosysprep.bat", start_menu_location
   }
 

@@ -128,13 +128,4 @@ class Provision::Factory
     virsh.wait_for_shutdown(spec)
     puts "gold image build is complete"
   end
-
-  def win7_gold_image(spec_hash)
-    spec_hash[:thread_number] = 0
-    spec = Provision::Core::MachineSpec.new(spec_hash)
-    targetdir = File.join(File.dirname(__FILE__), "../target")
-    image_service = Provision::Image::Service.new(:configdir => home("image_builders"), :targetdir => targetdir)
-    image_service.build_image("win7gold", spec)
-  end
-
 end
