@@ -57,21 +57,20 @@ define "win7" do
   }
 
   run("install Selenium") {
-    if spec[:se_hub].nil?
-      return
+    if spec[:selenium]
+      start_menu_grid_file = "#{mountpoint}/selenium/start-grid.bat"
+      selenium_dir = "#{common_files}/selenium"
+      java_dir     = "#{common_files}/java"
+      selenium = spec[:selenium]
+
+      FileUtils.cp_r selenium_dir, "#{mountpoint}"
+      FileUtils.cp_r java_dir, "#{mountpoint}"
+
+      spec[:ie_version] = `cat #{mountpoint}/ieversion.txt`.chomp unless spec[:ie_version]
+      cmd "sed -i s/%HUBHOST%/#{selenium[:hub_host]}/g \"#{start_menu_grid_file}\""
+      cmd "sed -i s/%SEVERSION%/#{selenium[:version]}/g \"#{start_menu_grid_file}\""
+      cmd "sed -i s/%IEVERSION%/#{spec[:ie_version]}/g \"#{start_menu_grid_file}\""
     end
-
-    start_menu_grid_file = "#{mountpoint}/selenium/start-grid.bat"
-    selenium_dir = "#{common_files}/selenium"
-    java_dir     = "#{common_files}/java"
-
-    FileUtils.cp_r selenium_dir, "#{mountpoint}"
-    FileUtils.cp_r java_dir, "#{mountpoint}"
-
-    spec[:ie_version] = `cat #{mountpoint}/ieversion.txt`.chomp unless spec[:ie_version]
-    cmd "sed -i s/%HUBHOST%/#{spec[:se_hub]}/g \"#{start_menu_grid_file}\""
-    cmd "sed -i s/%SEVERSION%/#{spec[:se_version]}/g \"#{start_menu_grid_file}\""
-    cmd "sed -i s/%IEVERSION%/#{spec[:ie_version]}/g \"#{start_menu_grid_file}\""
   }
 
   run("stamp time") {
