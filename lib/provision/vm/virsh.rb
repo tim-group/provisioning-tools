@@ -42,8 +42,8 @@ class Provision::VM::Virsh
     safe_system("virsh start #{spec[:hostname]} > /dev/null 2>&1")
   end
 
-  def wait_for_shutdown(spec)
-    120.times do
+  def wait_for_shutdown(spec, timeout = 120)
+    timeout.times do
       if not is_running(spec)
         return
       end

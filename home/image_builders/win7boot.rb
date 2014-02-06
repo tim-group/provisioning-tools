@@ -5,20 +5,12 @@ require 'socket'
 define "win7boot" do
   extend Provision::Image::Commands
 
-  def win7_files
-    "/var/lib/provisioning-tools/files/win7gold/"
-  end
-
-  def common_files
-    "/var/lib/provisioning-tools/files/common/"
-  end
-
   def mountpoint
     "#{spec[:temp_dir]}"
   end
 
   def sysprep_answer_file
-    "#{mountpoint}/sysprep/unattend.xml"
+    "#{mountpoint}/Windows/Panther/unattend.xml"
   end
 
   def start_menu_location
@@ -32,9 +24,8 @@ define "win7boot" do
     cmd "mount -o offset=#{win7_partition_location} #{spec[:image_path]} #{mountpoint}"
   }
 
-  run("install sysprep") {
-    FileUtils.cp_r "#{win7_files}/sysprep/", "#{mountpoint}"
-    FileUtils.cp "#{win7_files}/startmenu/dosysprep.bat", start_menu_location
+  run("Remove batch file which initates a fresh sysprep on boot") {
+    FileUtils.rm "#{start_menu_location}/dosysprep.bat"
   }
 
   run("inject hostname and ip address") {
@@ -56,20 +47,12 @@ define "win7boot" do
     end
   }
 
-  run("install Selenium") {
-    if spec[:selenium]
+  run("Configure and start Selenium node on boot") {
+    if spec[:selenium_hub_host]
       start_menu_grid_file = "#{mountpoint}/selenium/start-grid.bat"
-      selenium_dir = "#{common_files}/selenium"
-      java_dir     = "#{common_files}/java"
-      selenium = spec[:selenium]
 
-      FileUtils.cp_r selenium_dir, "#{mountpoint}"
-      FileUtils.cp_r java_dir, "#{mountpoint}"
-
-      spec[:ie_version] = `cat #{mountpoint}/ieversion.txt`.chomp unless spec[:ie_version]
-      cmd "sed -i s/%HUBHOST%/#{selenium[:hub_host]}/g \"#{start_menu_grid_file}\""
-      cmd "sed -i s/%SEVERSION%/#{selenium[:version]}/g \"#{start_menu_grid_file}\""
-      cmd "sed -i s/%IEVERSION%/#{spec[:ie_version]}/g \"#{start_menu_grid_file}\""
+      cmd "sed -i s/%HUBHOST%/#{spec[:selenium_hub_host]}/g \"#{start_menu_grid_file}\""
+      FileUtils.cp start_menu_grid_file, start_menu_location
     end
   }
 
