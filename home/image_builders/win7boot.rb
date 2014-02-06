@@ -2,7 +2,7 @@ require 'provision/image/catalogue'
 require 'provision/image/commands'
 require 'socket'
 
-define "win7" do
+define "win7boot" do
   extend Provision::Image::Commands
 
   def win7_files
@@ -25,10 +25,10 @@ define "win7" do
     "#{mountpoint}/ProgramData/Microsoft/Windows/Start\ Menu/Programs/Startup/"
   end
 
-  run("copy master image") {
+  run("copy gold image") {
     win7_partition_location = 105906176
     cmd "mkdir -p #{spec[:temp_dir]}"
-    cmd "curl --fail -o #{spec[:image_path]} #{spec[:master_image_url]}"
+    cmd "curl --fail -o #{spec[:image_path]} #{spec[:gold_image_url]}"
     cmd "mount -o offset=#{win7_partition_location} #{spec[:image_path]} #{mountpoint}"
   }
 

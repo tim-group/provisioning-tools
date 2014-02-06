@@ -1,6 +1,6 @@
 - :domain: dev.net.local
-  :template: win7
-  :master_image_url: file:///mnt/brixton/master_images/win7-ie9-master.img
+  :template: win7boot
+  :gold_image_url: http://iso.youdevise.com/gold/precise/win7-ie9-gold.img
   :fabric: local
   :vcpus: 1
   :networks:
@@ -12,4 +12,3 @@
   :selenium:
     :hub_host: dev-sehub-001.mgmt.dev.net.local
     :version: 2.32.0
-  :ie_version: 9
