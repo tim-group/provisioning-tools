@@ -15,8 +15,8 @@ option_parser = OptionParser.new do |opts|
     options[:master_image_url] = master_image_url
   end
 
-  opts.on("-v", "--ieversion VERSION", "specify the version of IE that is on the master image") do |ieversion|
-    options[:ieversion] = ieversion
+  opts.on("-i", "--ie_version VERSION", "specify the version of IE that is on the master image") do |version|
+    options[:ie_version] = version
   end
 
   opts.on("-n", "--image_name NAME", "specify what we call the resulting image") do |image_name|
@@ -28,15 +28,15 @@ end
 option_parser.parse!
 
 if (required_options - options.keys).empty?
-  result = Provision::Factory.new.xp_gold_image({
-    :ieversion => options[:ieversion],
+  result = Provision::Factory.new.windows_gold_image({
+    :ieversion => options[:ie_version],
     :master_image_url => options[:master_image_url],
     :hostname  => options[:image_name],
     :networks  => [:mgmt],
     :qualified_hostnames => {
       :mgmt => "#{options[:image_name]}.mgmt.dev.net.local"
     }
-  })
+  }, "xpgold")
 
 else
   puts option_parser.banner
