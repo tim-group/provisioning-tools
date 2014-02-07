@@ -142,6 +142,11 @@ class Provision::Factory
 
     puts "waiting until gold image has shutdown"
     virsh.wait_for_shutdown(spec, 300)
+
+    if not virsh.is_running(spec)
+        virsh.undefine_vm(spec)
+    end
+
     puts "gold image build is complete"
   end
 
