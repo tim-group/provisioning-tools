@@ -7,16 +7,21 @@ define "xpgold" do
 
   # TODO: sysprep should cleanup start menu folder
   # TODO: copy and paste :::
+
+  def xp_files
+    "/var/lib/provisioning-tools/files/xpgold/"
+  end
+
+  def common_files
+    "/var/lib/provisioning-tools/files/common/"
+  end
+
   def mountpoint
     "#{spec[:temp_dir]}"
   end
 
   def start_menu_location
     "#{mountpoint}/Documents\ and\ Settings/All Users/Start\ Menu/Programs/Startup/"
-  end
-
-  def xp_files
-    "/var/lib/provisioning-tools/files/xpgold/"
   end
 
   run ("download master image") {
@@ -32,13 +37,25 @@ define "xpgold" do
     suppress_error.cmd "rmdir #{spec[:temp_dir]}"
   }
 
-  run("setup sysprep") {
+  run("install sysprep") {
     cmd "rm \"#{start_menu_location}\"/*"
     FileUtils.mkdir_p("#{mountpoint}/settings")
     FileUtils.cp_r("#{xp_files}/support/", "#{mountpoint}/")
     FileUtils.cp_r("#{xp_files}/sysprep/", "#{mountpoint}/")
     FileUtils.cp "#{xp_files}/startmenu/dosysprep.bat", start_menu_location
     FileUtils.cp "#{xp_files}/startmenu/apply-reg-settings.bat", start_menu_location
+  }
+
+  run("install Selenium") {
+    selenium_dir = "#{common_files}/selenium"
+    java_dir     = "#{common_files}/java"
+    start_menu_grid_file = "#{mountpoint}/selenium/start-grid.bat"
+
+    FileUtils.cp_r selenium_dir, "#{mountpoint}"
+    FileUtils.cp_r java_dir, "#{mountpoint}"
+
+    cmd "sed -i s/%SEVERSION%/#{spec[:selenium_version]}/g \"#{start_menu_grid_file}\""
+    cmd "sed -i s/%IEVERSION%/#{spec[:ie_version]}/g \"#{start_menu_grid_file}\""
   }
 
   run("stamp gold image build date") {
