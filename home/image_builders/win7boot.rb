@@ -20,13 +20,7 @@ define "win7boot" do
   run("copy gold image") {
     win7_partition_location = 105906176
     cmd "mkdir -p #{spec[:temp_dir]}"
-
-#    cmd "curl --fail -o #{spec[:image_path]} #{spec[:gold_image_url]}"
-    until File.exists?("/var/local/images/win7-ie9-gold.img.1")
-      sleep(1)
-    end
-
-    cmd "mv /var/local/images/win7-ie9-gold.img.1 #{spec[:image_path]}"
+    cmd "curl --fail -o #{spec[:image_path]} #{spec[:gold_image_url]}"
     cmd "mount -o offset=#{win7_partition_location} #{spec[:image_path]} #{mountpoint}"
   }
 
