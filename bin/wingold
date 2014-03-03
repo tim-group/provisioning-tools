@@ -6,17 +6,26 @@ $: << File.join(File.dirname(__FILE__), "..", "lib")
 require 'provision'
 require 'pp'
 
-required_options = [:master_image_url, :ie_version, :image_name]
+required_options = [:master_image_url, :win_version, :ie_version, :selenium_version, :image_name]
 options = {}
 
 option_parser = OptionParser.new do |opts|
   opts.banner = "build a gold image here"
+
   opts.on("-m", "--master_image_url URL", "specify the url to download the master image") do |master_image_url|
     options[:master_image_url] = master_image_url
   end
 
+  opts.on("-w", "--windows_version [xp|win7]", "specify the version of Windows that is on the master image") do |version|
+    options[:win_version] = version
+  end
+
   opts.on("-i", "--ie_version VERSION", "specify the version of IE that is on the master image") do |version|
     options[:ie_version] = version
+  end
+
+  opts.on("-s", "--selenium_version VERSION", "specify the version of Selenium that is on the gold image") do |version|
+    options[:selenium_version] = version
   end
 
   opts.on("-n", "--image_name NAME", "specify what we call the resulting image") do |image_name|
@@ -29,14 +38,15 @@ option_parser.parse!
 
 if (required_options - options.keys).empty?
   result = Provision::Factory.new.windows_gold_image({
-    :ieversion => options[:ie_version],
     :master_image_url => options[:master_image_url],
-    :hostname  => options[:image_name],
+    :ie_version => options[:ie_version],
+    :selenium_version => options[:selenium_version],
+    :hostname  => options[:image_name].gsub(/.img$/, ""), # Take advantage of convention of using hostname as identity
     :networks  => [:mgmt],
     :qualified_hostnames => {
       :mgmt => "#{options[:image_name]}.mgmt.dev.net.local"
     }
-  }, "xpgold")
+  }, options[:win_version] + "gold")
 
 else
   puts option_parser.banner
