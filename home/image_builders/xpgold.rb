@@ -26,7 +26,7 @@ define "xpgold" do
 
   run ("download master image") {
     master_url = "#{spec[:master_image_url]}"
-    cmd "curl --fail -o #{spec[:image_path]} #{master_url}"
+    cmd "curl -Ss --fail -o #{spec[:image_path]} #{master_url}"
     suppress_error.cmd "mkdir -p #{spec[:temp_dir]}"
     cmd "mount -o offset=32256  #{spec[:image_path]} #{spec[:temp_dir]}"
   }

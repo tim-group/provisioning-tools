@@ -18,7 +18,7 @@ define "xpboot" do
 
   run("copy gold image") {
     cmd "mkdir -p #{spec[:temp_dir]}"
-    cmd "curl --fail -o #{spec[:image_path]} #{spec[:gold_image_url]}"
+    cmd "curl -Ss --fail -o #{spec[:image_path]} #{spec[:gold_image_url]}"
     cmd "mount -o offset=32256  #{spec[:image_path]} #{spec[:temp_dir]}"
   }
 

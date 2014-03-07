@@ -23,7 +23,7 @@ define "win7gold" do
 
   run("copy master image") {
     win7_partition_location = 105906176
-    cmd "curl --fail -o #{spec[:image_path]} #{spec[:master_image_url]}"
+    cmd "curl -Ss --fail -o #{spec[:image_path]} #{spec[:master_image_url]}"
     cmd "mkdir -p #{mountpoint}"
     cmd "mount -o offset=#{win7_partition_location} #{spec[:image_path]} #{mountpoint}"
   }
