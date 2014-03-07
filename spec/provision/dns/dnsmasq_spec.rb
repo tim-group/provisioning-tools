@@ -32,7 +32,7 @@ describe Provision::DNS::DNSMasq do
 
   def undertest(dir, options={})
     dnsmasq = Provision::DNS.get_backend("DNSMasq", options)
-    dnsmasq.add_network(:mgmt, "192.168.5.0/24", :min_allocation => "192.168.5.2", :hosts_file => "#{dir}/etc/hosts", :pid_file => "#{dir}/var/run/dnsmasq.pid", :checker => @checker)
+    dnsmasq.add_network(:mgmt, "192.168.5.0/24", :min_allocation => "192.168.5.2", :max_allocation => "192.168.5.250", :hosts_file => "#{dir}/etc/hosts", :pid_file => "#{dir}/var/run/dnsmasq.pid", :checker => @checker)
     dnsmasq.add_network(:prod, "192.168.6.0/24", :min_allocation => "192.168.6.2", :hosts_file =>"#{dir}/etc/hosts", :pid_file => "#{dir}/var/run/dnsmasq.pid", :checker => @checker)
     return dnsmasq
   end
@@ -61,28 +61,25 @@ describe Provision::DNS::DNSMasq do
   end
 
   it 'will restrict ip allocations to min and max allocations' do
-    dns = Provision::DNS::DNSMasqNetwork.new('prod', '192.168.1.0/24',
-      :min_allocation => "192.168.1.99",
-      :max_allocation => "192.168.1.150"
-    )
-    dns.network.to_s.should eql('192.168.1.0')
-    dns.broadcast.to_s.should eql('192.168.1.255')
-    dns.min_allocation.to_s.should eql('192.168.1.99')
-    dns.max_allocation.to_s.should eql('192.168.1.150')
+    Dir.mktmpdir { |dir|
+      mksubdirs(dir)
+      File.open("#{dir}/etc/hosts", 'w') { |f| f.write "# Example hosts file\n127.0.0.1 localhost\n" }
+
+      mock_logger = double()
+
+      thing = undertest(dir, :logger=>mock_logger)
+      thing.networks[:mgmt].network.to_s.should eql('192.168.5.0')
+      thing.networks[:mgmt].broadcast.to_s.should eql('192.168.5.255')
+      thing.networks[:mgmt].min_allocation.to_s.should eql('192.168.5.2')
+      thing.networks[:mgmt].max_allocation.to_s.should eql('192.168.5.250')
+      thing.networks[:prod].max_allocation.to_s.should eql('192.168.6.254')
+    }
   end
 
   it 'throws an appropriate error when subnet is invalid' do
     expect {
       Provision::DNS::DNSMasqNetwork.new('foo', 'biscuits', {})
     }.to raise_exception(ArgumentError, 'invalid address')
-  end
-
-  it 'will restrict ip allocations to min and max allocations' do
-    dns = Provision::DNS::DNSMasqNetwork.new('prod', '192.168.1.0/24')
-    dns.network.to_s.should eql('192.168.1.0')
-    dns.broadcast.to_s.should eql('192.168.1.255')
-    dns.min_allocation.to_s.should eql('192.168.1.10')
-    dns.max_allocation.to_s.should eql('192.168.1.254')
   end
 
   def expect_checks(allocations)

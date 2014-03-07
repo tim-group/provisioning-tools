@@ -47,6 +47,10 @@ describe Provision::DNS::DDNS do
     dns.max_allocation.to_s.should eql('192.168.1.254')
   end
 
+  # FIXME: This test is mostly crap, it passed when min/max allocations
+  # on a real DDNS fabric didnt work.
+  # Fixed in DNSMasq as I could /create/ a pretend DNSMasq setup. Harder
+  # to do here as we don't actually fire up bind in any way shape or form
   it 'will restrict ip allocations to min and max allocations' do
     dns = Provision::DNS::DDNSNetwork.new('prod', '192.168.1.0/24',
       :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
