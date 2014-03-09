@@ -51,7 +51,7 @@ class Provision::Factory
     numbering_service = Provision::DNS.get_backend(@config[:dns_backend], options)
 
     @config[:networks].each do |name, net_config|
-      my_options = {}
+      my_options = options.clone
       ['min', 'max'].each do |type|
         if net_config["#{type}_allocation".to_sym]
           my_options["#{type}_allocation".to_sym] = net_config["#{type}_allocation".to_sym]
