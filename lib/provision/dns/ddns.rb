@@ -21,6 +21,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     if !options[:primary_nameserver]
       options[:primary_nameserver] = '127.0.0.1'
     end
+    @reverse_zone_override = options[:reverse_zone_override]
     super(name, range, options)
     @debug = false
     parts = range.split('/')
@@ -66,13 +67,17 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
   end
 
   def reverse_zone
-    parts = @network.to_s.split('.').reverse
-    smparts = @subnet_mask.to_s.split('.').reverse
-    while smparts[0].to_i < 255
-      smparts.shift
-      parts.shift
+    if @reverse_zone_override
+      "#{@reverse_zone_override.split('.').reverse.join('.')}.in-addr.arpa"
+    else
+      parts = @network.to_s.split('.').reverse
+      smparts = @subnet_mask.to_s.split('.').reverse
+      while smparts[0].to_i < 255
+        smparts.shift
+        parts.shift
+      end
+      "#{parts.join('.')}.in-addr.arpa"
     end
-    "#{parts.join('.')}.in-addr.arpa"
   end
 
   def write_rndc_key

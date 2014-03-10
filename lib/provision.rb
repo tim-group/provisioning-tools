@@ -52,11 +52,11 @@ class Provision::Factory
 
     @config[:networks].each do |name, net_config|
       my_options = options.clone
-      ['min', 'max'].each do |type|
-        if net_config["#{type}_allocation".to_sym]
-          my_options["#{type}_allocation".to_sym] = net_config["#{type}_allocation".to_sym]
+      my_options.merge!(
+        net_config.reject do |key, value|
+          key == :net
         end
-      end
+      )
       numbering_service.add_network(name, net_config[:net], my_options)
     end
 

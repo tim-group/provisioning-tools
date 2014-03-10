@@ -100,6 +100,18 @@ describe Provision::DNS::DDNS do
     dns.reverse_zone.should eql('1.168.192.in-addr.arpa')
   end
 
+  it 'allows overriding the automatically generated reverse zone file name' do
+    dns = MockProvision.new('prod', '192.168.1.0/16',
+      :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
+      :reverse_zone_override => '192.168.1',
+      :nsupdate_replies => [],
+      :lookup_table => {
+      },
+      :primary_nameserver => "mars"
+    )
+    dns.reverse_zone.should eql('1.168.192.in-addr.arpa')
+  end
+
   it 'raises an exception if we get bad rndc key' do
     dns = MockProvision.new('prod', '192.168.1.0/16',
       :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
