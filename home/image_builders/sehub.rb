@@ -32,7 +32,7 @@ define "sehub" do
 
 
   run("install selenium packages") {
-    apt_install "openjdk-6-jdk"
+    apt_install "openjdk-7-jdk"
     apt_install "selenium"
     apt_install "selenium-hub"
 #    chroot "update-rc.d selenium-node defaults"
