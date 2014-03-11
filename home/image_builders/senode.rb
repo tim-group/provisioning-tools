@@ -37,7 +37,7 @@ define "senode" do
   }
 
   run("install selenium packages") {
-    apt_install "openjdk-6-jdk"
+    apt_install "openjdk-7-jdk"
     apt_install "acpid"
     apt_install "xvfb"
     apt_install "dbus"
