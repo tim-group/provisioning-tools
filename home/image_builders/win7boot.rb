@@ -20,8 +20,17 @@ define "win7boot" do
   run("copy gold image") {
     win7_partition_location = 105906176
     cmd "mkdir -p #{spec[:temp_dir]}"
-    cmd "curl -Ss --fail -o #{spec[:image_path]} #{spec[:gold_image_url]}"
-    cmd "mount -o offset=#{win7_partition_location} #{spec[:image_path]} #{mountpoint}"
+ 
+    case config[:vm_storage_type]
+    when 'lvm'
+      cmd "lvcreate -n #{spec[:hostname]} -L #{spec[:image_size]} #{spec[:lvm_vg]}"
+      cmd "curl -Ss --fail #{spec[:gold_image_url]} | dd of=/dev/#{spec[:lvm_vg]}/#{spec[:hostname]}"
+      vm_disk_location = "/dev/#{spec[:lvm_vg]}/#{spec[:hostname]}"
+      cmd "mount -o offset=#{win7_partition_location} #{vm_disk_location} #{mountpoint}"
+    when 'file'
+      cmd "curl -Ss --fail -o #{spec[:image_path]} #{spec[:gold_image_url]}"
+      cmd "mount -o offset=#{win7_partition_location} #{spec[:image_path]} #{mountpoint}"
+    end
   }
 
   run("Remove batch file which initates a fresh sysprep on boot") {
