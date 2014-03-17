@@ -18,8 +18,16 @@ define "xpboot" do
 
   run("copy gold image") {
     cmd "mkdir -p #{spec[:temp_dir]}"
-    cmd "curl -Ss --fail -o #{spec[:image_path]} #{spec[:gold_image_url]}"
-    cmd "mount -o offset=32256  #{spec[:image_path]} #{spec[:temp_dir]}"
+    case config[:vm_storage_type]
+    when 'lvm'
+      cmd "lvcreate -n #{spec[:hostname]} -L #{spec[:image_size]} #{spec[:lvm_vg]}"
+      cmd "curl -Ss --fail #{spec[:gold_image_url]} | dd of=/dev/#{spec[:lvm_vg]}/#{spec[:hostname]}"
+      vm_disk_location = "/dev/#{spec[:lvm_vg]}/#{spec[:hostname]}"
+      cmd "mount -o offset=32256 #{vm_disk_location} #{mountpoint}"
+    when 'image'
+      cmd "curl -Ss --fail -o #{spec[:image_path]} #{spec[:gold_image_url]}"
+      cmd "mount -o offset=32256  #{spec[:image_path]} #{spec[:temp_dir]}"
+    end
   }
 
   run("inject hostname and ip address") {
