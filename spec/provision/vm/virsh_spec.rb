@@ -57,4 +57,32 @@ describe Provision::VM::Virsh do
     IO.read("#{d}/vmx-1.xml").should match("<source dev='/dev/disk1/vmx-1'/>")
     IO.read("#{d}/vmx-1.xml").should match("<target dev='vda' bus='virtio'/>")
   end
+
+  it 'creates a virt machine xml file in libvirt with a different format template' do
+    d = Dir.mktmpdir
+
+    machine_spec = Provision::Core::MachineSpec.new(
+      :hostname=>"vmx-1",
+      :disk_dir=>"build/",
+      :vnc_port=>9005,
+      :ram => "1G",
+      :interfaces => [{:type=>"bridge",:name=>"br0"}, {:type=>"network", :name=>"provnat0"}],
+      :images_dir => "build",
+      :libvirt_dir => d,
+      :kvm_template => 'kvm_no_virtio'
+    )
+
+    config = {
+      :vm_storage_type => 'lvm',
+    }
+    virt_manager = Provision::VM::Virsh.new(config)
+    fn = virt_manager.write_virsh_xml(machine_spec)
+    fn.should eql("#{d}/vmx-1.xml")
+    File.exist?("#{d}/vmx-1.xml").should eql(true)
+
+    IO.read("#{d}/vmx-1.xml").should match("<name>vmx-1</name>")
+    IO.read("#{d}/vmx-1.xml").should match("<source dev='/dev/disk1/vmx-1'/>")
+    IO.read("#{d}/vmx-1.xml").should match("<target dev='hda' bus='ide'/>")
+    IO.read("#{d}/vmx-1.xml").should_not match("<model type='virtio'/>")
+  end
 end

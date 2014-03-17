@@ -1,0 +1,58 @@
+<domain type='kvm'>
+  <name><%= spec[:hostname] %></name>
+  <memory><%= spec[:ram] %></memory>
+  <currentMemory><%= spec[:ram] %></currentMemory>
+  <vcpu><%= spec[:vcpus] %></vcpu>
+  <os>
+    <type arch='x86_64' machine='pc'>hvm</type>
+    <boot dev='hd'/>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+    <pae/>
+  </features>
+  <clock offset='localtime'/>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>restart</on_crash>
+  <devices>
+    <emulator>/usr/bin/kvm</emulator>
+<% case config[:vm_storage_type] when 'image' %>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='raw'/>
+      <source file='<%= spec[:image_path] %>'/>
+      <target dev='hda' bus='ide'/>
+<% when 'lvm' %>
+    <disk type='block' device='disk'>
+      <driver name='qemu' type='raw'/>
+      <source dev='/dev/<%= spec[:lvm_vg] %>/<%= spec[:hostname] %>'/>
+      <target dev='hda' bus='ide'/>
+<% end %>
+    </disk>
+    <controller type='ide' index='0'>
+    </controller>
+    <% spec.interfaces.each do |nic| %>
+    <interface type='bridge'>
+      <mac address='<%= nic[:mac] %>'/>
+      <source bridge='br_<%= nic[:network] %>'/>
+      <driver name='vhost' txmode='iothread'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x0<%=nic[:slot]%>' function='0x0'/>
+    </interface>
+    <% end %>
+    <serial type='pty'>
+    <target port='0'/>
+    </serial>
+    <console type='pty'>
+      <target type='serial' port='0'/>
+    </console>
+    <input type='tablet' bus='usb'/>
+    <input type='mouse' bus='ps2'/>
+    <graphics type='vnc' port='<%=spec[:vnc_port]%>'/>
+    <video>
+      <model type='vga' vram='9216' heads='1'/>
+    </video>
+    <memballoon model='virtio'>
+    </memballoon>
+  </devices>
+</domain>

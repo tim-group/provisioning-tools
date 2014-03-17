@@ -5,7 +5,6 @@ require 'ostruct'
 
 class Provision::VM::Virsh
   def initialize(config)
-    @template = "#{Provision.base}/templates/kvm.template"
     @config = config
   end
 
@@ -55,7 +54,12 @@ class Provision::VM::Virsh
 
 
   def write_virsh_xml(spec)
-    template = ERB.new(File.read(@template))
+    if spec[:kvm_template]
+      template_file = "#{Provision.base}/templates/#{spec[:kvm_template]}.template"
+    else
+      template_file = "#{Provision.base}/templates/kvm.template"
+    end
+    template = ERB.new(File.read(template_file))
     to = "#{spec[:libvirt_dir]}/#{spec[:hostname]}.xml"
     binding = VirshBinding.new(spec, @config)
     begin
