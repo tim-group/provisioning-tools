@@ -57,7 +57,7 @@ define "senode" do
   }
 
   run("place the selenium node config") {
-    host = spec[:se_hub]
+    host = spec[:selenium_hub_host]
     port = "7799"
 
     cmd "mkdir -p #{spec[:temp_dir]}/etc/default"
