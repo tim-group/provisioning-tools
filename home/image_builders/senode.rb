@@ -43,7 +43,7 @@ define "senode" do
     apt_install "dbus"
     apt_install "dbus-x11"
     apt_install "hicolor-icon-theme"
-    apt_install "firefox"
+    apt_install "firefox=11.0+build1-0ubuntu4"
     apt_install "google-chrome-stable"
     apt_install "selenium"
     apt_install "selenium-node"
