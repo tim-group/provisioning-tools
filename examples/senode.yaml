@@ -1,0 +1,11 @@
+- :domain: dev.net.local
+  :template: senode
+  :fabric: local
+  :vcpus: 1
+  :networks:
+  - :mgmt
+  :ram: "2097152"
+  :hostname: dev-senode-001
+  :qualified_hostnames:
+    :mgmt: dev-senode-001.mgmt.dev.net.local
+  :selenium_hub_host: dev-sehub-001.mgmt.dev.net.local
