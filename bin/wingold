@@ -37,7 +37,8 @@ end
 option_parser.parse!
 
 if (required_options - options.keys).empty?
-  result = Provision::Factory.new.windows_gold_image({
+
+  spec =  {
     :master_image_url => options[:master_image_url],
     :ie_version => options[:ie_version],
     :selenium_version => options[:selenium_version],
@@ -46,7 +47,13 @@ if (required_options - options.keys).empty?
     :qualified_hostnames => {
       :mgmt => "#{options[:image_name]}.mgmt.dev.net.local"
     }
-  }, options[:win_version] + "gold")
+  }
+
+  if options[:ie_version] == "xp"
+    spec[:kvm_template] = "kvm_no_virtio"
+  end
+
+  result = Provision::Factory.new.windows_gold_image(spec,options[:win_version] + "gold")
 
 else
   puts option_parser.banner

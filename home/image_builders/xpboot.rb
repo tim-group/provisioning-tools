@@ -8,6 +8,10 @@ require 'socket'
 define "xpboot" do
   extend Provision::Image::Commands
 
+  def xp_files
+    "/var/lib/provisioning-tools/files/xpgold/"
+  end
+
   def mountpoint
     "#{spec[:temp_dir]}"
   end
@@ -62,6 +66,10 @@ define "xpboot" do
 
     cmd "rm \"#{start_menu_location}\"/*"
     FileUtils.cp start_menu_grid_file, start_menu_location
+  }
+
+  run("Apply registry settings on first boot") {
+    FileUtils.cp "#{xp_files}/startmenu/apply-reg-settings.bat", start_menu_location
   }
 
   run("stamp time") {

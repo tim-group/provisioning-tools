@@ -43,7 +43,6 @@ define "xpgold" do
     FileUtils.cp_r("#{xp_files}/support/", "#{mountpoint}/")
     FileUtils.cp_r("#{xp_files}/sysprep/", "#{mountpoint}/")
     FileUtils.cp "#{xp_files}/startmenu/dosysprep.bat", start_menu_location
-    FileUtils.cp "#{xp_files}/startmenu/apply-reg-settings.bat", start_menu_location
   }
 
   run("install Selenium") {
