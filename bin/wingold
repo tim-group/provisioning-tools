@@ -49,7 +49,7 @@ if (required_options - options.keys).empty?
     }
   }
 
-  if options[:ie_version] == "xp"
+  if options[:win_version] == "xp"
     spec[:kvm_template] = "kvm_no_virtio"
   end
 
