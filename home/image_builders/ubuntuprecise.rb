@@ -157,6 +157,19 @@ exec /sbin/getty -L ttyS0 115200 vt102
     }
   }
 
+  run("ensure the correct mailutils gets instaled") {
+    open("#{spec[:temp_dir]}/etc/apt/preferences.d/mailutils", 'w') { |f|
+      f.puts "Package: mailutils
+Pin: release o=TIMGroup,a=precise
+Pin-Priority: 1001\n"
+    }
+    open("#{spec[:temp_dir]}/etc/apt/preferences.d/libmailutils2", 'w') { |f|
+      f.puts "Package: libmailutils2
+Pin: release o=TIMGroup,a=precise
+Pin-Priority: 1001\n"
+    }
+  }
+
   run("run apt-update ") {
     chroot "apt-get -y --force-yes update"
   }
