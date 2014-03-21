@@ -27,7 +27,7 @@ define "win7boot" do
       cmd "curl -Ss --fail #{spec[:gold_image_url]} | dd of=/dev/#{spec[:lvm_vg]}/#{spec[:hostname]}"
       vm_disk_location = "/dev/#{spec[:lvm_vg]}/#{spec[:hostname]}"
       cmd "mount -o offset=#{win7_partition_location} #{vm_disk_location} #{mountpoint}"
-    when 'file'
+    when 'image'
       cmd "curl -Ss --fail -o #{spec[:image_path]} #{spec[:gold_image_url]}"
       cmd "mount -o offset=#{win7_partition_location} #{spec[:image_path]} #{mountpoint}"
     end
