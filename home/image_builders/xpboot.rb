@@ -62,10 +62,11 @@ define "xpboot" do
   run("Configure and start Selenium node on boot") {
     start_menu_grid_file = "#{mountpoint}/selenium/start-grid.bat"
 
-    cmd "sed -i s/%HUBHOST%/#{spec[:selenium_hub_host]}/g \"#{start_menu_grid_file}\""
-
-    cmd "rm \"#{start_menu_location}\"/*"
-    FileUtils.cp start_menu_grid_file, start_menu_location
+    if spec[:selenium_hub_host]
+      cmd "sed -i s/%HUBHOST%/#{spec[:selenium_hub_host]}/g \"#{start_menu_grid_file}\""
+      cmd "rm \"#{start_menu_location}\"/*"
+      FileUtils.cp start_menu_grid_file, start_menu_location
+    end
   }
 
   run("Apply registry settings on first boot") {
