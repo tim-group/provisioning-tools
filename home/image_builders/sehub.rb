@@ -39,6 +39,17 @@ define "sehub" do
  #   chroot "sed -i'.bak' -e 's#^securerandom.source=file:/dev/urandom#securerandom.source=file:/dev/../dev/urandom#g' /etc/java-7-openjdk/security/java.security"
   }
 
+  run("put in sehub monitoring stuff") {
+    apt_install "python-lxml"
+    open("#{spec[:temp_dir]}/etc/segrid.properties", 'w') { |f|
+      f.puts """
+[segrid]
+segrid.filter=#{spec[:hostname]}
+      """
+    }
+  }
+
+
   cleanup {
     chroot "/etc/init.d/selenium-hub stop"
   }
