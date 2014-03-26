@@ -45,6 +45,7 @@ define "sehub" do
       f.puts """
 [segrid]
 segrid.filter=#{spec[:hostname]}
+segrid.nodes=#{spec[:nodes].join(",")}
       """
     }
   }
