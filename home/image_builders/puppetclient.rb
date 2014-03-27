@@ -3,6 +3,7 @@ define "puppetclient" do
 
   run("install puppet") {
     apt_install "puppet"
+    apt_install "rubygem-msgpack"
     open("#{spec[:temp_dir]}/etc/puppet/puppet.conf", 'w') { |f|
       f.puts "[main]
   vardir                         = /var/lib/puppet
@@ -14,6 +15,7 @@ define "puppetclient" do
   pluginsync                     = true
   environment                    = masterbranch
   configtimeout                  = 3000
+  preferred_serialization_format = msgpack
 "
     }
   }

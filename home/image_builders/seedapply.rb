@@ -5,6 +5,7 @@ define "seedapply" do
 
   run("install puppet") {
     apt_install "puppet"
+    apt_install 'rubygem-msgpack'
   }
 
   run("seedapply") {
