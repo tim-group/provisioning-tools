@@ -29,6 +29,15 @@ define "grow" do
     cmd "resize2fs /dev/mapper/#{vm_partition_name}"
   }
 
+  on_error {
+    case config[:vm_storage_type]
+    when 'lvm'
+      if File.exists("/dev/#{spec[:lvm_vg]}/#{spec[:hostname]}")
+        cmd "lvremove -f /dev/#{spec[:lvm_vg]}/#{spec[:hostname]}"
+      end
+    end
+  }
+
   cleanup {
     case config[:vm_storage_type]
     when 'image'

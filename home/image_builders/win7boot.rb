@@ -20,7 +20,7 @@ define "win7boot" do
   run("copy gold image") {
     win7_partition_location = 105906176
     cmd "mkdir -p #{spec[:temp_dir]}"
- 
+
     case config[:vm_storage_type]
     when 'lvm'
       cmd "lvcreate -n #{spec[:hostname]} -L #{spec[:image_size]} #{spec[:lvm_vg]}"
@@ -30,6 +30,15 @@ define "win7boot" do
     when 'image'
       cmd "curl -Ss --fail -o #{spec[:image_path]} #{spec[:gold_image_url]}"
       cmd "mount -o offset=#{win7_partition_location} #{spec[:image_path]} #{mountpoint}"
+    end
+  }
+
+  on_error {
+    case config[:vm_storage_type]
+    when 'lvm'
+      if File.exists("/dev/#{spec[:lvm_vg]}/#{spec[:hostname]}")
+        cmd "lvremove -f /dev/#{spec[:lvm_vg]}/#{spec[:hostname]}"
+      end
     end
   }
 

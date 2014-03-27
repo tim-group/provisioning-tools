@@ -12,6 +12,7 @@ class Provision::Image::Build
     @config = config
     @commands = []
     @cleanups = []
+    @on_errors = []
     @suppress_error = CatchAndIgnore.new(self)
   end
 
@@ -23,6 +24,10 @@ class Provision::Image::Build
     @cleanups << lambda {
       suppress_error.instance_eval(&block)
     }
+  end
+
+  def on_error(&block)
+    @on_errors << block
   end
 
   def call(method)
@@ -61,6 +66,14 @@ class Provision::Image::Build
         end
       end
     rescue Exception => e
+      @on_errors.each do |error_block|
+        begin
+          error_block.call()
+        rescue Exception =>e
+          log.error(e)
+        end
+      end
+
       summary_log.info(e)
       log.error(e)
     end

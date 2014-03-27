@@ -34,6 +34,15 @@ define "xpboot" do
     end
   }
 
+  on_error {
+    case config[:vm_storage_type]
+    when 'lvm'
+      if File.exists("/dev/#{spec[:lvm_vg]}/#{spec[:hostname]}")
+        cmd "lvremove -f /dev/#{spec[:lvm_vg]}/#{spec[:hostname]}"
+      end
+    end
+  }
+
   run("inject hostname and ip address") {
     key="WJG3W-CHHC2-2R97W-7BC2F-MM9JD"
     answer_file="#{mountpoint}/sysprep/sysprep.inf"

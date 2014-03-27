@@ -238,6 +238,7 @@ describe XYZ do
 
     something.should eql("something")
   end
+
   it 'CCCCCc' do
     require 'provision/image/catalogue'
     something = nil
@@ -260,6 +261,48 @@ describe XYZ do
 
     something.should eql("something")
   end
+
+  it 'does not execute a clean up block when no errors occur' do
+    require 'provision/image/catalogue'
+    something = nil
+    define "defaults" do
+      extend Provision::Image::Commands
+      extend MockFunctions
+      run("configure defaults") {
+      }
+      on_error {
+        something= "I was executed"
+      }
+    end
+
+    build = Provision::Image::Catalogue::build("defaults", Provision::Core::MachineSpec.new({}), {})
+    build.execute()
+
+    something.should be_nil()
+  end
+  it 'execute a clean up block on error' do
+    require 'provision/image/catalogue'
+    something = nil
+    define "defaults" do
+      extend Provision::Image::Commands
+      extend MockFunctions
+      run("configure defaults") {
+        raise "an error"
+      }
+      on_error {
+        something = "I was executed"
+      }
+    end
+
+    build = Provision::Image::Catalogue::build("defaults", Provision::Core::MachineSpec.new({}), {})
+
+    expect {
+      build.execute()
+    }.to raise_error "an error"
+
+    something.should eql("I was executed")
+  end
+
 
   it 'raises a meaningful error when a non-existent template is defined' do
     require 'provision/image/catalogue'
