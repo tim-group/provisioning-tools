@@ -37,7 +37,7 @@ define "xpboot" do
   on_error {
     case config[:vm_storage_type]
     when 'lvm'
-      if File.exists("/dev/#{spec[:lvm_vg]}/#{spec[:hostname]}")
+      if File.exists?("/dev/#{spec[:lvm_vg]}/#{spec[:hostname]}")
         cmd "lvremove -f /dev/#{spec[:lvm_vg]}/#{spec[:hostname]}"
       end
     end
