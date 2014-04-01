@@ -2,7 +2,7 @@
   :template: xpboot
   :se_hub: dev-sehub-001.mgmt.dev.net.local
   :se_version: 2.32.0
-  :gold_image_url: file:///var/local/images/xp8-gold.img
+  :gold_image_url: http://iso.youdevise.com/master/precise/ldn-selie7-master.img
   :launch_script: start-grid.bat
   :group: dev-sxp
   :fabric: local
@@ -10,6 +10,7 @@
   :networks:
   - :mgmt
   :ram: "2097152"
+  :kvm_template]: 'kvm_no_virtio'
   :hostname: dev-sxp-002
   :qualified_hostnames:
     :mgmt: dev-sxp-002.mgmt.dev.net.local
