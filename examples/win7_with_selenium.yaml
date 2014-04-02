@@ -1,6 +1,6 @@
 - :domain: dev.net.local
   :template: win7boot
-  :gold_image_url: http://iso.youdevise.com/gold/win7-ie9-gold.img
+  :gold_image_url: http://imageserver.net.local/gold/win7-ie9-gold.img
   :fabric: local
   :vcpus: 1
   :networks:
@@ -10,3 +10,4 @@
   :qualified_hostnames:
     :mgmt: dev-selie9-001.mgmt.dev.net.local
   :selenium_hub_host: dev-sehub-001.mgmt.dev.net.local
+  :selenium_version: 2.41.0

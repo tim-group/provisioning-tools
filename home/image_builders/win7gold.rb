@@ -9,10 +9,6 @@ define "win7gold" do
     "/var/lib/provisioning-tools/files/win7gold/"
   end
 
-  def common_files
-    "/var/lib/provisioning-tools/files/common/"
-  end
-
   def mountpoint
     "#{spec[:temp_dir]}"
   end
@@ -31,24 +27,6 @@ define "win7gold" do
   run("install sysprep") {
     FileUtils.cp_r "#{win7_files}/sysprep/", "#{mountpoint}"
     FileUtils.cp "#{win7_files}/startmenu/dosysprep.bat", start_menu_location
-  }
-
-  run("install Selenium") {
-    selenium_dir = "#{common_files}/selenium"
-    java_dir     = "#{common_files}/java"
-    start_menu_grid_file = "#{mountpoint}/selenium/start-grid.bat"
-
-    FileUtils.cp_r selenium_dir, "#{mountpoint}"
-    FileUtils.cp_r java_dir, "#{mountpoint}"
-
-    cmd "sed -i s/%SEVERSION%/#{spec[:selenium_version]}/g \"#{start_menu_grid_file}\""
-
-    if spec[:selenium_version] == "2.41.0"
-        cmd "sed -i s/browserName=\\\\*iexplore%IEVERSION%,/browserName=*iexplore,/g \"#{start_menu_grid_file}\""
-        FileUtils.mv "#{mountpoint}/selenium/IEDriverServer.exe", "#{mountpoint}/selenium/IEDriverServer-2.32.0.exe"
-        FileUtils.cp "#{mountpoint}/selenium/IEDriverServer-2.41.0.exe", "#{mountpoint}/selenium/IEDriverServer.exe"
-    end
-    cmd "sed -i s/%IEVERSION%/#{spec[:ie_version]}/g \"#{start_menu_grid_file}\""
   }
 
   run("stamp gold image build date") {
