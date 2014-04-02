@@ -29,10 +29,12 @@ class Provision::VM::Virsh
   end
 
   def undefine_vm(spec)
+    raise 'VM marked as non-destroyable' if spec[:disallow_destroy]
     safe_system("virsh undefine #{spec[:hostname]} > /dev/null 2>&1")
   end
 
   def destroy_vm(spec)
+    raise 'VM marked as non-destroyable' if spec[:disallow_destroy]
     safe_system("virsh destroy #{spec[:hostname]} > /dev/null 2>&1")
   end
 

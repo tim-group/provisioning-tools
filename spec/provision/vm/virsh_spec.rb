@@ -85,4 +85,52 @@ describe Provision::VM::Virsh do
     IO.read("#{d}/vmx-1.xml").should match("<target dev='hda' bus='ide'/>")
     IO.read("#{d}/vmx-1.xml").should_not match("<model type='virtio'/>")
   end
+
+  it 'destroys VM when disallow_destroy is not set' do
+    hostname = 'somevmtobedestroyed'
+    spec = { :hostname => hostname }
+
+    virt_manager = Provision::VM::Virsh.new( {} )
+    virt_manager.should_receive(:system).with("virsh destroy #{hostname} > /dev/null 2>&1").and_return(true)
+
+    virt_manager.destroy_vm(spec)
+  end
+
+  it 'does not destroy VM when disallow_destroy is set' do
+    hostname = 'somevmtobedestroyed'
+    spec = { :disallow_destroy => true, :hostname => hostname }
+
+    virt_manager = Provision::VM::Virsh.new( {} )
+    virt_manager.should_not_receive(:system).with("virsh destroy #{hostname} > /dev/null 2>&1")
+
+    expect {
+      virt_manager.destroy_vm(spec)
+    }.to raise_error("VM marked as non-destroyable")
+  end
+
+  it 'undefine VM when disallow_destroy is not set' do
+    hostname = 'somevmtobedestroyed'
+    spec = { :hostname => hostname }
+
+    virt_manager = Provision::VM::Virsh.new( {} )
+    virt_manager.should_receive(:system).with("virsh undefine #{hostname} > /dev/null 2>&1").and_return(true)
+
+    virt_manager.undefine_vm(spec)
+  end
+
+  it 'does not undefine VM when disallow_destroy is set' do
+    hostname = 'somevmtobedestroyed'
+    spec = { :disallow_destroy => true, :hostname => hostname }
+
+    virt_manager = Provision::VM::Virsh.new( {} )
+    virt_manager.should_not_receive(:system).with("virsh undefine #{hostname} > /dev/null 2>&1")
+
+    expect {
+      virt_manager.undefine_vm(spec)
+    }.to raise_error("VM marked as non-destroyable")
+  end
+
+
+
+
 end

@@ -14,6 +14,7 @@ class Provision::Image::Service
   end
 
   def remove_image(spec)
+    raise 'VM marked as non-destroyable' if spec[:disallow_destroy]
     case @config[:vm_storage_type]
     when 'image'
       if File.exist?(spec[:image_path])
