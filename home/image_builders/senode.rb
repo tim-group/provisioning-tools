@@ -1,6 +1,10 @@
 define "senode" do
   copyboot
 
+  run("run apt-update ") {
+    chroot "apt-get -y --force-yes update"
+  }
+
   run("mounting devices") {
     cmd "mount --bind /dev #{spec[:temp_dir]}/dev"
     cmd "mount -t proc none #{spec[:temp_dir]}/proc"
