@@ -12,10 +12,6 @@ define "xpgold" do
     "/var/lib/provisioning-tools/files/xpgold/"
   end
 
-  def common_files
-    "/var/lib/provisioning-tools/files/common/"
-  end
-
   def mountpoint
     "#{spec[:temp_dir]}"
   end
@@ -43,18 +39,6 @@ define "xpgold" do
     FileUtils.cp_r("#{xp_files}/support/", "#{mountpoint}/")
     FileUtils.cp_r("#{xp_files}/sysprep/", "#{mountpoint}/")
     FileUtils.cp "#{xp_files}/startmenu/dosysprep.bat", start_menu_location
-  }
-
-  run("install Selenium") {
-    selenium_dir = "#{common_files}/selenium"
-    java_dir     = "#{common_files}/java"
-    start_menu_grid_file = "#{mountpoint}/selenium/start-grid.bat"
-
-    FileUtils.cp_r selenium_dir, "#{mountpoint}"
-    FileUtils.cp_r java_dir, "#{mountpoint}"
-
-    cmd "sed -i s/%SEVERSION%/#{spec[:selenium_version]}/g \"#{start_menu_grid_file}\""
-    cmd "sed -i s/%IEVERSION%/#{spec[:ie_version]}/g \"#{start_menu_grid_file}\""
   }
 
   run("stamp gold image build date") {

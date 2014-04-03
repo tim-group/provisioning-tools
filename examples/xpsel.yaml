@@ -1,15 +1,15 @@
 - :domain: dev.net.local
   :template: xpboot
-  :se_hub: dev-sehub-001.mgmt.dev.net.local
-  :se_version: 2.32.0
-  :gold_image_url: http://iso.youdevise.com/master/precise/ldn-selie7-master.img
-  :group: dev-sxp
+  :kvm_template: kvm_no_virtio
+  :gold_image_url: http://imageserver.net.local/gold/xp-ie7-gold.img
   :fabric: local
-  :vcpus: 2
+  :vcpus: 1
   :networks:
   - :mgmt
   :ram: "2097152"
-  :kvm_template]: 'kvm_no_virtio'
-  :hostname: dev-sxp-002
+  :hostname: dev-selie7-001
   :qualified_hostnames:
-    :mgmt: dev-sxp-002.mgmt.dev.net.local
+    :mgmt: dev-selie7-002.mgmt.dev.net.local
+  :selenium_hub_host: dev-sehub-001.mgmt.dev.net.local
+  :selenium_version: "2.41.0"
+  :ie_version: "7"
