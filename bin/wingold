@@ -6,7 +6,7 @@ $: << File.join(File.dirname(__FILE__), "..", "lib")
 require 'provision'
 require 'pp'
 
-required_options = [:master_image_url, :win_version, :ie_version, :selenium_version, :image_name]
+required_options = [:master_image_url, :win_version, :ie_version, :image_name]
 options = {}
 
 option_parser = OptionParser.new do |opts|
@@ -24,10 +24,6 @@ option_parser = OptionParser.new do |opts|
     options[:ie_version] = version
   end
 
-  opts.on("-s", "--selenium_version VERSION", "specify the version of Selenium that is on the gold image") do |version|
-    options[:selenium_version] = version
-  end
-
   opts.on("-n", "--image_name NAME", "specify what we call the resulting image") do |image_name|
     options[:image_name] = image_name
   end
@@ -41,7 +37,6 @@ if (required_options - options.keys).empty?
   spec =  {
     :master_image_url => options[:master_image_url],
     :ie_version => options[:ie_version],
-    :selenium_version => options[:selenium_version],
     :hostname  => options[:image_name].gsub(/.img$/, ""), # Take advantage of convention of using hostname as identity
     :networks  => [:mgmt],
     :qualified_hostnames => {
