@@ -18,6 +18,17 @@ define "puppetclient" do
     }
   }
 
+  run("setup one time password") {
+    require 'rotp'
+    totp = ROTP::TOTP.new("base32secret3232", :interval=>120)
+    onetime =  totp.now
+    open("#{spec[:temp_dir]}/etc/puppet/csr_attributes.yaml", 'w') { |f|
+      f.puts """extension_requests:
+  pp_preshared_key: #{onetime}
+      """
+    }
+  }
+
   run("seedapply") {
     cmd "mkdir #{spec[:temp_dir]}/seed"
 
