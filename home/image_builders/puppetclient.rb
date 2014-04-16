@@ -20,7 +20,7 @@ define "puppetclient" do
 
   run("setup one time password") {
     require 'rotp'
-    totp = ROTP::TOTP.new("base32secret3232", :interval=>120)
+    totp = ROTP::TOTP.new(config[:otp_secret], :interval=>120)
     onetime =  totp.now
     open("#{spec[:temp_dir]}/etc/puppet/csr_attributes.yaml", 'w') { |f|
       f.puts """extension_requests:
