@@ -45,10 +45,4 @@ define "xpgold" do
     tmp_date_file="#{mountpoint}/gold-build-date.txt"
     `date +"%m-%d-%y.%k:%M" > #{tmp_date_file}`
   }
-
-  run("write ie version to file") {
-    File.open("#{mountpoint}/ieversion.txt", 'w') do
-      |file| file.write(spec[:ieversion])
-    end
-  }
 end

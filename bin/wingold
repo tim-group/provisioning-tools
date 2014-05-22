@@ -20,10 +20,6 @@ option_parser = OptionParser.new do |opts|
     options[:win_version] = version
   end
 
-  opts.on("-i", "--ie_version VERSION", "specify the version of IE that is on the master image") do |version|
-    options[:ie_version] = version
-  end
-
   opts.on("-n", "--image_name NAME", "specify what we call the resulting image") do |image_name|
     options[:image_name] = image_name
   end
@@ -36,7 +32,6 @@ if (required_options - options.keys).empty?
 
   spec =  {
     :master_image_url => options[:master_image_url],
-    :ie_version => options[:ie_version],
     :hostname  => options[:image_name].gsub(/.img$/, ""), # Take advantage of convention of using hostname as identity
     :networks  => [:mgmt],
     :qualified_hostnames => {
