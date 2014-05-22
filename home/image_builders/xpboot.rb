@@ -77,10 +77,10 @@ define "xpboot" do
     java_dir     = "#{common_files}/java"
     start_menu_grid_file = "#{mountpoint}/selenium/start-grid.bat"
 
-    FileUtils.rm_r "#{mountpoint}/selenium"
+    FileUtils.rm_r "#{mountpoint}/selenium", :force => true
     FileUtils.cp_r selenium_dir, "#{mountpoint}"
 
-    FileUtils.rm_r "#{mountpoint}/java"
+    FileUtils.rm_r "#{mountpoint}/java", :force => true
     FileUtils.cp_r java_dir, "#{mountpoint}"
 
     cmd "sed -i s/%SEVERSION%/#{spec[:selenium_version]}/g \"#{start_menu_grid_file}\""
