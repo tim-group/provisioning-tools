@@ -99,6 +99,10 @@ define "win7boot" do
     end
   }
 
+  run("Install registry hack to make Selenium work on IE") {
+    FileUtils.cp "#{mountpoint}/selenium/hack-registry.bat", start_menu_location
+  }
+
   run("stamp time") {
      tmp_date_file="#{mountpoint}/build-date.txt"
     `date +"%m-%d-%y.%k:%M" > #{tmp_date_file}`
