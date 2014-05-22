@@ -6,7 +6,7 @@ $: << File.join(File.dirname(__FILE__), "..", "lib")
 require 'provision'
 require 'pp'
 
-required_options = [:master_image_url, :win_version, :ie_version, :image_name]
+required_options = [:master_image_url, :win_version, :image_name]
 options = {}
 
 option_parser = OptionParser.new do |opts|
