@@ -110,16 +110,6 @@ task :package_gold do
   sh commandLine.join(' ')
 end
 
-task :package_upload_unstable do
-  hash = `git rev-parse --short HEAD`.chomp
-  v_part= ENV['BUILD_NUMBER'] || "0.pre.#{hash}"
-  version = "0.0.#{v_part}"
-
-  sh "scp -o 'StrictHostKeyChecking no' -i /home/ci/.ssh/debrepo_upload.key build/provisioning-tools-gold-image_#{version}.deb debrepo@apt.youdevise.com:/tmp"
-  sh "ssh -i /home/ci/.ssh/debrepo_upload.key debrepo@apt.youdevise.com sudo /usr/local/bin/freight-package.rb -c unstable -d all /tmp/provisioning-tools-gold-image_#{version}.deb"
-  sh "mco debrepoupdate -t 999"
-end
-
 desc "Generate deb file for the MCollective agent"
 task :package_agent do
   sh "mkdir -p build"
