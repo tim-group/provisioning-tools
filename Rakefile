@@ -93,7 +93,7 @@ end
 desc "Generate deb file for the Gold image"
 task :package_gold do
   hash = `git rev-parse --short HEAD`.chomp
-  v_part= ENV['BUILD_NUMBER'] || "0.pre.#{hash}"
+  v_part= ENV['BUILD_NUMBER'] || "0.#{hash}"
   version = "0.0.#{v_part}"
 
   commandLine  = "fpm",
@@ -114,7 +114,7 @@ desc "Generate deb file for the MCollective agent"
 task :package_agent do
   sh "mkdir -p build"
   hash = `git rev-parse --short HEAD`.chomp
-  v_part= ENV['BUILD_NUMBER'] || "0.pre.#{hash}"
+  v_part= ENV['BUILD_NUMBER'] || "0.#{hash}"
   version = "0.0.#{v_part}"
 
   commandLine  = "fpm",
