@@ -19,17 +19,21 @@ define "grow" do
       end
       cmd "lvcreate -n #{spec[:hostname]} -L #{spec[:image_size]} #{spec[:lvm_vg]}"
       cmd "dd if=#{spec[:images_dir]}/gold/generic.img of=/dev/#{spec[:lvm_vg]}/#{spec[:hostname]}"
+    when 'new'
+      # do nothing
     else
       raise "provisioning tools does not know about vm_storage_type '#{config[:vm_storage_type]}'"
     end
 
-    cmd "parted -s #{vm_disk_location} rm 1"
-    cmd "parted -s #{vm_disk_location} mkpart primary ext3 2048s 100%"
-    vm_partition_name = cmd "kpartx -l #{vm_disk_location} | awk '{ print $1 }'"
-    cmd "kpartx -a #{vm_disk_location}"
+    if config[:vm_storage_type] != 'new'
+      cmd "parted -s #{vm_disk_location} rm 1"
+      cmd "parted -s #{vm_disk_location} mkpart primary ext3 2048s 100%"
+      vm_partition_name = cmd "kpartx -l #{vm_disk_location} | awk '{ print $1 }'"
+      cmd "kpartx -a #{vm_disk_location}"
 
-    cmd "e2fsck -f -p /dev/mapper/#{vm_partition_name}"
-    cmd "resize2fs /dev/mapper/#{vm_partition_name}"
+      cmd "e2fsck -f -p /dev/mapper/#{vm_partition_name}"
+      cmd "resize2fs /dev/mapper/#{vm_partition_name}"
+    end
   }
 
   on_error {
@@ -48,6 +52,8 @@ define "grow" do
       cmd "losetup -d /dev/#{spec[:loop0]}"
     when 'lvm'
       cmd "kpartx -d /dev/#{spec[:lvm_vg]}/#{spec[:hostname]}"
+    when 'new'
+      # do nothing
     else
       raise "provisioning tools does not know about vm_storage_type '#{config[:vm_storage_type]}'"
     end

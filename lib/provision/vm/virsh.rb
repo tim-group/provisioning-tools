@@ -55,7 +55,7 @@ class Provision::VM::Virsh
   end
 
 
-  def write_virsh_xml(spec)
+  def write_virsh_xml(spec, storage_xml=nil)
     if spec[:kvm_template]
       template_file = "#{Provision.base}/templates/#{spec[:kvm_template]}.template"
     else
@@ -63,7 +63,7 @@ class Provision::VM::Virsh
     end
     template = ERB.new(File.read(template_file))
     to = "#{spec[:libvirt_dir]}/#{spec[:hostname]}.xml"
-    binding = VirshBinding.new(spec, @config)
+    binding = VirshBinding.new(spec, @config, storage_xml)
     begin
       template.result(binding.get_binding())
     rescue Exception=>e
@@ -76,19 +76,20 @@ class Provision::VM::Virsh
     to
   end
 
-  def define_vm(spec)
-    to = write_virsh_xml(spec)
+  def define_vm(spec, storage_xml=nil)
+    to = write_virsh_xml(spec, storage_xml)
     safe_system("virsh define #{to} > /dev/null 2>&1")
   end
 end
 
 class VirshBinding
 
-  attr_accessor :spec, :config
+  attr_accessor :spec, :config, :storage_xml
 
-  def initialize(spec, config)
+  def initialize(spec, config, storage_xml=nil)
     @spec = spec
     @config = config
+    @storage_xml = storage_xml
   end
 
   def get_binding

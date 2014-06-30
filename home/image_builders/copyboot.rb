@@ -7,9 +7,12 @@ define "copyboot" do
 
   grow
 
-  run("create temporary mount directory for VM filesystem") {
-      cmd "mkdir #{spec[:temp_dir]}"
-  }
+  case config[:vm_storage_type]
+  when 'image','lvm'
+    run("create temporary mount directory for VM filesystem") {
+        cmd "mkdir #{spec[:temp_dir]}"
+    }
+  end
 
   case config[:vm_storage_type]
   when 'image'
@@ -27,12 +30,19 @@ define "copyboot" do
       vm_partition_name = cmd "kpartx -l /dev/#{spec[:lvm_vg]}/#{spec[:hostname]} | awk '{ print $1 }'"
       cmd "mount /dev/mapper/#{vm_partition_name} #{spec[:temp_dir]}"
     }
+  when 'new'
+    # do nothing
   end
 
-  cleanup {
-    cmd "umount #{spec[:temp_dir]}"
-    suppress_error.cmd "rmdir #{spec[:temp_dir]}"
-  }
+  case config[:vm_storage_type]
+  when 'image','lvm'
+    cleanup {
+      cmd "umount #{spec[:temp_dir]}"
+      suppress_error.cmd "rmdir #{spec[:temp_dir]}"
+    }
+  when 'new'
+    # do nothing
+  end
 
   run("set hostname") {
     open("#{spec[:temp_dir]}/etc/hostname", 'w') { |f|

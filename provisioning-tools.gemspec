@@ -1,7 +1,7 @@
 require 'rake'
 
 hash = `git rev-parse --short HEAD`.chomp
-v_part= ENV['BUILD_NUMBER'] || "0.#{hash}"
+v_part= ENV['BUILD_NUMBER'] || "0.#{hash.hex}"
 version = "0.0.#{v_part}"
 
 Gem::Specification.new do |s|

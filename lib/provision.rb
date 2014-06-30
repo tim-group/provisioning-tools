@@ -4,6 +4,8 @@ require 'provision/vm/virsh'
 require 'provision/core/provisioning_service'
 require 'provision/workqueue'
 require 'provision/dns'
+require 'provision/storage'
+require 'provision/storage/service'
 require 'util/symbol_utils'
 require 'yaml'
 require 'pp'
@@ -31,7 +33,13 @@ class Provision::Config
   def get()
     return nil unless File.exists? @configfile
     config = @symbol_utils.symbolize_keys(YAML.load(File.new(@configfile)))
-    missing_keys = required_config_keys - config.keys
+    # FIXME: Once new code is everywhere, undo this conditional
+    # and move :storage into the required_config_keys method
+    missing_keys = required_config_keys
+    if config[:vm_storage_type] == 'new'
+      missing_keys << :storage
+    end
+    missing_keys = missing_keys - config.keys
     raise "#{@configfile} has missing properties (#{missing_keys.join(', ')})" unless missing_keys.empty?
 
     return config
@@ -80,12 +88,18 @@ class Provision::Factory
 
     defaults = @config[:defaults]
 
+    storage_service = nil
+    if @config[:vm_storage_type] == 'new'
+      storage_service = Provision::Storage::Service.new(@config[:storage])
+    end
+
     @provisioning_service ||= Provision::Core::ProvisioningService.new(
       :image_service => Provision::Image::Service.new(
         :configdir => home("image_builders"),
         :targetdir => targetdir,
         :config => @config
-    ),
+      ),
+      :storage_service => storage_service,
       :vm_service => virsh,
       :numbering_service => numbering_service,
       :defaults => defaults,
