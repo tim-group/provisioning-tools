@@ -22,8 +22,15 @@ class Provision::Storage
         raise e
       end
     end
+
+    @@cleanup_tasks[name] = [] if @@cleanup_tasks[name].nil?
+    unless task_hash[:cleanup_remove].nil?
+      if @@cleanup_tasks[name].last == task_hash[:cleanup_remove]
+        @@cleanup_tasks[name].pop
+      end
+    end
+
     unless task_hash[:cleanup].nil?
-      @@cleanup_tasks[name] = [] if @@cleanup_tasks[name].nil?
       @@cleanup_tasks[name] << task_hash[:cleanup]
       log.debug("added cleanup task")
     end
