@@ -123,7 +123,10 @@ class Provision::Storage::Service
       type = settings[:type].to_sym
       storage = get_storage(type)
       source = storage.libvirt_source(name)
-      target = "dev='vd#{drive_letters[current_drive_letter]}'"
+      virtio = settings[:prepare][:options][:virtio] rescue true
+      disk_type = virtio ? 'vd' : 'hd'
+      bus = virtio ? 'virtio' : 'ide'
+      target = "dev='#{disk_type}#{drive_letters[current_drive_letter]}'"
       template = ERB.new(File.read(template_file))
       xml_output = xml_output + template.result(binding)
       current_drive_letter = current_drive_letter + 1
