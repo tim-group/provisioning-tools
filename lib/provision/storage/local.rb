@@ -23,7 +23,7 @@ module Provision::Storage::Local
       :task => lambda {
         cmd "parted -s #{device(name)} mklabel msdos"
         cmd "parted -s #{device(name)} mkpart primary ext3 2048s 100%"
-        cmd "kpartx -a #{device(name)}"
+        cmd "kpartx -av #{device(name)}"
       }
     })
     run_task(name, {
@@ -32,13 +32,13 @@ module Provision::Storage::Local
       },
       :on_error => lambda {
         sleep 1
-        cmd "kpartx -d #{device(name)}"
+        cmd "kpartx -dv #{device(name)}"
       }
     })
     run_task(name, {
       :task => lambda {
         sleep 1
-        cmd "kpartx -d #{device(name)}"
+        cmd "kpartx -dv #{device(name)}"
       }
     })
   end
@@ -80,7 +80,7 @@ module Provision::Storage::Local
     vm_partition_name = partition_name(name)
     run_task(name, {
       :task => lambda {
-        cmd "kpartx -a #{device(name)}"
+        cmd "kpartx -av #{device(name)}"
       }
     })
 
@@ -91,14 +91,14 @@ module Provision::Storage::Local
       },
       :on_error => lambda {
         sleep 1
-        cmd "kpartx -d #{device(name)}"
+        cmd "kpartx -dv #{device(name)}"
       }
     })
 
     run_task(name, {
       :task => lambda {
         sleep 1
-        cmd "kpartx -d #{device(name)}"
+        cmd "kpartx -dv #{device(name)}"
       }
     })
   end
@@ -114,7 +114,7 @@ module Provision::Storage::Local
 
     run_task(name, {
       :task => lambda {
-        cmd "kpartx -a #{device(name)}"
+        cmd "kpartx -av #{device(name)}"
       },
       :on_error => lambda {
         FileUtils.rmdir(dir) if temp_mountpoint and !dir_existed_at_start
@@ -128,7 +128,7 @@ module Provision::Storage::Local
       },
       :on_error => lambda {
         sleep 1
-        cmd "kpartx -d #{device(name)}"
+        cmd "kpartx -dv #{device(name)}"
         FileUtils.rmdir(dir) if temp_mountpoint and dir_existed_at_start
       }
     })
@@ -141,7 +141,7 @@ module Provision::Storage::Local
       },
       :on_error => lambda {
         sleep 1
-        cmd "kpartx -d #{device(name)}"
+        cmd "kpartx -dv #{device(name)}"
         FileUtils.rmdir(dir) if delete_mountpoint and dir_existed_at_start
       }
     })
@@ -149,7 +149,7 @@ module Provision::Storage::Local
     run_task(name, {
       :task => lambda {
         sleep 1
-        cmd "kpartx -d #{device(name)}"
+        cmd "kpartx -dv #{device(name)}"
         FileUtils.rmdir(dir) if delete_mountpoint and dir_existed_at_start
       }
     })
