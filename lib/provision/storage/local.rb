@@ -137,6 +137,7 @@ module Provision::Storage::Local
   def unmount(name, dir, delete_mountpoint=false)
     run_task(name, {
       :task => lambda {
+        sleep 1
         cmd "umount #{dir}"
       },
       :on_error => lambda {
