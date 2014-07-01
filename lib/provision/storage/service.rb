@@ -132,18 +132,17 @@ class Provision::Storage::Service
   end
 
   def create_fstab(storage_spec, tempdir)
-    prepare_options = storage_spec[mount_point][:prepare][:options]
-    create_fstab = prepare_options[:create_fstab].nil? ? true : prepare_options[:create_fstab]
-    unless prepare_options[:create_fstab] = false
-      fstab = "#{tempdir}/etc/fstab"
-      drive_letters = ('a'..'z').to_a
-      current_drive_letter = 0
+    fstab = "#{tempdir}/etc/fstab"
+    drive_letters = ('a'..'z').to_a
+    current_drive_letter = 0
 
-      ordered_keys = order_keys(storage_spec.keys)
+    ordered_keys = order_keys(storage_spec.keys)
 
-      File.open(fstab, 'a') do |f|
-        fstype = 'ext4'
-        ordered_keys.each do |mount_point|
+    ordered_keys.each do |mount_point|
+      create_in_fstab = storage_spec[mount_point][:prepare][:options][:create_in_fstab] rescue true
+      if create_in_fstab
+        File.open(fstab, 'a') do |f|
+          fstype = 'ext4'
           begin
             fstype = prepare_options[:type]
           rescue NoMethodError=>e
