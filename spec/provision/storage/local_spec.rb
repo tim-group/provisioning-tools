@@ -44,6 +44,22 @@ describe Provision::Storage::Local do
     @storage_type = MockStorage.new({:tmpdir => @tmpdir})
   end
 
+  it 'should symbolize the value of method' do
+    File.open("#{@tmpdir}/symbolize_method", 'w').write("source file contents")
+    settings = {
+      :size     => '5G',
+      :prepare  => {
+        :method  => 'image',
+        :options => {
+          :path    => "#{@tmpdir}/symbolize_method",
+        },
+      },
+    }
+    @storage_type.stub(:image_filesystem)
+    @storage_type.stub(:grow_filesystem)
+    @storage_type.should_receive(:image_filesystem)
+    @storage_type.init_filesystem('symbolize_method', settings)
+  end
   it 'should not resize the filesystem when resize is false' do
     File.open("#{@tmpdir}/resize_false", 'w').write("source file contents")
     settings = {
@@ -56,7 +72,6 @@ describe Provision::Storage::Local do
         },
       },
     }
-    @storage_type = MockStorage.new({:tmpdir => @tmpdir})
     @storage_type.should_not_receive(:grow_filesystem)
     @storage_type.init_filesystem('resize_false', settings)
   end

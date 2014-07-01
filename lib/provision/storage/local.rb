@@ -1,55 +1,60 @@
 module Provision::Storage::Local
 
-  def init_filesystem(name, settings = {})
+  def image_filesystem(name, prepare_options)
+    image_file_path = prepare_options[:path] || '/var/local/images/gold/generic.img'
+    run_task(name, {
+      :task => lambda {
+        case image_file_path
+        when /^\/.*/
+          raise "Source image file #{image_file_path} does not exist" if !File.exist?(image_file_path)
+          cmd "dd if=#{image_file_path} of=#{device(name)}"
+        when /^https?:\/\//
+          cmd "curl -Ss --fail #{image_file_path} | dd of=#{device(name)}"
+        else
+          raise "Not sure how to deal with image_file_path: '#{image_file_path}'"
+        end
+      }
+    })
+  end
 
+  def format_filesystem(name,prepare_options)
+    fs_type = prepare_options[:type] || 'ext4'
+    run_task(name, {
+      :task => lambda {
+        cmd "parted -s #{device(name)} mklabel msdos"
+        cmd "parted -s #{device(name)} mkpart primary ext3 2048s 100%"
+        cmd "kpartx -a #{device(name)}"
+      }
+    })
+    run_task(name, {
+      :task => lambda {
+        cmd "mkfs.#{fs_type} /dev/mapper/#{partition_name(name)}"
+      },
+      :on_error => lambda {
+        sleep 1
+        cmd "kpartx -d #{device(name)}"
+      }
+    })
+    run_task(name, {
+      :task => lambda {
+        sleep 1
+        cmd "kpartx -d #{device(name)}"
+      }
+    })
+  end
+
+  def init_filesystem(name, settings = {})
     size = settings[:size]
     prepare = settings[:prepare] || {}
     prepare_options = prepare[:options] || {}
-    method = prepare[:method] || :format
+    method = prepare[:method].to_sym || :format
     resize = prepare_options.has_key?(:resize)? prepare_options[:resize] : true
-
-
     case method
     when :image
-      image_file_path = prepare_options[:path] || '/var/local/images/gold/generic.img'
-      run_task(name, {
-        :task => lambda {
-          case image_file_path
-          when /^\/.*/
-            raise "Source image file #{image_file_path} does not exist" if !File.exist?(image_file_path)
-            cmd "dd if=#{image_file_path} of=#{device(name)}"
-          when /^https?:\/\//
-            cmd "curl -Ss --fail #{image_file_path} | dd of=#{device(name)}"
-          else
-            raise "Not sure how to deal with image_file_path: '#{image_file_path}'"
-          end
-          grow_filesystem(name, size, prepare_options) if resize
-        }
-      })
+      image_filesystem(name, prepare_options)
+      grow_filesystem(name, size, prepare_options) if resize
     when :format
-      fs_type = prepare_options[:type] || 'ext4'
-      run_task(name, {
-        :task => lambda {
-          cmd "parted -s #{device(name)} mklabel msdos"
-          cmd "parted -s #{device(name)} mkpart primary ext3 2048s 100%"
-          cmd "kpartx -a #{device(name)}"
-        }
-      })
-      run_task(name, {
-        :task => lambda {
-          cmd "mkfs.#{fs_type} /dev/mapper/#{partition_name(name)}"
-        },
-        :on_error => lambda {
-          sleep 1
-          cmd "kpartx -d #{device(name)}"
-        }
-      })
-      run_task(name, {
-        :task => lambda {
-          sleep 1
-          cmd "kpartx -d #{device(name)}"
-        }
-      })
+      format_filesystem(name, prepare_options)
     else
       raise "unsure how to init storage using method '#{method}'"
     end
