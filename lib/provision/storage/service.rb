@@ -132,26 +132,30 @@ class Provision::Storage::Service
   end
 
   def create_fstab(storage_spec, tempdir)
-    fstab = "#{tempdir}/etc/fstab"
-    drive_letters = ('a'..'z').to_a
-    current_drive_letter = 0
+    prepare_options = storage_spec[mount_point][:prepare][:options]
+    create_fstab = prepare_options[:create_fstab].nil? ? true : prepare_options[:create_fstab]
+    unless prepare_options[:create_fstab] = false
+      fstab = "#{tempdir}/etc/fstab"
+      drive_letters = ('a'..'z').to_a
+      current_drive_letter = 0
 
-    ordered_keys = order_keys(storage_spec.keys)
+      ordered_keys = order_keys(storage_spec.keys)
 
-    File.open(fstab, 'a') do |f|
-      fstype = 'ext4'
-      ordered_keys.each do |mount_point|
-        begin
-          fstype = storage_spec[mount_point][:prepare][:options][:type]
-        rescue NoMethodError=>e
-          if e.name == '[]'.to_sym
-            log.debug "fstype not found, using default value: #{fstype}"
-          else
-            raise e
+      File.open(fstab, 'a') do |f|
+        fstype = 'ext4'
+        ordered_keys.each do |mount_point|
+          begin
+            fstype = prepare_options[:type]
+          rescue NoMethodError=>e
+            if e.name == '[]'.to_sym
+              log.debug "fstype not found, using default value: #{fstype}"
+            else
+              raise e
+            end
           end
+          f.puts("/dev/vd#{drive_letters[current_drive_letter]}1 #{mount_point}  #{fstype} defaults 0 0")
+          current_drive_letter = current_drive_letter + 1
         end
-        f.puts("/dev/vd#{drive_letters[current_drive_letter]}1 #{mount_point}  #{fstype} defaults 0 0")
-        current_drive_letter = current_drive_letter + 1
       end
     end
   end
