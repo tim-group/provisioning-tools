@@ -44,6 +44,39 @@ describe Provision::Storage::Local do
     @storage_type = MockStorage.new({:tmpdir => @tmpdir})
   end
 
+  it 'should not resize the filesystem when resize is false' do
+    File.open("#{@tmpdir}/resize_false", 'w').write("source file contents")
+    @storage_type.stub(:grow_filesystem)
+    settings = {
+      :size     => '5G',
+      :prepare  => {
+        :method  => :image,
+        :resize  => false,
+        :options => {
+          :path    => "#{@tmpdir}/resize_false",
+        },
+      },
+    }
+    @storage_type.should_not_receive(:grow_filesystem)
+    @storage_type.init_filesystem('resize_false', settings)
+  end
+
+  it 'should resize the filesystem when resize is true' do
+    File.open("#{@tmpdir}/resize_true", 'w').write("source file contents")
+    settings = {
+      :size     => '5G',
+      :prepare  => {
+        :method  => :image,
+        :resize  => true,
+        :options => {
+          :path    => "#{@tmpdir}/resize_true",
+        },
+      },
+    }
+    @storage_type.should_receive(:grow_filesystem)
+    @storage_type.init_filesystem('resize_true', settings)
+  end
+
   it 'initialises the names storage from an image file path' do
     File.open("#{@tmpdir}/source", 'w') { |file|
       file.write("source file contents")
