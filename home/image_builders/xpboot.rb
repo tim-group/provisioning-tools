@@ -35,6 +35,8 @@ define "xpboot" do
     when 'image'
       cmd "curl -Ss --fail -o #{spec[:image_path]} #{spec[:gold_image_url]}"
       cmd "mount -o offset=32256  #{spec[:image_path]} #{spec[:temp_dir]}"
+    when 'new'
+      # do nothing
     end
   }
 
@@ -112,10 +114,15 @@ define "xpboot" do
     `date +"%m-%d-%y.%k:%M" > #{tmp_date_file}`
   }
 
-  cleanup {
-    cmd "umount -l #{mountpoint}"
-    cmd "sleep 1"
-    suppress_error.cmd "rmdir #{mountpoint}"
-  }
+  case config[:vm_storage_type]
+  when 'lvm','image'
+    cleanup {
+      cmd "umount -l #{mountpoint}"
+      cmd "sleep 1"
+      suppress_error.cmd "rmdir #{mountpoint}"
+    }
+  when 'new'
+    # do nothing
+  end
 
 end

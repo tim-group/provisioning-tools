@@ -115,15 +115,15 @@ define "win7boot" do
     `date +"%m-%d-%y.%k:%M" > #{tmp_date_file}`
   }
 
-    case config[:vm_storage_type]
-    when 'lvm','image'
-      cleanup {
-        cmd "umount -l #{mountpoint}"
-        cmd "sleep 1"
-        suppress_error.cmd "rmdir #{mountpoint}"
-      }
-    when 'new'
-      # do nothing
-    end
+  case config[:vm_storage_type]
+  when 'lvm','image'
+    cleanup {
+      cmd "umount -l #{mountpoint}"
+      cmd "sleep 1"
+      suppress_error.cmd "rmdir #{mountpoint}"
+    }
+  when 'new'
+    # do nothing
+  end
 
 end
