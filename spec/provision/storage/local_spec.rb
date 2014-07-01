@@ -96,6 +96,33 @@ describe Provision::Storage::Local do
     File.read("#{@tmpdir}/working").should eql 'source file contents'
   end
 
+  it 'should download the gold image if the path is a url' do
+    settings = {
+      :size     => '5G',
+      :prepare  => {
+        :method  => :image,
+        :options => {
+          :path    => "http://someplace/gold.img",
+        },
+      },
+    }
+    @storage_type.should_receive(:cmd).with("curl -Ss --fail http://someplace/gold.img | dd of=#{@tmpdir}/interfoo")
+    @storage_type.stub(:grow_filesystem)
+    @storage_type.stub(:cmd) do |arg|
+      case arg
+      when "curl -Ss --fail http://someplace/gold.img | dd of=#{@tmpdir}/interfoo"
+        true
+      when "kpartx -d #{@tmpdir}/interfoo"
+        true
+      else
+        false
+      end
+    end
+    @storage_type.init_filesystem('interfoo', settings)
+  end
+
+
+
   it 'complains if initialising the storage fails' do
     @storage_type.stub(:grow_filesystem)
     FileUtils.touch "#{@tmpdir}/empty_gold.img"

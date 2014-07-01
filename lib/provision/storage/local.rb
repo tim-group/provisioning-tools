@@ -10,11 +10,19 @@ module Provision::Storage::Local
     case method
     when :image
       image_file_path = prepare_options[:path] || '/var/local/images/gold/generic.img'
-      raise "Source image file #{image_file_path} does not exist" if !File.exist?(image_file_path)
+      should_grow = prepare_options[:resize] || true
       run_task(name, {
         :task => lambda {
-          cmd "dd if=#{image_file_path} of=#{device(name)}"
-          grow_filesystem(name, size, prepare_options)
+          case image_file_path
+          when /^\/.*/
+            raise "Source image file #{image_file_path} does not exist" if !File.exist?(image_file_path)
+            cmd "dd if=#{image_file_path} of=#{device(name)}"
+          when /^https?:\/\//
+            cmd "curl -Ss --fail #{image_file_path} | dd of=#{device(name)}"
+          else
+            raise "Not sure how to deal with image_file_path: '#{image_file_path}'"
+          end
+          grow_filesystem(name, size, prepare_options) if should_grow
         }
       })
     when :format
@@ -47,7 +55,7 @@ module Provision::Storage::Local
   end
 
   def partition_name(name)
-    vm_partition_name = cmd "kpartx -l #{device(name)} | awk '{ print $1 }' | head -1"
+    vm_partition_name = cmd "kpartx -l #{device(name)} | grep -v 'loop deleted : /dev/loop' | awk '{ print $1 }' | tail -1"
     raise "unable to work out vm_partition_name" if vm_partition_name.nil?
     return vm_partition_name
   end
