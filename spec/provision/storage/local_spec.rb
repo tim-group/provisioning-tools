@@ -212,10 +212,10 @@ describe Provision::Storage::Local do
     @storage_type.stub(:cmd) do |arg|
       true
     end
-    @storage_type.should_receive(:cmd).with("kpartx -a #{device_name}")
+    @storage_type.should_receive(:cmd).with("kpartx -av #{device_name}")
     @storage_type.should_receive(:cmd).with("e2fsck -f -p /dev/mapper/#{partition_name}")
     @storage_type.should_receive(:cmd).with("resize2fs /dev/mapper/#{partition_name}")
-    @storage_type.should_receive(:cmd).with("kpartx -d #{device_name}")
+    @storage_type.should_receive(:cmd).with("kpartx -dv #{device_name}")
     @storage_type.check_and_resize_filesystem(name)
   end
 
@@ -234,9 +234,9 @@ describe Provision::Storage::Local do
         true
       end
     end
-    @storage_type.should_receive(:cmd).with("kpartx -a #{device_name}")
+    @storage_type.should_receive(:cmd).with("kpartx -av #{device_name}")
     @storage_type.should_receive(:cmd).with("e2fsck -f -p /dev/mapper/#{partition_name}")
-    @storage_type.should_receive(:cmd).with("kpartx -d #{device_name}")
+    @storage_type.should_receive(:cmd).with("kpartx -dv #{device_name}")
     expect { @storage_type.check_and_resize_filesystem(name) }.to raise_error
   end
 
@@ -249,7 +249,7 @@ describe Provision::Storage::Local do
     @storage_type.stub(:partition_name) do |arg|
       'name'
     end
-    @storage_type.should_receive(:cmd).with("kpartx -a #{@tmpdir}/name")
+    @storage_type.should_receive(:cmd).with("kpartx -av #{@tmpdir}/name")
     @storage_type.should_receive(:cmd).with("mount /dev/mapper/name #{@tmpdir}/place")
     @storage_type.mount('name', "#{@tmpdir}/place", true)
     File.exist?("#{@tmpdir}/place").should eql true
