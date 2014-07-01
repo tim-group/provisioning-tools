@@ -46,17 +46,17 @@ describe Provision::Storage::Local do
 
   it 'should not resize the filesystem when resize is false' do
     File.open("#{@tmpdir}/resize_false", 'w').write("source file contents")
-    @storage_type.stub(:grow_filesystem)
     settings = {
       :size     => '5G',
       :prepare  => {
         :method  => :image,
-        :resize  => false,
         :options => {
           :path    => "#{@tmpdir}/resize_false",
+          :resize  => false,
         },
       },
     }
+    @storage_type = MockStorage.new({:tmpdir => @tmpdir})
     @storage_type.should_not_receive(:grow_filesystem)
     @storage_type.init_filesystem('resize_false', settings)
   end
@@ -67,9 +67,9 @@ describe Provision::Storage::Local do
       :size     => '5G',
       :prepare  => {
         :method  => :image,
-        :resize  => true,
         :options => {
           :path    => "#{@tmpdir}/resize_true",
+          :resize  => true,
         },
       },
     }
@@ -257,7 +257,7 @@ describe Provision::Storage::Local do
     device_name = @storage_type.device('magical')
     @storage_type.stub(:cmd) do |arg|
       case arg
-      when "kpartx -l #{device_name} | awk '{ print $1 }' | head -1"
+      when "kpartx -l #{device_name} | grep -v 'loop deleted : /dev/loop' | awk '{ print $1 }' | tail -1"
         "magical"
       else
         raise "Un-stubbed call to cmd for #{arg}"

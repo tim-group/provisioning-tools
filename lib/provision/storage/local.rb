@@ -6,11 +6,12 @@ module Provision::Storage::Local
     prepare = settings[:prepare] || {}
     prepare_options = prepare[:options] || {}
     method = prepare[:method] || :format
+    resize = prepare_options.has_key?(:resize)? prepare_options[:resize] : true
+
 
     case method
     when :image
       image_file_path = prepare_options[:path] || '/var/local/images/gold/generic.img'
-      should_grow = prepare_options[:resize] || true
       run_task(name, {
         :task => lambda {
           case image_file_path
@@ -22,7 +23,7 @@ module Provision::Storage::Local
           else
             raise "Not sure how to deal with image_file_path: '#{image_file_path}'"
           end
-          grow_filesystem(name, size, prepare_options) if should_grow
+          grow_filesystem(name, size, prepare_options) if resize
         }
       })
     when :format
