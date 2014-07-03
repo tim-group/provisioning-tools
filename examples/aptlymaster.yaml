@@ -1,0 +1,33 @@
+---
+  - !ruby/sym vcpus: "2"
+    !ruby/sym availability_group: dev-aptlymaster
+    !ruby/sym qualified_hostnames:
+      !ruby/sym mgmt: dev-aptlymaster-001-rpearce.mgmt.dev.net.local
+      !ruby/sym prod: dev-aptlymaster-001-rpearce.dev.net.local
+    !ruby/sym hostname: dev-aptlymaster-001-rpearce
+    !ruby/sym ram: "4194304"
+    !ruby/sym fabric: local
+    !ruby/sym image_size: "50G"
+    !ruby/sym networks:
+      - !ruby/sym mgmt
+      - !ruby/sym prod
+    !ruby/sym domain: dev.net.local
+    !ruby/sym storage:
+      !ruby/sym /:
+        !ruby/sym type: os
+        !ruby/sym size: "1G"
+        !ruby/sym prepare:
+          !ruby/sym method: image
+          !ruby/sym options:
+            !ruby/sym path: /var/local/images/gold/generic.img
+      !ruby/sym /var/www:
+        !ruby/sym type: data
+        !ruby/sym size: "1G"
+        !ruby/sym prepare:
+          !ruby/sym method: format
+          !ruby/sym options:
+            !ruby/sym fstype: ext4
+    !ruby/sym cnames:
+      !ruby/sym mgmt:
+        deb-transitional: dev-aptlymaster-001-rpearce.mgmt.dev.net.local
+        aptly-master: dev-aptlymaster-001-rpearce.mgmt.dev.net.local

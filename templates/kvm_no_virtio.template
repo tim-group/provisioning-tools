@@ -23,13 +23,16 @@
       <driver name='qemu' type='raw'/>
       <source file='<%= spec[:image_path] %>'/>
       <target dev='hda' bus='ide'/>
+    </disk>
 <% when 'lvm' %>
     <disk type='block' device='disk'>
       <driver name='qemu' type='raw'/>
       <source dev='/dev/<%= spec[:lvm_vg] %>/<%= spec[:hostname] %>'/>
       <target dev='hda' bus='ide'/>
-<% end %>
     </disk>
+<% when 'new' %>
+<%= storage_xml %>
+<% end %>
     <controller type='ide' index='0'>
     </controller>
     <% spec.interfaces.each do |nic| %>

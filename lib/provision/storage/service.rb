@@ -123,7 +123,10 @@ class Provision::Storage::Service
       type = settings[:type].to_sym
       storage = get_storage(type)
       source = storage.libvirt_source(name)
-      target = "dev='vd#{drive_letters[current_drive_letter]}'"
+      virtio = settings[:prepare][:options][:virtio] rescue true
+      disk_type = virtio ? 'vd' : 'hd'
+      bus = virtio ? 'virtio' : 'ide'
+      target = "dev='#{disk_type}#{drive_letters[current_drive_letter]}'"
       template = ERB.new(File.read(template_file))
       xml_output = xml_output + template.result(binding)
       current_drive_letter = current_drive_letter + 1
@@ -138,20 +141,24 @@ class Provision::Storage::Service
 
     ordered_keys = order_keys(storage_spec.keys)
 
-    File.open(fstab, 'a') do |f|
-      fstype = 'ext4'
-      ordered_keys.each do |mount_point|
-        begin
-          fstype = storage_spec[mount_point][:prepare][:options][:type]
-        rescue NoMethodError=>e
-          if e.name == '[]'.to_sym
-            log.debug "fstype not found, using default value: #{fstype}"
-          else
-            raise e
+    ordered_keys.each do |mount_point|
+      prepare_options = storage_spec[mount_point][:prepare][:options] rescue nil
+      create_in_fstab = prepare_options[:create_in_fstab] rescue true
+      if create_in_fstab
+        File.open(fstab, 'a') do |f|
+          fstype = 'ext4'
+          begin
+            fstype = prepare_options[:type] rescue 'ext4'
+          rescue NoMethodError=>e
+            if e.name == '[]'.to_sym
+              log.debug "fstype not found, using default value: #{fstype}"
+            else
+              raise e
+            end
           end
+          f.puts("/dev/vd#{drive_letters[current_drive_letter]}1 #{mount_point}  #{fstype} defaults 0 0")
+          current_drive_letter = current_drive_letter + 1
         end
-        f.puts("/dev/vd#{drive_letters[current_drive_letter]}1 #{mount_point}  #{fstype} defaults 0 0")
-        current_drive_letter = current_drive_letter + 1
       end
     end
   end

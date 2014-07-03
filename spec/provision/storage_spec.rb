@@ -81,5 +81,84 @@ describe Provision do
 
       Provision::Storage.cleanup('test')
     end
+
+    it 'removes a task from the cleanup tasks if one is specified in cleanup_remove of a task that succeeds' do
+      @pretend_object = double()
+      @pretend_object.should_receive(:blah1).ordered
+
+      @storage.run_task('test',{
+        :task => lambda {
+          @storage.cmd('true')
+        },
+        :cleanup => lambda {
+          @pretend_object.blah1()
+        }
+      })
+
+      cleanup_lambda = lambda {
+        @pretend_object.blah2()
+      }
+
+      @storage.run_task('test',{
+        :task => lambda {
+          @storage.cmd('true')
+        },
+        :cleanup => cleanup_lambda
+      })
+
+      @storage.run_task('test',{
+        :task => lambda {
+          @storage.cmd('true')
+        },
+        :cleanup_remove => cleanup_lambda
+      })
+
+      expect {
+        @storage.run_task('test',{
+          :task => lambda {
+            @storage.cmd('false')
+          },
+        })
+      }.to raise_error
+
+      Provision::Storage.cleanup('test')
+    end
+
+    it 'does not remove cleanup tasks if a task fails' do
+      @pretend_object = double()
+      @pretend_object.should_receive(:blah2).ordered
+      @pretend_object.should_receive(:blah1).ordered
+
+      @storage.run_task('test',{
+        :task => lambda {
+          @storage.cmd('true')
+        },
+        :cleanup => lambda {
+          @pretend_object.blah1()
+        }
+      })
+
+      cleanup_lambda = lambda {
+        @pretend_object.blah2()
+      }
+
+      @storage.run_task('test',{
+        :task => lambda {
+          @storage.cmd('true')
+        },
+        :cleanup => cleanup_lambda
+      })
+
+      expect {
+        @storage.run_task('test',{
+          :task => lambda {
+            @storage.cmd('false')
+          },
+          :cleanup_remove => cleanup_lambda
+        })
+      }.to raise_error
+
+      Provision::Storage.cleanup('test')
+    end
   end
 end

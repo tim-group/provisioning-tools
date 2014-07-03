@@ -23,7 +23,12 @@ define "win7boot" do
 
   run("copy gold image") {
     win7_partition_location = 105906176
-    cmd "mkdir -p #{spec[:temp_dir]}"
+    case config[:vm_storage_type]
+    when 'lvm','image'
+      cmd "mkdir -p #{spec[:temp_dir]}"
+    when 'new'
+      # do nothing
+    end
 
     case config[:vm_storage_type]
     when 'lvm'
@@ -34,6 +39,8 @@ define "win7boot" do
     when 'image'
       cmd "curl -Ss --fail -o #{spec[:image_path]} #{spec[:gold_image_url]}"
       cmd "mount -o offset=#{win7_partition_location} #{spec[:image_path]} #{mountpoint}"
+    when 'new'
+      # do nothing now mounted by storage service.
     end
   }
 
@@ -108,10 +115,15 @@ define "win7boot" do
     `date +"%m-%d-%y.%k:%M" > #{tmp_date_file}`
   }
 
-  cleanup {
-    cmd "umount -l #{mountpoint}"
-    cmd "sleep 1"
-    suppress_error.cmd "rmdir #{mountpoint}"
-  }
+  case config[:vm_storage_type]
+  when 'lvm','image'
+    cleanup {
+      cmd "umount -l #{mountpoint}"
+      cmd "sleep 1"
+      suppress_error.cmd "rmdir #{mountpoint}"
+    }
+  when 'new'
+    # do nothing
+  end
 
 end
