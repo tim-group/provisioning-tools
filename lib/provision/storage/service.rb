@@ -142,12 +142,13 @@ class Provision::Storage::Service
     ordered_keys = order_keys(storage_spec.keys)
 
     ordered_keys.each do |mount_point|
-      create_in_fstab = storage_spec[mount_point][:prepare][:options][:create_in_fstab] rescue true
+      prepare_options = storage_spec[mount_point][:prepare][:options] rescue nil
+      create_in_fstab = prepare_options[:create_in_fstab] rescue true
       if create_in_fstab
         File.open(fstab, 'a') do |f|
           fstype = 'ext4'
           begin
-            fstype = prepare_options[:type]
+            fstype = prepare_options[:type] rescue 'ext4'
           rescue NoMethodError=>e
             if e.name == '[]'.to_sym
               log.debug "fstype not found, using default value: #{fstype}"
