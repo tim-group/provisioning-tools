@@ -1,6 +1,7 @@
 - :domain: dev.net.local
   :template: xpgold
-  :master_image_url: http://localhost/vm-images/dev-seliex-master.img
+  :kvm_template: kvm_no_virtio
+  :master_image_url: http://imageserver.net.local/gold/xp-ie8-gold.img
   :ieversion: 8
   :fabric: local
   :networks:
@@ -9,3 +10,13 @@
   :hostname: dev-sxp-gold
   :qualified_hostnames:
     :mgmt: dev-sxp-gold.mgmt.dev.net.local
+  :storage:
+    /:
+      type: os
+      size: 15G
+      prepare:
+        method: image
+        options:
+          resize: false
+          create_in_fstab: false
+          path: http://imageserver.net.local/gold/xp-ie8-gold.img

@@ -20,18 +20,25 @@ define "xpgold" do
     "#{mountpoint}/Documents\ and\ Settings/All Users/Start\ Menu/Programs/Startup/"
   end
 
-  run ("download master image") {
-    master_url = "#{spec[:master_image_url]}"
-    cmd "curl -Ss --fail -o #{spec[:image_path]} #{master_url}"
-    suppress_error.cmd "mkdir -p #{spec[:temp_dir]}"
-    cmd "mount -o offset=32256  #{spec[:image_path]} #{spec[:temp_dir]}"
-  }
+  case config[:vm_storage_type]
+  when "image"
+    run ("download master image") {
+      master_url = "#{spec[:master_image_url]}"
+      cmd "curl -Ss --fail -o #{spec[:image_path]} #{master_url}"
+      suppress_error.cmd "mkdir -p #{spec[:temp_dir]}"
+      cmd "mount -o offset=32256  #{spec[:image_path]} #{spec[:temp_dir]}"
+    }
 
-  cleanup {
-    cmd "umount -l #{spec[:temp_dir]}"
-    cmd "sleep 1"
-    suppress_error.cmd "rmdir #{spec[:temp_dir]}"
-  }
+    cleanup {
+      cmd "umount -l #{spec[:temp_dir]}"
+      cmd "sleep 1"
+      suppress_error.cmd "rmdir #{spec[:temp_dir]}"
+    }
+  when "new"
+     # do nothing
+  else
+    raise "Unsure how to build xpgold with vm_storage_type of #{config[:vm_storage_type]}"
+  end
 
   run("install sysprep") {
     cmd "rm \"#{start_menu_location}\"/*"
