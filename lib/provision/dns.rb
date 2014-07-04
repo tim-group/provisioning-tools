@@ -32,6 +32,7 @@ class Provision::DNSChecker
       attempt = attempt +1
     end
     attempt >= max_attempts ? (raise "Lookup #{record} failed after #{max_attempts} attempts") : false
+
     logger.info("SUCCESS: #{msg} resolved to #{addrinfo.join(' ')}")
     addrinfo
   end
@@ -258,7 +259,7 @@ class Provision::DNS
       next unless spec[:cnames].has_key?(network)
       result.merge!(@networks[network].add_cnames_for(spec))
     end
-    @logger.info("Added #{result}")
+    result.each { |cname, destination| @logger.info("Added CNAME #{cname} -> #{destination}") }
     result
   end
 
