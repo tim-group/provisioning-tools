@@ -27,6 +27,7 @@ class Provision::Core::ProvisioningService
       # FIXME - We should pull this step out to a rake task in stacks as per 'free' later..
       spec[:networking] =  @numbering_service.allocate_ips_for(spec)
       @logger.info("Numbering is #{spec[:networking].inspect}")
+      @numbering_service.add_cnames_for(spec)
       if @storage_service.nil?
         @image_service.build_image(spec[:template], spec)
         @vm_service.define_vm(spec)
