@@ -62,6 +62,7 @@ describe Provision::Core::ProvisioningService do
 
     it 'allows the user to define vm from an image catalogue and vmdescription catalogue' do
       @numbering_service.should_receive(:allocate_ips_for)
+      @numbering_service.should_receive(:add_cnames_for)
       @image_service.should_receive(:build_image).with("ubuntuprecise", anything).ordered
       @vm_service.should_receive(:define_vm).ordered
       @vm_service.should_receive(:start_vm).ordered
@@ -76,7 +77,7 @@ describe Provision::Core::ProvisioningService do
         }
       }
       @numbering_service.stub(:allocate_ips_for).and_return(network_address)
-
+      @numbering_service.should_receive(:add_cnames_for)
       @image_service.should_receive(:build_image).with("ubuntuprecise", spec_with(:networking => network_address)).ordered
       @vm_service.should_receive(:define_vm).ordered
       @vm_service.should_receive(:start_vm).ordered
@@ -110,6 +111,7 @@ describe Provision::Core::ProvisioningService do
         }
       )
       @numbering_service.should_receive(:allocate_ips_for)
+      @numbering_service.should_receive(:add_cnames_for)
       @image_service.should_receive(:build_image).with("ubuntuprecise", anything).ordered
       @vm_service.should_receive(:define_vm).ordered
       @vm_service.should_receive(:start_vm).ordered
@@ -127,6 +129,7 @@ describe Provision::Core::ProvisioningService do
         }
       )
       @numbering_service.should_receive(:allocate_ips_for)
+      @numbering_service.should_receive(:add_cnames_for)
       @image_service.should_receive(:build_image).with("ubuntuprecise", anything).ordered
       @vm_service.should_receive(:define_vm).ordered
       @vm_service.should_receive(:start_vm).ordered
@@ -139,6 +142,7 @@ describe Provision::Core::ProvisioningService do
       @numbering_service.should_receive(:allocate_ips_for).with(spec_with(spec)).and_return(networking)
       @provisioning_service.allocate_ip(spec)
     end
+
   end
 
   describe "with a storage service" do
@@ -175,6 +179,7 @@ describe Provision::Core::ProvisioningService do
 
     it 'allows the user to define vm from an image catalogue and vmdescription catalogue' do
       @numbering_service.should_receive(:allocate_ips_for)
+      @numbering_service.should_receive(:add_cnames_for)
       @storage_service.should_receive(:prepare_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
       @image_service.should_receive(:build_image).with("ubuntuprecise", anything).ordered
       @storage_service.should_receive(:finish_preparing_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
@@ -192,6 +197,7 @@ describe Provision::Core::ProvisioningService do
         }
       }
       @numbering_service.stub(:allocate_ips_for).and_return(network_address)
+      @numbering_service.stub(:add_cnames_for)
 
       @storage_service.should_receive(:prepare_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
       @image_service.should_receive(:build_image).with("ubuntuprecise", anything).ordered
@@ -221,6 +227,7 @@ describe Provision::Core::ProvisioningService do
         }
       )
       @numbering_service.should_receive(:allocate_ips_for)
+      @numbering_service.should_receive(:add_cnames_for)
       @storage_service.should_receive(:prepare_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
       @image_service.should_receive(:build_image).with("ubuntuprecise", anything).ordered
       @storage_service.should_receive(:finish_preparing_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
@@ -242,6 +249,7 @@ describe Provision::Core::ProvisioningService do
         }
       )
       @numbering_service.should_receive(:allocate_ips_for)
+      @numbering_service.should_receive(:add_cnames_for)
       @storage_service.should_receive(:prepare_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
       @image_service.should_receive(:build_image).with("ubuntuprecise", anything).ordered
       @storage_service.should_receive(:finish_preparing_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
@@ -257,5 +265,6 @@ describe Provision::Core::ProvisioningService do
       @numbering_service.should_receive(:allocate_ips_for).with(spec_with(spec)).and_return(networking)
       @provisioning_service.allocate_ip(spec)
     end
+
   end
 end
