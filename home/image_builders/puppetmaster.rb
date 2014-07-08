@@ -21,7 +21,9 @@ define 'puppetmaster' do
 
       f.puts "#!/bin/bash
 echo 'Run ntpdate' | logger
+/etc/init.d/ntp stop | logger 2>&1
 /usr/sbin/ntpdate -s dc-1.net.local | logger 2>&1
+/etc/init.d/ntp start | logger 2>&1
 echo 'Run puppet apply' | logger
 /usr/bin/puppet apply --pluginsync --modulepath=/etc/puppet/modules --logdest=syslog /etc/puppet/manifests/site.pp
 /etc/init.d/apache2-puppetmaster restart 2>&1 | logger
