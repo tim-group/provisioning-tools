@@ -77,6 +77,7 @@ task :package_main do
   sh "mkdir -p build"
   sh "if [ -f *.gem ]; then rm *.gem; fi"
   sh "gem build provisioning-tools.gemspec && mv provisioning-tools-*.gem build/"
+  sh "cp postinst.sh build/"
 
   commandLine = "cd build",
     "&&",
@@ -129,6 +130,7 @@ task :package_agent do
     "-p", "build/provisioning-tools-mcollective-plugin_#{version}.deb",
     "--prefix", "/usr/share/mcollective/plugins/mcollective",
     "-x", "computenode.ddl",
+    "--post-install", "postinst.sh",
     "../mcollective/agent"
 
   sh commandLine.join(' ')
@@ -159,7 +161,6 @@ end
 task :package => [:clean, :package_main, :package_agent]
 task :install => [:package] do
    sh "sudo dpkg -i build/*.deb"
-   sh "sudo /etc/init.d/mcollective restart;"
 end
 task :test => [:spec, :mcollective_spec]
 
