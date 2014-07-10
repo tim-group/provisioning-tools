@@ -61,7 +61,7 @@ class Provision::Core::ProvisioningService
     if @storage_service.nil?
       @image_service.remove_image(spec)
     else
-      @storage_service.remove_storage(spec_hash[:hostname], spec_hash[:storage])
+      @storage_service.remove_storage(spec[:hostname], spec[:storage])
     end
     @vm_service.undefine_vm(spec)
     return nil
