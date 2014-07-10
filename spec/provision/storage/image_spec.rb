@@ -22,16 +22,14 @@ describe Provision::Storage::Image do
     end
 
     it 'complains if the storage to be created already exists' do
-      tmpfile = Tempfile.new('existing', @tmpdir)
+      FileUtils.touch "#{@tmpdir}/existing.img"
       expect {
-        @storage_type.create(File.basename(tmpfile.path), '10G')
-      }.to raise_error("Image file #{tmpfile.path} already exists")
-      tmpfile.close
-      tmpfile.unlink
+        @storage_type.create('existing', '10G')
+      }.to raise_error("Image file #{@tmpdir}/existing.img already exists")
     end
 
     it 'should create an empty file' do
-      device_name = "#{@tmpdir}/ok"
+      device_name = "#{@tmpdir}/ok.img"
       @storage_type.create('ok', '1M').should eql true
       File.exist?(device_name).should eql true
       File.size(device_name).should eql 1048576 #1M
@@ -42,7 +40,7 @@ describe Provision::Storage::Image do
   describe 'remove' do
 
     it 'should remove the device' do
-      FileUtils.touch "#{@tmpdir}/removal"
+      FileUtils.touch "#{@tmpdir}/removal.img"
       @storage_type.remove('removal')
       File.exist?("#{@tmpdir}/removal").should eql false
     end

@@ -182,7 +182,7 @@ describe Provision::Storage::Service do
       @storage_service.spec_to_xml('test', storage_hash).should eql( <<-EOS
     <disk type='block' device='disk'>
       <driver name='qemu' type='raw'/>
-      <source dev='#{@tmpdir}/os/test' />
+      <source dev='#{@tmpdir}/os/test.img' />
       <target dev='vda' bus='virtio'/>
     </disk>
   EOS
@@ -203,12 +203,12 @@ describe Provision::Storage::Service do
       @storage_service.spec_to_xml('test', storage_hash).should eql( <<-EOS
     <disk type='block' device='disk'>
       <driver name='qemu' type='raw'/>
-      <source dev='#{@tmpdir}/os/test' />
+      <source dev='#{@tmpdir}/os/test.img' />
       <target dev='vda' bus='virtio'/>
     </disk>
     <disk type='block' device='disk'>
       <driver name='qemu' type='raw'/>
-      <source dev='#{@tmpdir}/data/test' />
+      <source dev='#{@tmpdir}/data/test.img' />
       <target dev='vdb' bus='virtio'/>
     </disk>
   EOS

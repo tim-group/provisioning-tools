@@ -36,7 +36,7 @@ class Provision::Storage::Image < Provision::Storage
   end
 
   def device(name)
-    "#{@image_path}/#{name}"
+    "#{@image_path}/#{name}.img"
   end
 
   def remove(name)
