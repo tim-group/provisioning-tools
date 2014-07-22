@@ -129,8 +129,8 @@ task :package_agent do
     "-C", "build",
     "-p", "build/provisioning-tools-mcollective-plugin_#{version}.deb",
     "--prefix", "/usr/share/mcollective/plugins/mcollective",
-    "-x", "computenode.ddl",
     "--post-install", "postinst.sh",
+    "-x", "agent/*.ddl",
     "../mcollective/agent"
 
   sh commandLine.join(' ')
@@ -144,7 +144,7 @@ task :package_agent do
     "-C", "build",
     "-p", "build/provisioning-tools-mcollective-plugin-ddl_#{version}.deb",
     "--prefix", "/usr/share/mcollective/plugins/mcollective",
-    "-x", "computenode.rb",
+    "-x", "agent/*.rb",
     "../mcollective/agent"
 
   sh commandLine.join(' ')
