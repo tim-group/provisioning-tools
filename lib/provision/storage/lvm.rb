@@ -8,30 +8,31 @@ class Provision::Storage::LVM < Provision::Storage
     super(options)
   end
 
-  def create(name, size)
-    if File.exists?("#{device(name)}")
-      raise "Logical volume #{name} already exists in volume group #{@options[:vg]}"
+  def create(name, mount_point, size)
+    underscore_name = underscore_name(name, mount_point)
+    if File.exists?("#{device(underscore_name)}")
+      raise "Logical volume #{underscore_name} already exists in volume group #{@options[:vg]}"
     end
     run_task(name, {
       :task => lambda {
-        cmd "lvcreate -n #{name} -L #{size} #{@options[:vg]}"
+        cmd "lvcreate -n #{underscore_name} -L #{size} #{@options[:vg]}"
       },
       :cleanup => lambda {
-        remove(name)
+        remove(underscore_name)
       }
     })
   end
 
-  def grow_filesystem(name, size, options_hash={})
-    rebuild_partition(name, options_hash)
-    check_and_resize_filesystem(name)
+  def grow_filesystem(name, mount_point, size, options_hash={})
+    rebuild_partition(name, mount_point, options_hash)
+    check_and_resize_filesystem(name, mount_point)
   end
 
-  def device(name)
-    return "/dev/#{@options[:vg]}/#{name}"
+  def device(underscore_name)
+    return "/dev/#{@options[:vg]}/#{underscore_name}"
   end
 
-  def remove(name)
-    cmd "lvremove -f #{device(name)}"
+  def remove(underscore_name)
+    cmd "lvremove -f #{device(underscore_name)}"
   end
 end

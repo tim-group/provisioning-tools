@@ -15,7 +15,7 @@ describe Provision::Storage::LVM do
         "  Logical volume \"working\" created"
       end
     end
-    @storage_type.create('working', '10G')
+    @storage_type.create('working', '/'.to_sym, '10G')
   end
 
   it 'complains if the storage to be created already exists' do
@@ -26,7 +26,7 @@ describe Provision::Storage::LVM do
       end
     end
     expect {
-      @storage_type.create('existing', '10G')
+      @storage_type.create('existing', '/'.to_sym, '10G')
     }.to raise_error("Logical volume existing already exists in volume group main")
   end
 
@@ -38,7 +38,7 @@ describe Provision::Storage::LVM do
       end
     end
     expect {
-      @storage_type.create('working', '500G')
+      @storage_type.create('working', '/'.to_sym, '500G')
     }.to raise_error("command lvcreate -n existing -L 500G main returned non-zero error code 5")
   end
 
@@ -61,9 +61,9 @@ describe Provision::Storage::LVM do
       @storage_type.stub(:cmd) do |arg|
         true
       end
-      @storage_type.should_receive(:rebuild_partition).with(name, {})
-      @storage_type.should_receive(:check_and_resize_filesystem).with(name)
-      @storage_type.grow_filesystem(name, '5G')
+      @storage_type.should_receive(:rebuild_partition).with(name, '/'.to_sym, {})
+      @storage_type.should_receive(:check_and_resize_filesystem).with(name, '/'.to_sym)
+      @storage_type.grow_filesystem(name, '/'.to_sym, '5G')
     end
   end
 

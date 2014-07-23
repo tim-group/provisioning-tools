@@ -58,7 +58,7 @@ describe Provision::Storage::Local do
     @storage_type.stub(:image_filesystem)
     @storage_type.stub(:grow_filesystem)
     @storage_type.should_receive(:image_filesystem)
-    @storage_type.init_filesystem('symbolize_method', settings)
+    @storage_type.init_filesystem('symbolize_method', '/'.to_sym, settings)
   end
   it 'should not resize the filesystem when resize is false' do
     File.open("#{@tmpdir}/resize_false", 'w').write("source file contents")
@@ -73,7 +73,13 @@ describe Provision::Storage::Local do
       },
     }
     @storage_type.should_not_receive(:grow_filesystem)
-    @storage_type.init_filesystem('resize_false', settings)
+    @storage_type.init_filesystem('resize_false', '/'.to_sym, settings)
+  end
+
+  it 'should convert the name into an underscored version' do
+    name = 'test-db-001'
+    @storage_type.underscore_name(name, '/var/lib/mysql/').should eql 'test-db-001_var_lib_mysql'
+    @storage_type.underscore_name(name, '/').should eql 'test-db-001'
   end
 
   it 'should resize the filesystem when resize is true' do
@@ -89,7 +95,7 @@ describe Provision::Storage::Local do
       },
     }
     @storage_type.should_receive(:grow_filesystem)
-    @storage_type.init_filesystem('resize_true', settings)
+    @storage_type.init_filesystem('resize_true', '/'.to_sym, settings)
   end
 
   it 'initialises the names storage from an image file path' do
@@ -106,8 +112,8 @@ describe Provision::Storage::Local do
       },
     }
     @storage_type.stub(:grow_filesystem)
-    @storage_type.should_receive(:grow_filesystem).with('working', '5G', {:path => "#{@tmpdir}/source"})
-    @storage_type.init_filesystem('working', settings)
+    @storage_type.should_receive(:grow_filesystem).with('working', '/'.to_sym, '5G', {:path => "#{@tmpdir}/source"})
+    @storage_type.init_filesystem('working', '/'.to_sym, settings)
     File.read("#{@tmpdir}/working").should eql 'source file contents'
   end
 
@@ -133,7 +139,7 @@ describe Provision::Storage::Local do
         false
       end
     end
-    @storage_type.init_filesystem('interfoo', settings)
+    @storage_type.init_filesystem('interfoo', '/'.to_sym, settings)
   end
 
 
@@ -160,7 +166,7 @@ describe Provision::Storage::Local do
       FileUtils.remove_entry_secure "#{@tmpdir}/empty_gold.img"
     end
     expect {
-      @storage_type.init_filesystem('full', settings)
+      @storage_type.init_filesystem('full', '/'.to_sym, settings)
     }.to raise_error("command dd if=#{@tmpdir}/empty_gold.img of=#{@tmpdir}/full returned a non-zero error code 1")
   end
 
@@ -176,7 +182,7 @@ describe Provision::Storage::Local do
         },
       }
       expect {
-        @storage_type.init_filesystem('valid_name', settings)
+        @storage_type.init_filesystem('valid_name', '/'.to_sym, settings)
       }.to raise_error("Source image file #{@tmpdir}/non-existant-source does not exist")
     end
 
@@ -190,7 +196,8 @@ describe Provision::Storage::Local do
 
   it 'should cleanup when remove and re-create partition fails' do
     name = 'rebuild'
-    device_name = @storage_type.device(name)
+    underscore_name = @storage_type.underscore_name(name, '/'.to_sym)
+    device_name = @storage_type.device(underscore_name)
     @storage_type.stub(:cmd) do |arg|
       case arg
       when "parted -s #{device_name} mkpart primary ext4 2048s 100%"
@@ -199,7 +206,7 @@ describe Provision::Storage::Local do
     end
     @storage_type.should_receive(:cmd).with("parted -s #{device_name} rm 1")
     @storage_type.should_receive(:cmd).with("parted -s #{device_name} mkpart primary ext4 2048s 100%")
-    expect { @storage_type.rebuild_partition(name) }.to raise_error
+    expect { @storage_type.rebuild_partition(name, '/'.to_sym) }.to raise_error
   end
 
   it 'should check and resize the filesystem' do
@@ -216,12 +223,13 @@ describe Provision::Storage::Local do
     @storage_type.should_receive(:cmd).with("e2fsck -f -p /dev/mapper/#{partition_name}")
     @storage_type.should_receive(:cmd).with("resize2fs /dev/mapper/#{partition_name}")
     @storage_type.should_receive(:cmd).with("kpartx -dv #{device_name}")
-    @storage_type.check_and_resize_filesystem(name)
+    @storage_type.check_and_resize_filesystem(name, '/'.to_sym)
   end
 
   it 'should cleanup if check and resize the filesystem fails' do
     name = 'check_and_resize'
-    device_name = @storage_type.device(name)
+    underscore_name = @storage_type.underscore_name(name, '/'.to_sym)
+    device_name = @storage_type.device(underscore_name)
     @storage_type.stub(:partition_name) do |arg|
       name
     end
@@ -237,7 +245,7 @@ describe Provision::Storage::Local do
     @storage_type.should_receive(:cmd).with("kpartx -av #{device_name}")
     @storage_type.should_receive(:cmd).with("e2fsck -f -p /dev/mapper/#{partition_name}")
     @storage_type.should_receive(:cmd).with("kpartx -dv #{device_name}")
-    expect { @storage_type.check_and_resize_filesystem(name) }.to raise_error
+    expect { @storage_type.check_and_resize_filesystem(name, '/'.to_sym) }.to raise_error
   end
 
   it 'provides the correct parameter to use with the source tag within the libvirt template' do
@@ -251,7 +259,7 @@ describe Provision::Storage::Local do
     end
     @storage_type.should_receive(:cmd).with("kpartx -av #{@tmpdir}/name")
     @storage_type.should_receive(:cmd).with("mount /dev/mapper/name #{@tmpdir}/place")
-    @storage_type.mount('name', "#{@tmpdir}/place", true)
+    @storage_type.mount('name', '/'.to_sym, "#{@tmpdir}/place", true)
     File.exist?("#{@tmpdir}/place").should eql true
   end
 

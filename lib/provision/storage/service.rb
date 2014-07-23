@@ -40,10 +40,11 @@ class Provision::Storage::Service
     ordered_keys = order_keys(storage_spec.keys)
 
     ordered_keys.each do |mount_point|
+      underscore_name = underscore_name(name, mount_point)
       settings = storage_spec[mount_point]
       type = settings[:type].to_sym
       size = settings[:size]
-      get_storage(type).create(name, size)
+      get_storage(type).create(name, mount_point, size)
     end
   end
 
@@ -60,9 +61,10 @@ class Provision::Storage::Service
         prepare.merge!({:method => :image}) if prepare[:method].nil?
         settings[:prepare] = prepare
       end
-      storage.init_filesystem(name, settings)
+      storage.init_filesystem(name, mount_point, settings)
     end
   end
+
 
   def mount_filesystems(name, storage_spec, tempdir)
     ordered_keys = order_keys(storage_spec.keys)
@@ -74,12 +76,12 @@ class Provision::Storage::Service
       type = settings[:type].to_sym
       case mount_point
       when '/'
-        get_storage(type).mount(name, actual_mount_point, true)
+        get_storage(type).mount(name, mount_point, actual_mount_point, true)
       else
         unless File.exists? actual_mount_point
           FileUtils.mkdir_p actual_mount_point
         end
-        get_storage(type).mount(name, actual_mount_point, false)
+        get_storage(type).mount(name, mount_point, actual_mount_point, false)
       end
     end
   end
@@ -94,9 +96,9 @@ class Provision::Storage::Service
       type = settings[:type].to_sym
       case mount_point
       when '/'
-        get_storage(type).unmount(name, actual_mount_point, true)
+        get_storage(type).unmount(name, mount_point, actual_mount_point, true)
       else
-        get_storage(type).unmount(name, actual_mount_point, false)
+        get_storage(type).unmount(name, mount_point, actual_mount_point, false)
       end
     end
   end
@@ -122,7 +124,7 @@ class Provision::Storage::Service
       settings = storage_spec[mount_point]
       type = settings[:type].to_sym
       storage = get_storage(type)
-      source = storage.libvirt_source(name)
+      source = storage.libvirt_source(name, mount_point)
       virtio = settings[:prepare][:options][:virtio] rescue true
       disk_type = virtio ? 'vd' : 'hd'
       bus = virtio ? 'virtio' : 'ide'

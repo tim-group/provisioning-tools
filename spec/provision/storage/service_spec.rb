@@ -48,7 +48,7 @@ describe Provision::Storage::Service do
       }
 
       storage = storage_service.get_storage(:os)
-      storage.should_receive(:init_filesystem).with('root', expected_root_settings)
+      storage.should_receive(:init_filesystem).with('root', '/'.to_sym, expected_root_settings)
       storage_service.init_filesystems('root', storage_hash)
       storage.stub(:init_filesystem)
 
@@ -122,7 +122,7 @@ describe Provision::Storage::Service do
     </disk>
     <disk type='block' device='disk'>
       <driver name='qemu' type='raw'/>
-      <source dev='/dev/data/test' />
+      <source dev='/dev/data/test_var_lib_mysql' />
       <target dev='vdb' bus='virtio'/>
     </disk>
   EOS
@@ -172,6 +172,26 @@ describe Provision::Storage::Service do
       }.to raise_error "Storage service requires each storage type to specify the 'options' setting"
     end
 
+    xit 'should not remove persistent storage' do
+      @storage_service = Provision::Storage::Service.new(@settings)
+      storage = @storage_service.get_storage(:data)
+      storage_hash = {
+        '/'.to_sym => {
+          :type => 'os',
+          :size => '10G',
+        },
+        '/var/lib/mysql'.to_sym => {
+          :type => 'data',
+          :size => '10G',
+          :persistent => true,
+        }
+      }
+      #### Revisit when we have sorted the naming
+      storage.should_not_receive(:remove).with('/var/lib/mysql'.to_sym)
+      @storage_service.remove_storage('test', storage_hash)
+    end
+
+
     it 'generates the correct XML to put into a libvirt template for a single storage setup' do
       storage_hash = {
         '/'.to_sym => {
@@ -208,7 +228,7 @@ describe Provision::Storage::Service do
     </disk>
     <disk type='block' device='disk'>
       <driver name='qemu' type='raw'/>
-      <source dev='#{@tmpdir}/data/test.img' />
+      <source dev='#{@tmpdir}/data/test_var_lib_mysql.img' />
       <target dev='vdb' bus='virtio'/>
     </disk>
   EOS
