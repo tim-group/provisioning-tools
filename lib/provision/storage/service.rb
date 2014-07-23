@@ -40,7 +40,6 @@ class Provision::Storage::Service
     ordered_keys = order_keys(storage_spec.keys)
 
     ordered_keys.each do |mount_point|
-      underscore_name = underscore_name(name, mount_point)
       settings = storage_spec[mount_point]
       type = settings[:type].to_sym
       size = settings[:size]
