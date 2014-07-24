@@ -10,8 +10,9 @@ class Provision::Storage::Image < Provision::Storage
 
   end
 
-  def create(name, mount_point, size)
-    underscore_name = underscore_name(name, mount_point)
+  def create(name, mount_point_obj)
+    underscore_name = underscore_name(name, mount_point_obj.name)
+    size = mount_point_obj.config[:size]
     raise "Image file #{device(underscore_name)} already exists" if File.exist?("#{device(underscore_name)}")
     run_task(name, {
       :task => lambda {
@@ -23,18 +24,16 @@ class Provision::Storage::Image < Provision::Storage
     })
   end
 
-  def grow_filesystem(name, mount_point, size, options_hash={})
-    underscore_name = underscore_name(name, mount_point)
+  def grow_filesystem(name, mount_point_obj)
+    underscore_name = underscore_name(name, mount_point_obj.name)
+    size = mount_point_obj.config[:size]
     run_task(name, {
       :task => lambda {
         cmd "qemu-img resize #{device(underscore_name)} #{size}"
       },
-      :cleanup => lambda {
-        remove(underscore_name)
-      }
     })
-    rebuild_partition(name, mount_point, options_hash)
-    check_and_resize_filesystem(name, mount_point)
+    rebuild_partition(name, mount_point_obj)
+    check_and_resize_filesystem(name, mount_point_obj)
   end
 
   def device(underscore_name)
@@ -44,4 +43,9 @@ class Provision::Storage::Image < Provision::Storage
   def remove(underscore_name)
     FileUtils.remove_entry_secure device(underscore_name)
   end
+
+  def partition_name(name, mount_point_obj)
+    return mount_point_obj.get(:loopback_part)
+  end
+
 end

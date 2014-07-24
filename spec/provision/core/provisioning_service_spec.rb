@@ -182,8 +182,8 @@ describe Provision::Core::ProvisioningService do
       @numbering_service.should_receive(:add_cnames_for)
       @storage_service.should_receive(:prepare_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
       @image_service.should_receive(:build_image).with("ubuntuprecise", anything).ordered
-      @storage_service.should_receive(:finish_preparing_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
-      @storage_service.should_receive(:spec_to_xml).with("vmx1", @storage_hash).ordered
+      @storage_service.should_receive(:finish_preparing_storage).with("vmx1", "/tmp/provisioning-tools/build/vmx1").ordered
+      @storage_service.should_receive(:spec_to_xml).with("vmx1").ordered
       @vm_service.should_receive(:define_vm).with(kind_of(Provision::Core::MachineSpec), "some xml").ordered
       @vm_service.should_receive(:start_vm).ordered
       @provisioning_service.provision_vm(:hostname => "vmx1", :template => "ubuntuprecise", :storage => @storage_hash).should eql(true)
@@ -201,8 +201,8 @@ describe Provision::Core::ProvisioningService do
 
       @storage_service.should_receive(:prepare_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
       @image_service.should_receive(:build_image).with("ubuntuprecise", anything).ordered
-      @storage_service.should_receive(:finish_preparing_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
-      @storage_service.should_receive(:spec_to_xml).with("vmx1", @storage_hash).ordered
+      @storage_service.should_receive(:finish_preparing_storage).with("vmx1", "/tmp/provisioning-tools/build/vmx1").ordered
+      @storage_service.should_receive(:spec_to_xml).with("vmx1").ordered
       @vm_service.should_receive(:define_vm).ordered
       @vm_service.should_receive(:start_vm).ordered
       @provisioning_service.provision_vm(:hostname => "vmx1", :template => "ubuntuprecise", :storage => @storage_hash)
@@ -210,7 +210,7 @@ describe Provision::Core::ProvisioningService do
 
     it 'allows the user to clean up vms' do
       @vm_service.should_receive(:is_running).ordered
-      @storage_service.should_receive(:remove_storage).with("vmx1", @storage_hash).ordered
+      @storage_service.should_receive(:remove_storage).with("vmx1").ordered
       @vm_service.should_receive(:undefine_vm).ordered
       @provisioning_service.clean_vm(:hostname => "vmx1", :template => "ubuntuprecise", :storage => @storage_hash)
     end
@@ -230,8 +230,8 @@ describe Provision::Core::ProvisioningService do
       @numbering_service.should_receive(:add_cnames_for)
       @storage_service.should_receive(:prepare_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
       @image_service.should_receive(:build_image).with("ubuntuprecise", anything).ordered
-      @storage_service.should_receive(:finish_preparing_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
-      @storage_service.should_receive(:spec_to_xml).with("vmx1", @storage_hash).ordered
+      @storage_service.should_receive(:finish_preparing_storage).with("vmx1", "/tmp/provisioning-tools/build/vmx1").ordered
+      @storage_service.should_receive(:spec_to_xml).with("vmx1").ordered
       @vm_service.should_receive(:define_vm).ordered
       @vm_service.should_receive(:start_vm).ordered
       @provisioning_service.provision_vm(:hostname => "vmx1", :storage => @storage_hash)
@@ -252,8 +252,8 @@ describe Provision::Core::ProvisioningService do
       @numbering_service.should_receive(:add_cnames_for)
       @storage_service.should_receive(:prepare_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
       @image_service.should_receive(:build_image).with("ubuntuprecise", anything).ordered
-      @storage_service.should_receive(:finish_preparing_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
-      @storage_service.should_receive(:spec_to_xml).with("vmx1", @storage_hash).ordered
+      @storage_service.should_receive(:finish_preparing_storage).with("vmx1", "/tmp/provisioning-tools/build/vmx1").ordered
+      @storage_service.should_receive(:spec_to_xml).with("vmx1").ordered
       @vm_service.should_receive(:define_vm).ordered
       @vm_service.should_receive(:start_vm).ordered
       @provisioning_service.provision_vm(:hostname => "vmx1", :template => "ubuntuprecise", :storage => @storage_hash)

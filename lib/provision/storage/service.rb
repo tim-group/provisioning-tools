@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'provision/storage'
+require 'provision/storage/config'
 require 'provision/log'
 
 class Provision::Storage::Service
@@ -14,18 +15,24 @@ class Provision::Storage::Service
       require "provision/storage/#{arch.downcase}"
       instance = Provision::Storage.const_get(arch).new(options)
       @storage_types[storage_type] = instance
+      @storage_configs = {}
     end
   end
 
   def prepare_storage(name, storage_spec, temp_dir)
-    create_storage(name, storage_spec)
-    init_filesystems(name, storage_spec)
-    mount_filesystems(name, storage_spec, temp_dir)
+    create_config(name, storage_spec)
+    create_storage(name)
+    init_filesystems(name)
+    mount_filesystems(name, temp_dir)
   end
 
-  def finish_preparing_storage(name, storage_spec, temp_dir)
-    create_fstab(storage_spec, temp_dir)
-    unmount_filesystems(name, storage_spec, temp_dir)
+  def finish_preparing_storage(name, temp_dir)
+    create_fstab(name, temp_dir)
+    unmount_filesystems(name)
+  end
+
+  def create_config(name, storage_spec)
+    @storage_configs[name] = Provision::Storage::Config.new(storage_spec)
   end
 
   def cleanup(name)
@@ -36,95 +43,88 @@ class Provision::Storage::Service
     return @storage_types[type]
   end
 
-  def create_storage(name, storage_spec)
-    ordered_keys = order_keys(storage_spec.keys)
+  def get_mount_point(name, mount_point)
+    return @storage_configs[name].mount_point(mount_point)
+  end
 
-    ordered_keys.each do |mount_point|
-      settings = storage_spec[mount_point]
-      type = settings[:type].to_sym
-      size = settings[:size]
-      get_storage(type).create(name, mount_point, size)
+  def get_mount_point_config(name, mount_point)
+    return @storage_configs[name].mount_point(mount_point).config
+  end
+
+  def create_storage(name)
+    @storage_configs[name].mount_points.each do |mount_point|
+      mount_point_obj = get_mount_point(name, mount_point)
+      type = mount_point_obj.config[:type].to_sym
+      storage = get_storage(type)
+      storage.create(name, mount_point_obj)
     end
   end
 
-  def init_filesystems(name, storage_spec)
-    ordered_keys = order_keys(storage_spec.keys)
-
-    ordered_keys.each do |mount_point|
-      settings = storage_spec[mount_point]
-      storage = get_storage(settings[:type].to_sym)
-      prepare = settings[:prepare] || {}
-
-      case mount_point.to_s
-      when '/'
-        prepare.merge!({:method => :image}) if prepare[:method].nil?
-        settings[:prepare] = prepare
-      end
-      storage.init_filesystem(name, mount_point, settings)
+  def init_filesystems(name)
+    @storage_configs[name].mount_points.each do |mount_point|
+      mount_point_obj = get_mount_point(name, mount_point)
+      type = mount_point_obj.config[:type].to_sym
+      storage = get_storage(type)
+      storage.init_filesystem(name, mount_point_obj)
     end
   end
 
 
-  def mount_filesystems(name, storage_spec, tempdir)
-    ordered_keys = order_keys(storage_spec.keys)
-
-    ordered_keys.each do |mount_point|
+  def mount_filesystems(name, tempdir)
+    @storage_configs[name].mount_points.each do |mount_point|
+      mount_point_obj = get_mount_point(name, mount_point)
       actual_mount_point = "#{tempdir}#{mount_point}"
+      mount_point_obj.set(:actual_mount_point, actual_mount_point)
+      mount_point_obj.set(:temp_mount_point, true) if mount_point.to_s == '/'
 
-      settings = storage_spec[mount_point]
-      type = settings[:type].to_sym
-      case mount_point
-      when '/'
-        get_storage(type).mount(name, mount_point, actual_mount_point, true)
-      else
+      type = mount_point_obj.config[:type].to_sym
+      storage = get_storage(type)
+
+      unless mount_point.to_s == '/'
         unless File.exists? actual_mount_point
           FileUtils.mkdir_p actual_mount_point
         end
-        get_storage(type).mount(name, mount_point, actual_mount_point, false)
       end
+
+      storage.mount(name, mount_point_obj)
     end
   end
 
-  def unmount_filesystems(name, storage_spec, tempdir)
-    ordered_keys = order_keys(storage_spec.keys)
+  def unmount_filesystems(name)
+    @storage_configs[name].mount_points.reverse.each do |mount_point|
+      mount_point_obj = get_mount_point(name, mount_point)
 
-    ordered_keys.reverse.each do |mount_point|
-      actual_mount_point = "#{tempdir}#{mount_point}"
+      type = mount_point_obj.config[:type].to_sym
+      storage = get_storage(type)
 
-      settings = storage_spec[mount_point]
-      type = settings[:type].to_sym
-      case mount_point
-      when '/'
-        get_storage(type).unmount(name, mount_point, actual_mount_point, true)
-      else
-        get_storage(type).unmount(name, mount_point, actual_mount_point, false)
-      end
+      storage.unmount(name, mount_point_obj)
+
+      mount_point_obj.unset(:actual_mount_point)
+      mount_point_obj.unset(:temp_mount_point)
     end
   end
 
-  def remove_storage(name, storage_spec)
-    ordered_keys = order_keys(storage_spec.keys)
-
-    ordered_keys.reverse.each do |mount_point|
-      settings = storage_spec[mount_point]
-      type = settings[:type].to_sym
-      get_storage(type).remove(name)
+  def remove_storage(name)
+    @storage_configs[name].mount_points.each do |mount_point|
+      mount_point_obj = get_mount_point(name, mount_point)
+      type = mount_point_obj.config[:type].to_sym
+      storage = get_storage(type)
+      storage.remove(name)
     end
   end
 
-  def spec_to_xml(name, storage_spec)
+  def spec_to_xml(name)
     template_file = "#{Provision.base}/templates/disk.template"
     xml_output = ""
     drive_letters = ('a'..'z').to_a
     current_drive_letter = 0
-    ordered_keys = order_keys(storage_spec.keys)
 
-    ordered_keys.each do |mount_point|
-      settings = storage_spec[mount_point]
-      type = settings[:type].to_sym
+    @storage_configs[name].mount_points.each do |mount_point|
+      mount_point_obj = get_mount_point(name, mount_point)
+      type = mount_point_obj.config[:type].to_sym
       storage = get_storage(type)
-      source = storage.libvirt_source(name, mount_point)
-      virtio = settings[:prepare][:options][:virtio] rescue true
+      source = storage.libvirt_source(name, mount_point_obj.name)
+      virtio = mount_point_obj.config[:prepare][:options][:virtio]
       disk_type = virtio ? 'vd' : 'hd'
       bus = virtio ? 'virtio' : 'ide'
       target = "dev='#{disk_type}#{drive_letters[current_drive_letter]}'"
@@ -135,21 +135,20 @@ class Provision::Storage::Service
     xml_output
   end
 
-  def create_fstab(storage_spec, tempdir)
+  def create_fstab(name, tempdir)
     fstab = "#{tempdir}/etc/fstab"
     drive_letters = ('a'..'z').to_a
     current_drive_letter = 0
 
-    ordered_keys = order_keys(storage_spec.keys)
-
-    ordered_keys.each do |mount_point|
-      prepare_options = storage_spec[mount_point][:prepare][:options] rescue nil
-      create_in_fstab = prepare_options[:create_in_fstab] rescue true
+    @storage_configs[name].mount_points.each do |mount_point|
+      mount_point_obj = get_mount_point(name, mount_point)
+      prepare_options = mount_point_obj.config[:prepare][:options]
+      create_in_fstab = prepare_options[:create_in_fstab]
       if create_in_fstab
         File.open(fstab, 'a') do |f|
           fstype = 'ext4'
           begin
-            fstype = prepare_options[:type] rescue 'ext4'
+            fstype = prepare_options[:type]
           rescue NoMethodError=>e
             if e.name == '[]'.to_sym
               log.debug "fstype not found, using default value: #{fstype}"
@@ -157,22 +156,10 @@ class Provision::Storage::Service
               raise e
             end
           end
-          f.puts("/dev/vd#{drive_letters[current_drive_letter]}1 #{mount_point}  #{fstype} defaults 0 0")
+          f.puts("/dev/vd#{drive_letters[current_drive_letter]}1 #{mount_point_obj.name}  #{fstype} defaults 0 0")
           current_drive_letter = current_drive_letter + 1
         end
       end
     end
-  end
-
-  private
-  def order_keys(keys)
-    keys.map! do |key|
-      key.to_s
-    end
-    keys.sort!
-    keys.map! do |key|
-      key.to_sym
-    end
-    keys
   end
 end
