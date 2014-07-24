@@ -49,14 +49,14 @@ module Provision::Storage::Local
     size = settings[:size]
     prepare = settings[:prepare] || {}
     prepare_options = prepare[:options] || {}
-    method = prepare[:method].to_sym || :format
+    method = prepare[:method].to_sym rescue :format
     resize = prepare_options.has_key?(:resize)? prepare_options[:resize] : true
     case method
     when :image
       image_filesystem(name, mount_point, prepare_options)
       grow_filesystem(name, mount_point, size, prepare_options) if resize
     when :format
-      format_filesystem(name, mount_path, prepare_options)
+      format_filesystem(name, mount_point, prepare_options)
     else
       raise "unsure how to init storage using method '#{method}'"
     end
