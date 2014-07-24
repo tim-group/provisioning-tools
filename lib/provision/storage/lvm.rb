@@ -8,8 +8,9 @@ class Provision::Storage::LVM < Provision::Storage
     super(options)
   end
 
-  def create(name, mount_point, size)
-    underscore_name = underscore_name(name, mount_point)
+  def create(name, mount_point_obj)
+    underscore_name = underscore_name(name, mount_point_obj.name)
+    size = mount_point_obj.config[:size]
     if File.exists?("#{device(underscore_name)}")
       raise "Logical volume #{underscore_name} already exists in volume group #{@options[:vg]}"
     end
@@ -23,9 +24,9 @@ class Provision::Storage::LVM < Provision::Storage
     })
   end
 
-  def grow_filesystem(name, mount_point, size, options_hash={})
-    rebuild_partition(name, mount_point, options_hash)
-    check_and_resize_filesystem(name, mount_point)
+  def grow_filesystem(name, mount_point_obj)
+    rebuild_partition(name, mount_point_obj)
+    check_and_resize_filesystem(name, mount_point_obj)
   end
 
   def device(underscore_name)
@@ -36,4 +37,12 @@ class Provision::Storage::LVM < Provision::Storage
     underscore_name = underscore_name(name, mount_point)
     cmd "lvremove -f #{device(underscore_name)}"
   end
+
+  def partition_name(name, mount_point_obj)
+    underscore_name = underscore_name(name, mount_point_obj.name)
+    vm_partition_name = cmd "kpartx -l #{device(underscore_name)} | grep -v 'loop deleted : /dev/loop' | awk '{ print $1 }' | tail -1"
+    raise "unable to work out vm_partition_name" if vm_partition_name.nil?
+    return vm_partition_name
+  end
+
 end

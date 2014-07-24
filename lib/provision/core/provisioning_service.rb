@@ -35,8 +35,8 @@ class Provision::Core::ProvisioningService
         begin
           @storage_service.prepare_storage(spec[:hostname], spec[:storage], spec[:temp_dir])
           @image_service.build_image(spec[:template], spec)
-          @storage_service.finish_preparing_storage(spec[:hostname], spec[:storage], spec[:temp_dir])
-          storage_xml = @storage_service.spec_to_xml(spec[:hostname], spec[:storage])
+          @storage_service.finish_preparing_storage(spec[:hostname], spec[:temp_dir])
+          storage_xml = @storage_service.spec_to_xml(spec[:hostname])
           @vm_service.define_vm(spec, storage_xml)
         rescue Exception => e
           begin
@@ -61,7 +61,7 @@ class Provision::Core::ProvisioningService
     if @storage_service.nil?
       @image_service.remove_image(spec)
     else
-      @storage_service.remove_storage(spec[:hostname], spec[:storage])
+      @storage_service.clean_storage(spec[:hostname], spec[:storage])
     end
     @vm_service.undefine_vm(spec)
     return nil

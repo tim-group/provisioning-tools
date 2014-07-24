@@ -6,6 +6,8 @@ require 'provision/storage/lvm'
 describe Provision::Storage::LVM do
   before do
     @storage_type = Provision::Storage::LVM.new(:vg => 'main')
+    @mount_point_obj = Provision::Storage::Mount_point.new('/', {:size => '10G'})
+    @large_mount_point_obj = Provision::Storage::Mount_point.new('/', {:size => '5000G'})
   end
 
   it 'creates some storage given a name and a size' do
@@ -15,7 +17,7 @@ describe Provision::Storage::LVM do
         "  Logical volume \"working\" created"
       end
     end
-    @storage_type.create('working', '/'.to_sym, '10G')
+    @storage_type.create('working', @mount_point_obj)
   end
 
   it 'complains if the storage to be created already exists' do
@@ -26,20 +28,20 @@ describe Provision::Storage::LVM do
       end
     end
     expect {
-      @storage_type.create('existing', '/'.to_sym, '10G')
+      @storage_type.create('existing', @mount_point_obj)
     }.to raise_error("Logical volume existing already exists in volume group main")
   end
 
   it 'complains if something bad happens trying to create storage' do
     @storage_type.stub(:cmd) do |arg|
       case arg
-      when 'lvcreate -n working -L 500G main'
-        raise "command lvcreate -n existing -L 500G main returned non-zero error code 5"
+      when 'lvcreate -n working -L 5000G main'
+        raise "command lvcreate -n existing -L 5000G main returned non-zero error code 5"
       end
     end
     expect {
-      @storage_type.create('working', '/'.to_sym, '500G')
-    }.to raise_error("command lvcreate -n existing -L 500G main returned non-zero error code 5")
+      @storage_type.create('working', @large_mount_point_obj)
+    }.to raise_error("command lvcreate -n existing -L 5000G main returned non-zero error code 5")
   end
 
   it 'runs lvremove when trying to remove a VMs storage' do
@@ -61,10 +63,22 @@ describe Provision::Storage::LVM do
       @storage_type.stub(:cmd) do |arg|
         true
       end
-      @storage_type.should_receive(:rebuild_partition).with(name, '/'.to_sym, {})
-      @storage_type.should_receive(:check_and_resize_filesystem).with(name, '/'.to_sym)
-      @storage_type.grow_filesystem(name, '/'.to_sym, '5G')
+      @storage_type.should_receive(:rebuild_partition).with(name, @mount_point_obj)
+      @storage_type.should_receive(:check_and_resize_filesystem).with(name, @mount_point_obj)
+      @storage_type.grow_filesystem(name, @mount_point_obj)
     end
   end
 
+  it 'partition name should return correct name' do
+    device_name = @storage_type.device('magical')
+    @storage_type.stub(:cmd) do |arg|
+      case arg
+      when "kpartx -l #{device_name} | grep -v 'loop deleted : /dev/loop' | awk '{ print $1 }' | tail -1"
+        "magical"
+      else
+        raise "Un-stubbed call to cmd for #{arg}"
+      end
+    end
+    @storage_type.partition_name('magical', @mount_point_obj).should eql "magical"
+  end
 end
