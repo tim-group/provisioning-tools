@@ -107,8 +107,14 @@ class Provision::Storage::Service
 
     ordered_keys.reverse.each do |mount_point|
       settings = storage_spec[mount_point]
+      persistent = settings[:persistent] rescue false
       type = settings[:type].to_sym
-      get_storage(type).remove(name)
+      if persistent
+        log.info "Unable to remove storage for #{mount_point} on #{name}, storage is marked as persistent, "
+      else
+        log.debug "Removing storage for #{mount_point} on #{name}"
+        get_storage(type).remove(name, mount_point)
+      end
     end
   end
 

@@ -40,9 +40,9 @@ describe Provision::Storage::Image do
   describe 'remove' do
 
     it 'should remove the device' do
-      FileUtils.touch "#{@tmpdir}/removal.img"
-      @storage_type.remove('removal')
-      File.exist?("#{@tmpdir}/removal").should eql false
+      FileUtils.touch "#{@tmpdir}/oy-deletedb-001_var_lib_mysql.img"
+      @storage_type.remove('oy-deletedb-001', '/var/lib/mysql')
+      File.exist?("#{@tmpdir}/oy-deletedb-001_var_lib_mysql.img").should eql false
     end
   end
 

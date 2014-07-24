@@ -46,8 +46,8 @@ describe Provision::Storage::LVM do
     @storage_type.stub(:cmd) do |arg|
       true
     end
-    @storage_type.should_receive(:cmd).with('lvremove -f /dev/main/delete')
-    @storage_type.remove('delete')
+    @storage_type.should_receive(:cmd).with('lvremove -f /dev/main/oy-deletedb-001_var_lib_mysql')
+    @storage_type.remove('oy-deletedb-001', '/var/lib/mysql')
   end
 
   describe 'grow' do

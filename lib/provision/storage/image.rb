@@ -18,7 +18,7 @@ class Provision::Storage::Image < Provision::Storage
         cmd "qemu-img create #{device(underscore_name)} #{size}"
       },
       :cleanup => lambda {
-        remove(underscore_name)
+        remove(name, mount_point)
       }
     })
   end
@@ -30,7 +30,7 @@ class Provision::Storage::Image < Provision::Storage
         cmd "qemu-img resize #{device(underscore_name)} #{size}"
       },
       :cleanup => lambda {
-        remove(underscore_name)
+        remove(name, mount_point)
       }
     })
     rebuild_partition(name, mount_point, options_hash)
@@ -41,7 +41,8 @@ class Provision::Storage::Image < Provision::Storage
     "#{@image_path}/#{underscore_name}.img"
   end
 
-  def remove(underscore_name)
+  def remove(name, mount_point)
+    underscore_name = underscore_name(name, mount_point)
     FileUtils.remove_entry_secure device(underscore_name)
   end
 end

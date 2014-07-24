@@ -172,22 +172,26 @@ describe Provision::Storage::Service do
       }.to raise_error "Storage service requires each storage type to specify the 'options' setting"
     end
 
-    xit 'should not remove persistent storage' do
+    it 'should not remove persistent storage' do
       @storage_service = Provision::Storage::Service.new(@settings)
+
       storage = @storage_service.get_storage(:data)
+      storage.stub(:remove)
+      @storage_service.stub(:get_storage).and_return storage
+
       storage_hash = {
         '/'.to_sym => {
           :type => 'os',
           :size => '10G',
         },
         '/var/lib/mysql'.to_sym => {
-          :type => 'data',
-          :size => '10G',
+          :type       => 'data',
+          :size       => '10G',
           :persistent => true,
         }
       }
-      #### Revisit when we have sorted the naming
-      storage.should_not_receive(:remove).with('/var/lib/mysql'.to_sym)
+      storage.should_receive(:remove).with('test', '/'.to_sym)
+      storage.should_not_receive(:remove).with('test', '/var/lib/mysql'.to_sym)
       @storage_service.remove_storage('test', storage_hash)
     end
 

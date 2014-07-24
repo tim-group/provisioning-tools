@@ -18,7 +18,7 @@ class Provision::Storage::LVM < Provision::Storage
         cmd "lvcreate -n #{underscore_name} -L #{size} #{@options[:vg]}"
       },
       :cleanup => lambda {
-        remove(underscore_name)
+        remove(name, mount_point)
       }
     })
   end
@@ -32,7 +32,8 @@ class Provision::Storage::LVM < Provision::Storage
     return "/dev/#{@options[:vg]}/#{underscore_name}"
   end
 
-  def remove(underscore_name)
+  def remove(name, mount_point)
+    underscore_name = underscore_name(name, mount_point)
     cmd "lvremove -f #{device(underscore_name)}"
   end
 end
