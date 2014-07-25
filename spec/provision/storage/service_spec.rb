@@ -175,12 +175,12 @@ describe Provision::Storage::Service do
     end
 
     it 'should not remove persistent storage' do
+      FileUtils.touch "#{@tmpdir}/os/oy-db-001.img"
+      FileUtils.touch "#{@tmpdir}/data/oy-db-001_var_lib_mysql.img"
+      File.exist?("#{@tmpdir}/os/oy-db-001.img").should eql true
+      File.exist?("#{@tmpdir}/data/oy-db-001_var_lib_mysql.img").should eql true
+
       @storage_service = Provision::Storage::Service.new(@settings)
-
-      storage = @storage_service.get_storage(:data)
-      storage.stub(:remove)
-      @storage_service.stub(:get_storage).and_return storage
-
       storage_hash = {
         '/'.to_sym => {
           :type => 'os',
@@ -192,10 +192,10 @@ describe Provision::Storage::Service do
           :persistent => true,
         }
       }
-      storage.should_receive(:remove).with('test', '/'.to_sym)
-      storage.should_not_receive(:remove).with('test', '/var/lib/mysql'.to_sym)
-      @storage_service.create_config('test', storage_hash)
-      @storage_service.remove_storage('test')
+      @storage_service.create_config('oy-db-001', storage_hash)
+      @storage_service.remove_storage('oy-db-001')
+      File.exist?("#{@tmpdir}/os/oy-db-001.img").should eql false
+      File.exist?("#{@tmpdir}/data/oy-db-001_var_lib_mysql.img").should eql true
     end
 
 
