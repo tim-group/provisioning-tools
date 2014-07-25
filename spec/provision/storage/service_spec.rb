@@ -31,7 +31,7 @@ describe Provision::Storage::Service do
       @storage_service = Provision::Storage::Service.new(@settings)
     end
 
-    xit 'should set the default method to image for the root filesystem' do
+    it 'should set the default method to image for the root filesystem' do
       storage_service = ExtendedStorageService.new(@settings)
       storage_hash = {
         '/'.to_sym => {
@@ -46,11 +46,13 @@ describe Provision::Storage::Service do
           :method => :image,
         },
       }
-
+      storage_service.create_config('oy-app-001', storage_hash)
+      mount_point_obj = storage_service.get_mount_point('oy-app-001', '/'.to_sym)
       storage = storage_service.get_storage(:os)
-      storage.should_receive(:init_filesystem).with('root', '/'.to_sym, expected_root_settings)
-      storage_service.init_filesystems('root')
       storage.stub(:init_filesystem)
+
+      storage.should_receive(:init_filesystem).with('oy-app-001', mount_point_obj)
+      storage_service.init_filesystems('oy-app-001')
 
     end
 
@@ -198,6 +200,28 @@ describe Provision::Storage::Service do
       File.exist?("#{@tmpdir}/data/oy-db-001_var_lib_mysql.img").should eql true
     end
 
+    it 'should check persistent storage on creation' do
+      storage_hash = {
+        '/'.to_sym => {
+          :type => 'os',
+          :size => '10G',
+        },
+        '/var/lib/mysql'.to_sym => {
+          :type       => 'data',
+          :size       => '10G',
+          :persistent => true,
+        }
+      }
+      FileUtils.touch "#{@tmpdir}/data/oy-db-001_var_lib_mysql.img"
+      File.exist?("#{@tmpdir}/data/oy-db-001_var_lib_mysql.img").should eql true
+
+      @storage_service = Provision::Storage::Service.new(@settings)
+      @storage_service.create_config('oy-db-001', storage_hash)
+      mount_point_obj = @storage_service.get_mount_point('oy-db-001', '/var/lib/mysql'.to_sym)
+      storage = @storage_service.get_storage(:data)
+      storage.should_receive(:check_persistent_storage).with('oy-db-001', mount_point_obj)
+      @storage_service.create_storage('oy-db-001')
+    end
 
     it 'generates the correct XML to put into a libvirt template for a single storage setup' do
       storage_hash = {

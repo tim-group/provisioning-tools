@@ -72,7 +72,23 @@ module Provision::Storage::Local
     })
   end
 
-  def check_and_resize_filesystem(name, mount_point_obj)
+  def check_persistent_storage(name, mount_point_obj)
+    underscore_name = underscore_name(name, mount_point_obj.name)
+    size = mount_point_obj.config[:size]
+    persistence_options = mount_point_obj.config[:persistence_options]
+    if !File.exist?("#{device(underscore_name)}")
+      case persistence_options[:on_storage_not_found]
+      when :raise_error
+        raise "Persistent storage was not found for #{device(underscore_name)}"
+      when :create_new
+        create(name, mount_point_obj)
+      end
+    else
+      check_and_resize_filesystem(name, mount_point_obj, false)
+    end
+  end
+
+  def check_and_resize_filesystem(name, mount_point_obj, resize=true)
     run_task(name, {
       :task => lambda {
         kpartxa(name, mount_point_obj)
@@ -83,7 +99,7 @@ module Provision::Storage::Local
     run_task(name, {
       :task => lambda {
         cmd "e2fsck -f -p /dev/mapper/#{vm_partition_name}"
-        cmd "resize2fs /dev/mapper/#{vm_partition_name}"
+        cmd "resize2fs /dev/mapper/#{vm_partition_name}" if resize
       },
       :on_error => lambda {
         kpartxd(name, mount_point_obj)

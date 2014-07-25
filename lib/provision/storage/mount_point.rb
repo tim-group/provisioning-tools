@@ -6,6 +6,10 @@ class Provision::Storage::Mount_point
     @name = mount_point
     default_config = {
       :persistent => false,
+      :persistence_options => {
+        :on_storage_not_found     => :raise_error,
+        :on_storage_size_mismatch => :raise_error
+      },
       :prepare    => {
         :options => {
           :create_in_fstab => true,

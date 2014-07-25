@@ -81,4 +81,5 @@ describe Provision::Storage::LVM do
     end
     @storage_type.partition_name('magical', @mount_point_obj).should eql "magical"
   end
+
 end

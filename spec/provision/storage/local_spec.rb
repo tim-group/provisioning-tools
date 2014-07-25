@@ -281,4 +281,36 @@ describe Provision::Storage::Local do
     @storage_type.libvirt_source('magical').should eql "dev='#{device_name}'"
   end
 
+  describe 'check_persistent_storage' do
+
+    it 'will raise an exception if persistent storage was not found' do
+      mount_point_hash = { :size => '10G', :persistent => true }
+      mount_point_obj = Provision::Storage::Mount_point.new('/var/lib/mysql'.to_sym, mount_point_hash)
+      expect {
+        @storage_type.check_persistent_storage('oy-foodb-001', mount_point_obj)
+      }.to raise_error("Persistent storage was not found for #{@tmpdir}/oy-foodb-001_var_lib_mysql")
+    end
+
+    it 'will create storage if persistent storage was not found' do
+      mount_point_hash = {
+        :size => '10G',
+        :persistent => true,
+        :persistence_options => { :on_storage_not_found => :create_new }
+      }
+      mount_point_obj = Provision::Storage::Mount_point.new('/var/lib/mysql'.to_sym, mount_point_hash)
+      @storage_type.should_receive(:create).with("oy-foodb-001", mount_point_obj)
+      @storage_type.check_persistent_storage('oy-foodb-001', mount_point_obj)
+    end
+
+    it 'will check storage if persistent storage already exists' do
+      FileUtils.touch "#{@tmpdir}/oy-foodb-001_var_lib_mysql"
+      mount_point_hash = {
+        :size => '10G',
+        :persistent => true,
+      }
+      mount_point_obj = Provision::Storage::Mount_point.new('/var/lib/mysql'.to_sym, mount_point_hash)
+      @storage_type.should_receive(:check_and_resize_filesystem).with("oy-foodb-001", mount_point_obj, false)
+      @storage_type.check_persistent_storage('oy-foodb-001', mount_point_obj)
+    end
+  end
 end

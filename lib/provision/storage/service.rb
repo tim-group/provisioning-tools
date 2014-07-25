@@ -6,6 +6,7 @@ require 'provision/log'
 class Provision::Storage::Service
   include Provision::Log
 
+  attr_accessor :default_persistence_options
   def initialize(storage_options)
     @storage_types = {}
     storage_options.each do |storage_type, settings|
@@ -16,6 +17,7 @@ class Provision::Storage::Service
       instance = Provision::Storage.const_get(arch).new(options)
       @storage_types[storage_type] = instance
       @storage_configs = {}
+
     end
   end
 
@@ -60,8 +62,15 @@ class Provision::Storage::Service
     @storage_configs[name].mount_points.each do |mount_point|
       mount_point_obj = get_mount_point(name, mount_point)
       type = mount_point_obj.config[:type].to_sym
+      persistent = mount_point_obj.config[:persistent] rescue false
+      raise 'Persistent options not found' unless mount_point_obj.config.has_key?(:persistence_options)
       storage = get_storage(type)
-      storage.create(name, mount_point_obj)
+      if persistent
+        storage.check_persistent_storage(name, mount_point_obj)
+      else
+        log.debug "Creating storage for #{mount_point} on #{name}"
+        storage.create(name, mount_point_obj)
+      end
     end
   end
 
@@ -113,7 +122,7 @@ class Provision::Storage::Service
     @storage_configs[name].mount_points.each do |mount_point|
       mount_point_obj = get_mount_point(name, mount_point)
       type = mount_point_obj.config[:type].to_sym
-      persistent = mount_point_obj.config[:persistent]
+      persistent = mount_point_obj.config[:persistent] rescue false
       storage = get_storage(type)
       if persistent
         log.info "Unable to remove storage for #{mount_point} on #{name}, storage is marked as persistent, "

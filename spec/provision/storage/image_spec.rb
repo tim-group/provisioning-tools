@@ -68,6 +68,4 @@ describe Provision::Storage::Image do
     end
   end
 
-  xit 'partition name should return correct name' do
-  end
 end
