@@ -16,7 +16,7 @@ describe Provision::Storage::Image do
   end
 
   describe 'create' do
-    it 'complains if the storage to be created already exists' do
+    it 'complains if the path option is not provided' do
       expect {
         @storage_type = Provision::Storage::Image.new({})
       }.to raise_error("Image storage requires a path as an option, named path")
