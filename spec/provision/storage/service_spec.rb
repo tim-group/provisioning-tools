@@ -223,6 +223,22 @@ describe Provision::Storage::Service do
       @storage_service.create_storage('oy-db-001')
     end
 
+    it 'should not call init_filesystems for persistent storage' do
+      @storage_service = Provision::Storage::Service.new(@settings)
+      storage_hash = {
+        '/var/lib/mysql'.to_sym => {
+          :type       => 'data',
+          :size       => '10G',
+          :persistent => true,
+        }
+      }
+      @storage_service.create_config('oy-db-001', storage_hash)
+      storage = @storage_service.get_storage(:data)
+      storage.stub(:init_filesystem)
+      storage.should_not_receive(:init_filesystem)
+      @storage_service.init_filesystems('oy-db-001')
+    end
+
     it 'generates the correct XML to put into a libvirt template for a single storage setup' do
       storage_hash = {
         '/'.to_sym => {

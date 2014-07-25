@@ -66,6 +66,7 @@ class Provision::Storage::Service
       raise 'Persistent options not found' unless mount_point_obj.config.has_key?(:persistence_options)
       storage = get_storage(type)
       if persistent
+        log.debug "Checking existing persistent storage for #{mount_point} on #{name}"
         storage.check_persistent_storage(name, mount_point_obj)
       else
         log.debug "Creating storage for #{mount_point} on #{name}"
@@ -78,8 +79,9 @@ class Provision::Storage::Service
     @storage_configs[name].mount_points.each do |mount_point|
       mount_point_obj = get_mount_point(name, mount_point)
       type = mount_point_obj.config[:type].to_sym
+      persistent = mount_point_obj.config[:persistent] rescue false
       storage = get_storage(type)
-      storage.init_filesystem(name, mount_point_obj)
+      storage.init_filesystem(name, mount_point_obj) unless persistent
     end
   end
 
