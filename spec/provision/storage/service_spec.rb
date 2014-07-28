@@ -30,32 +30,6 @@ describe Provision::Storage::Service do
 
       @storage_service = Provision::Storage::Service.new(@settings)
     end
-
-    it 'should set the default method to image for the root filesystem' do
-      storage_service = ExtendedStorageService.new(@settings)
-      storage_hash = {
-        '/'.to_sym => {
-          :type => 'os',
-          :size => '10G',
-        }
-      }
-      expected_root_settings = {
-        :type => 'os',
-        :size => '10G',
-        :prepare => {
-          :method => :image,
-        },
-      }
-      storage_service.create_config('oy-app-001', storage_hash)
-      mount_point_obj = storage_service.get_mount_point('oy-app-001', '/'.to_sym)
-      storage = storage_service.get_storage(:os)
-      storage.stub(:init_filesystem)
-
-      storage.should_receive(:init_filesystem).with('oy-app-001', mount_point_obj)
-      storage_service.init_filesystems('oy-app-001')
-
-    end
-
   end
   describe 'LVM' do
 
