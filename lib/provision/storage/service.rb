@@ -62,7 +62,7 @@ class Provision::Storage::Service
     @storage_configs[name].mount_points.each do |mount_point|
       mount_point_obj = get_mount_point(name, mount_point)
       type = mount_point_obj.config[:type].to_sym
-      persistent = mount_point_obj.config[:persistent] rescue false
+      persistent = mount_point_obj.config[:persistent]
       raise 'Persistent options not found' unless mount_point_obj.config.has_key?(:persistence_options)
       storage = get_storage(type)
       if persistent
@@ -71,6 +71,7 @@ class Provision::Storage::Service
       else
         log.debug "Creating storage for #{mount_point} on #{name}"
         storage.create(name, mount_point_obj)
+        mount_point_obj.set(:newly_created, true)
       end
     end
   end
@@ -79,9 +80,10 @@ class Provision::Storage::Service
     @storage_configs[name].mount_points.each do |mount_point|
       mount_point_obj = get_mount_point(name, mount_point)
       type = mount_point_obj.config[:type].to_sym
-      persistent = mount_point_obj.config[:persistent] rescue false
+      persistent = mount_point_obj.config[:persistent]
+      newly_created = mount_point_obj.get(:newly_created)
       storage = get_storage(type)
-      storage.init_filesystem(name, mount_point_obj) unless persistent
+      storage.init_filesystem(name, mount_point_obj) if newly_created
     end
   end
 
@@ -124,7 +126,7 @@ class Provision::Storage::Service
     @storage_configs[name].mount_points.each do |mount_point|
       mount_point_obj = get_mount_point(name, mount_point)
       type = mount_point_obj.config[:type].to_sym
-      persistent = mount_point_obj.config[:persistent] rescue false
+      persistent = mount_point_obj.config[:persistent]
       storage = get_storage(type)
       if persistent
         log.info "Unable to remove storage for #{mount_point} on #{name}, storage is marked as persistent, "

@@ -82,6 +82,7 @@ module Provision::Storage::Local
         raise "Persistent storage was not found for #{device(underscore_name)}"
       when :create_new
         create(name, mount_point_obj)
+        mount_point_obj.set(:newly_created, true)
       end
     else
       check_and_resize_filesystem(name, mount_point_obj, false)
