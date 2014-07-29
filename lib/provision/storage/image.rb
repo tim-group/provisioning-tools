@@ -42,7 +42,7 @@ class Provision::Storage::Image < Provision::Storage
 
   def remove(name, mount_point)
     underscore_name = underscore_name(name, mount_point)
-    FileUtils.remove_entry_secure device(underscore_name)
+    FileUtils.remove_entry_secure(device(underscore_name)) if File.exists?(device(underscore_name))
   end
 
   def partition_name(name, mount_point_obj)
