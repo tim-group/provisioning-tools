@@ -22,7 +22,6 @@ class Provision::Storage::Service
   end
 
   def prepare_storage(name, storage_spec, temp_dir)
-    create_config(name, storage_spec)
     create_storage(name)
     init_filesystems(name)
     mount_filesystems(name, temp_dir)
@@ -34,7 +33,6 @@ class Provision::Storage::Service
   end
 
   def clean_storage(name, storage_spec)
-    create_config(name, storage_spec)
     remove_storage(name)
   end
 
