@@ -35,7 +35,7 @@ class Provision::Storage::LVM < Provision::Storage
 
   def remove(name, mount_point)
     underscore_name = underscore_name(name, mount_point)
-    cmd "lvremove -f #{device(underscore_name)}"
+    cmd "lvremove -f #{device(underscore_name)}" if File.exists?(device(underscore_name))
   end
 
   def partition_name(name, mount_point_obj)

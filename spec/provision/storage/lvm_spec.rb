@@ -45,6 +45,12 @@ describe Provision::Storage::LVM do
   end
 
   it 'runs lvremove when trying to remove a VMs storage' do
+    File.stub(:exists?) do |arg|
+      case arg
+      when '/dev/main/oy-deletedb-001_var_lib_mysql'
+        true
+      end
+    end
     @storage_type.stub(:cmd) do |arg|
       true
     end
