@@ -216,11 +216,11 @@ module Provision::Storage::Local
       :remove_cleanup => "create partition device nodes #{underscore_name}"
     })
 
-    run_task(name, "undo make directory #{temp_mountpoint}", {
+    run_task(name, "undo make directory #{delete_mountpoint}", {
       :task => lambda {
         FileUtils.rmdir(dir) if delete_mountpoint and dir_existed_at_start
       },
-      :remove_cleanup => "make directory #{temp_mountpoint}",
+      :remove_cleanup => "make directory #{delete_mountpoint}",
     })
 
     mount_point_obj.unset(:dir_existed_at_start)
