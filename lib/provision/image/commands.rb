@@ -17,7 +17,7 @@ module Provision::Image::Commands
 
     exit_status = $?
     if exit_status != 0
-      raise "command #{cmd} returned non-zero error code #{exit_status}"
+      raise "command #{cmd} returned non-zero error code #{exit_status}, output: #{output}"
     end
     return output
   end
