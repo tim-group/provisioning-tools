@@ -14,12 +14,12 @@ class Provision::Storage::LVM < Provision::Storage
     if File.exists?("#{device(underscore_name)}")
       raise "Logical volume #{underscore_name} already exists in volume group #{@options[:vg]}"
     end
-    run_task(name, {
+    run_task(name, "create #{underscore_name}", {
       :task => lambda {
         cmd "lvcreate -n #{underscore_name} -L #{size} #{@options[:vg]}"
       },
       :cleanup => lambda {
-        remove(name, mount_point)
+        remove(name, mount_point_obj.name)
       }
     })
   end

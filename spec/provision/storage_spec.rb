@@ -9,39 +9,23 @@ describe Provision do
 
   describe '#run_task' do
     it 'runs a task' do
-      @storage.run_task('test',{
+      @storage.run_task('test', 'run true', {
         :task => lambda {
           @storage.cmd('true')
         }
       })
     end
 
-    it 'runs the on_error lamdba if the task fails' do
-      @pretend_object = double()
-      @pretend_object.should_receive(:blah)
-
-      expect {
-        @storage.run_task('test',{
-          :task => lambda {
-            @storage.cmd('false')
-          },
-          :on_error => lambda {
-            @pretend_object.blah()
-          }
-        })
-      }.to raise_error
-    end
-
     it 'adds a lambda to the cleanup_tasks hash if the task is successful' do
-      @pretend_object = double()
-      @pretend_object.should_receive(:blah)
+      pretend_object = double()
+      pretend_object.should_receive(:blah)
 
-      @storage.run_task('test',{
+      @storage.run_task('test', 'run true', {
         :task => lambda {
           @storage.cmd('true')
         },
         :cleanup => lambda {
-          @pretend_object.blah()
+          pretend_object.blah()
         }
       })
 
@@ -49,30 +33,30 @@ describe Provision do
     end
 
     it 'performs cleanup tasks in reverse order' do
-      @pretend_object = double()
-      @pretend_object.should_receive(:blah2).ordered
-      @pretend_object.should_receive(:blah1).ordered
+      pretend_object = double()
+      pretend_object.should_receive(:blah2).ordered
+      pretend_object.should_receive(:blah1).ordered
 
-      @storage.run_task('test',{
+      @storage.run_task('test','run true 1', {
         :task => lambda {
           @storage.cmd('true')
         },
         :cleanup => lambda {
-          @pretend_object.blah1()
+          pretend_object.blah1()
         }
       })
 
-      @storage.run_task('test',{
+      @storage.run_task('test', 'run true 2', {
         :task => lambda {
           @storage.cmd('true')
         },
         :cleanup => lambda {
-          @pretend_object.blah2()
+          pretend_object.blah2()
         }
       })
 
       expect {
-        @storage.run_task('test',{
+        @storage.run_task('test','fail miserably', {
           :task => lambda {
             @storage.cmd('false')
           },
@@ -82,39 +66,32 @@ describe Provision do
       Provision::Storage.cleanup('test')
     end
 
-    it 'removes a task from the cleanup tasks if one is specified in cleanup_remove of a task that succeeds' do
-      @pretend_object = double()
-      @pretend_object.should_receive(:blah1).ordered
+    it 'removes a cleanup task if the option is set and the task was successful' do
+      pretend_object = double()
+      pretend_object.should_receive(:blah2).ordered
+      pretend_object.should_not_receive(:blah1)
 
-      @storage.run_task('test',{
+      @storage.run_task('test', 'run true 1', {
         :task => lambda {
           @storage.cmd('true')
         },
         :cleanup => lambda {
-          @pretend_object.blah1()
-        }
+          pretend_object.blah1()
+        },
       })
 
-      cleanup_lambda = lambda {
-        @pretend_object.blah2()
-      }
-
-      @storage.run_task('test',{
+      @storage.run_task('test', 'run true 2', {
         :task => lambda {
           @storage.cmd('true')
         },
-        :cleanup => cleanup_lambda
-      })
-
-      @storage.run_task('test',{
-        :task => lambda {
-          @storage.cmd('true')
+        :cleanup => lambda {
+          pretend_object.blah2()
         },
-        :cleanup_remove => cleanup_lambda
+        :remove_cleanup => 'run true 1'
       })
 
       expect {
-        @storage.run_task('test',{
+        @storage.run_task('test', 'fail miserably', {
           :task => lambda {
             @storage.cmd('false')
           },
@@ -124,41 +101,81 @@ describe Provision do
       Provision::Storage.cleanup('test')
     end
 
-    it 'does not remove cleanup tasks if a task fails' do
-      @pretend_object = double()
-      @pretend_object.should_receive(:blah2).ordered
-      @pretend_object.should_receive(:blah1).ordered
+    it 'removes multiple cleanup tasks if the option is set and the task was successful' do
+      pretend_object = double()
+      pretend_object.should_receive(:blah4).ordered
+      pretend_object.should_receive(:blah1).ordered
+      pretend_object.should_not_receive(:blah2)
+      pretend_object.should_not_receive(:blah3)
 
-      @storage.run_task('test',{
+      @storage.run_task('test', 'run true 1', {
         :task => lambda {
           @storage.cmd('true')
         },
         :cleanup => lambda {
-          @pretend_object.blah1()
-        }
+          pretend_object.blah1()
+        },
       })
 
-      cleanup_lambda = lambda {
-        @pretend_object.blah2()
-      }
-
-      @storage.run_task('test',{
+      @storage.run_task('test', 'run true 2', {
         :task => lambda {
           @storage.cmd('true')
         },
-        :cleanup => cleanup_lambda
+        :cleanup => lambda {
+          pretend_object.blah2()
+        },
+      })
+
+      @storage.run_task('test', 'run true 3', {
+        :task => lambda {
+          @storage.cmd('true')
+        },
+        :cleanup => lambda {
+          pretend_object.blah3()
+        },
+      })
+
+      @storage.run_task('test', 'run true 4', {
+        :task => lambda {
+          @storage.cmd('true')
+        },
+        :cleanup => lambda {
+          pretend_object.blah4()
+        },
+        :remove_cleanup => ['run true 2', 'run true 3']
       })
 
       expect {
-        @storage.run_task('test',{
+        @storage.run_task('test', 'fail miserably', {
           :task => lambda {
             @storage.cmd('false')
           },
-          :cleanup_remove => cleanup_lambda
         })
       }.to raise_error
 
       Provision::Storage.cleanup('test')
+    end
+
+    it 'complains if you try to add two cleanup tasks with the same identifier' do
+      @storage.run_task('test', 'run true 1', {
+        :task => lambda {
+          @storage.cmd('true')
+        },
+        :cleanup => lambda {
+          pretend_object.blah1()
+        },
+      })
+
+      expect {
+        @storage.run_task('test', 'run true 1', {
+          :task => lambda {
+            @storage.cmd('true')
+          },
+          :cleanup => lambda {
+            pretend_object.blah1()
+          },
+        })
+      }.to raise_error
     end
   end
 end

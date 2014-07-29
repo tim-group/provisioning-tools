@@ -244,10 +244,13 @@ describe Provision::Storage::Local do
         true
       end
     end
-    @storage_type.should_receive(:cmd).with("kpartx -av #{device_name}")
-    @storage_type.should_receive(:cmd).with("e2fsck -f -p /dev/mapper/#{partition_name}")
-    @storage_type.should_receive(:cmd).with("kpartx -dv #{device_name}")
+    @storage_type.should_receive(:cmd).with("udevadm settle").ordered
+    @storage_type.should_receive(:cmd).with("kpartx -av #{device_name}").ordered
+    @storage_type.should_receive(:cmd).with("e2fsck -f -p /dev/mapper/#{partition_name}").ordered
+    @storage_type.should_receive(:cmd).with("udevadm settle").ordered
+    @storage_type.should_receive(:cmd).with("kpartx -dv #{device_name}").ordered
     expect { @storage_type.check_and_resize_filesystem(name, @mount_point_obj) }.to raise_error
+    Provision::Storage.cleanup("check_and_resize")
   end
 
   it 'provides the correct parameter to use with the source tag within the libvirt template' do
@@ -259,6 +262,7 @@ describe Provision::Storage::Local do
     @storage_type.stub(:partition_name) do |name, mount_point_obj|
       'name'
     end
+    @storage_type.should_receive(:cmd).with("udevadm settle")
     @storage_type.should_receive(:cmd).with("kpartx -av #{@tmpdir}/name")
     @storage_type.should_receive(:cmd).with("mount /dev/mapper/name #{@tmpdir}/name")
     @mount_point_obj.set(:actual_mount_point, "#{@tmpdir}/name")
@@ -268,12 +272,12 @@ describe Provision::Storage::Local do
   end
 
   it 'does not try to create the mountpoint when mounting if it is not considered temporary' do
-    @storage_type.should_not_receive(:cmd).with('mkdir /some/name')
+    @storage_type.should_not_receive(:cmd).with('mkdir /some/name1')
     @storage_type.stub(:partition_name) do |name, mount_point_obj|
       'mount'
     end
-    @mount_point_obj.set(:actual_mount_point, "/some/name")
-    @storage_type.mount('name', @mount_point_obj)
+    @mount_point_obj.set(:actual_mount_point, "/some/name1")
+    @storage_type.mount('name1', @mount_point_obj)
   end
 
   it 'libvirt_source should return correct name' do

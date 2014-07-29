@@ -20,7 +20,7 @@ module Provision::Storage::Local
     underscore_name = underscore_name(name, mount_point_obj.name)
     image_file_path = mount_point_obj.config[:prepare][:options][:path]
 
-    run_task(name, {
+    run_task(name, "image #{underscore_name}", {
       :task => lambda {
         case image_file_path
         when /^\/.*/
@@ -39,32 +39,38 @@ module Provision::Storage::Local
     underscore_name = underscore_name(name, mount_point_obj.name)
     fs_type = mount_point_obj.config[:prepare][:options][:type]
 
-    run_task(name, {
+    run_task(name, "create partition #{underscore_name}", {
       :task => lambda {
         cmd "parted -s #{device(underscore_name)} mklabel msdos"
         cmd "parted -s #{device(underscore_name)} mkpart primary ext3 2048s 100%"
-        kpartxa(name, mount_point_obj)
       }
     })
-    run_task(name, {
+
+    run_task(name, "create partition device nodes #{underscore_name}", {
+      :task => lambda {
+        kpartxa(name, mount_point_obj)
+      },
+      :cleanup => lambda {
+        kpartxd(name, mount_point_obj)
+      }
+    })
+    run_task(name, "create filesystem #{underscore_name}", {
       :task => lambda {
         cmd "mkfs.#{fs_type} /dev/mapper/#{partition_name(name, mount_point_obj)}"
       },
-      :on_error => lambda {
-        kpartxd(name, mount_point_obj)
-      }
     })
-    run_task(name, {
+    run_task(name, "undo create partition device nodes #{underscore_name}", {
       :task => lambda {
         kpartxd(name, mount_point_obj)
-      }
+      },
+      :remove_cleanup => "create partition device nodes #{underscore_name}",
     })
   end
 
   def rebuild_partition(name, mount_point_obj)
     underscore_name = underscore_name(name, mount_point_obj.name)
     fs_type = mount_point_obj.config[:prepare][:options][:type]
-    run_task(name, {
+    run_task(name, "resize partition #{underscore_name}", {
       :task => lambda {
         cmd "parted -s #{device(underscore_name)} rm 1"
         cmd "parted -s #{device(underscore_name)} mkpart primary #{fs_type} 2048s 100%"
@@ -90,32 +96,35 @@ module Provision::Storage::Local
   end
 
   def check_and_resize_filesystem(name, mount_point_obj, resize=true)
-    run_task(name, {
+    underscore_name = underscore_name(name, mount_point_obj.name)
+    run_task(name, "create partition device nodes #{underscore_name}", {
       :task => lambda {
         kpartxa(name, mount_point_obj)
+      },
+      :cleanup => lambda {
+        kpartxd(name, mount_point_obj)
       }
     })
 
     vm_partition_name = partition_name(name, mount_point_obj)
-    run_task(name, {
+    run_task(name, "check and resize filesystem #{vm_partition_name}", {
       :task => lambda {
         cmd "e2fsck -f -p /dev/mapper/#{vm_partition_name}"
         cmd "resize2fs /dev/mapper/#{vm_partition_name}" if resize
       },
-      :on_error => lambda {
-        kpartxd(name, mount_point_obj)
-      }
     })
 
-    run_task(name, {
+    run_task(name, "undo create partition device nodes #{underscore_name}", {
       :task => lambda {
         kpartxd(name, mount_point_obj)
-      }
+      },
+      :remove_cleanup => "create partition device nodes #{underscore_name}",
     })
   end
 
   def kpartxa(name, mount_point_obj)
     underscore_name = underscore_name(name, mount_point_obj.name)
+    cmd "udevadm settle"
     output = cmd "kpartx -av #{device(underscore_name)}"
     if output =~ /^add map (loop\d+)(p\d+) \(\d+:\d+\): \d+ \d+ linear \/dev\/loop\d+ \d+$/
       mount_point_obj.set(:loopback_dev, $1)
@@ -128,6 +137,7 @@ module Provision::Storage::Local
     loopback = mount_point_obj.get(:loopback_dev)
 
     sleep 1
+    cmd "udevadm settle"
 
     if loopback
       cmd "kpartx -dv /dev/#{loopback}"
@@ -151,29 +161,32 @@ module Provision::Storage::Local
     underscore_name = underscore_name(name, mount_point_obj.name)
     dir_existed_at_start = File.exists? dir
 
-    run_task(name, {
+    run_task(name, "make directory #{dir}", {
       :task => lambda {
         FileUtils.mkdir(dir) if temp_mountpoint and !dir_existed_at_start
       },
-    })
-
-    run_task(name, {
-      :task => lambda {
-        kpartxa(name, mount_point_obj)
-      },
-      :on_error => lambda {
+      :cleanup => lambda {
         FileUtils.rmdir(dir) if temp_mountpoint and !dir_existed_at_start
       }
     })
 
-    run_task(name, {
+    run_task(name, "create partition device nodes #{underscore_name}", {
+      :task => lambda {
+        kpartxa(name, mount_point_obj)
+      },
+      :cleanup => lambda {
+        kpartxd(name, mount_point_obj)
+      }
+    })
+
+    part_name = partition_name(name, mount_point_obj)
+    run_task(name, "mount #{part_name} on #{dir}", {
       :task => lambda {
         sleep 1
-        cmd "mount /dev/mapper/#{partition_name(name, mount_point_obj)} #{dir}"
+        cmd "mount /dev/mapper/#{part_name} #{dir}"
       },
-      :on_error => lambda {
-        kpartxd(name, mount_point_obj)
-        FileUtils.rmdir(dir) if temp_mountpoint and dir_existed_at_start
+      :cleanup => lambda {
+        cmd "umount #{dir}"
       }
     })
 
@@ -186,22 +199,28 @@ module Provision::Storage::Local
     dir_existed_at_start = mount_point_obj.get(:dir_existed_at_start)
 
     underscore_name = underscore_name(name, mount_point_obj.name)
-    run_task(name, {
+    part_name = partition_name(name, mount_point_obj)
+
+    run_task(name, "undo mount #{part_name} on #{dir}", {
       :task => lambda {
         sleep 1
         cmd "umount #{dir}"
       },
-      :on_error => lambda {
-        kpartxd(name, mount_point_obj)
-        FileUtils.rmdir(dir) if delete_mountpoint and dir_existed_at_start
-      }
+      :remove_cleanup => "mount #{part_name} on #{dir}"
     })
 
-    run_task(name, {
+    run_task(name, "undo create partition device nodes #{underscore_name}", {
       :task => lambda {
         kpartxd(name, mount_point_obj)
+      },
+      :remove_cleanup => "create partition device nodes #{underscore_name}"
+    })
+
+    run_task(name, "undo make directory #{temp_mountpoint}", {
+      :task => lambda {
         FileUtils.rmdir(dir) if delete_mountpoint and dir_existed_at_start
-      }
+      },
+      :remove_cleanup => "make directory #{temp_mountpoint}",
     })
 
     mount_point_obj.unset(:dir_existed_at_start)

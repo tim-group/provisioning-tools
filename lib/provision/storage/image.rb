@@ -14,12 +14,12 @@ class Provision::Storage::Image < Provision::Storage
     underscore_name = underscore_name(name, mount_point_obj.name)
     size = mount_point_obj.config[:size]
     raise "Image file #{device(underscore_name)} already exists" if File.exist?("#{device(underscore_name)}")
-    run_task(name, {
+    run_task(name, "create #{underscore_name}", {
       :task => lambda {
         cmd "qemu-img create #{device(underscore_name)} #{size}"
       },
       :cleanup => lambda {
-        remove(name, mount_point)
+        remove(name, mount_point_obj.name)
       }
     })
   end
@@ -27,7 +27,7 @@ class Provision::Storage::Image < Provision::Storage
   def grow_filesystem(name, mount_point_obj)
     underscore_name = underscore_name(name, mount_point_obj.name)
     size = mount_point_obj.config[:size]
-    run_task(name, {
+    run_task(name, "grow #{underscore_name}", {
       :task => lambda {
         cmd "qemu-img resize #{device(underscore_name)} #{size}"
       },

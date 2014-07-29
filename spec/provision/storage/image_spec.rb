@@ -33,7 +33,7 @@ describe Provision::Storage::Image do
     it 'should create an empty file' do
       device_name = "#{@tmpdir}/ok.img"
       mount_point_obj = Provision::Storage::Mount_point.new('/', { :size => '1M' })
-      @storage_type.create('ok', mount_point_obj).should eql true
+      @storage_type.create('ok', mount_point_obj)
       File.exist?(device_name).should eql true
       File.size(device_name).should eql 1048576 #1M
       FileUtils.remove_entry_secure(device_name)

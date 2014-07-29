@@ -37,11 +37,14 @@ class Provision::Core::ProvisioningService
           storage_xml = @storage_service.spec_to_xml(spec[:hostname])
           @vm_service.define_vm(spec, storage_xml)
           @storage_service.prepare_storage(spec[:hostname], spec[:storage], spec[:temp_dir])
+          @logger.debug("calling build image")
           @image_service.build_image(spec[:template], spec)
           @storage_service.finish_preparing_storage(spec[:hostname], spec[:temp_dir])
         rescue Exception => e
           begin
             @storage_service.cleanup(spec[:hostname])
+          rescue Exception => f
+            @logger.debug("Problem occurred during cleanup, exception was: #{f.inspect}")
           ensure
             raise e
           end
