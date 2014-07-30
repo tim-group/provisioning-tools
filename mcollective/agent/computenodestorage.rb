@@ -42,6 +42,14 @@ module MCollective
         f.close
         lv_data
       end
+      def get_allocation_disabled_fact_value()
+        allocation_disabled = false
+        if File.exist?('/etc/facts.d/allocation_disabled.fact')
+          contents = File.read('/etc/facts.d/allocation_disabled.fact')
+          allocation_disabled = contents.split('=').last.rstrip!
+        end
+        allocation_disabled.to_s
+      end
 
       def df_for_image_path(image_path)
         raise "Image path #{image_path} does not exist" unless File.directory?(image_path)
@@ -60,7 +68,7 @@ module MCollective
         line = f.readlines.first
         size = line.match(/^(\d+).+img$/).captures.first
         f.close
-        size
+        size.to_f
       end
 
       def get_images_for_image_path(image_path)
@@ -84,10 +92,13 @@ module MCollective
             reply[storage_type] = get_vg_data(storage[storage_type]['options']['vg'])
             reply[storage_type][:arch] = storage_type_arch
             reply[storage_type][:existing_storage] = get_lv_data_for_vg(storage[storage_type]['options']['vg'])
+            reply[storage_type][:allocation_disabled] = get_allocation_disabled_fact_value
+
           when 'Image'
             reply[storage_type] = df_for_image_path(storage[storage_type]['options']['image_path'])
             reply[storage_type][:arch] = storage_type_arch
             reply[storage_type][:existing_storage] = get_images_for_image_path(storage[storage_type]['options']['image_path'])
+            reply[storage_type][:allocation_disabled] = get_allocation_disabled_fact_value
           else
             raise "Unsure how to deal with architecture: #{arch}"
           end
