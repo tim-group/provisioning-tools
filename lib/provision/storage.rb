@@ -63,8 +63,13 @@ class Provision::Storage
         @@cleanup_tasks[name][id].call
       end
     end
-    @@cleanup_tasks_order[name] = []
-    @@cleanup_tasks[name] = {}
+    finished(name)
     @@logger.debug("finished cleanup for '#{name}'")
+  end
+
+  def self.finished(name)
+    @@cleanup_tasks_order.delete name
+    @@cleanup_tasks.delete name
+    @@executed_tasks.delete name
   end
 end

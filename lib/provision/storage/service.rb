@@ -29,6 +29,7 @@ class Provision::Storage::Service
   def finish_preparing_storage(name, temp_dir)
     create_fstab(name, temp_dir)
     unmount_filesystems(name)
+    Provision::Storage.finished(name)
   end
 
   def clean_storage(name, storage_spec)
