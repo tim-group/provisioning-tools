@@ -58,25 +58,9 @@ module MCollective
         raise "Image #{image} does not exist" unless File.exists?(image)
         f = open("|du --apparent-size #{image}")
         line = f.readlines.first
-        size = line.match(/^(\d+)\s+#{image}/).captures.first
+        size = line.match(/^(\d+).+img$/).captures.first
         f.close
-        KB_to_GB(size)
-      end
-
-      def KB_to_GB(value)
-        ((value.to_f / (1024*1024) * 100).round / 100.0)
-      end
-
-      def convert_hash_values_from_KB_to_GB(result_hash)
-        gb_hash = result_hash.each.inject({}) do |result, (key, value)|
-          if key == :used
-            result[key] = KB_to_GB(value).to_f.ceil
-          else
-            result[key] = KB_to_GB(value).to_f.floor
-          end
-          result
-        end
-        return gb_hash
+        size
       end
 
       def get_images_for_image_path(image_path)
@@ -101,8 +85,7 @@ module MCollective
             reply[storage_type][:arch] = storage_type_arch
             reply[storage_type][:existing_storage] = get_lv_data_for_vg(storage[storage_type]['options']['vg'])
           when 'Image'
-            df_results = df_for_image_path(storage[storage_type]['options']['image_path'])
-            reply[storage_type] = convert_hash_values_from_KB_to_GB(df_results)
+            reply[storage_type] = df_for_image_path(storage[storage_type]['options']['image_path'])
             reply[storage_type][:arch] = storage_type_arch
             reply[storage_type][:existing_storage] = get_images_for_image_path(storage[storage_type]['options']['image_path'])
           else
