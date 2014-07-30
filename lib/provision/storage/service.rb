@@ -1,12 +1,11 @@
 require 'fileutils'
 require 'provision/storage'
 require 'provision/storage/config'
-require 'provision/log'
+require 'provision/logger'
 
 class Provision::Storage::Service
-  include Provision::Log
-
   attr_accessor :default_persistence_options
+
   def initialize(storage_options)
     @storage_types = {}
     storage_options.each do |storage_type, settings|
@@ -17,7 +16,7 @@ class Provision::Storage::Service
       instance = Provision::Storage.const_get(arch).new(options)
       @storage_types[storage_type] = instance
       @storage_configs = {}
-
+      @log = Provision::Logger.get_logger('storage')
     end
   end
 
@@ -64,10 +63,10 @@ class Provision::Storage::Service
       raise 'Persistent options not found' unless mount_point_obj.config.has_key?(:persistence_options)
       storage = get_storage(type)
       if persistent
-        log.debug "Checking existing persistent storage for #{mount_point} on #{name}"
+        @log.debug "Checking existing persistent storage for #{mount_point} on #{name}"
         storage.check_persistent_storage(name, mount_point_obj)
       else
-        log.debug "Creating storage for #{mount_point} on #{name}"
+        @log.debug "Creating storage for #{mount_point} on #{name}"
         storage.create(name, mount_point_obj)
         mount_point_obj.set(:newly_created, true)
       end
@@ -127,9 +126,9 @@ class Provision::Storage::Service
       persistent = mount_point_obj.config[:persistent]
       storage = get_storage(type)
       if persistent
-        log.info "Unable to remove storage for #{mount_point} on #{name}, storage is marked as persistent, "
+        @log.info "Unable to remove storage for #{mount_point} on #{name}, storage is marked as persistent, "
       else
-        log.debug "Removing storage for #{mount_point} on #{name}"
+        @log.debug "Removing storage for #{mount_point} on #{name}"
         storage.remove(name, mount_point)
       end
     end
@@ -173,7 +172,7 @@ class Provision::Storage::Service
             fstype = prepare_options[:type]
           rescue NoMethodError=>e
             if e.name == '[]'.to_sym
-              log.debug "fstype not found, using default value: #{fstype}"
+              @log.debug "fstype not found, using default value: #{fstype}"
             else
               raise e
             end
