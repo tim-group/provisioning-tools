@@ -25,7 +25,12 @@ class Provision::Storage
       @@logger.debug("Running task '#{identifier}' for '#{name}'")
       @@executed_tasks[name] = [] if @@executed_tasks[name].nil?
       @@executed_tasks[name] << identifier
-      task_hash[:task].call
+      begin
+        task_hash[:task].call
+      rescue Exception => e
+        log.debug("Run task #{identifier} on host #{name} failed with: #{e.inspect}.")
+        raise e
+      end
     end
 
     @@cleanup_tasks[name] = {} if @@cleanup_tasks[name].nil?
@@ -60,7 +65,12 @@ class Provision::Storage
       end
       @@cleanup_tasks_order[name].reverse.each do |id|
         @@logger.debug("starting cleanup for '#{name}' with identifier '#{id}'")
-        @@cleanup_tasks[name][id].call
+        begin
+          @@cleanup_tasks[name][id].call
+        rescue Exception => e
+          log.debug("Run task #{identifier} on host #{name} failed with: #{e.inspect}.")
+          raise e
+        end
       end
     end
     finished(name)

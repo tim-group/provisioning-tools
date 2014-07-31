@@ -17,6 +17,7 @@ module Provision::Image::Commands
 
     exit_status = $?
     if exit_status != 0
+      log.debug("command #{cmd} returned non-zero error code #{exit_status}, output: #{output}")
       raise "command #{cmd} returned non-zero error code #{exit_status}, output: #{output}"
     end
     return output
