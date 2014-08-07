@@ -42,7 +42,7 @@ module Provision::Storage::Local
     run_task(name, "create partition #{underscore_name}", {
       :task => lambda {
         cmd "parted -s #{device(underscore_name)} mklabel msdos"
-        cmd "parted -s #{device(underscore_name)} mkpart primary ext3 2048s 100%"
+        cmd "parted -s #{device(underscore_name)} mkpart primary #{fs_type} 2048s 100%"
       }
     })
 
