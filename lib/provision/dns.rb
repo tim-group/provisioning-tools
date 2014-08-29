@@ -98,7 +98,7 @@ class Provision::DNSNetwork
        while !try_add_reverse_lookup(ip, hostname, all_hostnames)
          ip = IPAddr.new(ip.to_i + 1, Socket::AF_INET)
          if ip >= max_ip
-           raise("Ran out of ips")
+           raise("Ran out of IP Addresses for #{hostname} - Maximum IP reached: #{@max_ip}")
          end
        end
        add_forward_lookup(ip, hostname)
