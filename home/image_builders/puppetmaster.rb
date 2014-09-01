@@ -27,9 +27,9 @@ echo 'Run ntpdate' | logger
 /usr/sbin/ntpdate -s ci-1.youdevise.com | logger 2>&1
 /etc/init.d/ntp start | logger 2>&1
 echo 'Run puppet apply' | logger
-/usr/bin/puppet apply --pluginsync --modulepath=/etc/puppet/modules --logdest=syslog /etc/puppet/manifests/site.pp
+/usr/bin/puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/modules --logdest=syslog /etc/puppet/manifests/site.pp
 /etc/init.d/apache2-puppetmaster restart 2>&1 | logger
-puppet agent --debug --waitforcert 10 --onetime 2>&1 | tee /seed/init.log
+puppet agent --debug --verbose --waitforcert 10 --onetime 2>&1 | tee /seed/init.log
 echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local"
     }
   }
