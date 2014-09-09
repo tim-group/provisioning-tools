@@ -35,7 +35,20 @@ class Provision::Storage::LVM < Provision::Storage
 
   def remove(name, mount_point)
     underscore_name = underscore_name(name, mount_point)
-    cmd "lvremove -f #{device(underscore_name)}" if File.exists?(device(underscore_name))
+    exception = nil
+    100.times do |i|
+      begin
+        output = cmd "lvremove -f #{device(underscore_name)}" if File.exists?(device(underscore_name))
+      rescue Exception => e
+        exception = e if i >= 99
+      end
+      return output unless File.exists?(device(underscore_name))
+    end
+    unless exception.nil?
+      raise exception
+    else
+      raise "Tried to lvremove but failed 100 times and didn't raise an exception!?"
+    end
   end
 
   def partition_name(name, mount_point_obj)

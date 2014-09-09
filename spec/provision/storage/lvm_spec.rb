@@ -45,17 +45,37 @@ describe Provision::Storage::LVM do
   end
 
   it 'runs lvremove when trying to remove a VMs storage' do
-    File.stub(:exists?) do |arg|
-      case arg
-      when '/dev/main/oy-deletedb-001_var_lib_mysql'
-        true
-      end
-    end
+    File.stub(:exists?).and_return(true, false)
     @storage_type.stub(:cmd) do |arg|
       true
     end
+
     @storage_type.should_receive(:cmd).with('lvremove -f /dev/main/oy-deletedb-001_var_lib_mysql')
     @storage_type.remove('oy-deletedb-001', '/var/lib/mysql')
+  end
+
+  it 'runs lvremove over and over when trying to remove a VMs storage if removing the storage fails' do
+    File.stub(:exists?).and_return(true)
+    @storage_type.stub(:cmd) do |arg|
+      raise "fake exception"
+    end
+
+    @storage_type.should_receive(:cmd).with('lvremove -f /dev/main/oy-deletedb-001_var_lib_mysql')
+    expect {
+      @storage_type.remove('oy-deletedb-001', '/var/lib/mysql')
+    }.to raise_error("fake exception")
+  end
+
+  it 'runs lvremove 100 times if removing the storage fails every time' do
+    File.stub(:exists?).and_return(true)
+    @storage_type.stub(:cmd).and_return(true)
+
+    100.times do
+      @storage_type.should_receive(:cmd).with('lvremove -f /dev/main/oy-deletedb-001_var_lib_mysql')
+    end
+    expect {
+      @storage_type.remove('oy-deletedb-001', '/var/lib/mysql')
+    }.to raise_error("Tried to lvremove but failed 100 times and didn't raise an exception!?")
   end
 
   describe 'grow' do
