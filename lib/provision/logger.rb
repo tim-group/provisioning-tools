@@ -8,7 +8,7 @@ class Provision::Logger
         log_dir = '/tmp/provisioning-tools/log'
         FileUtils.mkdir_p(log_dir)
       end
-      @@logger = Logger.new("#{log_dir}/#{log_id}.log")
+      @@logger = Logger.new("#{log_dir}/#{log_id}.log", 'weekly')
     end
     @@logger
   end

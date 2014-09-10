@@ -95,7 +95,7 @@ class Provision::Core::MachineSpec
   end
 
   def get_logger(fn)
-    Logger.new("#{@log_dir}/#{fn}-#{@thread_number}.log")
+    Logger.new("#{@log_dir}/#{fn}-#{@thread_number}.log", 'weekly')
   end
 
   def networks
