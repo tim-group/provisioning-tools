@@ -31,19 +31,35 @@ option_parser.parse!
 if (required_options - options.keys).empty?
 
   spec =  {
-    :master_image_url => options[:master_image_url],
+#    :master_image_url => options[:master_image_url],
     :hostname  => options[:image_name].gsub(/.img$/, ""), # Take advantage of convention of using hostname as identity
     :networks  => [:mgmt],
     :qualified_hostnames => {
       :mgmt => "#{options[:image_name]}.mgmt.dev.net.local"
-    }
+    },
+    :storage => {
+      '/'.to_sym => {
+        :type => 'os',
+        :size => '15G',
+        :prepare => {
+          :method =>  'image',
+          :options => {
+            :path => options[:master_image_url],
+            :resize => false,
+            :create_in_fstab => false,
+          }
+        }
+      }
+    },
+    :template => options[:win_version] + "gold",
   }
 
   if options[:win_version] == "xp"
-    spec[:kvm_template] = "kvm_no_virtio"
+    spec[:storage][:/][:size] = '8G'
+    spec[:storage][:/][:prepare][:options][:virtio] = false
   end
 
-  result = Provision::Factory.new.windows_gold_image(spec,options[:win_version] + "gold")
+  result = Provision::Factory.new.windows_gold_image(spec)
 
 else
   puts option_parser.banner

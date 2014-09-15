@@ -17,7 +17,7 @@ define "xpgold" do
   end
 
   def start_menu_location
-    "#{mountpoint}/Documents\ and\ Settings/All Users/Start\ Menu/Programs/Startup/"
+    "#{spec[:temp_dir]}/Documents\ and\ Settings/All Users/Start\ Menu/Programs/Startup/"
   end
 
   case config[:vm_storage_type]
@@ -43,13 +43,13 @@ define "xpgold" do
   run("install sysprep") {
     cmd "rm \"#{start_menu_location}\"/*"
     FileUtils.mkdir_p("#{mountpoint}/settings")
-    FileUtils.cp_r("#{xp_files}/support/", "#{mountpoint}/")
-    FileUtils.cp_r("#{xp_files}/sysprep/", "#{mountpoint}/")
+    FileUtils.cp_r("#{xp_files}/support/", "#{spec[:temp_dir]}/")
+    FileUtils.cp_r("#{xp_files}/sysprep/", "#{spec[:temp_dir]}/")
     FileUtils.cp "#{xp_files}/startmenu/dosysprep.bat", start_menu_location
   }
 
   run("stamp gold image build date") {
-    tmp_date_file="#{mountpoint}/gold-build-date.txt"
+    tmp_date_file="#{spec[:temp_dir]}/gold-build-date.txt"
     `date +"%m-%d-%y.%k:%M" > #{tmp_date_file}`
   }
 end

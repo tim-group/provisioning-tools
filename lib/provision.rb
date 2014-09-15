@@ -126,18 +126,12 @@ class Provision::Factory
     image_service.build_image("shrink", spec)
   end
 
-  def windows_gold_image(spec_hash, template)
-    spec_hash[:thread_number] = 0
-    spec = Provision::Core::MachineSpec.new(spec_hash)
-    targetdir = File.join(File.dirname(__FILE__), "../target")
-    image_service = Provision::Image::Service.new(:configdir => home("image_builders"), :targetdir => targetdir, :config => @config )
-    image_service.build_image(template, spec)
-
-    virsh.define_vm(spec)
-    puts "starting gold image - prepare for sysprep"
-    virsh.start_vm(spec)
+  def windows_gold_image(spec_hash)
+#    targetdir = File.join(File.dirname(__FILE__), "../target")
+    provisioning_service.provision_vm(spec_hash)
 
     puts "waiting until gold image has shutdown"
+    spec = Provision::Core::MachineSpec.new(spec_hash)
     virsh.wait_for_shutdown(spec, 300)
 
     if not virsh.is_running(spec)
