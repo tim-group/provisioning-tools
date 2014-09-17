@@ -86,7 +86,6 @@ task :package_main do
     "-t", "deb",
     "-n", "provisioning-tools",
     "-d", "provisioning-tools-gold-image",
-    "-d", 'qemu-utils',
     "provisioning-tools-*.gem"
 
   sh commandLine.join(' ')
