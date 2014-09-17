@@ -8,6 +8,9 @@ define 'puppetmaster' do
   run('clone puppet') {
     cmd "rm -rf #{spec[:temp_dir]}/etc/puppet"
     cmd "git clone http://git.youdevise.com/git/puppet #{spec[:temp_dir]}/etc/puppet"
+    cmd "cp #{spec[:temp_dir]}/etc/puppet/modules/puppetmaster/files/hiera.yaml #{spec[:temp_dir]}/etc/puppet/hiera.yaml"
+    cmd "cp #{spec[:temp_dir]}/etc/puppet/modules/puppetmaster/files/auth.conf #{spec[:temp_dir]}/etc/puppet/auth.conf"
+    cmd "cp #{spec[:temp_dir]}/etc/puppet/modules/puppetmaster/files/routes.yaml #{spec[:temp_dir]}/etc/puppet/routes.yaml"
   }
 
   run('install ruby') {
