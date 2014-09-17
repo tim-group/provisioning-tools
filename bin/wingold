@@ -59,7 +59,7 @@ if (required_options - options.keys).empty?
     spec[:storage][:/][:prepare][:options][:virtio] = false
   end
 
-  result = Provision::Factory.new.windows_gold_image(spec)
+  result = Provision::Factory.new(:configfile => 'wingold.conf').windows_gold_image(spec)
 
 else
   puts option_parser.banner

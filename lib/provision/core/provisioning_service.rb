@@ -16,18 +16,19 @@ class Provision::Core::ProvisioningService
     @logger = options[:logger] || Logger.new(STDERR)
   end
 
-  def provision_vm(spec_hash)
+  def provision_vm(spec_hash, with_numbering=true)
     spec_hash = @machinespec_defaults.merge(spec_hash)
     spec = Provision::Core::MachineSpec.new(spec_hash)
 
-
     if not @vm_service.is_defined(spec_hash)
       @logger.info("Provisioning a newly allocated VM")
-      @logger.info("Getting numbering for spec #{spec.inspect}")
-      # FIXME - We should pull this step out to a rake task in stacks as per 'free' later..
-      spec[:networking] =  @numbering_service.allocate_ips_for(spec)
-      @logger.info("Numbering is #{spec[:networking].inspect}")
-      @numbering_service.add_cnames_for(spec)
+      if with_numbering
+        @logger.info("Getting numbering for spec #{spec.inspect}")
+        # FIXME - We should pull this step out to a rake task in stacks as per 'free' later..
+        spec[:networking] =  @numbering_service.allocate_ips_for(spec)
+        @logger.info("Numbering is #{spec[:networking].inspect}")
+        @numbering_service.add_cnames_for(spec)
+      end
       if @storage_service.nil?
         @image_service.build_image(spec[:template], spec)
         @vm_service.define_vm(spec)

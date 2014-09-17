@@ -128,7 +128,7 @@ class Provision::Factory
 
   def windows_gold_image(spec_hash)
 #    targetdir = File.join(File.dirname(__FILE__), "../target")
-    provisioning_service.provision_vm(spec_hash)
+    provisioning_service.provision_vm(spec_hash, false)
 
     puts "waiting until gold image has shutdown"
     spec = Provision::Core::MachineSpec.new(spec_hash)
