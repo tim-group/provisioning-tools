@@ -1,57 +1,8 @@
 require 'provision/image/catalogue'
 require 'provision/image/commands'
 
-# TODO:
-# This file is legacy once gold images are built in a normal stacks way
-# Its currecntly used by the bin/gold script, which will also go away.
-# Please clean it up once that happens :)
-
-define "ubuntuprecise" do
+define "ubuntu-precise" do
   extend Provision::Image::Commands
-
-  run("loopback devices") {
-    cmd "mkdir #{spec[:temp_dir]}"
-    cmd "kvm-img create -fraw #{spec[:image_path]} 3G"
-    cmd "losetup /dev/#{spec[:loop0]} #{spec[:image_path]}"
-    cmd "parted -sm /dev/#{spec[:loop0]} mklabel msdos"
-    suppress_error.cmd "parted -sm /dev/#{spec[:loop0]} mkpart primary ext3 1 100%"
-    cmd "kpartx -a -v /dev/#{spec[:loop0]}"
-    cmd "mkfs.ext4 /dev/mapper/#{spec[:loop0]}p1"
-  }
-
-  cleanup {
-    keep_doing {
-    suppress_error.cmd "kpartx -d /dev/#{spec[:loop0]}"
-  }.until {`dmsetup ls | grep #{spec[:loop0]}p1 | wc -l`.chomp == "0"}
-
-  cmd "udevadm settle"
-
-  keep_doing {
-    suppress_error.cmd "losetup -d /dev/#{spec[:loop0]}"
-  }.until {`losetup -a | grep /dev/#{spec[:loop0]} | wc -l`.chomp == "0"}
-
-  keep_doing {
-    suppress_error.cmd "umount #{spec[:temp_dir]}"
-    suppress_error.cmd "rmdir #{spec[:temp_dir]}"
-  }.until {`ls -d  #{spec[:temp_dir]} 2> /dev/null | wc -l`.chomp == "0"}
-
-  cmd "udevadm settle"
-  cmd "rmdir #{spec[:temp_dir]}"
-  }
-
-  run("loopback devices 2") {
-    cmd "losetup /dev/#{spec[:loop1]} /dev/mapper/#{spec[:loop0]}p1"
-    cmd "mount /dev/#{spec[:loop1]} #{spec[:temp_dir]}"
-  }
-
-  cleanup {
-    keep_doing {
-      suppress_error.cmd "umount -d /dev/#{spec[:loop1]}"
-      suppress_error.cmd "losetup -d /dev/#{spec[:loop1]}"
-    }.until {
-      `losetup -a | grep /dev/#{spec[:loop1]} | wc -l`.chomp == "0"
-    }
-  }
 
   run("running debootstrap") {
     cmd "debootstrap --arch amd64 --exclude=resolvconf,ubuntu-minimal precise #{spec[:temp_dir]} http://aptproxy:3142/ubuntu"
@@ -251,13 +202,17 @@ sun-java6-jre   shared/present-sun-dlj-v1-1     note
     chroot "apt-get -y --force-yes update"
     apt_install "linux-image-virtual"
     apt_install "grub-pc"
+    puts "vm_storage_type: #{config[:vm_storage_type]}"
     cmd "mkdir -p #{spec[:temp_dir]}/boot/grub"
-    cmd "tune2fs -Lmain /dev/#{spec[:loop1]}"
+      host_device = cmd("readlink -f -n #{spec[:host_device]}")
+      host_device_partition = cmd("readlink -f -n #{spec[:host_device_partition]}")
 
-    open("#{spec[:temp_dir]}/boot/grub/device.map", 'w') { |f|
-      f.puts "(hd0) /dev/#{spec[:loop0]}"
-      f.puts "(hd0,1) /dev/#{spec[:loop1]}"
-    }
+    cmd "tune2fs -Lmain #{host_device_partition}"
+
+#    open("#{spec[:temp_dir]}/boot/grub/device.map", 'w') { |f|
+#      f.puts "(hd0) #{host_device}"
+#      f.puts "(hd0,1) #{host_device_partition}"
+#    }
 
     find_kernel = `ls -c #{spec[:temp_dir]}/boot/vmlinuz-* | head -1`.chomp
     find_kernel =~ /vmlinuz-(.+)/
@@ -265,7 +220,7 @@ sun-java6-jre   shared/present-sun-dlj-v1-1     note
 
     kernel = "/boot/vmlinuz-#{kernel_version}"
     initrd = "/boot/initrd.img-#{kernel_version}"
-    uuid = `blkid -o value /dev/mapper/#{spec[:loop0]}p1 | head -n1`.chomp
+    uuid = `blkid -o value #{host_device_partition} | head -n1`.chomp
 
     open("#{spec[:temp_dir]}/boot/grub/grub.cfg", 'w') { |f|
       f.puts "
@@ -281,7 +236,8 @@ sun-java6-jre   shared/present-sun-dlj-v1-1     note
           }"
     }
 
-    chroot "grub-install --no-floppy --grub-mkdevicemap=/boot/grub/device.map /dev/#{spec[:loop0]}"
+#    chroot "grub-install --no-floppy --grub-mkdevicemap=/boot/grub/device.map #{host_device}"
+    chroot "grub-install --no-floppy #{host_device}"
   }
 
   run("remove cached packages") {
