@@ -1,0 +1,66 @@
+#!/usr/bin/ruby
+require 'yaml'
+require 'optparse'
+$: << File.join(File.dirname(__FILE__), "..", "lib")
+
+require 'provision'
+require 'pp'
+
+required_options = [:master_image_url, :win_version, :image_name]
+options = {}
+
+option_parser = OptionParser.new do |opts|
+  opts.banner = "build a gold image here"
+
+  opts.on("-m", "--master_image_url URL", "specify the url to download the master image") do |master_image_url|
+    options[:master_image_url] = master_image_url
+  end
+
+  opts.on("-w", "--windows_version [xp|win7]", "specify the version of Windows that is on the master image") do |version|
+    options[:win_version] = version
+  end
+
+  opts.on("-n", "--image_name NAME", "specify what we call the resulting image") do |image_name|
+    options[:image_name] = image_name
+  end
+
+end
+
+option_parser.parse!
+
+if (required_options - options.keys).empty?
+
+  spec =  {
+#    :master_image_url => options[:master_image_url],
+    :hostname  => options[:image_name].gsub(/.img$/, ""), # Take advantage of convention of using hostname as identity
+    :networks  => [:mgmt],
+    :qualified_hostnames => {
+      :mgmt => "#{options[:image_name]}.mgmt.dev.net.local"
+    },
+    :storage => {
+      '/'.to_sym => {
+        :type => 'os',
+        :size => '15G',
+        :prepare => {
+          :method =>  'image',
+          :options => {
+            :path => options[:master_image_url],
+            :resize => false,
+            :create_in_fstab => false,
+          }
+        }
+      }
+    },
+    :template => options[:win_version] + "gold",
+  }
+
+  if options[:win_version] == "xp"
+    spec[:storage][:/][:size] = '8G'
+    spec[:storage][:/][:prepare][:options][:virtio] = false
+  end
+
+  result = Provision::Factory.new(:configfile => 'wingold.conf').windows_gold_image(spec)
+
+else
+  puts option_parser.banner
+end

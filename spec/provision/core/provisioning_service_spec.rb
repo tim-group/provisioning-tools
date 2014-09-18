@@ -184,8 +184,6 @@ describe Provision::Core::ProvisioningService do
       @storage_service.should_receive(:spec_to_xml).with("vmx1").ordered
       @vm_service.should_receive(:define_vm).with(kind_of(Provision::Core::MachineSpec), "some xml").ordered
       @storage_service.should_receive(:prepare_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
-      @storage_service.should_receive(:get_host_device).with('vmx1', :/).ordered
-      @storage_service.should_receive(:get_host_device_partition).with('vmx1', :/).ordered
       @image_service.should_receive(:build_image).with("ubuntuprecise", anything).ordered
       @storage_service.should_receive(:finish_preparing_storage).with("vmx1", "/tmp/provisioning-tools/build/vmx1").ordered
       @vm_service.should_receive(:start_vm).ordered
@@ -206,8 +204,6 @@ describe Provision::Core::ProvisioningService do
       @storage_service.should_receive(:spec_to_xml).with("vmx1").ordered
       @vm_service.should_receive(:define_vm).ordered
       @storage_service.should_receive(:prepare_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
-      @storage_service.should_receive(:get_host_device).with('vmx1', :/).ordered
-      @storage_service.should_receive(:get_host_device_partition).with('vmx1', :/).ordered
       @image_service.should_receive(:build_image).with("ubuntuprecise", anything).ordered
       @storage_service.should_receive(:finish_preparing_storage).with("vmx1", "/tmp/provisioning-tools/build/vmx1").ordered
       @vm_service.should_receive(:start_vm).ordered
@@ -239,8 +235,6 @@ describe Provision::Core::ProvisioningService do
       @storage_service.should_receive(:spec_to_xml).with("vmx1").ordered
       @vm_service.should_receive(:define_vm).ordered
       @storage_service.should_receive(:prepare_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
-      @storage_service.should_receive(:get_host_device).with('vmx1', :/).ordered
-      @storage_service.should_receive(:get_host_device_partition).with('vmx1', :/).ordered
       @image_service.should_receive(:build_image).with("ubuntuprecise", anything).ordered
       @storage_service.should_receive(:finish_preparing_storage).with("vmx1", "/tmp/provisioning-tools/build/vmx1").ordered
       @vm_service.should_receive(:start_vm).ordered
@@ -264,8 +258,6 @@ describe Provision::Core::ProvisioningService do
       @storage_service.should_receive(:spec_to_xml).with("vmx1").ordered
       @vm_service.should_receive(:define_vm).ordered
       @storage_service.should_receive(:prepare_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
-      @storage_service.should_receive(:get_host_device).with('vmx1', :/).ordered
-      @storage_service.should_receive(:get_host_device_partition).with('vmx1', :/).ordered
       @image_service.should_receive(:build_image).with("ubuntuprecise", anything).ordered
       @storage_service.should_receive(:finish_preparing_storage).with("vmx1", "/tmp/provisioning-tools/build/vmx1").ordered
       @vm_service.should_receive(:start_vm).ordered

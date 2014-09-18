@@ -36,20 +36,6 @@ class Provision::Storage::Image < Provision::Storage
     check_and_resize_filesystem(name, mount_point_obj)
   end
 
-  def shrink_filesystem(name, mount_point_obj)
-    check_and_resize_filesystem(name, mount_point_obj, :minimum)
-    rebuild_partition(name, mount_point_obj, :minimum)
-    underscore_name = underscore_name(name, mount_point_obj.name)
-
-    newsize=`parted -sm #{device(underscore_name)} print | grep -e '^1:' | awk -F ':' '{ print $3 }'`
-
-    run_task(name, "shrink image #{underscore_name}", {
-      :task => lambda {
-        cmd "qemu-img resize #{device(underscore_name)} #{newsize}"
-      },
-    })
-  end
-
   def device(underscore_name)
     "#{@image_path}/#{underscore_name}.img"
   end

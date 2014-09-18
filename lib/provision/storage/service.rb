@@ -29,7 +29,6 @@ class Provision::Storage::Service
   def finish_preparing_storage(name, temp_dir)
     create_fstab(name, temp_dir)
     unmount_filesystems(name)
-    post_unmount_tasks(name)
     Provision::Storage.finished(name)
   end
 
@@ -47,18 +46,6 @@ class Provision::Storage::Service
 
   def get_storage(type)
     return @storage_types[type]
-  end
-
-  def get_host_device(name, mount_point)
-    mount_point_obj = @storage_configs[name].mount_point(mount_point)
-    storage = get_storage(mount_point_obj.config[:type].to_sym)
-    storage.device(storage.underscore_name(name, mount_point_obj.name))
-  end
-
-  def get_host_device_partition(name, mount_point)
-    mount_point_obj = @storage_configs[name].mount_point(mount_point)
-    storage = get_storage(mount_point_obj.config[:type].to_sym)
-    storage.partition_name(name, mount_point_obj)
   end
 
   def get_mount_point(name, mount_point)
@@ -130,20 +117,6 @@ class Provision::Storage::Service
 
       mount_point_obj.unset(:actual_mount_point)
       mount_point_obj.unset(:temp_mount_point)
-    end
-  end
-
-  def post_unmount_tasks(name)
-    @storage_configs[name].mount_points.reverse.each do |mount_point|
-      mount_point_obj = get_mount_point(name, mount_point)
-
-      type = mount_point_obj.config[:type].to_sym
-      storage = get_storage(type)
-
-      shrink = mount_point_obj.config[:prepare][:options][:shrink_after_unmount]
-      if shrink
-        storage.shrink_filesystem(name, mount_point_obj)
-      end
     end
   end
 

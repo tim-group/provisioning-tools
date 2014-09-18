@@ -38,14 +38,6 @@ class Provision::Core::ProvisioningService
           storage_xml = @storage_service.spec_to_xml(spec[:hostname])
           @vm_service.define_vm(spec, storage_xml)
           @storage_service.prepare_storage(spec[:hostname], spec[:storage], spec[:temp_dir])
-
-          # FIXME:
-          # Need to get some storage things into the spec, can't do it where spec
-          # is created above because that stuff knows nothing about storage..
-          spec[:host_device] = @storage_service.get_host_device(spec[:hostname], '/'.to_sym)
-          spec[:host_device_partition] = "/dev/mapper/#{@storage_service.get_host_device_partition(spec[:hostname], '/'.to_sym)}"
-          # end FIXME
-
           @logger.debug("calling build image")
           @image_service.build_image(spec[:template], spec)
           @storage_service.finish_preparing_storage(spec[:hostname], spec[:temp_dir])
@@ -59,9 +51,7 @@ class Provision::Core::ProvisioningService
           end
         end
       end
-      unless spec[:dont_start]
-        @vm_service.start_vm(spec)
-      end
+      @vm_service.start_vm(spec)
       true
     else
       raise "failed to launch #{spec_hash[:hostname]} already exists"

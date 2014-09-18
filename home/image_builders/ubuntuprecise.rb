@@ -1,11 +1,6 @@
 require 'provision/image/catalogue'
 require 'provision/image/commands'
 
-# TODO:
-# This file is legacy once gold images are built in a normal stacks way
-# Its currecntly used by the bin/gold script, which will also go away.
-# Please clean it up once that happens :)
-
 define "ubuntuprecise" do
   extend Provision::Image::Commands
 

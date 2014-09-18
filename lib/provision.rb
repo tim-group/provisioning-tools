@@ -126,4 +126,19 @@ class Provision::Factory
     image_service.build_image("shrink", spec)
   end
 
+  def windows_gold_image(spec_hash)
+#    targetdir = File.join(File.dirname(__FILE__), "../target")
+    provisioning_service.provision_vm(spec_hash, false)
+
+    puts "waiting until gold image has shutdown"
+    spec = Provision::Core::MachineSpec.new(spec_hash)
+    virsh.wait_for_shutdown(spec, 300)
+
+    if not virsh.is_running(spec)
+        virsh.undefine_vm(spec)
+    end
+
+    puts "gold image build is complete"
+  end
+
 end
