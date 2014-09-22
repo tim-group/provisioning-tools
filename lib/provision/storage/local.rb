@@ -67,15 +67,50 @@ module Provision::Storage::Local
     })
   end
 
-  def rebuild_partition(name, mount_point_obj)
+  def rebuild_partition(name, mount_point_obj, size=:maximum)
     underscore_name = underscore_name(name, mount_point_obj.name)
     fs_type = mount_point_obj.config[:prepare][:options][:type]
-    run_task(name, "resize partition #{underscore_name}", {
-      :task => lambda {
-        cmd "parted -s #{device(underscore_name)} rm 1"
-        cmd "parted -s #{device(underscore_name)} mkpart primary #{fs_type} 2048s 100%"
-      }
-    })
+
+    case size
+    when :maximum
+      run_task(name, "resize partition #{underscore_name}", {
+        :task => lambda {
+          cmd "parted -s #{device(underscore_name)} rm 1"
+          cmd "parted -s #{device(underscore_name)} mkpart primary #{fs_type} 2048s 100%"
+        }
+      })
+    when :minimum
+      run_task(name, "create partition device nodes #{underscore_name}", {
+        :task => lambda {
+          kpartxa(name, mount_point_obj)
+        },
+        :cleanup => lambda {
+          kpartxd(name, mount_point_obj)
+        }
+      })
+
+      vm_partition_name = partition_name(name, mount_point_obj)
+      blockcount = cmd("dumpe2fs -h /dev/mapper/#{vm_partition_name} | grep -F 'Block count:' | awk -F ':' '{ print $2 }' | sed 's/ //g'").chomp.to_i
+      blocksize = cmd("dumpe2fs -h /dev/mapper/#{vm_partition_name} | grep -F 'Block size:' | awk -F ':' '{ print $2 }' | sed 's/ //g'").chomp.to_i
+      sectors=(blockcount*blocksize/512)+2048
+
+      kpartxd(name, mount_point_obj)
+
+      underscore_name = underscore_name(name, mount_point_obj.name)
+      run_task(name, "resize partition #{underscore_name}", {
+        :task => lambda {
+          cmd "parted -s #{device(underscore_name)} rm 1"
+          cmd "parted -s #{device(underscore_name)} mkpart primary #{fs_type} 2048s #{sectors}s"
+        }
+      })
+
+      run_task(name, "undo create partition device nodes #{underscore_name}", {
+        :task => lambda {
+          kpartxd(name, mount_point_obj)
+        },
+        :remove_cleanup => "create partition device nodes #{underscore_name}",
+      })
+    end
   end
 
   def check_persistent_storage(name, mount_point_obj)
@@ -95,7 +130,7 @@ module Provision::Storage::Local
     end
   end
 
-  def check_and_resize_filesystem(name, mount_point_obj, resize=true)
+  def check_and_resize_filesystem(name, mount_point_obj, resize=:maximum)
     underscore_name = underscore_name(name, mount_point_obj.name)
     run_task(name, "create partition device nodes #{underscore_name}", {
       :task => lambda {
@@ -110,7 +145,16 @@ module Provision::Storage::Local
     run_task(name, "check and resize filesystem #{vm_partition_name}", {
       :task => lambda {
         cmd "e2fsck -f -p /dev/mapper/#{vm_partition_name}"
-        cmd "resize2fs /dev/mapper/#{vm_partition_name}" if resize
+        case resize
+        when :maximum
+          cmd "resize2fs /dev/mapper/#{vm_partition_name}"
+        when :minimum
+          cmd "resize2fs -M /dev/mapper/#{vm_partition_name}"
+        when false
+          # no action
+        else
+          raise "unsure how to deal with resize option: #{resize}"
+        end
       },
     })
 
