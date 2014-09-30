@@ -211,4 +211,13 @@ class Provision::Storage::Service
       end
     end
   end
+
+  # FIXME: This function doens't really work like the others. It was created
+  # as a way to copy from an mcollective agent, because of that there's no spec
+  # to work from, so we have to provide all the details ourself
+  def copy(name, storage_type, mount_point, transport, transport_options)
+    storage = @storage_types[storage_type.to_sym]
+    mount_point_obj = Provision::Storage::Mount_point.new(mount_point, {})
+    storage.copy_to(name, mount_point_obj, transport, transport_options)
+  end
 end

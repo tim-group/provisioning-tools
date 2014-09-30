@@ -317,4 +317,55 @@ describe Provision::Storage::Local do
       @storage_type.check_persistent_storage('oy-foodb-001', mount_point_obj)
     end
   end
+
+  describe 'copying storage' do
+    it 'creates the correct command if provided with valid arguments' do
+      mount_point_obj = Provision::Storage::Mount_point.new('/'.to_sym, {})
+      @storage_type.stub(:cmd) do |arg|
+        arg
+      end
+      transport = 'dd_from_source,gzip,ssh_cmd,gunzip,dd_of,end_ssh_cmd'
+      transport_options = 'ssh_cmd__username:grichards,ssh_cmd__host:grichards-desktop.youdevise.com,dd_of__path:/tmp/something.img'
+      @storage_type.copy_to("test", mount_point_obj, transport, transport_options).should eql("dd if=#{@tmpdir}/test | gzip | ssh grichards@grichards-desktop.youdevise.com 'gunzip | dd of=/tmp/something.img'")
+    end
+
+    it 'blows up if a required transport option is not set' do
+      mount_point_obj = Provision::Storage::Mount_point.new('/'.to_sym, {})
+      @storage_type.stub(:cmd) do |arg|
+        arg
+      end
+      transport = 'dd_from_source,gzip,ssh_cmd,gunzip,dd_of,end_ssh_cmd'
+      transport_options = 'ssh_cmd__username:grichards,ssh_cmd__host:grichards-desktop.youdevise.com'
+      expect {
+      @storage_type.copy_to("test", mount_point_obj, transport, transport_options)
+      }.to raise_error('transport dd_of requires option path')
+    end
+
+    it 'blows up if a transport that expect input is provided no input' do
+      mount_point_obj = Provision::Storage::Mount_point.new('/'.to_sym, {})
+      transport = 'gzip,ssh_cmd,gunzip,dd_of,end_ssh_cmd'
+      transport_options = 'ssh_cmd__username:grichards,ssh_cmd__host:grichards-desktop.youdevise.com'
+      expect {
+        @storage_type.copy_to("test", mount_point_obj, transport, transport_options)
+      }.to raise_error('transport gzip expects input, but previous command start provides no output')
+    end
+
+    it 'blows up if a transport that is not expecting input is provided input' do
+      mount_point_obj = Provision::Storage::Mount_point.new('/'.to_sym, {})
+      transport = 'dd_from_source,dd_from_source'
+      transport_options = ''
+      expect {
+        @storage_type.copy_to("test", mount_point_obj, transport, transport_options)
+      }.to raise_error('transport dd_from_source does not expect any input, but previous command dd_from_source provides output')
+    end
+
+    it 'blows up if a transport option is provided for a transport that is not used' do
+      mount_point_obj = Provision::Storage::Mount_point.new('/'.to_sym, {})
+      transport = 'dd_from_source,dd_of'
+      transport_options = 'dd_of__path:/some/where,ssh_cmd__username:test'
+      expect {
+        @storage_type.copy_to("test", mount_point_obj, transport, transport_options)
+      }.to raise_error('option: username for unused transport: ssh_cmd provided')
+    end
+  end
 end

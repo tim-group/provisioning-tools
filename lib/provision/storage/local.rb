@@ -275,5 +275,84 @@ module Provision::Storage::Local
     return "dev='#{device(underscore_name)}'"
   end
 
-end
+  def copy_to(name, mount_point_obj, transport_string, transport_options)
+    transports = transport_string.split(',')
+    transports.map! do |t|
+      t.to_sym
+    end
 
+    options = {}
+    transports.each do |transport|
+      options[transport] = {}
+    end
+
+    split_opts = transport_options.split(',')
+    split_opts.each do |opt|
+      temp_key, value = opt.split(':')
+      transport, option = temp_key.split('__',2)
+      raise "option: #{option} for unused transport: #{transport} provided" if options[transport.to_sym].nil?
+      options[transport.to_sym][option.to_sym] = value
+    end
+
+    copy_cmd = ""
+    last_cmd = :start
+    last_cmd_provides_output = false
+
+
+    transports.each do |transport|
+      t_options = options[transport]
+      case transport
+      when :dd_from_source
+        raise "transport #{transport} does not expect any input, but previous command #{last_cmd} provides output" if last_cmd_provides_output == true or last_cmd == :ssh_cmd
+        copy_cmd = "#{copy_cmd}dd if=#{device(underscore_name(name, mount_point_obj.name))}"
+        last_cmd_provides_output = true
+      when :dd_of
+        raise "transport #{transport} expects input, but previous command #{last_cmd} provides no output" if last_cmd_provides_output == false and last_cmd != :ssh_cmd
+        if last_cmd_provides_output == true
+          copy_cmd = "#{copy_cmd} | "
+        end
+        [:path].each do |opt|
+          raise "transport #{transport} requires option #{opt}" if t_options[opt].nil?
+        end
+        copy_cmd = "#{copy_cmd}dd of=#{t_options[:path]}"
+        last_cmd_provides_output = false
+      when :gzip
+        raise "transport #{transport} expects input, but previous command #{last_cmd} provides no output" if last_cmd_provides_output == false and last_cmd != :ssh_cmd
+        if last_cmd_provides_output == true
+          copy_cmd = "#{copy_cmd} | "
+        end
+        copy_cmd = "#{copy_cmd}gzip"
+        last_cmd_provides_output = true
+      when :gunzip
+        raise "transport gunzip expects input, but previous command #{last_cmd} provides no output" if last_cmd_provides_output == false and last_cmd != :ssh_cmd
+        if last_cmd_provides_output == true
+          copy_cmd = "#{copy_cmd} | "
+        end
+        copy_cmd = "#{copy_cmd}gunzip"
+        last_cmd_provides_output = true
+      when :ssh_cmd
+        raise "transport #{transport} expects input, but previous command #{last_cmd} provides no output" if last_cmd_provides_output == false
+        [:host, :username].each do |opt|
+          raise "transport #{transport} requires option #{opt}" if t_options[opt].nil?
+        end
+        copy_cmd = "#{copy_cmd} | ssh #{t_options[:username]}@#{t_options[:host]} '"
+        last_cmd_provides_output = false
+      when :end_ssh_cmd
+        raise "transport #{transport} does not expect any input, but previous command #{last_cmd} provides output" if last_cmd_provides_output == true or last_cmd == :ssh_cmd
+        copy_cmd = "#{copy_cmd}'"
+        last_cmd_provides_output = false
+      else
+        raise "Unknown transport: #{transport}"
+      end
+      last_cmd = transport
+    end
+
+    output = nil
+    run_task(name, copy_cmd, {
+      :task => lambda {
+         output = cmd "#{copy_cmd}"
+      }
+    })
+    return output
+  end
+end
