@@ -62,6 +62,13 @@ class Provision::Core::ProvisioningService
       unless spec[:dont_start]
         @vm_service.start_vm(spec)
       end
+      unless spec[:wait_for_shutdown].nil?
+        if spec[:wait_for_shutdown] == true
+          @vm_service.wait_for_shutdown(spec)
+        else
+          @vm_service.wait_for_shutdown(spec, spec[:wait_for_shutdown])
+        end
+      end
       true
     else
       raise "failed to launch #{spec_hash[:hostname]} already exists"
