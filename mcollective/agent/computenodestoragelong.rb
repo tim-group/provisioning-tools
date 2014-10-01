@@ -17,7 +17,6 @@ module MCollective
         source = request[:source]
         transport = request[:transport]
         transport_options = request[:transport_options]
-        data
         begin
           reply.data = copy(source, transport, transport_options)
         rescue Provision::Storage::StorageNotFoundError
