@@ -326,7 +326,7 @@ describe Provision::Storage::Local do
       end
       transport = 'dd_from_source,gzip,ssh_cmd,gunzip,dd_of,end_ssh_cmd'
       transport_options = 'ssh_cmd__username:grichards,ssh_cmd__host:grichards-desktop.youdevise.com,dd_of__path:/tmp/something.img'
-      @storage_type.copy_to("test", mount_point_obj, transport, transport_options).should eql("dd if=#{@tmpdir}/test | gzip | ssh grichards@grichards-desktop.youdevise.com 'gunzip | dd of=/tmp/something.img'")
+      @storage_type.copy_to("test", mount_point_obj, transport, transport_options).should eql("dd if=#{@tmpdir}/test | gzip | ssh -o StrictHostKeyChecking=no grichards@grichards-desktop.youdevise.com 'gunzip | dd of=/tmp/something.img'")
     end
 
     it 'blows up if a required transport option is not set' do

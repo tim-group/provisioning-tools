@@ -335,7 +335,9 @@ module Provision::Storage::Local
         [:host, :username].each do |opt|
           raise "transport #{transport} requires option #{opt}" if t_options[opt].nil?
         end
-        copy_cmd = "#{copy_cmd} | ssh #{t_options[:username]}@#{t_options[:host]} '"
+        copy_cmd = "#{copy_cmd} | ssh"
+        copy_cmd = "#{copy_cmd} -i #{t_options[:key]}" if t_options[:key]
+        copy_cmd = "#{copy_cmd} -o StrictHostKeyChecking=no #{t_options[:username]}@#{t_options[:host]} '"
         last_cmd_provides_output = false
       when :end_ssh_cmd
         raise "transport #{transport} does not expect any input, but previous command #{last_cmd} provides output" if last_cmd_provides_output == true or last_cmd == :ssh_cmd
