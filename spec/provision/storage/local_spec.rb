@@ -319,6 +319,12 @@ describe Provision::Storage::Local do
   end
 
   describe 'copying storage' do
+    before do
+      File.stub(:exists?) do |arg|
+        true
+      end
+    end
+
     it 'creates the correct command if provided with valid arguments' do
       mount_point_obj = Provision::Storage::Mount_point.new('/'.to_sym, {})
       @storage_type.stub(:cmd) do |arg|
@@ -366,6 +372,21 @@ describe Provision::Storage::Local do
       expect {
         @storage_type.copy_to("test", mount_point_obj, transport, transport_options)
       }.to raise_error('option: username for unused transport: ssh_cmd provided')
+    end
+
+    it 'blows up with a storage not found error if the source storage does not exist' do
+      File.stub(:exists?) do |arg|
+        false
+      end
+      @storage_type.stub(:cmd) do |arg|
+        arg
+      end
+      mount_point_obj = Provision::Storage::Mount_point.new('/'.to_sym, {})
+      transport = 'dd_from_source,dd_of'
+      transport_options = 'dd_of__path:/some/where'
+      expect {
+        @storage_type.copy_to("test", mount_point_obj, transport, transport_options)
+      }.to raise_error(Provision::Storage::StorageNotFoundError, "Source device: #{@tmpdir}/test does not exist")
     end
   end
 end

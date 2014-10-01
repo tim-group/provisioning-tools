@@ -7,7 +7,6 @@ module MCollective
     class Computenodestoragelong<RPC::Agent
       def copy(source, transport, transport_options)
         config = Provision::Config.new.get()
-        pp config
         storage_service = Provision::Storage::Service.new(config[:storage])
         name, type, path = source.split(':')
         path = '/' if path.nil?
@@ -18,7 +17,12 @@ module MCollective
         source = request[:source]
         transport = request[:transport]
         transport_options = request[:transport_options]
-        reply.data = copy(source, transport, transport_options)
+        data
+        begin
+          reply.data = copy(source, transport, transport_options)
+        rescue Provision::Storage::StorageNotFoundError
+          reply.data = "Storage: #{source} does not exist here"
+        end
       end
     end
   end

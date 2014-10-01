@@ -83,3 +83,7 @@ class Provision::Storage
     @@executed_tasks.delete name
   end
 end
+
+class Provision::Storage::StorageNotFoundError < StandardError
+end
+

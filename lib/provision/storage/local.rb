@@ -277,7 +277,7 @@ module Provision::Storage::Local
 
   def copy_to(name, mount_point_obj, transport_string, transport_options)
     source_device=device(underscore_name(name, mount_point_obj.name))
-    raise "Source device: #{source_device} does not exist" if File.exists?(source_device)
+    raise Provision::Storage::StorageNotFoundError, "Source device: #{source_device} does not exist" unless File.exists?(source_device)
 
     transports = transport_string.split(',')
     transports.map! do |t|
