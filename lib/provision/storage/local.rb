@@ -276,6 +276,9 @@ module Provision::Storage::Local
   end
 
   def copy_to(name, mount_point_obj, transport_string, transport_options)
+    source_device=device(underscore_name(name, mount_point_obj.name))
+    raise "Source device: #{source_device} does not exist" if File.exists?(source_device)
+
     transports = transport_string.split(',')
     transports.map! do |t|
       t.to_sym
@@ -298,13 +301,12 @@ module Provision::Storage::Local
     last_cmd = :start
     last_cmd_provides_output = false
 
-
     transports.each do |transport|
       t_options = options[transport]
       case transport
       when :dd_from_source
         raise "transport #{transport} does not expect any input, but previous command #{last_cmd} provides output" if last_cmd_provides_output == true or last_cmd == :ssh_cmd
-        copy_cmd = "#{copy_cmd}dd if=#{device(underscore_name(name, mount_point_obj.name))}"
+        copy_cmd = "#{copy_cmd}dd if=#{source_device}"
         last_cmd_provides_output = true
       when :dd_of
         raise "transport #{transport} expects input, but previous command #{last_cmd} provides no output" if last_cmd_provides_output == false and last_cmd != :ssh_cmd
