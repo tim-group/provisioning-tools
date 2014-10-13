@@ -3,6 +3,7 @@ require 'util/symbol_utils'
 module Provision::Image::Commands
 
   def cmd(cmd)
+    start_time = Time.now
     log.debug("running command #{cmd}")
 
     output = ""
@@ -20,6 +21,8 @@ module Provision::Image::Commands
       log.debug("command #{cmd} returned non-zero error code #{exit_status}, output: #{output}")
       raise "command #{cmd} returned non-zero error code #{exit_status}, output: #{output}"
     end
+    elapsed_time = Time.now - start_time
+    log.debug("command #{cmd} took #{elapsed_time}ms")
     return output
   end
 
