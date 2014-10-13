@@ -78,7 +78,7 @@ class Provision::Core::ProvisioningService
   def clean_vm(spec_hash)
     spec_hash = @machinespec_defaults.merge(spec_hash)
     spec = Provision::Core::MachineSpec.new(spec_hash)
-    @vm_service.destroy_vm(spec) if @vm_service.is_running(spec)
+    @vm_service.shutdown_vm_wait_and_destroy(spec) if @vm_service.is_running(spec)
 
     if @storage_service.nil?
       @image_service.remove_image(spec)

@@ -94,7 +94,7 @@ describe Provision::Core::ProvisioningService do
     it 'cleanup should call destroy if vm running' do
       @vm_service.stub(:is_running).and_return true
       @vm_service.should_receive(:is_running)
-      @vm_service.should_receive(:destroy_vm)
+      @vm_service.should_receive(:shutdown_vm_wait_and_destroy)
       @image_service.should_receive(:remove_image)
       @vm_service.should_receive(:undefine_vm).ordered
       @provisioning_service.clean_vm(:hostname => "vmx1", :template => "ubuntuprecise")

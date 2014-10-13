@@ -38,6 +38,20 @@ class Provision::VM::Virsh
     safe_system("virsh destroy #{spec[:hostname]} > /dev/null 2>&1")
   end
 
+  def shutdown_vm(spec)
+    raise 'VM marked as non-destroyable' if spec[:disallow_destroy]
+    safe_system("virsh shutdown #{spec[:hostname]} > /dev/null 2>&1")
+  end
+
+  def shutdown_vm_wait_and_destroy(spec, timeout=5)
+    shutdown_vm(spec)
+    begin
+      wait_for_shutdown(spec, timeout)
+    rescue Exception => e
+      destroy_vm(spec)
+    end
+  end
+
   def start_vm(spec)
     return if is_running(spec)
     safe_system("virsh start #{spec[:hostname]} > /dev/null 2>&1")
