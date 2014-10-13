@@ -22,7 +22,7 @@ module Provision::Image::Commands
       raise "command #{cmd} returned non-zero error code #{exit_status}, output: #{output}"
     end
     elapsed_time = Time.now - start_time
-    log.debug("command #{cmd} took #{elapsed_time}ms")
+    log.debug("command #{cmd} took #{elapsed_time}s")
     return output
   end
 
