@@ -43,7 +43,7 @@ class Provision::VM::Virsh
     safe_system("virsh shutdown #{spec[:hostname]} > /dev/null 2>&1")
   end
 
-  def shutdown_vm_wait_and_destroy(spec, timeout=5)
+  def shutdown_vm_wait_and_destroy(spec, timeout=60)
     shutdown_vm(spec)
     begin
       wait_for_shutdown(spec, timeout)
