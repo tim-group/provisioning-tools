@@ -44,7 +44,7 @@ puppet agent --debug --verbose --waitforcert 10 --onetime 2>&1 | tee /seed/init.
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
       f.puts """#!/bin/sh -e
 echo 'Run ntpdate'
-(/usr/sbin/ntpdate -b -s ci-1.youdevise.com || exit 0)
+(/usr/sbin/ntpdate -b -v -d -s ci-1.youdevise.com > /tmp/ntpdate.log 2>&1 || exit 0)
 echo 'Running seed puppet'
 /seed/puppet.sh
 echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local
