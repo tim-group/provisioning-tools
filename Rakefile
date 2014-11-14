@@ -30,19 +30,6 @@ task :network do
   sh "sudo bash 'networking/numbering_service.sh'"
 end
 
-desc "Build Gold Image"
-task :build_gold do
-  sh "mkdir -p build/gold"
-  $: << File.join(File.dirname(__FILE__), "./lib")
-  require 'yaml'
-  require 'provision'
-  require 'pp'
-
-  dest = File.dirname(__FILE__) + '/build/gold'
-  result = Provision::Factory.new.create_gold_image({:spindle=>dest, :hostname=>"generic"})
-  sh "chmod a+w -R build"
-end
-
 desc "Build Precise Gold Image"
 task :build_gold_precise do
   sh "mkdir -p build/gold-precise"
@@ -111,29 +98,9 @@ task :package_main do
     "-s", "gem",
     "-t", "deb",
     "-n", "provisioning-tools",
-    "-d", "provisioning-tools-gold-image",
+    "-d", "provisioning-tools-gold-image-precise",
     "-d", "debootstrap",
     "provisioning-tools-*.gem"
-
-  sh commandLine.join(' ')
-end
-
-desc "Generate deb file for the Gold image"
-task :package_gold do
-  hash = `git rev-parse --short HEAD`.chomp
-  v_part= ENV['BUILD_NUMBER'] || "0.#{hash.hex}"
-  version = "0.0.#{v_part}"
-
-  commandLine  = "fpm",
-    "-s", "dir",
-    "-t", "deb",
-    "-n", "provisioning-tools-gold-image",
-    "-v", version,
-    "-a", "all",
-    "-C", "build",
-    "-p", "build/provisioning-tools-gold-image_#{version}.deb",
-    "--prefix", "/var/local/images/",
-    "gold"
 
   sh commandLine.join(' ')
 end
