@@ -29,7 +29,7 @@ class Provision::Storage
       begin
         task_hash[:task].call
       rescue Exception => e
-        log.debug("Run task #{identifier} on host #{name} failed with: #{e.inspect}.")
+        @@logger.debug("Run task #{identifier} on host #{name} failed with: #{e.inspect}.")
         raise e
       end
     end
@@ -76,7 +76,7 @@ class Provision::Storage
         begin
           @@cleanup_tasks[name][id].call
         rescue Exception => e
-          log.debug("Run task #{identifier} on host #{name} failed with: #{e.inspect}.")
+          @logger.debug("Run task #{identifier} on host #{name} failed with: #{e.inspect}.")
           raise e
         end
       end
