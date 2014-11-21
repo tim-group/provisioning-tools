@@ -6,8 +6,10 @@ require 'provision'
 require 'pp'
 
 result = Provision::Factory.new.create_gold_image({
-  :spindle=>"/mnt",
-  :hostname=>"generic"
+  :spindle      =>"/mnt",
+  :hostname     =>"generic",
+  :distid       =>"ubuntu"
+  :distcodename =>"trusty"
 })
 
 pp result

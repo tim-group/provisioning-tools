@@ -121,10 +121,12 @@ class Provision::Factory
 
   def create_gold_image(spec_hash)
     spec_hash[:thread_number] = 0
+    distid = spec_hash[:distid] || 'ubuntu'
+    distcodename = spec_hash[:distcodename] || 'precise'
     spec = Provision::Core::MachineSpec.new(spec_hash)
     targetdir = File.join(File.dirname(__FILE__), "../target")
     image_service = Provision::Image::Service.new(:configdir => home("image_builders"), :targetdir => targetdir, :config => @config )
-    image_service.build_image("ubuntuprecise", spec)
+    image_service.build_image("gold-#{distid}-#{distcodename}", spec)
     image_service.build_image("shrink", spec)
   end
 

@@ -1,0 +1,16 @@
+#!/usr/bin/ruby
+require 'yaml'
+$: << File.join(File.dirname(__FILE__), "..", "lib")
+
+require 'provision'
+require 'pp'
+
+result = Provision::Factory.new.create_gold_image({
+  :spindle      =>"/mnt",
+  :hostname     =>"generic",
+  :distid       =>"ubuntu"
+  :distcodename =>"precise"
+})
+
+pp result
+

@@ -39,7 +39,7 @@ task :build_gold_precise do
   require 'pp'
 
   dest = File.dirname(__FILE__) + '/build/gold-precise'
-  result = Provision::Factory.new.create_gold_image({:spindle=>dest, :hostname=>"generic"})
+  result = Provision::Factory.new.create_gold_image({:spindle=>dest, :hostname=>"generic", :distid => "ubuntu", :distcodename => "precise"})
   sh "chmod a+w -R build"
 end
 
@@ -52,7 +52,7 @@ task :build_gold_trusty do
   require 'pp'
 
   dest = File.dirname(__FILE__) + '/build/gold-trusty'
-  result = Provision::Factory.new.create_gold_image({:spindle=>dest, :hostname=>"generic"})
+  result = Provision::Factory.new.create_gold_image({:spindle=>dest, :hostname=>"generic", :distid => "ubuntu", :distcodename => "trusty"})
   sh "chmod a+w -R build"
 end
 

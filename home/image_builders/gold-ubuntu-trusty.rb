@@ -6,7 +6,7 @@ require 'provision/image/commands'
 # Its currecntly used by the bin/gold script, which will also go away.
 # Please clean it up once that happens :)
 
-define "ubuntuprecise" do
+define "gold-ubuntu-trusty" do
   extend Provision::Image::Commands
 
   run("loopback devices") {
@@ -54,7 +54,7 @@ define "ubuntuprecise" do
   }
 
   run("running debootstrap") {
-    cmd "debootstrap --arch amd64 --exclude=resolvconf,ubuntu-minimal precise #{spec[:temp_dir]} http://aptproxy:3142/ubuntu"
+    cmd "debootstrap --arch amd64 --exclude=resolvconf,ubuntu-minimal trusty #{spec[:temp_dir]} http://aptproxy:3142/ubuntu"
     cmd "mkdir -p #{spec[:temp_dir]}/etc/default"
   }
 
@@ -137,15 +137,15 @@ exec /sbin/getty -L ttyS0 115200 vt102
     chroot "killall -9u syslog"
   }
 
-  run("configure precise repo") {
+  run("configure trusty repo") {
     open("#{spec[:temp_dir]}/etc/apt/sources.list", 'w') { |f|
-      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ precise main\n"
-      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ precise universe\n"
-      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ precise-updates main\n"
-      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ precise-updates universe\n"
-      f.puts "deb http://deb.youdevise.com precise main\n"
+      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ trusty main\n"
+      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ trusty universe\n"
+      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ trusty-updates main\n"
+      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ trusty-updates universe\n"
+      f.puts "deb http://deb.youdevise.com trusty main\n"
       f.puts "deb http://deb.youdevise.com all main\n"
-      f.puts "deb http://deb-transitional.youdevise.com/stable precise main\n"
+      f.puts "deb http://deb-transitional.youdevise.com/stable trusty main\n"
       f.puts "deb http://deb-transitional.youdevise.com/stable all main\n"
     }
     chroot "curl -Ss http://deb.youdevise.com/pubkey.gpg | apt-key add -"
@@ -168,12 +168,12 @@ exec /sbin/getty -L ttyS0 115200 vt102
   run("ensure the correct mailutils gets instaled") {
     open("#{spec[:temp_dir]}/etc/apt/preferences.d/mailutils", 'w') { |f|
       f.puts "Package: mailutils
-Pin: release o=TIMGroup,a=precise
+Pin: release o=TIMGroup,a=trusty
 Pin-Priority: 1001\n"
     }
     open("#{spec[:temp_dir]}/etc/apt/preferences.d/libmailutils2", 'w') { |f|
       f.puts "Package: libmailutils2
-Pin: release o=TIMGroup,a=precise
+Pin: release o=TIMGroup,a=trusty
 Pin-Priority: 1001\n"
     }
   }
