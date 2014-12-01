@@ -10,8 +10,8 @@ Gem::Specification.new do |s|
   s.date        = Time.now.strftime("%Y-%m-%d")
   s.summary     = "Provisioning tools for building gold images"
   s.description = "Provisioning tools for building gold images and other libraries"
-  s.authors     = ["Tomas Doran"]
-  s.email       = 'tomas.doran@youdevise.com'
+  s.authors     = ["TIM Group Infra"]
+  s.email       = 'infra@timgroup.com'
   s.files       = FileList[
     'lib/**/*.rb',
     'bin/*',
@@ -21,7 +21,8 @@ Gem::Specification.new do |s|
     '[A-Z]*',
     'test/**/*'].to_a
   s.executables << 'dns'
-  s.executables << 'gold'
+  s.executables << 'gold-trusty'
+  s.executables << 'gold-precise'
   s.executables << 'provision'
 end
 
