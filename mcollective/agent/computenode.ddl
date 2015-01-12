@@ -4,7 +4,7 @@ metadata    :name        => "computenode",
             :license     => "",
             :version     => "",
             :url         => "",
-            :timeout     => 2000
+            :timeout     => 10000
 
 action "launch", :description => "" do
     display :always
