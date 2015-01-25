@@ -20,7 +20,7 @@ class Provision::Core::ProvisioningService
     spec_hash = @machinespec_defaults.merge(spec_hash)
     spec = Provision::Core::MachineSpec.new(spec_hash)
 
-    host = `hostname -f`.strip
+    host = `hostname`.strip
     start_time = Time.now
 
     if not @vm_service.is_defined(spec_hash)
