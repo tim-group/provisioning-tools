@@ -80,12 +80,12 @@ class Provision::Core::ProvisioningService
           @vm_service.wait_for_shutdown(spec, spec[:wait_for_shutdown])
         end
       end
+      @logger.info("#{Time.now}: #{host}: #{spec[:hostname]}: 04 - end provision (#{Time.now - start_time} secs)")
+      puts "#{Time.now}: #{host}: #{spec[:hostname]}: 04 - end provision (#{Time.now - start_time} secs)"
       true
     else
       raise "failed to launch #{spec_hash[:hostname]} already exists"
     end
-    @logger.info("#{Time.now}: #{host}: #{spec[:hostname]}: 04 - end provision (#{Time.now - start_time} secs)")
-    puts "#{Time.now}: #{host}: #{spec[:hostname]}: 04 - end provision (#{Time.now - start_time} secs)"
   end
 
   def clean_vm(spec_hash)
