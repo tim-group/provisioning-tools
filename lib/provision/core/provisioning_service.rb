@@ -20,8 +20,13 @@ class Provision::Core::ProvisioningService
     spec_hash = @machinespec_defaults.merge(spec_hash)
     spec = Provision::Core::MachineSpec.new(spec_hash)
 
+    host = `hostname -f`.strip
+    start_time = Time.now
+
     if not @vm_service.is_defined(spec_hash)
       @logger.info("Provisioning a newly allocated VM")
+      @logger.info("#{Time.now}: #{host}: #{spec[:hostname]}: 01 - starting provision (#{Time.now - start_time} secs)")
+      puts "#{Time.now}: #{host}: #{spec[:hostname]}: 01 - starting provision (#{Time.now - start_time} secs)"
       if with_numbering
         @logger.info("Getting numbering for spec #{spec.inspect}")
         # FIXME - We should pull this step out to a rake task in stacks as per 'free' later..
@@ -30,6 +35,8 @@ class Provision::Core::ProvisioningService
         @numbering_service.add_cnames_for(spec)
       end
       if @storage_service.nil?
+        @logger.info("#{Time.now}: #{host}: #{spec[:hostname]}: 02 - building image (#{Time.now - start_time} secs)")
+        puts "#{Time.now}: #{host}: #{spec[:hostname]}: 02 - building image (#{Time.now - start_time} secs)"
         @image_service.build_image(spec[:template], spec)
         @vm_service.define_vm(spec)
       else
@@ -47,6 +54,8 @@ class Provision::Core::ProvisioningService
           # end FIXME
 
           @logger.debug("calling build image")
+          @logger.info("#{Time.now}: #{host}: #{spec[:hostname]}: 02 - building image (#{Time.now - start_time} secs)")
+          puts "#{Time.now}: #{host}: #{spec[:hostname]}: 02 - building image (#{Time.now - start_time} secs)"
           @image_service.build_image(spec[:template], spec)
           @storage_service.finish_preparing_storage(spec[:hostname], spec[:temp_dir])
         rescue Exception => e
@@ -60,6 +69,8 @@ class Provision::Core::ProvisioningService
         end
       end
       unless spec[:dont_start]
+        @logger.info("#{Time.now}: #{host}: #{spec[:hostname]}: 03 - starting vm (#{Time.now - start_time} secs)")
+        puts "#{Time.now}: #{host}: #{spec[:hostname]}: 03 - starting vm (#{Time.now - start_time} secs)"
         @vm_service.start_vm(spec)
       end
       unless spec[:wait_for_shutdown].nil?
@@ -73,6 +84,8 @@ class Provision::Core::ProvisioningService
     else
       raise "failed to launch #{spec_hash[:hostname]} already exists"
     end
+    @logger.info("#{Time.now}: #{host}: #{spec[:hostname]}: 04 - end provision (#{Time.now - start_time} secs)")
+    puts "#{Time.now}: #{host}: #{spec[:hostname]}: 04 - end provision (#{Time.now - start_time} secs)"
   end
 
   def clean_vm(spec_hash)
