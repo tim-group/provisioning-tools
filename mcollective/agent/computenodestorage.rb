@@ -9,7 +9,7 @@ module MCollective
         total = 0
         used = 0
         free = 0
-        f = open("|vgdisplay #{volume_group} --units k")
+        f = open("|vgdisplay #{volume_group} --units K")
         f.readlines.each do |line|
           if line.match(/Volume group "${volume_group}" not found/)
             raise line
@@ -27,7 +27,7 @@ module MCollective
 
       def get_lv_data_for_vg(volume_group)
         lv_data = {}
-        f = open("|lvdisplay #{volume_group} --units k")
+        f = open("|lvdisplay #{volume_group} --units K")
         name = ''
         f.readlines.each do |line|
           if line.match(/Volume group "${volume_group}" not found/)
