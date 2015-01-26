@@ -26,7 +26,6 @@ class Provision::Core::ProvisioningService
     if not @vm_service.is_defined(spec_hash)
       @logger.info("Provisioning a newly allocated VM")
       @logger.info("#{Time.now}: #{host}: #{spec[:hostname]}: 01 - starting provision (#{Time.now - start_time} secs)")
-      puts "#{Time.now}: #{host}: #{spec[:hostname]}: 01 - starting provision (#{Time.now - start_time} secs)"
       if with_numbering
         @logger.info("Getting numbering for spec #{spec.inspect}")
         # FIXME - We should pull this step out to a rake task in stacks as per 'free' later..
@@ -35,27 +34,30 @@ class Provision::Core::ProvisioningService
         @numbering_service.add_cnames_for(spec)
       end
       if @storage_service.nil?
-        @logger.info("#{Time.now}: #{host}: #{spec[:hostname]}: 02 - building image (#{Time.now - start_time} secs)")
-        puts "#{Time.now}: #{host}: #{spec[:hostname]}: 02 - building image (#{Time.now - start_time} secs)"
+        @logger.info("#{Time.now}: #{host}: #{spec[:hostname]}: 02a - building image (#{Time.now - start_time} secs)")
         @image_service.build_image(spec[:template], spec)
         @vm_service.define_vm(spec)
       else
         begin
+          @logger.info("#{Time.now}: #{host}: #{spec[:hostname]}: 01b1 - storage prep (#{Time.now - start_time} secs)")
           @storage_service.create_config(spec[:hostname], spec[:storage])
           storage_xml = @storage_service.spec_to_xml(spec[:hostname])
+          @logger.info("#{Time.now}: #{host}: #{spec[:hostname]}: 01b2 - storage prep (#{Time.now - start_time} secs)")
           @vm_service.define_vm(spec, storage_xml)
+          @logger.info("#{Time.now}: #{host}: #{spec[:hostname]}: 01b3 - storage prep (#{Time.now - start_time} secs)")
           @storage_service.prepare_storage(spec[:hostname], spec[:storage], spec[:temp_dir])
 
           # FIXME:
           # Need to get some storage things into the spec, can't do it where spec
           # is created above because that stuff knows nothing about storage..
+          @logger.info("#{Time.now}: #{host}: #{spec[:hostname]}: 01b4 - storage prep (#{Time.now - start_time} secs)")
           spec[:host_device] = @storage_service.get_host_device(spec[:hostname], '/'.to_sym)
+          @logger.info("#{Time.now}: #{host}: #{spec[:hostname]}: 01b5 - storage prep (#{Time.now - start_time} secs)")
           spec[:host_device_partition] = "/dev/mapper/#{@storage_service.get_host_device_partition(spec[:hostname], '/'.to_sym)}"
           # end FIXME
 
           @logger.debug("calling build image")
-          @logger.info("#{Time.now}: #{host}: #{spec[:hostname]}: 02 - building image (#{Time.now - start_time} secs)")
-          puts "#{Time.now}: #{host}: #{spec[:hostname]}: 02 - building image (#{Time.now - start_time} secs)"
+          @logger.info("#{Time.now}: #{host}: #{spec[:hostname]}: 02b - building image (#{Time.now - start_time} secs)")
           @image_service.build_image(spec[:template], spec)
           @storage_service.finish_preparing_storage(spec[:hostname], spec[:temp_dir])
         rescue Exception => e
@@ -70,7 +72,6 @@ class Provision::Core::ProvisioningService
       end
       unless spec[:dont_start]
         @logger.info("#{Time.now}: #{host}: #{spec[:hostname]}: 03 - starting vm (#{Time.now - start_time} secs)")
-        puts "#{Time.now}: #{host}: #{spec[:hostname]}: 03 - starting vm (#{Time.now - start_time} secs)"
         @vm_service.start_vm(spec)
       end
       unless spec[:wait_for_shutdown].nil?
@@ -81,7 +82,6 @@ class Provision::Core::ProvisioningService
         end
       end
       @logger.info("#{Time.now}: #{host}: #{spec[:hostname]}: 04 - end provision (#{Time.now - start_time} secs)")
-      puts "#{Time.now}: #{host}: #{spec[:hostname]}: 04 - end provision (#{Time.now - start_time} secs)"
       true
     else
       raise "failed to launch #{spec_hash[:hostname]} already exists"
