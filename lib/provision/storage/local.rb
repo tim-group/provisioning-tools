@@ -1,3 +1,5 @@
+require 'provision/logger'
+
 module Provision::Storage::Local
 
   def init_filesystem(name, mount_point_obj)
