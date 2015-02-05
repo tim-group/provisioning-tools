@@ -88,7 +88,7 @@ end
 desc "Generate deb file for the gem and command-line tools"
 task :package_main do
   sh "mkdir -p build"
-  sh "if [ -f *.gem ]; then rm *.gem; fi"
+  sh "rm -f *.gem"
   sh "gem build provisioning-tools.gemspec && mv provisioning-tools-*.gem build/"
   sh "cp postinst.sh build/"
 
