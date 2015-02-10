@@ -129,11 +129,11 @@ describe Provision::Storage::Local do
         },
       },
     })
-    @storage_type.should_receive(:cmd).with("curl -Ss --fail http://someplace/gold.img | dd of=#{@tmpdir}/interfoo")
+    @storage_type.should_receive(:cmd).with("curl -Ss --fail http://someplace/gold.img | dd bs=1M of=#{@tmpdir}/interfoo")
     @storage_type.stub(:grow_filesystem)
     @storage_type.stub(:cmd) do |arg|
       case arg
-      when "curl -Ss --fail http://someplace/gold.img | dd of=#{@tmpdir}/interfoo"
+      when "curl -Ss --fail http://someplace/gold.img | dd bs=1M of=#{@tmpdir}/interfoo"
         true
       when "kpartx -d #{@tmpdir}/interfoo"
         true
@@ -160,8 +160,8 @@ describe Provision::Storage::Local do
     })
     @storage_type.stub(:cmd) do |arg|
       case arg
-      when "dd if=#{@tmpdir}/empty_gold.img of=#{@tmpdir}/full"
-        raise "command dd if=#{@tmpdir}/empty_gold.img of=#{@tmpdir}/full returned a non-zero error code 1"
+      when "dd bs=1M if=#{@tmpdir}/empty_gold.img of=#{@tmpdir}/full"
+        raise "command dd bs=1M if=#{@tmpdir}/empty_gold.img of=#{@tmpdir}/full returned a non-zero error code 1"
       when "kpartx -d #{@tmpdir}/full"
         true
       end
@@ -169,7 +169,7 @@ describe Provision::Storage::Local do
     end
     expect {
       @storage_type.init_filesystem('full', mount_point_obj)
-    }.to raise_error("command dd if=#{@tmpdir}/empty_gold.img of=#{@tmpdir}/full returned a non-zero error code 1")
+    }.to raise_error("command dd bs=1M if=#{@tmpdir}/empty_gold.img of=#{@tmpdir}/full returned a non-zero error code 1")
   end
 
     it 'complains if source image file to copy from does not exist' do
