@@ -38,11 +38,11 @@ module Provision::Storage::Local
         when /^\/.*/
           @@logger.info("#{Time.now}: #{host}: #{name}: 01b3x-3-A2x1 - image dd (#{Time.now - start_time} secs)")
           raise "Source image file #{image_file_path} does not exist" if !File.exist?(image_file_path)
-          cmd "dd if=#{image_file_path} of=#{device(underscore_name)}"
+          cmd "dd bs=1M if=#{image_file_path} of=#{device(underscore_name)}"
           @@logger.info("#{Time.now}: #{host}: #{name}: 01b3x-3-A2x2 - image end (#{Time.now - start_time} secs)")
         when /^https?:\/\//
           @@logger.info("#{Time.now}: #{host}: #{name}: 01b3x-3-A2y1 - image dd (#{Time.now - start_time} secs)")
-          cmd "curl -Ss --fail #{image_file_path} | dd of=#{device(underscore_name)}"
+          cmd "curl -Ss --fail #{image_file_path} | dd bs=1M of=#{device(underscore_name)}"
           @@logger.info("#{Time.now}: #{host}: #{name}: 01b3x-3-A2y2 - image end (#{Time.now - start_time} secs)")
         else
           raise "Not sure how to deal with image_file_path: '#{image_file_path}'"
