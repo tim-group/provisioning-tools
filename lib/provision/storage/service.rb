@@ -21,15 +21,9 @@ class Provision::Storage::Service
   end
 
   def prepare_storage(name, storage_spec, temp_dir)
-    host = `hostname`.strip
-    start_time = Time.now
-    @log.info("#{Time.now}: #{host}: #{name}: 01b3w - prep start (#{Time.now - start_time} secs)")
     create_storage(name)
-    @log.info("#{Time.now}: #{host}: #{name}: 01b3x - prep create (#{Time.now - start_time} secs)")
     init_filesystems(name)
-    @log.info("#{Time.now}: #{host}: #{name}: 01b3y - prep init (#{Time.now - start_time} secs)")
     mount_filesystems(name, temp_dir)
-    @log.info("#{Time.now}: #{host}: #{name}: 01b3z - prep mount (#{Time.now - start_time} secs)")
   end
 
   def finish_preparing_storage(name, temp_dir)
@@ -76,56 +70,35 @@ class Provision::Storage::Service
   end
 
   def create_storage(name)
-    host = `hostname`.strip
-    start_time = Time.now
-
-    @log.info("#{Time.now}: #{host}: #{name}: 01b3w-1 - create start (#{Time.now - start_time} secs)")
     @storage_configs[name].mount_points.each do |mount_point|
-      @log.info("#{Time.now}: #{host}: #{name}: 01b3w-2 - create mount #{mount_point} (#{Time.now - start_time} secs)")
       mount_point_obj = get_mount_point(name, mount_point)
       type = mount_point_obj.config[:type].to_sym
       persistent = mount_point_obj.config[:persistent]
       raise 'Persistent options not found' unless mount_point_obj.config.has_key?(:persistence_options)
       storage = get_storage(type)
-      @log.info("#{Time.now}: #{host}: #{name}: 01b3w-3 - create mount #{mount_point} (#{Time.now - start_time} secs)")
       if persistent
-        @log.debug "Checking existing persistent storage for #{mount_point} on #{name}"
         storage.check_persistent_storage(name, mount_point_obj)
       else
-        @log.debug "Creating storage for #{mount_point} on #{name}"
         storage.create(name, mount_point_obj)
         mount_point_obj.set(:newly_created, true)
       end
-      @log.info("#{Time.now}: #{host}: #{name}: 01b3w-4 - create mount #{mount_point} (#{Time.now - start_time} secs)")
     end
   end
 
   def init_filesystems(name)
-    host = `hostname`.strip
-    start_time = Time.now
-
-    @log.info("#{Time.now}: #{host}: #{name}: 01b3x-1 - init start (#{Time.now - start_time} secs)")
     @storage_configs[name].mount_points.each do |mount_point|
-      @log.info("#{Time.now}: #{host}: #{name}: 01b3x-2 - init mount #{mount_point} (#{Time.now - start_time} secs)")
       mount_point_obj = get_mount_point(name, mount_point)
       type = mount_point_obj.config[:type].to_sym
       persistent = mount_point_obj.config[:persistent]
       newly_created = mount_point_obj.get(:newly_created)
       storage = get_storage(type)
-      @log.info("#{Time.now}: #{host}: #{name}: 01b3x-3 - init mount #{mount_point} (#{Time.now - start_time} secs)")
       storage.init_filesystem(name, mount_point_obj) if newly_created
-      @log.info("#{Time.now}: #{host}: #{name}: 01b3x-4 - init mount #{mount_point} (#{Time.now - start_time} secs)")
     end
   end
 
 
   def mount_filesystems(name, tempdir)
-    host = `hostname`.strip
-    start_time = Time.now
-
-    @log.info("#{Time.now}: #{host}: #{name}: 01b3y-1 - mount start (#{Time.now - start_time} secs)")
     @storage_configs[name].mount_points.each do |mount_point|
-      @log.info("#{Time.now}: #{host}: #{name}: 01b3y-2 - mount fs #{mount_point} (#{Time.now - start_time} secs)")
       mount_point_obj = get_mount_point(name, mount_point)
       actual_mount_point = "#{tempdir}#{mount_point}"
       mount_point_obj.set(:actual_mount_point, actual_mount_point)
@@ -140,9 +113,7 @@ class Provision::Storage::Service
         end
       end
 
-      @log.info("#{Time.now}: #{host}: #{name}: 01b3y-3 - mount fs #{mount_point} (#{Time.now - start_time} secs)")
       storage.mount(name, mount_point_obj)
-      @log.info("#{Time.now}: #{host}: #{name}: 01b3y-4 - mount fs #{mount_point} (#{Time.now - start_time} secs)")
     end
   end
 

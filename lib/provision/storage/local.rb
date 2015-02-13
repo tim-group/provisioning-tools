@@ -4,20 +4,15 @@ module Provision::Storage::Local
   @@logger = Provision::Logger.get_logger('storage')
 
   def init_filesystem(name, mount_point_obj)
-    host = `hostname`.strip
-    start_time = Time.now
-    @@logger.info("#{Time.now}: #{host}: #{name}: 01b3x-3-A - init local start (#{Time.now - start_time} secs)")
     size = mount_point_obj.config[:size]
     prepare = mount_point_obj.config[:prepare]
     method = prepare[:method].to_sym
     resize = prepare[:options][:resize]
     case method
     when :image
-      @@logger.info("#{Time.now}: #{host}: #{name}: 01b3x-3-B1 - init local image (#{Time.now - start_time} secs)")
       image_filesystem(name, mount_point_obj)
       grow_filesystem(name, mount_point_obj) if resize
     when :format
-      @@logger.info("#{Time.now}: #{host}: #{name}: 01b3x-3-B2 - init local image (#{Time.now - start_time} secs)")
       format_filesystem(name, mount_point_obj)
     else
       raise "unsure how to init storage using method '#{method}'"
@@ -28,22 +23,14 @@ module Provision::Storage::Local
     underscore_name = underscore_name(name, mount_point_obj.name)
     image_file_path = mount_point_obj.config[:prepare][:options][:path]
 
-    host = `hostname`.strip
-    start_time = Time.now
-    @@logger.info("#{Time.now}: #{host}: #{name}: 01b3x-3-A1 - image start (#{Time.now - start_time} secs)")
-
     run_task(name, "image #{underscore_name}", {
       :task => lambda {
         case image_file_path
         when /^\/.*/
-          @@logger.info("#{Time.now}: #{host}: #{name}: 01b3x-3-A2x1 - image dd (#{Time.now - start_time} secs)")
           raise "Source image file #{image_file_path} does not exist" if !File.exist?(image_file_path)
           cmd "dd bs=1M if=#{image_file_path} of=#{device(underscore_name)}"
-          @@logger.info("#{Time.now}: #{host}: #{name}: 01b3x-3-A2x2 - image end (#{Time.now - start_time} secs)")
         when /^https?:\/\//
-          @@logger.info("#{Time.now}: #{host}: #{name}: 01b3x-3-A2y1 - image dd (#{Time.now - start_time} secs)")
           cmd "curl -Ss --fail #{image_file_path} | dd bs=1M of=#{device(underscore_name)}"
-          @@logger.info("#{Time.now}: #{host}: #{name}: 01b3x-3-A2y2 - image end (#{Time.now - start_time} secs)")
         else
           raise "Not sure how to deal with image_file_path: '#{image_file_path}'"
         end
