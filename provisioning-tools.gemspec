@@ -21,8 +21,6 @@ Gem::Specification.new do |s|
     '[A-Z]*',
     'test/**/*'].to_a
   s.executables << 'dns'
-  s.executables << 'gold-trusty'
-  s.executables << 'gold-precise'
   s.executables << 'provision'
 end
 
