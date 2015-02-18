@@ -5,7 +5,7 @@ require 'provision/namespace'
 module Provision
   module Log
     def new_log()
-      if (@spec!=nil)
+      if (@spec != nil)
         @log = spec.get_logger('provision')
       else
         @log = Logger.new(STDOUT)
@@ -13,9 +13,8 @@ module Provision
     end
 
     def log()
-      new_log() if (@log==nil)
+      new_log() if (@log == nil)
       return @log
     end
   end
 end
-

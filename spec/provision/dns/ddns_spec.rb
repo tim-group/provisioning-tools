@@ -11,7 +11,7 @@ class MockProvision < Provision::DNS::DDNSNetwork
   attr_reader :update_files
   attr_accessor :checker
 
-  def initialize(name, net, options={})
+  def initialize(name, net, options = {})
     super(name, net, options)
     @nsupdate_replies = options[:nsupdate_replies] || raise("Need :nsupdate_replies")
     @lookup_table = options[:lookup_table] || raise("Need :lookup_table")
@@ -69,7 +69,7 @@ describe Provision::DNS::DDNS do
       :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
       :nsupdate_replies => [],
       :lookup_table => {
-        'foo.example.com' => '172.16.0.1',
+        'foo.example.com' => '172.16.0.1'
       },
       :primary_nameserver => "mars"
     )
@@ -95,7 +95,7 @@ describe Provision::DNS::DDNS do
         :nsupdate_replies => [],
         :lookup_table => {
       },
-      :primary_nameserver => "mars"
+        :primary_nameserver => "mars"
     )
     dns.reverse_zone.should eql('1.168.192.in-addr.arpa')
   end
@@ -153,7 +153,7 @@ update failed: NOTAUTH(BADKEY)
     dns = MockProvision.new('prod', '192.168.1.0/16',
       :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
       :nsupdate_replies => ['', '', '', ''],
-      :lookup_table => {'st-testmachine-001.mgmt.st.net.local' => '192.168.0.10'},
+      :lookup_table => { 'st-testmachine-001.mgmt.st.net.local' => '192.168.0.10' },
       :primary_nameserver => "mars"
     )
     ip = dns.allocate_ip_for(get_spec())

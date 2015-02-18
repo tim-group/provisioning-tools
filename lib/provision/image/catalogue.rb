@@ -7,9 +7,9 @@ module Provision::Image::Catalogue
   def loadconfig(dir)
     begin
       Dir.entries(dir).each do |file|
-        require "#{dir}/#{file}" if file =~/.rb$/
+        require "#{dir}/#{file}" if file =~ /.rb$/
       end
-    rescue Exception=>e
+    rescue Exception => e
       print e
     end
   end
@@ -25,7 +25,7 @@ module Provision::Image::Catalogue
   def call_define(name, build)
     closure = @@catalogue[name]
 
-    if (closure==nil)
+    if (closure == nil)
       raise NameError.new(name)
     end
 
@@ -43,4 +43,3 @@ module Provision::Image::Catalogue
 end
 
 include Provision::Image::Catalogue
-

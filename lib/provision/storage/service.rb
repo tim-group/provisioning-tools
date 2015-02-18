@@ -196,7 +196,7 @@ class Provision::Storage::Service
           fstype = 'ext4'
           begin
             fstype = prepare_options[:type]
-          rescue NoMethodError=>e
+          rescue NoMethodError => e
             if e.name == '[]'.to_sym
               @log.debug "fstype not found, using default value: #{fstype}"
             else

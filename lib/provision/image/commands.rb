@@ -48,7 +48,7 @@ module Provision::Image::Commands
 
   class Continuation
       def initialize(target_object, block)
-        raise "nil block given " unless block !=nil
+        raise "nil block given " unless block != nil
         @block = block
         @target_object = target_object
       end
@@ -57,9 +57,9 @@ module Provision::Image::Commands
 
         100.times {
           return if (@target_object.instance_eval(&condition) == true)
-  	      @target_object.instance_eval(&@block)
+          @target_object.instance_eval(&@block)
           sleep(0.5)
-       	}
+        }
         raise "timeout waiting for condition"
       end
   end
@@ -68,14 +68,13 @@ module Provision::Image::Commands
     return Continuation.new(self, block)
   end
 
-  def wait_until(desc="", options= {:retry_attempts=>100}, &block)
+  def wait_until(desc = "", options = { :retry_attempts => 100 }, &block)
     options[:retry_attempts].times {
       log.debug("waiting until: #{desc}")
-      return if (block != nil and block.call() == true)
+      return if block != nil and block.call() == true
       sleep(0.4)
     }
     raise "timeout waiting for condition"
   end
 
 end
-

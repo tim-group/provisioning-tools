@@ -37,7 +37,7 @@ describe Provision do
       pretend_object.should_receive(:blah2).ordered
       pretend_object.should_receive(:blah1).ordered
 
-      @storage.run_task('test','run true 1', {
+      @storage.run_task('test', 'run true 1', {
         :task => lambda {
           @storage.cmd('true')
         },
@@ -56,10 +56,10 @@ describe Provision do
       })
 
       expect {
-        @storage.run_task('test','fail miserably', {
+        @storage.run_task('test', 'fail miserably', {
           :task => lambda {
             @storage.cmd('false')
-          },
+          }
         })
       }.to raise_error
 
@@ -77,7 +77,7 @@ describe Provision do
         },
         :cleanup => lambda {
           pretend_object.blah1()
-        },
+        }
       })
 
       @storage.run_task('test', 'run true 2', {
@@ -94,7 +94,7 @@ describe Provision do
         @storage.run_task('test', 'fail miserably', {
           :task => lambda {
             @storage.cmd('false')
-          },
+          }
         })
       }.to raise_error
 
@@ -114,7 +114,7 @@ describe Provision do
         },
         :cleanup => lambda {
           pretend_object.blah1()
-        },
+        }
       })
 
       @storage.run_task('test', 'run true 2', {
@@ -123,7 +123,7 @@ describe Provision do
         },
         :cleanup => lambda {
           pretend_object.blah2()
-        },
+        }
       })
 
       @storage.run_task('test', 'run true 3', {
@@ -132,7 +132,7 @@ describe Provision do
         },
         :cleanup => lambda {
           pretend_object.blah3()
-        },
+        }
       })
 
       @storage.run_task('test', 'run true 4', {
@@ -149,7 +149,7 @@ describe Provision do
         @storage.run_task('test', 'fail miserably', {
           :task => lambda {
             @storage.cmd('false')
-          },
+          }
         })
       }.to raise_error
 
@@ -163,7 +163,7 @@ describe Provision do
         },
         :cleanup => lambda {
           pretend_object.blah1()
-        },
+        }
       })
 
       expect {
@@ -173,7 +173,7 @@ describe Provision do
           },
           :cleanup => lambda {
             pretend_object.blah1()
-          },
+          }
         })
       }.to raise_error
     end

@@ -23,8 +23,8 @@ class Provision::VM::Virsh
   end
 
   def is_in_virsh_list(spec, extra = '')
-    vm_name=spec[:hostname]
-    result=`virsh list #{extra} | grep ' #{vm_name} ' | wc -l`
+    vm_name = spec[:hostname]
+    result = `virsh list #{extra} | grep ' #{vm_name} ' | wc -l`
     return result.match(/1/)
   end
 
@@ -43,7 +43,7 @@ class Provision::VM::Virsh
     safe_system("virsh shutdown #{spec[:hostname]} > /dev/null 2>&1")
   end
 
-  def shutdown_vm_wait_and_destroy(spec, timeout=60)
+  def shutdown_vm_wait_and_destroy(spec, timeout = 60)
     shutdown_vm(spec)
     begin
       wait_for_shutdown(spec, timeout)
@@ -69,7 +69,7 @@ class Provision::VM::Virsh
   end
 
 
-  def write_virsh_xml(spec, storage_xml=nil)
+  def write_virsh_xml(spec, storage_xml = nil)
     if spec[:kvm_template]
       template_file = "#{Provision.base}/templates/#{spec[:kvm_template]}.template"
     else
@@ -80,7 +80,7 @@ class Provision::VM::Virsh
     binding = VirshBinding.new(spec, @config, storage_xml)
     begin
       template.result(binding.get_binding())
-    rescue Exception=>e
+    rescue Exception => e
       print e
       print e.backtrace
     end
@@ -90,7 +90,7 @@ class Provision::VM::Virsh
     to
   end
 
-  def define_vm(spec, storage_xml=nil)
+  def define_vm(spec, storage_xml = nil)
     to = write_virsh_xml(spec, storage_xml)
     safe_system("virsh define #{to} > /dev/null 2>&1")
   end
@@ -100,7 +100,7 @@ class VirshBinding
 
   attr_accessor :spec, :config, :storage_xml
 
-  def initialize(spec, config, storage_xml=nil)
+  def initialize(spec, config, storage_xml = nil)
     @spec = spec
     @config = config
     @storage_xml = storage_xml
@@ -110,6 +110,3 @@ class VirshBinding
     return binding()
   end
 end
-
-
-

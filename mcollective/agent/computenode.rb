@@ -77,7 +77,7 @@ module MCollective
           end
         rescue Exception => e
           logger.error(e)
-          reply.data = {"error" => e.message, "backtrace" => e.backtrace}
+          reply.data = { "error" => e.message, "backtrace" => e.backtrace }
           raise e
         end
       end

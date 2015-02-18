@@ -19,15 +19,15 @@ define "sehub" do
     log.debug(`mount -l | grep #{spec[:hostname]}/proc | wc -l`.chomp)
     keep_doing {
       suppress_error.cmd "umount -l #{spec[:temp_dir]}/proc"
-    }.until {`mount -l | grep #{spec[:hostname]}/proc | wc -l`.chomp == "0"}
+    }.until { `mount -l | grep #{spec[:hostname]}/proc | wc -l`.chomp == "0" }
 
     keep_doing {
       suppress_error.cmd "umount -l #{spec[:temp_dir]}/sys"
-    }.until {`mount -l | grep #{spec[:hostname]}/sys | wc -l`.chomp == "0"}
+    }.until { `mount -l | grep #{spec[:hostname]}/sys | wc -l`.chomp == "0" }
 
     keep_doing {
       suppress_error.cmd "umount -l #{spec[:temp_dir]}/dev"
-    }.until {`mount -l | grep #{spec[:hostname]}/dev | wc -l`.chomp == "0"}
+    }.until { `mount -l | grep #{spec[:hostname]}/dev | wc -l`.chomp == "0" }
   }
 
 

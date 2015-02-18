@@ -50,9 +50,9 @@ define "xpboot" do
   }
 
   run("inject hostname and ip address") {
-    key="WJG3W-CHHC2-2R97W-7BC2F-MM9JD"
-    answer_file="#{mountpoint}/sysprep/sysprep.inf"
-    network_file="#{mountpoint}/sysprep/net.txt"
+    key = "WJG3W-CHHC2-2R97W-7BC2F-MM9JD"
+    answer_file = "#{mountpoint}/sysprep/sysprep.inf"
+    network_file = "#{mountpoint}/sysprep/net.txt"
     cmd "sed -i s/\"<%COMPUTERNAME%>\"/#{spec[:hostname]}/g #{answer_file}"
     cmd "sed -i s/\"<%PRODUCTKEY%>\"/#{key}/g #{answer_file}"
 
@@ -110,12 +110,12 @@ define "xpboot" do
   }
 
   run("stamp time") {
-     tmp_date_file="#{mountpoint}/build-date.txt"
+     tmp_date_file = "#{mountpoint}/build-date.txt"
     `date +"%m-%d-%y.%k:%M" > #{tmp_date_file}`
   }
 
   case config[:vm_storage_type]
-  when 'lvm','image'
+  when 'lvm', 'image'
     cleanup {
       cmd "umount -l #{mountpoint}"
       cmd "sleep 1"

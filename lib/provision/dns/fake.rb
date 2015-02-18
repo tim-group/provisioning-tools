@@ -8,4 +8,3 @@ class Provision::DNS::Fake < Provision::DNS
     return true
   end
 end
-

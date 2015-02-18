@@ -49,7 +49,7 @@ define "xpgold" do
   }
 
   run("stamp gold image build date") {
-    tmp_date_file="#{spec[:temp_dir]}/gold-build-date.txt"
+    tmp_date_file = "#{spec[:temp_dir]}/gold-build-date.txt"
     `date +"%m-%d-%y.%k:%M" > #{tmp_date_file}`
   }
 end

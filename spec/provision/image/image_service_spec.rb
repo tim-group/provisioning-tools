@@ -13,7 +13,7 @@ describe Provision::Image::Service  do
 
   it 'does not remove image if spec has disallow_destroy set' do
     Provision::Image::Catalogue.stub :loadconfig
-    config = {:vm_storage_type => 'image' }
+    config = { :vm_storage_type => 'image' }
     spec = { :disallow_destroy => 'true', :image_path => @image_file.path }
     image_service = Provision::Image::Service.new({ :configdir => 'whatever', :config => config })
 
@@ -26,7 +26,7 @@ describe Provision::Image::Service  do
 
   it 'remove image if spec does not have disallow_destroy set' do
     Provision::Image::Catalogue.stub :loadconfig
-    config = {:vm_storage_type => 'image' }
+    config = { :vm_storage_type => 'image' }
     spec = { :image_path => @image_file.path }
     image_service = Provision::Image::Service.new({ :configdir => 'whatever', :config => config })
 
@@ -35,4 +35,3 @@ describe Provision::Image::Service  do
   end
 
 end
-

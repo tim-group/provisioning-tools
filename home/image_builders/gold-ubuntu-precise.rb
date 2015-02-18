@@ -22,18 +22,18 @@ define "gold-ubuntu-precise" do
   cleanup {
     keep_doing {
     suppress_error.cmd "kpartx -d /dev/#{spec[:loop0]}"
-  }.until {`dmsetup ls | grep #{spec[:loop0]}p1 | wc -l`.chomp == "0"}
+    }.until { `dmsetup ls | grep #{spec[:loop0]}p1 | wc -l`.chomp == "0" }
 
   cmd "udevadm settle"
 
   keep_doing {
     suppress_error.cmd "losetup -d /dev/#{spec[:loop0]}"
-  }.until {`losetup -a | grep /dev/#{spec[:loop0]} | wc -l`.chomp == "0"}
+  }.until { `losetup -a | grep /dev/#{spec[:loop0]} | wc -l`.chomp == "0" }
 
   keep_doing {
     suppress_error.cmd "umount #{spec[:temp_dir]}"
     suppress_error.cmd "rmdir #{spec[:temp_dir]}"
-  }.until {`ls -d  #{spec[:temp_dir]} 2> /dev/null | wc -l`.chomp == "0"}
+  }.until { `ls -d  #{spec[:temp_dir]} 2> /dev/null | wc -l`.chomp == "0" }
 
   cmd "udevadm settle"
   cmd "rmdir #{spec[:temp_dir]}"
@@ -69,15 +69,15 @@ define "gold-ubuntu-precise" do
     log.debug(`mount -l | grep #{spec[:hostname]}/proc | wc -l`.chomp)
     keep_doing {
       suppress_error.cmd "umount -l #{spec[:temp_dir]}/proc"
-    }.until {`mount -l | grep #{spec[:hostname]}/proc | wc -l`.chomp == "0"}
+    }.until { `mount -l | grep #{spec[:hostname]}/proc | wc -l`.chomp == "0" }
 
     keep_doing {
       suppress_error.cmd "umount -l #{spec[:temp_dir]}/sys"
-    }.until {`mount -l | grep #{spec[:hostname]}/sys | wc -l`.chomp == "0"}
+    }.until { `mount -l | grep #{spec[:hostname]}/sys | wc -l`.chomp == "0" }
 
     keep_doing {
       suppress_error.cmd "umount -l #{spec[:temp_dir]}/dev"
-    }.until {`mount -l | grep #{spec[:hostname]}/dev | wc -l`.chomp == "0"}
+    }.until { `mount -l | grep #{spec[:hostname]}/dev | wc -l`.chomp == "0" }
   }
 
   run("set locale") {

@@ -16,7 +16,7 @@ module MCollective
     #                        /var/lib/puppet/state/last_run_summary.yaml
     #    puppetd.pidfile   - Where to find puppet agent's pid file; defaults to
     #                        /var/run/puppet/agent.pid
-    class Puppetd<RPC::Agent
+    class Puppetd < RPC::Agent
 
       def startup_hook
         @splaytime = @config.pluginconf["puppetd.splaytime"].to_i || 0
@@ -61,12 +61,12 @@ module MCollective
 
 
         begin
-        reply[:resources] = {"failed"=>0, "changed"=>0, "total"=>0, "restarted"=>0, "out_of_sync"=>0}.merge(summary["resources"])
+        reply[:resources] = { "failed" => 0, "changed" => 0, "total" => 0, "restarted" => 0, "out_of_sync" => 0 }.merge(summary["resources"])
 
         ["time", "events", "changes", "version"].each do |dat|
           reply[dat.to_sym] = summary[dat]
         end
-        rescue Exception=>e
+        rescue Exception => e
           logger.error(e)
           logger.error(e.backtrace)
 raise e
@@ -91,12 +91,12 @@ raise e
 
         return 'disabled' if disabled
         return 'running'  if   locked && has_pid
-        return 'idling'   if ! locked && has_pid
-        return 'stopped'  if ! has_pid
+        return 'idling'   if !locked && has_pid
+        return 'stopped'  if !has_pid
       end
 
       def check_pid_running
-        if (File.exists?(@pidfile))
+        if File.exists?(@pidfile)
           pid = File.read(@pidfile)
           if pid =~ /^\d+$/
             begin

@@ -10,7 +10,7 @@ describe Provision::Config do
     f.puts({}.to_yaml)
     f.close
     expect {
-      Provision::Config.new(:configfile=>f.path).get()
+      Provision::Config.new(:configfile => f.path).get()
     }.to raise_error("#{f.path} has missing properties (dns_backend, dns_backend_options, networks)")
   end
 
@@ -40,12 +40,12 @@ describe Provision::Config do
   it 'recurses when applying sym form' do
     exp = {
         :dns_backend => 'baz',
-        :dns_backend_options => {:foo => 'bar'},
+        :dns_backend_options => { :foo => 'bar' },
         :networks => {}
     }
     send = {
         'dns_backend' => 'baz',
-        'dns_backend_options' => {'foo' => 'bar'},
+        'dns_backend_options' => { 'foo' => 'bar' },
         'networks' => {}
     }
     f = Tempfile.new('test_yaml')
@@ -55,4 +55,3 @@ describe Provision::Config do
     c.get.should eql(exp)
   end
 end
-

@@ -60,12 +60,12 @@ class Provision::Core::MachineSpec
     if_nil_define_var(:image_size, "3G")
     if_nil_define_var(:vcpus, "1")
 
-    if_nil_define_var(:loop0, "loop#{@thread_number*2}")
-    if_nil_define_var(:loop1, "loop#{@thread_number*2+1}")
+    if_nil_define_var(:loop0, "loop#{@thread_number * 2}")
+    if_nil_define_var(:loop1, "loop#{@thread_number * 2 + 1}")
 
     if_nil_define_var(:temp_dir, "#{@build_dir}/#{@spec[:hostname]}")
 
-    if (@spec.has_key?(:qualified_hostnames))
+    if @spec.has_key?(:qualified_hostnames)
       if_nil_define_var(:fqdn, "#{@spec[:qualified_hostnames][:mgmt]}")
     end
     if_nil_define_var(:fqdn, "#{@spec[:hostname]}.#{@spec[:domain]}")
@@ -112,7 +112,7 @@ class Provision::Core::MachineSpec
         :bridge => "br_#{net}",
         :network => "#{net}"
       }
-      slot = slot+1
+      slot = slot + 1
     }
     nics
   end
@@ -122,13 +122,13 @@ class Provision::Core::MachineSpec
   end
 
   def domain_on(network)
-    @spec[:qualified_hostnames][network].gsub(/^#{@spec[:hostname]}\./,'').strip
+    @spec[:qualified_hostnames][network].gsub(/^#{@spec[:hostname]}\./, '').strip
   end
 
   def all_hostnames_on(network)
     hostnames = [hostname_on(network)]
     # the way we do aliases is pretty feeble; these should be per-interface
-    if (network == :mgmt and !@spec[:aliases].nil?)
+    if network == :mgmt and !@spec[:aliases].nil?
       hostnames << @spec[:aliases].collect { |a| "#{a}.#{network.to_s}.#{@spec[:domain]}" }
     end
     return hostnames
@@ -139,7 +139,7 @@ class Provision::Core::MachineSpec
     raise 'a fully-qualified domain name must be a string' unless fqdn.is_a?(String)
     raise 'a fully-qualified domain name cannot be an empty string' if fqdn.empty?
     sha1 = Digest::SHA1.new
-    bytes = sha1.digest(fqdn+host)
+    bytes = sha1.digest(fqdn + host)
     "52:54:00:%s" % bytes.unpack('H2x9H2x8H2').join(':')
   end
 end

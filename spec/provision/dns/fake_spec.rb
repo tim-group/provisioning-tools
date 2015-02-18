@@ -26,4 +26,3 @@ describe Provision::DNS::Fake do
     other.to_s.should eql("192.168.5.5")
   end
 end
-

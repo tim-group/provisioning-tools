@@ -41,8 +41,8 @@ describe Provision::Storage::Local do
       end
     end
 
-    @storage_type = MockStorage.new({:tmpdir => @tmpdir})
-    @mount_point_obj = Provision::Storage::Mount_point.new('/', {:size => '10G'})
+    @storage_type = MockStorage.new({ :tmpdir => @tmpdir })
+    @mount_point_obj = Provision::Storage::Mount_point.new('/', { :size => '10G' })
   end
 
   it 'should symbolize the value of method' do
@@ -52,9 +52,9 @@ describe Provision::Storage::Local do
       :prepare  => {
         :method  => 'image',
         :options => {
-          :path    => "#{@tmpdir}/symbolize_method",
-        },
-      },
+          :path    => "#{@tmpdir}/symbolize_method"
+        }
+      }
     })
     @storage_type.stub(:image_filesystem)
     @storage_type.stub(:grow_filesystem)
@@ -69,9 +69,9 @@ describe Provision::Storage::Local do
         :method  => :image,
         :options => {
           :path    => "#{@tmpdir}/resize_false",
-          :resize  => false,
-        },
-      },
+          :resize  => false
+        }
+      }
     })
     @storage_type.should_not_receive(:grow_filesystem)
     @storage_type.init_filesystem('resize_false', mount_point_obj)
@@ -91,9 +91,9 @@ describe Provision::Storage::Local do
         :method  => :image,
         :options => {
           :path    => "#{@tmpdir}/resize_true",
-          :resize  => true,
-        },
-      },
+          :resize  => true
+        }
+      }
     })
     @storage_type.should_receive(:grow_filesystem)
     @storage_type.init_filesystem('resize_true', mount_point_obj)
@@ -109,9 +109,9 @@ describe Provision::Storage::Local do
       :prepare  => {
         :method  => :image,
         :options => {
-          :path    => "#{@tmpdir}/source",
-        },
-      },
+          :path    => "#{@tmpdir}/source"
+        }
+      }
     })
     @storage_type.stub(:grow_filesystem)
     @storage_type.should_receive(:grow_filesystem).with('working', mount_point_obj)
@@ -125,9 +125,9 @@ describe Provision::Storage::Local do
       :prepare  => {
         :method  => :image,
         :options => {
-          :path    => "http://someplace/gold.img",
-        },
-      },
+          :path    => "http://someplace/gold.img"
+        }
+      }
     })
     @storage_type.should_receive(:cmd).with("curl -Ss --fail http://someplace/gold.img | dd bs=1M of=#{@tmpdir}/interfoo")
     @storage_type.stub(:grow_filesystem)
@@ -154,9 +154,9 @@ describe Provision::Storage::Local do
       :prepare  => {
         :method  => :image,
         :options => {
-          :path    => "#{@tmpdir}/empty_gold.img",
-        },
-      },
+          :path    => "#{@tmpdir}/empty_gold.img"
+        }
+      }
     })
     @storage_type.stub(:cmd) do |arg|
       case arg
@@ -179,9 +179,9 @@ describe Provision::Storage::Local do
         :prepare  => {
           :method  => :image,
           :options => {
-            :path    => "#{@tmpdir}/non-existant-source",
-          },
-        },
+            :path    => "#{@tmpdir}/non-existant-source"
+          }
+        }
       })
       expect {
         @storage_type.init_filesystem('valid_name', mount_point_obj)
@@ -310,7 +310,7 @@ describe Provision::Storage::Local do
       FileUtils.touch "#{@tmpdir}/oy-foodb-001_var_lib_mysql"
       mount_point_hash = {
         :size => '10G',
-        :persistent => true,
+        :persistent => true
       }
       mount_point_obj = Provision::Storage::Mount_point.new('/var/lib/mysql'.to_sym, mount_point_hash)
       @storage_type.should_receive(:check_and_resize_filesystem).with("oy-foodb-001", mount_point_obj, false)

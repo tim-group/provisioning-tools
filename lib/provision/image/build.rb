@@ -3,7 +3,7 @@ require 'provision/log'
 
 class Provision::Image::Build
   include Provision::Log
-  attr_accessor :spec,:config
+  attr_accessor :spec, :config
   attr_accessor :suppress_error
 
   def initialize(name, spec, config)
@@ -17,7 +17,7 @@ class Provision::Image::Build
   end
 
   def run(txt, &block)
-    @commands << {:txt => txt, :block => block}
+    @commands << { :txt => txt, :block => block }
   end
 
   def cleanup(&block)
@@ -61,7 +61,7 @@ class Provision::Image::Build
             raise error
           else
             elapsed_time = Time.now - start
-            summary_log.info("[\e[0;32mDONE in #{elapsed_time*1000} ms\e[0m]\n")
+            summary_log.info("[\e[0;32mDONE in #{elapsed_time * 1000} ms\e[0m]\n")
           end
         end
       end
@@ -69,7 +69,7 @@ class Provision::Image::Build
       @on_errors.each do |error_block|
         begin
           error_block.call()
-        rescue Exception =>e
+        rescue Exception => e
           log.error(e)
         end
       end

@@ -1,7 +1,7 @@
 require 'logger'
 class Provision::Logger
   @@logger = nil
-  def self.get_logger(log_id='provision')
+  def self.get_logger(log_id = 'provision')
     if @@logger.nil?
       log_dir = '/var/log/provisioning-tools'
       unless File.directory?(log_dir) and File.writable?(log_dir)

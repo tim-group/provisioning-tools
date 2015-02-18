@@ -9,7 +9,7 @@ end
 describe XYZ do
   before do
     @commands = double()
-    MockFunctions.commands=@commands
+    MockFunctions.commands = @commands
   end
 
   module MockFunctions
@@ -17,11 +17,11 @@ describe XYZ do
       @@commands = commands
     end
 
-    def action(args=nil)
+    def action(args = nil)
       @@commands.action(args)
     end
 
-    def die(args=nil)
+    def die(args = nil)
       raise "I was asked to die"
     end
 
@@ -44,9 +44,9 @@ describe XYZ do
       cleanup {
         action(config[:item2])
       }
-   end
+    end
 
-    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({:hostname=>"myfirstmachine"}), {:item=>"run", :item2 => "clean"})
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({ :hostname => "myfirstmachine" }), { :item => "run", :item2 => "clean" })
 
     @commands.should_receive(:action).with("run")
     @commands.should_receive(:action).with("clean")
@@ -74,7 +74,7 @@ describe XYZ do
       }
     end
 
-    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({:hostname=>"myfirstmachine"}), {})
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({ :hostname => "myfirstmachine" }), {})
 
     @commands.should_receive(:action).with("1")
     @commands.should_receive(:action).with("2")
@@ -105,7 +105,7 @@ describe XYZ do
       }
     end
 
-    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({:hostname=>"myfirstmachine"}), {})
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({ :hostname => "myfirstmachine" }), {})
 
     @commands.should_receive(:action).with("6").ordered
     @commands.should_receive(:action).with("5").ordered
@@ -127,7 +127,7 @@ describe XYZ do
       }
     end
 
-    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({:hostname=>"myfirstmachine"}), {})
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({ :hostname => "myfirstmachine" }), {})
     @commands.should_receive(:action).with("5")
     build.execute()
   end
@@ -142,7 +142,7 @@ describe XYZ do
       }
     end
 
-    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({:hostname=>"myfirstmachine"}), {})
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({ :hostname => "myfirstmachine" }), {})
     @commands.should_receive(:action).with("5")
     build.execute()
   end
@@ -157,7 +157,7 @@ describe XYZ do
         action("3")
       }
     end
-    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({:hostname=>"myfirstmachine"}), {})
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({ :hostname => "myfirstmachine" }), {})
     @commands.should_receive(:action).with("1")
     @commands.should_not_receive(:action).with("3")
 
@@ -174,7 +174,7 @@ describe XYZ do
       }
     end
 
-    build = Provision::Image::Catalogue::build("vanillavm",Provision::Core::MachineSpec.new({:hostname=>"myfirstmachine"}), {})
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({ :hostname => "myfirstmachine" }), {})
 
     @commands.should_receive(:action).with("myfirstmachine")
 
@@ -252,7 +252,7 @@ describe XYZ do
         suppress_error.die("this line should throw an error and be swallowed")
         something = returns_something()
         print "something = #{something} \n"
-      }.until {something=="something"}
+        }.until { something == "something" }
       }
     end
 
@@ -271,7 +271,7 @@ describe XYZ do
       run("configure defaults") {
       }
       on_error {
-        something= "I was executed"
+        something = "I was executed"
       }
     end
 

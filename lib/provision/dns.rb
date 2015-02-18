@@ -17,7 +17,7 @@ class Provision::DNSChecker
    @primary_nameserver = options[:primary_nameserver] || '192.168.5.1'
  end
 
- def resolve(record, element, max_attempts=10)
+ def resolve(record, element, max_attempts = 10)
     attempt = 1
     addrinfo = Set.new()
     while (attempt <= max_attempts)
@@ -29,7 +29,7 @@ class Provision::DNSChecker
        logger.error("DNS RESOLVE FAILURE: #{msg} - #{e.inspect}")
        sleep 1
       end
-      attempt = attempt +1
+      attempt = attempt + 1
     end
     attempt >= max_attempts ? (raise "Lookup #{record} failed after #{max_attempts} attempts") : false
 
@@ -138,7 +138,7 @@ class Provision::DNSNetwork
         existing_cname = lookup_cname_for(fqdn)
         if existing_cname
           if existing_cname == cname
-            result.merge!({fqdn => cname})
+            result.merge!({ fqdn => cname })
             next
           else
             # Should we be unallocating here if it's already allocated?
@@ -147,7 +147,7 @@ class Provision::DNSNetwork
         else
           add_cname_lookup(fqdn, cname)
         end
-        result.merge!({fqdn => cname})
+        result.merge!({ fqdn => cname })
 
         raise "unable to resolve cname #{fqdn} -> #{cname}" unless @checker.resolve_forward(fqdn)
       end
@@ -167,7 +167,7 @@ class Provision::DNSNetwork
         if existing_cname
           if existing_cname == cname_fqdn
             remove_cname_lookup(fqdn, cname_fqdn)
-            result.merge!({fqdn => cname_fqdn})
+            result.merge!({ fqdn => cname_fqdn })
           else
             raise "#{fqdn} resolves to CNAME: '#{existing_cname}', not CNAME: '#{cname_fqdn}' that was expected, not removing"
           end
@@ -182,7 +182,7 @@ end
 class Provision::DNS
   attr_accessor :backend
 
-  def self.get_backend(name, options={})
+  def self.get_backend(name, options = {})
     raise("get_backend not supplied a name, cannot continue.") if name.nil? or name == false
     require "provision/dns/#{name.downcase}"
     instance = Provision::DNS.const_get(name).new(options)
@@ -190,7 +190,7 @@ class Provision::DNS
     instance
   end
 
-  def initialize(options={})
+  def initialize(options = {})
     @networks = {}
     @options = options
     @logger = options[:logger] || Logger.new(STDERR)

@@ -86,7 +86,7 @@ class Provision::WorkQueue
   end
 
   def destroy(spec)
-    if (@virsh.is_defined(spec))
+    if @virsh.is_defined(spec)
       @queue << SpecTask.new(spec) do
         @provisioning_service.clean_vm(spec)
       end
@@ -111,7 +111,7 @@ class Provision::WorkQueue
     total = @queue.size()
     @worker_count.times {|i|
       threads << Thread.new {
-        while(not @queue.empty?)
+        while not @queue.empty?
           task = @queue.pop(true)
           task.spec[:thread_number] = i
           require 'yaml'

@@ -66,11 +66,11 @@ describe Provision::Storage::Service do
       storage_hash = {
         '/'.to_sym => {
           :type => 'os',
-          :size => '10G',
+          :size => '10G'
         }
       }
       @storage_service.create_config('test', storage_hash)
-      @storage_service.spec_to_xml('test').should eql( <<-EOS
+      @storage_service.spec_to_xml('test').should eql(<<-EOS
     <disk type='block' device='disk'>
       <driver name='qemu' type='raw'/>
       <source dev='/dev/main/test' />
@@ -84,15 +84,15 @@ describe Provision::Storage::Service do
       storage_hash = {
         '/'.to_sym => {
           :type => 'os',
-          :size => '10G',
+          :size => '10G'
         },
         '/var/lib/mysql'.to_sym => {
           :type => 'data',
-          :size => '100G',
+          :size => '100G'
         }
       }
       @storage_service.create_config('test', storage_hash)
-      @storage_service.spec_to_xml('test').should eql( <<-EOS
+      @storage_service.spec_to_xml('test').should eql(<<-EOS
     <disk type='block' device='disk'>
       <driver name='qemu' type='raw'/>
       <source dev='/dev/main/test' />
@@ -142,8 +142,8 @@ describe Provision::Storage::Service do
     it 'should raise exception if provisioning an Image without an image_path' do
       settings = {
         :os => {
-          :arch    => 'Image',
-        },
+          :arch    => 'Image'
+        }
       }
       expect {
         @storage_service = Provision::Storage::Service.new(settings)
@@ -160,12 +160,12 @@ describe Provision::Storage::Service do
       storage_hash = {
         '/'.to_sym => {
           :type => 'os',
-          :size => '10G',
+          :size => '10G'
         },
         '/var/lib/mysql'.to_sym => {
           :type       => 'data',
           :size       => '10G',
-          :persistent => true,
+          :persistent => true
         }
       }
       @storage_service.create_config('oy-db-001', storage_hash)
@@ -178,12 +178,12 @@ describe Provision::Storage::Service do
       storage_hash = {
         '/'.to_sym => {
           :type => 'os',
-          :size => '10G',
+          :size => '10G'
         },
         '/var/lib/mysql'.to_sym => {
           :type       => 'data',
           :size       => '10G',
-          :persistent => true,
+          :persistent => true
         }
       }
       FileUtils.touch "#{@tmpdir}/data/oy-db-001_var_lib_mysql.img"
@@ -203,7 +203,7 @@ describe Provision::Storage::Service do
         '/var/lib/mysql'.to_sym => {
           :type       => 'data',
           :size       => '10G',
-          :persistent => true,
+          :persistent => true
         }
       }
       @storage_service.create_config('oy-db-001', storage_hash)
@@ -217,11 +217,11 @@ describe Provision::Storage::Service do
       storage_hash = {
         '/'.to_sym => {
           :type => 'os',
-          :size => '10G',
+          :size => '10G'
         }
       }
       @storage_service.create_config('test', storage_hash)
-      @storage_service.spec_to_xml('test').should eql( <<-EOS
+      @storage_service.spec_to_xml('test').should eql(<<-EOS
     <disk type='block' device='disk'>
       <driver name='qemu' type='raw'/>
       <source dev='#{@tmpdir}/os/test.img' />
@@ -235,15 +235,15 @@ describe Provision::Storage::Service do
       storage_hash = {
         '/'.to_sym => {
           :type => 'os',
-          :size => '10G',
+          :size => '10G'
         },
         '/var/lib/mysql'.to_sym => {
           :type => 'data',
-          :size => '100G',
+          :size => '100G'
         }
       }
       @storage_service.create_config('test', storage_hash)
-      @storage_service.spec_to_xml('test').should eql( <<-EOS
+      @storage_service.spec_to_xml('test').should eql(<<-EOS
     <disk type='block' device='disk'>
       <driver name='qemu' type='raw'/>
       <source dev='#{@tmpdir}/os/test.img' />

@@ -86,4 +86,3 @@ end
 
 class Provision::Storage::StorageNotFoundError < StandardError
 end
-

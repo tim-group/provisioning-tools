@@ -38,4 +38,3 @@ echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local"
   }
 
 end
-

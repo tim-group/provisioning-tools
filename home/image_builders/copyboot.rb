@@ -8,7 +8,7 @@ define "copyboot" do
   grow
 
   case config[:vm_storage_type]
-  when 'image','lvm'
+  when 'image', 'lvm'
     run("create temporary mount directory for VM filesystem") {
         cmd "mkdir #{spec[:temp_dir]}"
     }
@@ -17,10 +17,10 @@ define "copyboot" do
   case config[:vm_storage_type]
   when 'image'
     run("mount loopback device") {
-      #cmd "cp /mnt/generic.img #{spec[:image_path]}"
+      # cmd "cp /mnt/generic.img #{spec[:image_path]}"
       #    cmd "dd if=/mnt/generic.img of=/dev/mapper/MYMACHINE"
       #
-      #print "mounting #{spec[:image_path]} to #{spec[:temp_dir]}\n"
+      # print "mounting #{spec[:image_path]} to #{spec[:temp_dir]}\n"
 #      pp spec
       cmd "mount -o offset=1048576  #{spec[:image_path]} #{spec[:temp_dir]}"
     }
@@ -35,7 +35,7 @@ define "copyboot" do
   end
 
   case config[:vm_storage_type]
-  when 'image','lvm'
+  when 'image', 'lvm'
     cleanup {
       cmd "umount #{spec[:temp_dir]}"
       suppress_error.cmd "rmdir #{spec[:temp_dir]}"

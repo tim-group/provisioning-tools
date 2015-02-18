@@ -11,17 +11,17 @@ require 'yaml'
 require 'pp'
 
 module Provision
-  def self.base(dir="")
+  def self.base(dir = "")
     return File.expand_path(File.join(File.dirname(__FILE__), "../#{dir}"))
   end
 
-  def self.home(dir="")
+  def self.home(dir = "")
     return File.expand_path(File.join(File.dirname(__FILE__), "../home/#{dir}"))
   end
 end
 
 class Provision::Config
-  def initialize(options={})
+  def initialize(options = {})
     @configfile = options[:configfile] || "/etc/provision/config.yaml"
     @symbol_utils = Util::SymbolUtils.new
   end
@@ -48,7 +48,7 @@ end
 
 class Provision::Factory
   attr_reader :logger
-  def initialize(options={})
+  def initialize(options = {})
     @logger = options[:logger] || Logger.new(STDOUT)
     @config = Provision::Config.new(:configfile => options[:configfile]).get()
   end
@@ -71,11 +71,11 @@ class Provision::Factory
     return numbering_service
   end
 
-  def home(dir="")
+  def home(dir = "")
     Provision.home(dir)
   end
 
-  def base(dir="")
+  def base(dir = "")
     Provision.base(dir)
   end
 
@@ -86,7 +86,7 @@ class Provision::Factory
   def provisioning_service()
     targetdir = File.join(File.dirname(__FILE__), "../target")
 
-    (puts "@config[:defaults] is undefined, are you sure this is a compute node?" ; exit 1) if ! defined?(@config[:defaults])
+    (puts "@config[:defaults] is undefined, are you sure this is a compute node?"; exit 1) if !defined?(@config[:defaults])
 
     defaults = @config[:defaults]
 
@@ -125,7 +125,7 @@ class Provision::Factory
     distcodename = spec_hash[:distcodename] || 'precise'
     spec = Provision::Core::MachineSpec.new(spec_hash)
     targetdir = File.join(File.dirname(__FILE__), "../target")
-    image_service = Provision::Image::Service.new(:configdir => home("image_builders"), :targetdir => targetdir, :config => @config )
+    image_service = Provision::Image::Service.new(:configdir => home("image_builders"), :targetdir => targetdir, :config => @config)
     image_service.build_image("gold-#{distid}-#{distcodename}", spec)
     image_service.build_image("shrink", spec)
   end

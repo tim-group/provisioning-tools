@@ -17,7 +17,7 @@ module Provision::DNS::DDNS::Exception
 end
 
 class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
-  def initialize(name, range, options={})
+  def initialize(name, range, options = {})
     if !options[:primary_nameserver]
       options[:primary_nameserver] = '127.0.0.1'
     end
@@ -207,4 +207,3 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     nsupdate(tmp_file, "Remove reverse for #{ip.to_s}")
   end
 end
-

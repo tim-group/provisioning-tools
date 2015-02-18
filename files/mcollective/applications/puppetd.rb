@@ -1,4 +1,4 @@
-class MCollective::Application::Puppetd<MCollective::Application
+class MCollective::Application::Puppetd < MCollective::Application
   description "Run puppet agent, get its status, and enable/disable it"
     usage <<-END_OF_USAGE
 mco puppetd [OPTIONS] [FILTERS] <ACTION> [CONCURRENCY]
@@ -104,7 +104,7 @@ The ACTION can be one of the following:
         hosts.each do |host|
           running = waitfor(configuration[:concurrency], mc)
           log("Running #{host}, concurrency is #{running}")
-          result = mc.custom_request("runonce", parameters, host, {"identity" => host})
+          result = mc.custom_request("runonce", parameters, host, { "identity" => host })
 
           begin
             log("#{host} schedule status: #{result[0][:statusmsg]}")
@@ -125,10 +125,10 @@ The ACTION can be one of the following:
 
         parameters = { :forcerun => configuration[:force],
                        :tags     => configuration[:tags],
-                       :noop     => configuration[:noop]}
+                       :noop     => configuration[:noop] }
       else
         parameters = { :force => configuration[:force],
-                       :noop  => configuration[:noop]}
+                       :noop  => configuration[:noop] }
       end
 
       printrpc mc.runonce(parameters)
@@ -141,7 +141,7 @@ The ACTION can be one of the following:
           msg = node[:statusmsg]
         end
 
-        puts "%-40s %s" % [ node[:sender], msg ]
+        puts "%-40s %s" % [node[:sender], msg]
       end
 
     when "summary"

@@ -24,7 +24,7 @@ define "win7boot" do
   run("copy gold image") {
     win7_partition_location = 105906176
     case config[:vm_storage_type]
-    when 'lvm','image'
+    when 'lvm', 'image'
       cmd "mkdir -p #{spec[:temp_dir]}"
     when 'new'
       # do nothing
@@ -111,12 +111,12 @@ define "win7boot" do
   }
 
   run("stamp time") {
-     tmp_date_file="#{mountpoint}/build-date.txt"
+     tmp_date_file = "#{mountpoint}/build-date.txt"
     `date +"%m-%d-%y.%k:%M" > #{tmp_date_file}`
   }
 
   case config[:vm_storage_type]
-  when 'lvm','image'
+  when 'lvm', 'image'
     cleanup {
       cmd "umount -l #{mountpoint}"
       cmd "sleep 1"

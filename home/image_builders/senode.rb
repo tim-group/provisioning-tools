@@ -16,18 +16,18 @@ define "senode" do
     log.debug(`mount -l | grep #{spec[:hostname]}/proc | wc -l`.chomp)
     keep_doing {
       suppress_error.cmd "umount -l #{spec[:temp_dir]}/proc"
-    }.until {`mount -l | grep #{spec[:hostname]}/proc | wc -l`.chomp == "0"}
+    }.until { `mount -l | grep #{spec[:hostname]}/proc | wc -l`.chomp == "0" }
 
     keep_doing {
       suppress_error.cmd "umount -l #{spec[:temp_dir]}/sys"
-    }.until {`mount -l | grep #{spec[:hostname]}/sys | wc -l`.chomp == "0"}
+    }.until { `mount -l | grep #{spec[:hostname]}/sys | wc -l`.chomp == "0" }
 
     keep_doing {
       suppress_error.cmd "umount -l #{spec[:temp_dir]}/dev"
-    }.until {`mount -l | grep #{spec[:hostname]}/dev | wc -l`.chomp == "0"}
+    }.until { `mount -l | grep #{spec[:hostname]}/dev | wc -l`.chomp == "0" }
   }
 
-#run("configure google apt repo") {
+# run("configure google apt repo") {
 #    open("#{spec[:temp_dir]}/etc/apt/sources.list.d/google.list", 'w') { |f|
 #      f.puts "deb http://dl.google.com/linux/deb/ stable main\n"
 #    }

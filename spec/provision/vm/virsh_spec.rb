@@ -13,16 +13,16 @@ describe Provision::VM::Virsh do
     d = Dir.mktmpdir
 
     machine_spec = Provision::Core::MachineSpec.new(
-      :hostname=>"vmx1",
-      :disk_dir=>"build/",
-      :vnc_port=>9005,
+      :hostname => "vmx1",
+      :disk_dir => "build/",
+      :vnc_port => 9005,
       :ram => "1G",
-      :interfaces => [{:type=>"bridge",:name=>"br0"}, {:type=>"network", :name=>"provnat0"}],
+      :interfaces => [{ :type => "bridge", :name => "br0" }, { :type => "network", :name => "provnat0" }],
       :images_dir => "build",
       :libvirt_dir => d
     )
 
-    virt_manager = Provision::VM::Virsh.new({:vm_storage_type => "image"})
+    virt_manager = Provision::VM::Virsh.new({ :vm_storage_type => "image" })
     fn = virt_manager.write_virsh_xml(machine_spec)
     fn.should eql("#{d}/vmx1.xml")
     File.exist?("#{d}/vmx1.xml").should eql(true)
@@ -36,17 +36,17 @@ describe Provision::VM::Virsh do
     d = Dir.mktmpdir
 
     machine_spec = Provision::Core::MachineSpec.new(
-      :hostname=>"vmx-1",
-      :disk_dir=>"build/",
-      :vnc_port=>9005,
+      :hostname => "vmx-1",
+      :disk_dir => "build/",
+      :vnc_port => 9005,
       :ram => "1G",
-      :interfaces => [{:type=>"bridge",:name=>"br0"}, {:type=>"network", :name=>"provnat0"}],
+      :interfaces => [{ :type => "bridge", :name => "br0" }, { :type => "network", :name => "provnat0" }],
       :images_dir => "build",
       :libvirt_dir => d
     )
 
     config = {
-      :vm_storage_type => 'lvm',
+      :vm_storage_type => 'lvm'
     }
     virt_manager = Provision::VM::Virsh.new(config)
     fn = virt_manager.write_virsh_xml(machine_spec)
@@ -62,18 +62,18 @@ describe Provision::VM::Virsh do
     d = Dir.mktmpdir
 
     machine_spec = Provision::Core::MachineSpec.new(
-      :hostname=>"vmx-1",
-      :disk_dir=>"build/",
-      :vnc_port=>9005,
+      :hostname => "vmx-1",
+      :disk_dir => "build/",
+      :vnc_port => 9005,
       :ram => "1G",
-      :interfaces => [{:type=>"bridge",:name=>"br0"}, {:type=>"network", :name=>"provnat0"}],
+      :interfaces => [{ :type => "bridge", :name => "br0" }, { :type => "network", :name => "provnat0" }],
       :images_dir => "build",
       :libvirt_dir => d,
       :kvm_template => 'kvm_no_virtio'
     )
 
     config = {
-      :vm_storage_type => 'lvm',
+      :vm_storage_type => 'lvm'
     }
     virt_manager = Provision::VM::Virsh.new(config)
     fn = virt_manager.write_virsh_xml(machine_spec)
@@ -90,7 +90,7 @@ describe Provision::VM::Virsh do
     hostname = 'somevmtobedestroyed'
     spec = { :hostname => hostname }
 
-    virt_manager = Provision::VM::Virsh.new( {} )
+    virt_manager = Provision::VM::Virsh.new({})
     virt_manager.should_receive(:system).with("virsh destroy #{hostname} > /dev/null 2>&1").and_return(true)
 
     virt_manager.destroy_vm(spec)
@@ -100,7 +100,7 @@ describe Provision::VM::Virsh do
     hostname = 'somevmtobedestroyed'
     spec = { :disallow_destroy => true, :hostname => hostname }
 
-    virt_manager = Provision::VM::Virsh.new( {} )
+    virt_manager = Provision::VM::Virsh.new({})
     virt_manager.should_not_receive(:system).with("virsh destroy #{hostname} > /dev/null 2>&1")
 
     expect {
@@ -112,7 +112,7 @@ describe Provision::VM::Virsh do
     hostname = 'somevmtobedestroyed'
     spec = { :hostname => hostname }
 
-    virt_manager = Provision::VM::Virsh.new( {} )
+    virt_manager = Provision::VM::Virsh.new({})
     virt_manager.should_receive(:system).with("virsh undefine #{hostname} > /dev/null 2>&1").and_return(true)
 
     virt_manager.undefine_vm(spec)
@@ -122,7 +122,7 @@ describe Provision::VM::Virsh do
     hostname = 'somevmtobedestroyed'
     spec = { :disallow_destroy => true, :hostname => hostname }
 
-    virt_manager = Provision::VM::Virsh.new( {} )
+    virt_manager = Provision::VM::Virsh.new({})
     virt_manager.should_not_receive(:system).with("virsh undefine #{hostname} > /dev/null 2>&1")
 
     expect {

@@ -107,7 +107,7 @@ describe Provision::Core::ProvisioningService do
         :numbering_service => @numbering_service,
         :defaults => {
           :template => "ubuntuprecise",
-          :enc => {:classes => {}}
+          :enc => { :classes => {} }
         }
       )
       @numbering_service.should_receive(:allocate_ips_for)
@@ -125,7 +125,7 @@ describe Provision::Core::ProvisioningService do
         :numbering_service => @numbering_service,
         :defaults => {
           :template => "blah",
-          :enc => {:classes => {}}
+          :enc => { :classes => {} }
         }
       )
       @numbering_service.should_receive(:allocate_ips_for)
@@ -137,8 +137,8 @@ describe Provision::Core::ProvisioningService do
     end
 
     it 'will allocate you an IP for a name without doing anything else, like for a VIP' do
-      spec = {:networks => ['mtv'], :qualified_hostnames => {'mtv' => 'beavis.mtv.cable.net.local'}}
-      networking = {:mtv => {:netmask => "0.0.0.0", :address => "1.2.3.4"}}
+      spec = { :networks => ['mtv'], :qualified_hostnames => { 'mtv' => 'beavis.mtv.cable.net.local' } }
+      networking = { :mtv => { :netmask => "0.0.0.0", :address => "1.2.3.4" } }
       @numbering_service.should_receive(:allocate_ips_for).with(spec_with(spec)).and_return(networking)
       @provisioning_service.allocate_ip(spec)
     end
@@ -163,7 +163,7 @@ describe Provision::Core::ProvisioningService do
       @storage_hash = {
         :/ => {
           :type => 'os',
-          :size => '10G',
+          :size => '10G'
         }
       }
     end
@@ -180,7 +180,7 @@ describe Provision::Core::ProvisioningService do
     it 'allows the user to define vm from an image catalogue and vmdescription catalogue' do
       @numbering_service.should_receive(:allocate_ips_for)
       @numbering_service.should_receive(:add_cnames_for)
-      @storage_service.should_receive(:create_config).with("vmx1", {'/'.to_sym=>{:type=>"os", :size=>"10G"}}).ordered
+      @storage_service.should_receive(:create_config).with("vmx1", { '/'.to_sym => { :type => "os", :size => "10G" } }).ordered
       @storage_service.should_receive(:spec_to_xml).with("vmx1").ordered
       @vm_service.should_receive(:define_vm).with(kind_of(Provision::Core::MachineSpec), "some xml").ordered
       @storage_service.should_receive(:prepare_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
@@ -202,7 +202,7 @@ describe Provision::Core::ProvisioningService do
       @numbering_service.stub(:allocate_ips_for).and_return(network_address)
       @numbering_service.stub(:add_cnames_for)
 
-      @storage_service.should_receive(:create_config).with("vmx1", {'/'.to_sym=>{:type=>"os", :size=>"10G"}}).ordered
+      @storage_service.should_receive(:create_config).with("vmx1", { '/'.to_sym => { :type => "os", :size => "10G" } }).ordered
       @storage_service.should_receive(:spec_to_xml).with("vmx1").ordered
       @vm_service.should_receive(:define_vm).ordered
       @storage_service.should_receive(:prepare_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
@@ -216,7 +216,7 @@ describe Provision::Core::ProvisioningService do
 
     it 'allows the user to clean up vms' do
       @vm_service.should_receive(:is_running).ordered
-      @storage_service.should_receive(:create_config).with("vmx1", {'/'.to_sym=>{:type=>"os", :size=>"10G"}}).ordered
+      @storage_service.should_receive(:create_config).with("vmx1", { '/'.to_sym => { :type => "os", :size => "10G" } }).ordered
       @storage_service.should_receive(:clean_storage).with("vmx1", @storage_hash).ordered
       @vm_service.should_receive(:undefine_vm).ordered
       @provisioning_service.clean_vm(:hostname => "vmx1", :template => "ubuntuprecise", :storage => @storage_hash)
@@ -230,12 +230,12 @@ describe Provision::Core::ProvisioningService do
         :storage_service => @storage_service,
         :defaults => {
           :template => "ubuntuprecise",
-          :enc => {:classes => {}}
+          :enc => { :classes => {} }
         }
       )
       @numbering_service.should_receive(:allocate_ips_for)
       @numbering_service.should_receive(:add_cnames_for)
-      @storage_service.should_receive(:create_config).with("vmx1", {'/'.to_sym=>{:type=>"os", :size=>"10G"}}).ordered
+      @storage_service.should_receive(:create_config).with("vmx1", { '/'.to_sym => { :type => "os", :size => "10G" } }).ordered
       @storage_service.should_receive(:spec_to_xml).with("vmx1").ordered
       @vm_service.should_receive(:define_vm).ordered
       @storage_service.should_receive(:prepare_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
@@ -255,12 +255,12 @@ describe Provision::Core::ProvisioningService do
         :storage_service => @storage_service,
         :defaults => {
           :template => "blah",
-          :enc => {:classes => {}}
+          :enc => { :classes => {} }
         }
       )
       @numbering_service.should_receive(:allocate_ips_for)
       @numbering_service.should_receive(:add_cnames_for)
-      @storage_service.should_receive(:create_config).with("vmx1", {'/'.to_sym=>{:type=>"os", :size=>"10G"}}).ordered
+      @storage_service.should_receive(:create_config).with("vmx1", { '/'.to_sym => { :type => "os", :size => "10G" } }).ordered
       @storage_service.should_receive(:spec_to_xml).with("vmx1").ordered
       @vm_service.should_receive(:define_vm).ordered
       @storage_service.should_receive(:prepare_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
@@ -273,8 +273,8 @@ describe Provision::Core::ProvisioningService do
     end
 
     it 'will allocate you an IP for a name without doing anything else, like for a VIP' do
-      spec = {:networks => ['mtv'], :qualified_hostnames => {'mtv' => 'beavis.mtv.cable.net.local'}}
-      networking = {:mtv => {:netmask => "0.0.0.0", :address => "1.2.3.4"}}
+      spec = { :networks => ['mtv'], :qualified_hostnames => { 'mtv' => 'beavis.mtv.cable.net.local' } }
+      networking = { :mtv => { :netmask => "0.0.0.0", :address => "1.2.3.4" } }
       @numbering_service.should_receive(:allocate_ips_for).with(spec_with(spec)).and_return(networking)
       @provisioning_service.allocate_ip(spec)
     end

@@ -30,4 +30,3 @@ class Provision::Image::Service
     end
   end
 end
-

@@ -15,10 +15,10 @@ class Provision::Storage::Mount_point
           :create_in_fstab => true,
           :resize          => true,
           :type            => 'ext4',
-          :virtio          => true,
+          :virtio          => true
         }
       },
-      :size       =>"3G",
+      :size => "3G"
     }
 
     if mount_point == '/'.to_sym
@@ -57,9 +57,9 @@ class Provision::Storage::Mount_point
   end
 
   private
-  def recurse_merge(a,b)
-    a.merge(b) do |_,x,y|
-      (x.is_a?(Hash) && y.is_a?(Hash)) ? recurse_merge(x,y) : y
+  def recurse_merge(a, b)
+    a.merge(b) do |_, x, y|
+      (x.is_a?(Hash) && y.is_a?(Hash)) ? recurse_merge(x, y) : y
     end
   end
 end

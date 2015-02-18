@@ -12,7 +12,7 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
   attr_reader :by_name
   attr_reader :by_cname
 
-  def initialize(name, range, options={})
+  def initialize(name, range, options = {})
     if !options[:primary_nameserver]
       options[:primary_nameserver] = '127.0.0.1'
     end
@@ -82,7 +82,7 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
   def remove_cname_lookup(fqdn, cname_fqdn)
     $etc_hosts_mutex.synchronize do
       parse_hosts
-      #return if @cnames_by_fqdn[fqdn] == cname_fqdn
+      # return if @cnames_by_fqdn[fqdn] == cname_fqdn
       ip = @by_name[cname_fqdn]
       if ip
         temp_file = Tempfile.new('etc_hosts_update')
@@ -142,20 +142,20 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
   end
 
   def reload_dnsmasq
-    if (File.exists?(@dnsmasq_pid_file))
+    if File.exists?(@dnsmasq_pid_file)
       pid = File.open(@dnsmasq_pid_file).first.to_i
       puts "Reloading dnsmasq (#{pid})"
       Process.kill('HUP', pid)
     end
   end
 
-  def remove_lines_from_file(regex,file)
+  def remove_lines_from_file(regex, file)
     found = 0
     tmp_file = Tempfile.new('remove_temp')
     File.open(file, 'r') do |f|
-      f.each_line{|line|
+      f.each_line {|line|
         matching_line = line =~ regex
-        matching_line ? (found+=1) : (tmp_file.puts line)
+        matching_line ? (found += 1) : (tmp_file.puts line)
       }
     end
     tmp_file.close

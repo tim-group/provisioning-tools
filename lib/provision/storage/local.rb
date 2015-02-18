@@ -60,17 +60,17 @@ module Provision::Storage::Local
     run_task(name, "create filesystem #{underscore_name}", {
       :task => lambda {
         cmd "mkfs.#{fs_type} /dev/mapper/#{partition_name(name, mount_point_obj)}"
-      },
+      }
     })
     run_task(name, "undo create partition device nodes #{underscore_name}", {
       :task => lambda {
         kpartxd(name, mount_point_obj)
       },
-      :remove_cleanup => "create partition device nodes #{underscore_name}",
+      :remove_cleanup => "create partition device nodes #{underscore_name}"
     })
   end
 
-  def rebuild_partition(name, mount_point_obj, size=:maximum)
+  def rebuild_partition(name, mount_point_obj, size = :maximum)
     underscore_name = underscore_name(name, mount_point_obj.name)
     fs_type = mount_point_obj.config[:prepare][:options][:type]
 
@@ -95,7 +95,7 @@ module Provision::Storage::Local
       vm_partition_name = partition_name(name, mount_point_obj)
       blockcount = cmd("dumpe2fs -h /dev/mapper/#{vm_partition_name} | grep -F 'Block count:' | awk -F ':' '{ print $2 }' | sed 's/ //g'").chomp.to_i
       blocksize = cmd("dumpe2fs -h /dev/mapper/#{vm_partition_name} | grep -F 'Block size:' | awk -F ':' '{ print $2 }' | sed 's/ //g'").chomp.to_i
-      sectors=(blockcount*blocksize/512)+2048
+      sectors = (blockcount * blocksize / 512) + 2048
 
       kpartxd(name, mount_point_obj)
 
@@ -111,7 +111,7 @@ module Provision::Storage::Local
         :task => lambda {
           kpartxd(name, mount_point_obj)
         },
-        :remove_cleanup => "create partition device nodes #{underscore_name}",
+        :remove_cleanup => "create partition device nodes #{underscore_name}"
       })
     end
   end
@@ -133,7 +133,7 @@ module Provision::Storage::Local
     end
   end
 
-  def check_and_resize_filesystem(name, mount_point_obj, resize=:maximum)
+  def check_and_resize_filesystem(name, mount_point_obj, resize = :maximum)
     underscore_name = underscore_name(name, mount_point_obj.name)
     run_task(name, "create partition device nodes #{underscore_name}", {
       :task => lambda {
@@ -158,14 +158,14 @@ module Provision::Storage::Local
         else
           raise "unsure how to deal with resize option: #{resize}"
         end
-      },
+      }
     })
 
     run_task(name, "undo create partition device nodes #{underscore_name}", {
       :task => lambda {
         kpartxd(name, mount_point_obj)
       },
-      :remove_cleanup => "create partition device nodes #{underscore_name}",
+      :remove_cleanup => "create partition device nodes #{underscore_name}"
     })
   end
 
@@ -198,7 +198,7 @@ module Provision::Storage::Local
   end
 
   def underscore_name(name, mount_point)
-    "#{name}#{mount_point.to_s.gsub('/','_').gsub(/_$/, '')}"
+    "#{name}#{mount_point.to_s.gsub('/', '_').gsub(/_$/, '')}"
   end
 
   def mount(name, mount_point_obj)
@@ -267,7 +267,7 @@ module Provision::Storage::Local
       :task => lambda {
         FileUtils.rmdir(dir) if delete_mountpoint and dir_existed_at_start
       },
-      :remove_cleanup => "make directory #{dir}",
+      :remove_cleanup => "make directory #{dir}"
     })
 
     mount_point_obj.unset(:dir_existed_at_start)
@@ -279,7 +279,7 @@ module Provision::Storage::Local
   end
 
   def copy_to(name, mount_point_obj, transport_string, transport_options)
-    source_device=device(underscore_name(name, mount_point_obj.name))
+    source_device = device(underscore_name(name, mount_point_obj.name))
     raise Provision::Storage::StorageNotFoundError, "Source device: #{source_device} does not exist" unless File.exists?(source_device)
 
     transports = transport_string.split(',')
@@ -295,7 +295,7 @@ module Provision::Storage::Local
     split_opts = transport_options.split(',')
     split_opts.each do |opt|
       temp_key, value = opt.split(':')
-      transport, option = temp_key.split('__',2)
+      transport, option = temp_key.split('__', 2)
       raise "option: #{option} for unused transport: #{transport} provided" if options[transport.to_sym].nil?
       options[transport.to_sym][option.to_sym] = value
     end

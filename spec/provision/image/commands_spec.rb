@@ -8,7 +8,7 @@ describe Provision::Image::Commands do
     @thread_number = 1
     extend Provision::Log
     extend Provision::Image::Commands
-    i=0;
+    i = 0;
 #    expect {
 #	keep_doing {}.until {i==5}
 #    }.should raise_error(Exception)
@@ -19,11 +19,11 @@ describe Provision::Image::Commands do
     @thread_number = 1
     extend Provision::Log
     extend Provision::Image::Commands
-    i=0;
+    i = 0;
     keep_doing {
-      i+=1
+      i += 1
       print i
-    }.until {i==5}
+    }.until { i == 5 }
 
     i.should eql(5)
   end

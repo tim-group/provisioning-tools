@@ -1,6 +1,6 @@
 module MCollective
   module Agent
-    class Computenodeconfig<RPC::Agent
+    class Computenodeconfig < RPC::Agent
       action "get" do
         reply[:response] = get(request)
       end

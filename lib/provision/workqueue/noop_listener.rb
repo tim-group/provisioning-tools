@@ -11,12 +11,12 @@ class NoopListener
     end
   end
 
-  def initialize(options={})
+  def initialize(options = {})
     @results = {}
     @logger = options[:logger] || InternalLogger.new
   end
 
-  def passed(spec, msg="")
+  def passed(spec, msg = "")
     @results[spec[:hostname]] = ["success", msg]
     @logger.info("#{spec[:hostname]} [passed] #{msg}")
   end

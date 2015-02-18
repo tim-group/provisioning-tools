@@ -30,10 +30,10 @@ describe Provision::DNS::DNSMasq do
     @checker = double()
   end
 
-  def undertest(dir, options={})
+  def undertest(dir, options = {})
     dnsmasq = Provision::DNS.get_backend("DNSMasq", options)
     dnsmasq.add_network(:mgmt, "192.168.5.0/24", :min_allocation => "192.168.5.2", :max_allocation => "192.168.5.250", :hosts_file => "#{dir}/etc/hosts", :pid_file => "#{dir}/var/run/dnsmasq.pid", :checker => @checker)
-    dnsmasq.add_network(:prod, "192.168.6.0/24", :min_allocation => "192.168.6.2", :hosts_file =>"#{dir}/etc/hosts", :pid_file => "#{dir}/var/run/dnsmasq.pid", :checker => @checker)
+    dnsmasq.add_network(:prod, "192.168.6.0/24", :min_allocation => "192.168.6.2", :hosts_file => "#{dir}/etc/hosts", :pid_file => "#{dir}/var/run/dnsmasq.pid", :checker => @checker)
     return dnsmasq
   end
 
@@ -45,7 +45,7 @@ describe Provision::DNS::DNSMasq do
       mock_logger = double()
       mock_logger.should_receive(:warn).with(/[:prod,:noexist]/)
 
-      thing = undertest(dir, :logger=>mock_logger)
+      thing = undertest(dir, :logger => mock_logger)
 
       thing.remove_ips_for(Provision::Core::MachineSpec.new(
         :hostname => "example",
@@ -54,7 +54,7 @@ describe Provision::DNS::DNSMasq do
           :prod => 'example.youdevise.com',
           :noexist => 'example.mgmt.youdevise.com'
         },
-        :networks => [:prod,:noexist]
+        :networks => [:prod, :noexist]
       ))
 
     }
@@ -67,7 +67,7 @@ describe Provision::DNS::DNSMasq do
 
       mock_logger = double()
 
-      thing = undertest(dir, :logger=>mock_logger)
+      thing = undertest(dir, :logger => mock_logger)
       thing.networks[:mgmt].network.to_s.should eql('192.168.5.0')
       thing.networks[:mgmt].broadcast.to_s.should eql('192.168.5.255')
       thing.networks[:mgmt].min_allocation.to_s.should eql('192.168.5.2')
@@ -145,7 +145,7 @@ describe Provision::DNS::DNSMasq do
 
       new_thing.hosts_by_name(:mgmt).should eql({
         "example.mgmt.youdevise.com" => "192.168.5.2",
-        "example2.mgmt.youdevise.com" => "192.168.5.3",
+        "example2.mgmt.youdevise.com" => "192.168.5.3"
       })
     }
   end
@@ -229,8 +229,8 @@ describe Provision::DNS::DNSMasq do
       })
       expect_checks('example2.mgmt.youdevise.com' => '192.168.5.3', 'example2.youdevise.com' => '192.168.6.3')
       thing.allocate_ips_for(spec2)
-      thing.remove_ips_for(spec1)[:mgmt].should eql({:netmask => '255.255.255.0', :address => '192.168.5.2'})
-      thing.remove_ips_for(spec2)[:mgmt].should eql({:netmask => '255.255.255.0', :address => '192.168.5.3'})
+      thing.remove_ips_for(spec1)[:mgmt].should eql({ :netmask => '255.255.255.0', :address => '192.168.5.2' })
+      thing.remove_ips_for(spec2)[:mgmt].should eql({ :netmask => '255.255.255.0', :address => '192.168.5.3' })
 
       File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("") }
     }
@@ -299,7 +299,7 @@ describe Provision::DNS::DNSMasq do
         :domain => "youdevise.com",
         :cnames => {
           :prod => {
-            'cname1' => 'example.youdevise.com',
+            'cname1' => 'example.youdevise.com'
           }
         },
         :qualified_hostnames => {

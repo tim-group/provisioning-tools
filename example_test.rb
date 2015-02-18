@@ -16,11 +16,11 @@ specs = [
     :group => 'dev-tfundsproxy',
     :qualified_hostnames => {
       :prod => "dev-tfundsproxy-001-grichards.#{domain}",
-      :mgmt => "dev-tfundsproxy-001-grichards.mgmt.#{domain}",
+      :mgmt => "dev-tfundsproxy-001-grichards.mgmt.#{domain}"
     },
     :cnames => {
       :prod => {
-        "c" => "dev-tfundsproxy-001-grichards.#{domain}",
+        "c" => "dev-tfundsproxy-001-grichards.#{domain}"
       }
     },
     :ram => '2097152',
@@ -36,18 +36,18 @@ specs = [
     :group => 'dev-tfundsproxy',
     :qualified_hostnames => {
       :prod => "dev-tfundsproxy-002-grichards.#{domain}",
-      :mgmt => "dev-tfundsproxy-002-grichards.mgmt.#{domain}",
+      :mgmt => "dev-tfundsproxy-002-grichards.mgmt.#{domain}"
     },
     :cnames => {
       :prod => {
         "a" => "dev-tfundsproxy-001-grichards.#{domain}",
-        "b" => "dev-tfundsproxy-001-grichards.#{domain}",
+        "b" => "dev-tfundsproxy-001-grichards.#{domain}"
       }
     },
     :ram => '2097152',
     :domain => "#{domain}",
     :fabric => 'production'
-  },
+  }
 ]
 printrpc mc.allocate_ips(:specs => specs)
 printrpc mc.add_cnames(:specs => specs)

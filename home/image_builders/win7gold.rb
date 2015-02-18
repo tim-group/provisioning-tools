@@ -43,7 +43,7 @@ define "win7gold" do
   }
 
   run("stamp gold image build date") {
-    tmp_date_file="#{mountpoint}/gold-build-date.txt"
+    tmp_date_file = "#{mountpoint}/gold-build-date.txt"
     `date +"%m-%d-%y.%k:%M" > #{tmp_date_file}`
   }
 end

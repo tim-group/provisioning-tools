@@ -39,7 +39,7 @@ task :build_gold_precise do
   require 'pp'
 
   dest = File.dirname(__FILE__) + '/build/gold-precise'
-  result = Provision::Factory.new.create_gold_image({:spindle=>dest, :hostname=>"generic", :distid => "ubuntu", :distcodename => "precise"})
+  result = Provision::Factory.new.create_gold_image({ :spindle => dest, :hostname => "generic", :distid => "ubuntu", :distcodename => "precise" })
   sh "chmod a+w -R build"
 end
 
@@ -52,7 +52,7 @@ task :build_gold_trusty do
   require 'pp'
 
   dest = File.dirname(__FILE__) + '/build/gold-trusty'
-  result = Provision::Factory.new.create_gold_image({:spindle=>dest, :hostname=>"generic", :distid => "ubuntu", :distcodename => "trusty"})
+  result = Provision::Factory.new.create_gold_image({ :spindle => dest, :hostname => "generic", :distid => "ubuntu", :distcodename => "trusty" })
   sh "chmod a+w -R build"
 end
 
@@ -93,14 +93,14 @@ task :package_main do
   sh "cp postinst.sh build/"
 
   commandLine = "cd build",
-    "&&",
-    "fpm",
-    "-s", "gem",
-    "-t", "deb",
-    "-n", "provisioning-tools",
-    "-d", "provisioning-tools-gold-image-precise",
-    "-d", "debootstrap",
-    "provisioning-tools-*.gem"
+                "&&",
+                "fpm",
+                "-s", "gem",
+                "-t", "deb",
+                "-n", "provisioning-tools",
+                "-d", "provisioning-tools-gold-image-precise",
+                "-d", "debootstrap",
+                "provisioning-tools-*.gem"
 
   sh commandLine.join(' ')
 end
@@ -108,19 +108,19 @@ end
 desc "Generate deb file for the Precise Gold image"
 task :package_gold_precise do
   hash = `git rev-parse --short HEAD`.chomp
-  v_part= ENV['BUILD_NUMBER'] || "0.#{hash.hex}"
+  v_part = ENV['BUILD_NUMBER'] || "0.#{hash.hex}"
   version = "0.0.#{v_part}"
 
   commandLine  = "fpm",
-    "-s", "dir",
-    "-t", "deb",
-    "-n", "provisioning-tools-gold-image-precise",
-    "-v", version,
-    "-a", "all",
-    "-C", "build",
-    "-p", "build/provisioning-tools-gold-image-precise_#{version}.deb",
-    "--prefix", "/var/local/images/",
-    "gold-precise"
+                 "-s", "dir",
+                 "-t", "deb",
+                 "-n", "provisioning-tools-gold-image-precise",
+                 "-v", version,
+                 "-a", "all",
+                 "-C", "build",
+                 "-p", "build/provisioning-tools-gold-image-precise_#{version}.deb",
+                 "--prefix", "/var/local/images/",
+                 "gold-precise"
 
   sh commandLine.join(' ')
 end
@@ -128,19 +128,19 @@ end
 desc "Generate deb file for the Trusty Gold image"
 task :package_gold_trusty do
   hash = `git rev-parse --short HEAD`.chomp
-  v_part= ENV['BUILD_NUMBER'] || "0.#{hash.hex}"
+  v_part = ENV['BUILD_NUMBER'] || "0.#{hash.hex}"
   version = "0.0.#{v_part}"
 
   commandLine  = "fpm",
-    "-s", "dir",
-    "-t", "deb",
-    "-n", "provisioning-tools-gold-image-trusty",
-    "-v", version,
-    "-a", "all",
-    "-C", "build",
-    "-p", "build/provisioning-tools-gold-image-trusty_#{version}.deb",
-    "--prefix", "/var/local/images/",
-    "gold-trusty"
+                 "-s", "dir",
+                 "-t", "deb",
+                 "-n", "provisioning-tools-gold-image-trusty",
+                 "-v", version,
+                 "-a", "all",
+                 "-C", "build",
+                 "-p", "build/provisioning-tools-gold-image-trusty_#{version}.deb",
+                 "--prefix", "/var/local/images/",
+                 "gold-trusty"
   sh commandLine.join(' ')
 end
 
@@ -148,37 +148,37 @@ desc "Generate deb file for the MCollective agent"
 task :package_agent do
   sh "mkdir -p build"
   hash = `git rev-parse --short HEAD`.chomp
-  v_part= ENV['BUILD_NUMBER'] || "0.#{hash.hex}"
+  v_part = ENV['BUILD_NUMBER'] || "0.#{hash.hex}"
   version = "0.0.#{v_part}"
 
   commandLine  = "fpm",
-    "-s", "dir",
-    "-t", "deb",
-    "-n", "provisioning-tools-mcollective-plugin",
-    "-v", version,
-    "-d", "provisioning-tools",
-    "-d", "provisioning-tools-mcollective-plugin-ddl",
-    "-a", "all",
-    "-C", "build",
-    "-p", "build/provisioning-tools-mcollective-plugin_#{version}.deb",
-    "--prefix", "/usr/share/mcollective/plugins/mcollective",
-    "--post-install", "postinst.sh",
-    "-x", "agent/*.ddl",
-    "../mcollective/agent"
+                 "-s", "dir",
+                 "-t", "deb",
+                 "-n", "provisioning-tools-mcollective-plugin",
+                 "-v", version,
+                 "-d", "provisioning-tools",
+                 "-d", "provisioning-tools-mcollective-plugin-ddl",
+                 "-a", "all",
+                 "-C", "build",
+                 "-p", "build/provisioning-tools-mcollective-plugin_#{version}.deb",
+                 "--prefix", "/usr/share/mcollective/plugins/mcollective",
+                 "--post-install", "postinst.sh",
+                 "-x", "agent/*.ddl",
+                 "../mcollective/agent"
 
   sh commandLine.join(' ')
 
   commandLine  = "fpm",
-    "-s", "dir",
-    "-t", "deb",
-    "-n", "provisioning-tools-mcollective-plugin-ddl",
-    "-v", version,
-    "-a", "all",
-    "-C", "build",
-    "-p", "build/provisioning-tools-mcollective-plugin-ddl_#{version}.deb",
-    "--prefix", "/usr/share/mcollective/plugins/mcollective",
-    "-x", "agent/*.rb",
-    "../mcollective/agent"
+                 "-s", "dir",
+                 "-t", "deb",
+                 "-n", "provisioning-tools-mcollective-plugin-ddl",
+                 "-v", version,
+                 "-a", "all",
+                 "-C", "build",
+                 "-p", "build/provisioning-tools-mcollective-plugin-ddl_#{version}.deb",
+                 "--prefix", "/usr/share/mcollective/plugins/mcollective",
+                 "-x", "agent/*.rb",
+                 "../mcollective/agent"
 
   sh commandLine.join(' ')
 

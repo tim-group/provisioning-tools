@@ -12,11 +12,11 @@ class Provision::Core::ProvisioningService
     @storage_service = options[:storage_service] # || raise("No :storage_service option passed")
     @image_service = options[:image_service] || raise("No :image_service option passed")
     @numbering_service = options[:numbering_service] || raise("No :numbering_service option passed")
-    @machinespec_defaults = options[:defaults] || {:enc => {:classes => {}}}
+    @machinespec_defaults = options[:defaults] || { :enc => { :classes => {} } }
     @logger = options[:logger] || Logger.new(STDERR)
   end
 
-  def provision_vm(spec_hash, with_numbering=true)
+  def provision_vm(spec_hash, with_numbering = true)
     spec_hash = @machinespec_defaults.merge(spec_hash)
     spec = Provision::Core::MachineSpec.new(spec_hash)
 

@@ -33,12 +33,12 @@ class Provision::Storage::LVM < Provision::Storage
     check_and_resize_filesystem(name, mount_point_obj, :minimum)
     rebuild_partition(name, mount_point_obj, :minimum)
     underscore_name = underscore_name(name, mount_point_obj.name)
-    newsize=cmd("parted -sm #{device(underscore_name)} print | grep -e '^1:' | awk -F ':' '{ print $3 }'")
+    newsize = cmd("parted -sm #{device(underscore_name)} print | grep -e '^1:' | awk -F ':' '{ print $3 }'")
 
     run_task(name, "shrink lvm #{underscore_name}", {
       :task => lambda {
         cmd "lvreduce -f -L #{newsize} #{device(underscore_name)}"
-      },
+      }
     })
   end
 
@@ -57,10 +57,10 @@ class Provision::Storage::LVM < Provision::Storage
       end
       return output unless File.exists?(device(underscore_name))
     end
-    unless exception.nil?
-      raise exception
-    else
+    if exception.nil?
       raise "Tried to lvremove but failed 100 times and didn't raise an exception!?"
+    else
+      raise exception
     end
   end
 

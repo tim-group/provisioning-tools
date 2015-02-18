@@ -30,4 +30,3 @@ class Provision::Storage::Config
   end
 
 end
-
