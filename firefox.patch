@@ -1,0 +1,14 @@
+diff --git a/home/image_builders/senode.rb b/home/image_builders/senode.rb
+index 9ad6707..e982cb0 100644
+--- a/home/image_builders/senode.rb
++++ b/home/image_builders/senode.rb
+@@ -47,7 +47,8 @@ define "senode" do
+     apt_install "dbus"
+     apt_install "dbus-x11"
+     apt_install "hicolor-icon-theme"
+-    apt_install "firefox=11.0+build1-0ubuntu4"
++    firefox_version = spec[:firefox_version] || "11.0+build1-0ubuntu4"
++    apt_install "firefox=#{firefox_version}"
+     apt_install "google-chrome-stable"
+     selenium_version = spec[:selenium_version] || "2.32.0"
+     apt_install "selenium=#{selenium_version}"
