@@ -8,12 +8,12 @@ class Provision::DNS::DDNS < Provision::DNS
 end
 
 module Provision::DNS::DDNS::Exception
-    class BadKey < Exception
-    end
-    class Timeout < Exception
-    end
-    class UnknownError < Exception
-    end
+  class BadKey < Exception
+  end
+  class Timeout < Exception
+  end
+  class UnknownError < Exception
+  end
 end
 
 class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
@@ -91,7 +91,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
   end
 
   def get_primary_nameserver
-    return @primary_nameserver
+    @primary_nameserver
   end
 
   def try_add_reverse_lookup(ip, fqdn, all_hostnames)
@@ -145,7 +145,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     fqdn_s = fqdn.split "."
     zone_s = fqdn_s.clone
     hn = zone_s.shift
-    return hn
+    hn
   end
 
   def get_zone(fqdn)
@@ -153,7 +153,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     zone_s = fqdn_s.clone
     hn = zone_s.shift
     zone = zone_s.join('.')
-    return zone
+    zone
   end
 
   def add_forward_lookup(ip, fqdn)

@@ -6,45 +6,44 @@ require 'set'
 
 module IPAddrExtensions
   def subnet_mask
-    return _to_string(@mask_addr)
+    _to_string(@mask_addr)
   end
 end
 
 class Provision::DNSChecker
- attr_reader :logger
- def initialize(options)
-   @logger = options[:logger] || Logger.new(STDERR)
-   @primary_nameserver = options[:primary_nameserver] || '192.168.5.1'
- end
+  attr_reader :logger
+  def initialize(options)
+    @logger = options[:logger] || Logger.new(STDERR)
+    @primary_nameserver = options[:primary_nameserver] || '192.168.5.1'
+  end
 
- def resolve(record, element, max_attempts = 10)
+  def resolve(record, element, max_attempts = 10)
     attempt = 1
-    addrinfo = Set.new()
+    addrinfo = Set.new
     while (attempt <= max_attempts)
       msg = "Lookup #{record} (#{attempt}/#{max_attempts})"
       begin
         addrinfo = Set.new(Socket.getaddrinfo(record, nil)).map { |a| a[element] }
         break
       rescue Exception => e
-       logger.error("DNS RESOLVE FAILURE: #{msg} - #{e.inspect}")
-       sleep 1
+        logger.error("DNS RESOLVE FAILURE: #{msg} - #{e.inspect}")
+        sleep 1
       end
-      attempt = attempt + 1
+      attempt += 1
     end
     attempt >= max_attempts ? (raise "Lookup #{record} failed after #{max_attempts} attempts") : false
 
     logger.info("SUCCESS: #{msg} resolved to #{addrinfo.join(' ')}")
     addrinfo
-  end
+   end
 
   def resolve_forward(hostname)
-     resolve(hostname, 3)
+    resolve(hostname, 3)
   end
 
   def resolve_reverse(ip)
     resolve(ip, 2)
   end
-
 end
 
 class Provision::DNSNetwork
@@ -71,60 +70,59 @@ class Provision::DNSNetwork
 
     max_allocation = options[:max_allocation] || @broadcast.to_i - 1
     @max_allocation = IPAddr.new(max_allocation, Socket::AF_INET)
-
   end
 
   def hostname_from_spec(spec)
-     spec.hostname_on(@name)
+    spec.hostname_on(@name)
   end
 
   def allocate_ip_for(spec)
-     hostname = hostname_from_spec spec
-     all_hostnames = spec.all_hostnames_on(@name)
-     ip = nil
+    hostname = hostname_from_spec spec
+    all_hostnames = spec.all_hostnames_on(@name)
+    ip = nil
 
-     if ip = lookup_ip_for(hostname)
-       @logger.info("No new allocation for #{hostname}, already allocated to #{ip}")
-       puts "No new allocation for #{hostname}, already allocated"
-       return {
-         :netmask => @subnet_mask.to_s,
-         :address => lookup_ip_for(hostname)
-       }
-     else
-       max_ip = @max_allocation
-       ip = @min_allocation
-       @logger.info("Trying to allocate ips #{hostname} between #{ip} and #{max_ip}")
+    if ip = lookup_ip_for(hostname)
+      @logger.info("No new allocation for #{hostname}, already allocated to #{ip}")
+      puts "No new allocation for #{hostname}, already allocated"
+      return {
+        :netmask => @subnet_mask.to_s,
+        :address => lookup_ip_for(hostname)
+      }
+    else
+      max_ip = @max_allocation
+      ip = @min_allocation
+      @logger.info("Trying to allocate ips #{hostname} between #{ip} and #{max_ip}")
 
-       while !try_add_reverse_lookup(ip, hostname, all_hostnames)
-         ip = IPAddr.new(ip.to_i + 1, Socket::AF_INET)
-         if ip >= max_ip
-           raise("Ran out of IP Addresses for #{hostname} - Maximum IP reached: #{max_ip} - Minimum #{@min_allocation}")
-         end
-       end
-       add_forward_lookup(ip, hostname)
-     end
+      while !try_add_reverse_lookup(ip, hostname, all_hostnames)
+        ip = IPAddr.new(ip.to_i + 1, Socket::AF_INET)
+        if ip >= max_ip
+          raise("Ran out of IP Addresses for #{hostname} - Maximum IP reached: #{max_ip} - Minimum #{@min_allocation}")
+        end
+      end
+      add_forward_lookup(ip, hostname)
+    end
 
-     raise "unable to resolve forward #{hostname} -> #{ip.to_s}" unless @checker.resolve_forward(hostname).include?(ip.to_s)
-     raise "unable to resolve reverse #{ip.to_s} -> #{hostname}" unless @checker.resolve_reverse(ip.to_s).include?(hostname)
+    raise "unable to resolve forward #{hostname} -> #{ip.to_s}" unless @checker.resolve_forward(hostname).include?(ip.to_s)
+    raise "unable to resolve reverse #{ip.to_s} -> #{hostname}" unless @checker.resolve_reverse(ip.to_s).include?(hostname)
 
-     return {
-       :netmask => @subnet_mask.to_s,
-       :address => ip.to_s
-     }
+    {
+      :netmask => @subnet_mask.to_s,
+      :address => ip.to_s
+    }
   end
 
   def remove_ip_for(spec)
-     hostname = hostname_from_spec spec
-     ip = lookup_ip_for(hostname)
-     if ip
-       remove_forward_lookup(hostname)
-       remove_reverse_lookup ip
-     end
+    hostname = hostname_from_spec spec
+    ip = lookup_ip_for(hostname)
+    if ip
+      remove_forward_lookup(hostname)
+      remove_reverse_lookup ip
+    end
 
-     return {
-       :netmask => @subnet_mask.to_s,
-       :address => ip
-     }
+    {
+      :netmask => @subnet_mask.to_s,
+      :address => ip
+    }
   end
 
   def add_cnames_for(spec)
@@ -138,7 +136,7 @@ class Provision::DNSNetwork
         existing_cname = lookup_cname_for(fqdn)
         if existing_cname
           if existing_cname == cname
-            result.merge!({ fqdn => cname })
+            result.merge!(fqdn => cname)
             next
           else
             # Should we be unallocating here if it's already allocated?
@@ -147,7 +145,7 @@ class Provision::DNSNetwork
         else
           add_cname_lookup(fqdn, cname)
         end
-        result.merge!({ fqdn => cname })
+        result.merge!(fqdn => cname)
 
         raise "unable to resolve cname #{fqdn} -> #{cname}" unless @checker.resolve_forward(fqdn)
       end
@@ -167,7 +165,7 @@ class Provision::DNSNetwork
         if existing_cname
           if existing_cname == cname_fqdn
             remove_cname_lookup(fqdn, cname_fqdn)
-            result.merge!({ fqdn => cname_fqdn })
+            result.merge!(fqdn => cname_fqdn)
           else
             raise "#{fqdn} resolves to CNAME: '#{existing_cname}', not CNAME: '#{cname_fqdn}' that was expected, not removing"
           end
@@ -176,14 +174,13 @@ class Provision::DNSNetwork
     end
     result
   end
-
 end
 
 class Provision::DNS
   attr_accessor :backend
 
   def self.get_backend(name, options = {})
-    raise("get_backend not supplied a name, cannot continue.") if name.nil? or name == false
+    raise("get_backend not supplied a name, cannot continue.") if name.nil? || name == false
     require "provision/dns/#{name.downcase}"
     instance = Provision::DNS.const_get(name).new(options)
     instance.backend = name
@@ -229,15 +226,14 @@ class Provision::DNS
     elapsed_time = (Time.now - start_time).to_f
     @logger.info("IP allocation for #{spec[:hostname]} took %.6f seconds" % elapsed_time)
 
-    return allocations
+    allocations
   end
 
   def remove_ips_for(spec)
     remove_results = {}
 
     spec.networks.each do |name|
-
-      if not @networks.has_key?(name.to_sym)
+      if !@networks.has_key?(name.to_sym)
         @logger.warn "can't remove an ip on #{name} because there is no config on the compute node. Known networks #{@networks.keys.inspect}"
         next
       end
@@ -245,7 +241,7 @@ class Provision::DNS
       remove_results[name] = @networks[name.to_sym].remove_ip_for(spec)
     end
 
-    return remove_results
+    remove_results
   end
 
   def add_cnames_for(spec)
@@ -276,7 +272,5 @@ class Provision::DNS
     end
     @logger.info("Removed #{result}")
     result
-
   end
-
 end

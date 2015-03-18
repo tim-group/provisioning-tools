@@ -15,11 +15,11 @@ describe Provision::Image::Service  do
     Provision::Image::Catalogue.stub :loadconfig
     config = { :vm_storage_type => 'image' }
     spec = { :disallow_destroy => 'true', :image_path => @image_file.path }
-    image_service = Provision::Image::Service.new({ :configdir => 'whatever', :config => config })
+    image_service = Provision::Image::Service.new(:configdir => 'whatever', :config => config)
 
-    expect {
+    expect do
       image_service.remove_image(spec)
-    }.to raise_error("VM marked as non-destroyable")
+    end.to raise_error("VM marked as non-destroyable")
 
     File.exist?(@image_file.path).should eql(true)
   end
@@ -28,10 +28,9 @@ describe Provision::Image::Service  do
     Provision::Image::Catalogue.stub :loadconfig
     config = { :vm_storage_type => 'image' }
     spec = { :image_path => @image_file.path }
-    image_service = Provision::Image::Service.new({ :configdir => 'whatever', :config => config })
+    image_service = Provision::Image::Service.new(:configdir => 'whatever', :config => config)
 
     image_service.remove_image(spec)
     File.exist?(@image_file.path).should eql(false)
   end
-
 end

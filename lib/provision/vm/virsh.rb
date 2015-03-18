@@ -25,7 +25,7 @@ class Provision::VM::Virsh
   def is_in_virsh_list(spec, extra = '')
     vm_name = spec[:hostname]
     result = `virsh list #{extra} | grep ' #{vm_name} ' | wc -l`
-    return result.match(/1/)
+    result.match(/1/)
   end
 
   def undefine_vm(spec)
@@ -59,7 +59,7 @@ class Provision::VM::Virsh
 
   def wait_for_shutdown(spec, timeout = 120)
     timeout.times do
-      if not is_running(spec)
+      if !is_running(spec)
         return
       end
       sleep 1
@@ -67,7 +67,6 @@ class Provision::VM::Virsh
 
     raise "giving up waiting for #{spec[:hostname]} to shutdown"
   end
-
 
   def write_virsh_xml(spec, storage_xml = nil)
     if spec[:kvm_template]
@@ -79,13 +78,13 @@ class Provision::VM::Virsh
     to = "#{spec[:libvirt_dir]}/#{spec[:hostname]}.xml"
     binding = VirshBinding.new(spec, @config, storage_xml)
     begin
-      template.result(binding.get_binding())
+      template.result(binding.get_binding)
     rescue Exception => e
       print e
       print e.backtrace
     end
     File.open to, 'w' do |f|
-      f.write template.result(binding.get_binding())
+      f.write template.result(binding.get_binding)
     end
     to
   end
@@ -97,7 +96,6 @@ class Provision::VM::Virsh
 end
 
 class VirshBinding
-
   attr_accessor :spec, :config, :storage_xml
 
   def initialize(spec, config, storage_xml = nil)
@@ -107,6 +105,6 @@ class VirshBinding
   end
 
   def get_binding
-    return binding()
+    binding
   end
 end

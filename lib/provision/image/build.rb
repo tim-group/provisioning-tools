@@ -21,9 +21,9 @@ class Provision::Image::Build
   end
 
   def cleanup(&block)
-    @cleanups << lambda {
+    @cleanups << lambda do
       suppress_error.instance_eval(&block)
-    }
+    end
   end
 
   def on_error(&block)
@@ -35,10 +35,10 @@ class Provision::Image::Build
   end
 
   def method_missing(name, *args, &block)
-    call(name.to_s())
+    call(name.to_s)
   end
 
-  def execute()
+  def execute
     position = 40
     error = nil
     trap("SIGINT") { throw :ctrl_c }
@@ -51,7 +51,7 @@ class Provision::Image::Build
         start = Time.new
 
         begin
-          command[:block].call()
+          command[:block].call
         rescue Exception => e
           error = e
           raise e
@@ -68,7 +68,7 @@ class Provision::Image::Build
     rescue Exception => e
       @on_errors.each do |error_block|
         begin
-          error_block.call()
+          error_block.call
         rescue Exception => e
           log.error(e)
         end
@@ -83,23 +83,23 @@ class Provision::Image::Build
     padding = position - txt.length
     @cleanups.reverse.each do |command|
       begin
-        command.call()
+        command.call
       rescue Exception => e
         cleanup_log.error(e)
       end
     end
     summary_log.info("[\e[0;32mDONE\e[0m]\n")
 
-    if error != nil
+    if !error.nil?
       raise error
     end
   end
 
-  def summary_log()
+  def summary_log
     @summary_log ||= @spec.get_logger('summary')
   end
 
-  def cleanup_log()
+  def cleanup_log
     @cleanup_log ||= @spec.get_logger('cleanup_provision')
   end
 end
@@ -112,13 +112,11 @@ class CatchAndIgnore
   end
 
   def method_missing(name, *args, &block)
-    begin
-      result = @build.send(name, *args, &block)
-      return result
-    rescue Exception => e
-      cleanup_log.error("error sending #{name}")
-      cleanup_log.error(e)
-      return nil
-    end
+    result = @build.send(name, *args, &block)
+    return result
+  rescue Exception => e
+    cleanup_log.error("error sending #{name}")
+    cleanup_log.error(e)
+    return nil
   end
 end

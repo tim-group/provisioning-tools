@@ -9,21 +9,21 @@ describe Provision::Config do
     f = Tempfile.new('test_yaml')
     f.puts({}.to_yaml)
     f.close
-    expect {
-      Provision::Config.new(:configfile => f.path).get()
-    }.to raise_error("#{f.path} has missing properties (dns_backend, dns_backend_options, networks)")
+    expect do
+      Provision::Config.new(:configfile => f.path).get
+    end.to raise_error("#{f.path} has missing properties (dns_backend, dns_backend_options, networks)")
   end
 
   it 'Can load a config in either sym form or raw form' do
     d = {
-        :dns_backend => 'baz',
-        :dns_backend_options => {},
-        :networks => {}
+      :dns_backend => 'baz',
+      :dns_backend_options => {},
+      :networks => {}
     }
     d2 = {
-        'dns_backend' => 'baz',
-        'dns_backend_options' => {},
-        'networks' => {}
+      'dns_backend' => 'baz',
+      'dns_backend_options' => {},
+      'networks' => {}
     }
     f = Tempfile.new('test_yaml')
     f.puts(d.to_yaml)
@@ -39,14 +39,14 @@ describe Provision::Config do
 
   it 'recurses when applying sym form' do
     exp = {
-        :dns_backend => 'baz',
-        :dns_backend_options => { :foo => 'bar' },
-        :networks => {}
+      :dns_backend => 'baz',
+      :dns_backend_options => { :foo => 'bar' },
+      :networks => {}
     }
     send = {
-        'dns_backend' => 'baz',
-        'dns_backend_options' => { 'foo' => 'bar' },
-        'networks' => {}
+      'dns_backend' => 'baz',
+      'dns_backend_options' => { 'foo' => 'bar' },
+      'networks' => {}
     }
     f = Tempfile.new('test_yaml')
     f.puts(send.to_yaml)

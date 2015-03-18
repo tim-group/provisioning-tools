@@ -22,7 +22,7 @@ describe Provision::VM::Virsh do
       :libvirt_dir => d
     )
 
-    virt_manager = Provision::VM::Virsh.new({ :vm_storage_type => "image" })
+    virt_manager = Provision::VM::Virsh.new(:vm_storage_type => "image")
     fn = virt_manager.write_virsh_xml(machine_spec)
     fn.should eql("#{d}/vmx1.xml")
     File.exist?("#{d}/vmx1.xml").should eql(true)
@@ -103,9 +103,9 @@ describe Provision::VM::Virsh do
     virt_manager = Provision::VM::Virsh.new({})
     virt_manager.should_not_receive(:system).with("virsh destroy #{hostname} > /dev/null 2>&1")
 
-    expect {
+    expect do
       virt_manager.destroy_vm(spec)
-    }.to raise_error("VM marked as non-destroyable")
+    end.to raise_error("VM marked as non-destroyable")
   end
 
   it 'undefine VM when disallow_destroy is not set' do
@@ -125,12 +125,8 @@ describe Provision::VM::Virsh do
     virt_manager = Provision::VM::Virsh.new({})
     virt_manager.should_not_receive(:system).with("virsh undefine #{hostname} > /dev/null 2>&1")
 
-    expect {
+    expect do
       virt_manager.undefine_vm(spec)
-    }.to raise_error("VM marked as non-destroyable")
+    end.to raise_error("VM marked as non-destroyable")
   end
-
-
-
-
 end

@@ -1,31 +1,31 @@
 define "senode" do
   copyboot
 
-  run("run apt-update ") {
+  run("run apt-update ") do
     chroot "apt-get -y --force-yes update"
-  }
+  end
 
-  run("mounting devices") {
+  run("mounting devices") do
     cmd "mount --bind /dev #{spec[:temp_dir]}/dev"
     cmd "mount -t proc none #{spec[:temp_dir]}/proc"
     cmd "mount -t sysfs none #{spec[:temp_dir]}/sys"
-  }
+  end
 
-  cleanup {
+  cleanup do
     log.debug("cleaning up procs")
     log.debug(`mount -l | grep #{spec[:hostname]}/proc | wc -l`.chomp)
-    keep_doing {
+    keep_doing do
       suppress_error.cmd "umount -l #{spec[:temp_dir]}/proc"
-    }.until { `mount -l | grep #{spec[:hostname]}/proc | wc -l`.chomp == "0" }
+    end.until { `mount -l | grep #{spec[:hostname]}/proc | wc -l`.chomp == "0" }
 
-    keep_doing {
+    keep_doing do
       suppress_error.cmd "umount -l #{spec[:temp_dir]}/sys"
-    }.until { `mount -l | grep #{spec[:hostname]}/sys | wc -l`.chomp == "0" }
+    end.until { `mount -l | grep #{spec[:hostname]}/sys | wc -l`.chomp == "0" }
 
-    keep_doing {
+    keep_doing do
       suppress_error.cmd "umount -l #{spec[:temp_dir]}/dev"
-    }.until { `mount -l | grep #{spec[:hostname]}/dev | wc -l`.chomp == "0" }
-  }
+    end.until { `mount -l | grep #{spec[:hostname]}/dev | wc -l`.chomp == "0" }
+  end
 
 # run("configure google apt repo") {
 #    open("#{spec[:temp_dir]}/etc/apt/sources.list.d/google.list", 'w') { |f|
@@ -36,11 +36,11 @@ define "senode" do
 #    suppress_error.chroot "apt-get update"
 #  }
 
-  run("create ci user") {
+  run("create ci user") do
     chroot "/usr/sbin/adduser ci"
-  }
+  end
 
-  run("install selenium packages") {
+  run("install selenium packages") do
     apt_install "openjdk-7-jdk"
     apt_install "acpid"
     apt_install "xvfb"
@@ -56,21 +56,20 @@ define "senode" do
     chroot "update-rc.d selenium-node defaults"
     chroot "sed -i'.bak' -e 's#^securerandom.source=file:/dev/urandom#securerandom.source=file:/dev/../dev/urandom#g' /etc/java-7-openjdk/security/java.security"
     chroot "ln -s /usr/lib/firefox/firefox /usr/bin/firefox-bin"
-  }
+  end
 
-  cleanup {
+  cleanup do
     chroot "/etc/init.d/dbus stop"
-  }
+  end
 
-  run("place the selenium node config") {
+  run("place the selenium node config") do
     host = spec[:selenium_hub_host]
     port = "7799"
 
     cmd "mkdir -p #{spec[:temp_dir]}/etc/default"
-    open("#{spec[:temp_dir]}/etc/default/selenium-node", 'w') { |f|
+    open("#{spec[:temp_dir]}/etc/default/selenium-node", 'w') do |f|
       f.puts "HUBHOST=#{host}"
       f.puts "HUBPORT=#{port}"
-    }
-  }
-
+    end
+  end
 end

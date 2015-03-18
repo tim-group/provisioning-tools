@@ -5,7 +5,7 @@ require 'fileutils'
 require 'rspec/core/rake_task'
 require 'fpm'
 
-def build_deb()
+def build_deb
   $: << File.join(File.dirname(__FILE__), "..", "..", "lib")
 
   package = FPM::Package::Gem.new
@@ -18,7 +18,6 @@ def build_deb()
     rpm.cleanup
   end
 end
-
 
 task :default do
   sh "rake -s -T"
@@ -39,7 +38,7 @@ task :build_gold_precise do
   require 'pp'
 
   dest = File.dirname(__FILE__) + '/build/gold-precise'
-  result = Provision::Factory.new.create_gold_image({ :spindle => dest, :hostname => "generic", :distid => "ubuntu", :distcodename => "precise" })
+  result = Provision::Factory.new.create_gold_image(:spindle => dest, :hostname => "generic", :distid => "ubuntu", :distcodename => "precise")
   sh "chmod a+w -R build"
 end
 
@@ -52,7 +51,7 @@ task :build_gold_trusty do
   require 'pp'
 
   dest = File.dirname(__FILE__) + '/build/gold-trusty'
-  result = Provision::Factory.new.create_gold_image({ :spindle => dest, :hostname => "generic", :distid => "ubuntu", :distcodename => "trusty" })
+  result = Provision::Factory.new.create_gold_image(:spindle => dest, :hostname => "generic", :distid => "ubuntu", :distcodename => "trusty")
   sh "chmod a+w -R build"
 end
 
@@ -69,7 +68,7 @@ task :ctags do
 end
 
 desc "Run specs"
-RSpec::Core::RakeTask.new() do |t|
+RSpec::Core::RakeTask.new do |t|
   t.rspec_opts = %w[--color]
   t.pattern = "spec/**/*_spec.rb"
 end
@@ -182,8 +181,6 @@ task :package_agent do
 
   sh commandLine.join(' ')
 
-
-
   #      '-m',"youDevise <support@timgroup.com>",
   #      '--description',"TIM Account Management Report Tool (Import)",
   #      '--pre-install','build-scripts/deb-pre-install.rb',
@@ -193,7 +190,7 @@ end
 
 task :package => [:clean, :package_main, :package_agent]
 task :install => [:package] do
-   sh "sudo dpkg -i build/*.deb"
+  sh "sudo dpkg -i build/*.deb"
 end
 task :test => [:spec, :mcollective_spec]
 

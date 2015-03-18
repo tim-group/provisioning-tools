@@ -118,34 +118,6 @@ Metrics/PerceivedComplexity:
 Style/AccessorMethodName:
   Enabled: false
 
-# Offense count: 15
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/AlignParameters:
-  Enabled: false
-
-# Offense count: 14
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/AndOr:
-  Enabled: false
-
-# Offense count: 417
-# Cop supports --auto-correct.
-Style/Blocks:
-  Enabled: false
-
-# Offense count: 83
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/BracesAroundHashParameters:
-  Enabled: false
-
-# Offense count: 1
-# Configuration parameters: IndentWhenRelativeTo, SupportedStyles, IndentOneStep.
-Style/CaseIndentation:
-  Enabled: false
-
 # Offense count: 1
 Style/ClassAndModuleCamelCase:
   Enabled: false
@@ -177,12 +149,8 @@ Style/CommentAnnotation:
 
 # Offense count: 18
 # Cop supports --auto-correct.
+# XXX most of these need attention
 Style/CommentIndentation:
-  Enabled: false
-
-# Offense count: 13
-# Cop supports --auto-correct.
-Style/DefWithParentheses:
   Enabled: false
 
 # Offense count: 8
@@ -194,48 +162,9 @@ Style/DeprecatedHashMethods:
 Style/Documentation:
   Enabled: false
 
-# Offense count: 19
-# Cop supports --auto-correct.
-Style/EmptyLines:
-  Enabled: false
-
-# Offense count: 3
-# Cop supports --auto-correct.
-Style/EmptyLinesAroundAccessModifier:
-  Enabled: false
-
-# Offense count: 47
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/EmptyLinesAroundBlockBody:
-  Enabled: false
-
-# Offense count: 15
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/EmptyLinesAroundClassBody:
-  Enabled: false
-
-# Offense count: 6
-# Cop supports --auto-correct.
-Style/EmptyLinesAroundMethodBody:
-  Enabled: false
-
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/EmptyLinesAroundModuleBody:
-  Enabled: false
-
 # Offense count: 4
 # Configuration parameters: Exclude.
 Style/FileName:
-  Enabled: false
-
-# Offense count: 7
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/FirstParameterIndentation:
   Enabled: false
 
 # Offense count: 3
@@ -253,32 +182,9 @@ Style/GlobalVars:
 Style/GuardClause:
   Enabled: false
 
-# Offense count: 613
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/HashSyntax:
-  Enabled: false
-
 # Offense count: 15
 # Configuration parameters: MaxLineLength.
 Style/IfUnlessModifier:
-  Enabled: false
-
-# Offense count: 107
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/IndentHash:
-  Enabled: false
-
-# Offense count: 41
-# Cop supports --auto-correct.
-Style/IndentationConsistency:
-  Enabled: false
-
-# Offense count: 27
-# Cop supports --auto-correct.
-# Configuration parameters: Width.
-Style/IndentationWidth:
   Enabled: false
 
 # Offense count: 1
@@ -286,19 +192,8 @@ Style/IndentationWidth:
 Style/Lambda:
   Enabled: false
 
-# Offense count: 114
-# Cop supports --auto-correct.
-Style/MethodCallParentheses:
-  Enabled: false
-
 # Offense count: 29
 Style/MultilineBlockChain:
-  Enabled: false
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/MultilineOperationIndentation:
   Enabled: false
 
 # Offense count: 7
@@ -315,27 +210,6 @@ Style/NegatedWhile:
 # Configuration parameters: EnforcedStyle, MinBodyLength, SupportedStyles.
 Style/Next:
   Enabled: false
-
-# Offense count: 3
-# Cop supports --auto-correct.
-Style/NilComparison:
-  Enabled: false
-
-# Offense count: 5
-# Cop supports --auto-correct.
-# Configuration parameters: IncludeSemanticChanges.
-Style/NonNilCheck:
-  Enabled: false
-
-# Offense count: 4
-# Cop supports --auto-correct.
-Style/Not:
-  Enabled: false
-
-# Offense count: 3
-# Cop supports --auto-correct.
-Style/NumericLiterals:
-  MinDigits: 10
 
 # Offense count: 1
 Style/OpMethod:
@@ -362,30 +236,9 @@ Style/PredicateName:
 Style/RaiseArgs:
   Enabled: false
 
-# Offense count: 4
-# Cop supports --auto-correct.
-Style/RedundantBegin:
-  Enabled: false
-
-# Offense count: 58
-# Cop supports --auto-correct.
-# Configuration parameters: AllowMultipleReturnValues.
-Style/RedundantReturn:
-  Enabled: false
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/RedundantSelf:
-  Enabled: false
-
 # Offense count: 3
 Style/RegexpLiteral:
   MaxSlashes: 3
-
-# Offense count: 7
-# Cop supports --auto-correct.
-Style/SelfAssignment:
-  Enabled: false
 
 # Offense count: 3
 # Cop supports --auto-correct.
@@ -433,8 +286,7 @@ Style/TrivialAccessors:
 Style/VariableName:
   Enabled: false
 
-# Offense count: 5
+# Offense count: 39
 # Cop supports --auto-correct.
-# Configuration parameters: WordRegex.
-Style/WordArray:
-  MinSize: 4
+Style/Blocks:
+  Enabled: false

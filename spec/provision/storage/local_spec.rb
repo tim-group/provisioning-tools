@@ -4,25 +4,25 @@ require 'provision/storage'
 require 'provision/storage/local'
 
 describe Provision::Storage::Local do
-    class MockStorage < Provision::Storage
-      include Provision::Storage::Local
-      def initialize(options)
-        @tmpdir = options[:tmpdir]
-        super(options)
-      end
-
-      def device(name)
-        "#{@tmpdir}/#{name}"
-      end
-
-      def libvirt_source(name)
-        return "dev='#{device(name)}'"
-      end
-
-      def remove(name)
-        true
-      end
+  class MockStorage < Provision::Storage
+    include Provision::Storage::Local
+    def initialize(options)
+      @tmpdir = options[:tmpdir]
+      super(options)
     end
+
+    def device(name)
+      "#{@tmpdir}/#{name}"
+    end
+
+    def libvirt_source(name)
+      "dev='#{device(name)}'"
+    end
+
+    def remove(name)
+      true
+    end
+  end
 
   after do
     FileUtils.remove_entry_secure @tmpdir
@@ -41,21 +41,19 @@ describe Provision::Storage::Local do
       end
     end
 
-    @storage_type = MockStorage.new({ :tmpdir => @tmpdir })
-    @mount_point_obj = Provision::Storage::Mount_point.new('/', { :size => '10G' })
+    @storage_type = MockStorage.new(:tmpdir => @tmpdir)
+    @mount_point_obj = Provision::Storage::Mount_point.new('/', :size => '10G')
   end
 
   it 'should symbolize the value of method' do
     File.open("#{@tmpdir}/symbolize_method", 'w').write("source file contents")
-    mount_point_obj = Provision::Storage::Mount_point.new('/', {
-      :size     => '5G',
-      :prepare  => {
-        :method  => 'image',
-        :options => {
-          :path    => "#{@tmpdir}/symbolize_method"
-        }
-      }
-    })
+    mount_point_obj = Provision::Storage::Mount_point.new('/',       :size     => '5G',
+                                                                     :prepare  => {
+                                                                       :method  => 'image',
+                                                                       :options => {
+                                                                         :path    => "#{@tmpdir}/symbolize_method"
+                                                                       }
+                                                                     })
     @storage_type.stub(:image_filesystem)
     @storage_type.stub(:grow_filesystem)
     @storage_type.should_receive(:image_filesystem)
@@ -63,16 +61,14 @@ describe Provision::Storage::Local do
   end
   it 'should not resize the filesystem when resize is false' do
     File.open("#{@tmpdir}/resize_false", 'w').write("source file contents")
-    mount_point_obj = Provision::Storage::Mount_point.new('/', {
-      :size     => '5G',
-      :prepare  => {
-        :method  => :image,
-        :options => {
-          :path    => "#{@tmpdir}/resize_false",
-          :resize  => false
-        }
-      }
-    })
+    mount_point_obj = Provision::Storage::Mount_point.new('/',       :size     => '5G',
+                                                                     :prepare  => {
+                                                                       :method  => :image,
+                                                                       :options => {
+                                                                         :path    => "#{@tmpdir}/resize_false",
+                                                                         :resize  => false
+                                                                       }
+                                                                     })
     @storage_type.should_not_receive(:grow_filesystem)
     @storage_type.init_filesystem('resize_false', mount_point_obj)
   end
@@ -85,34 +81,30 @@ describe Provision::Storage::Local do
 
   it 'should resize the filesystem when resize is true' do
     File.open("#{@tmpdir}/resize_true", 'w').write("source file contents")
-    mount_point_obj = Provision::Storage::Mount_point.new('/', {
-      :size     => '5G',
-      :prepare  => {
-        :method  => :image,
-        :options => {
-          :path    => "#{@tmpdir}/resize_true",
-          :resize  => true
-        }
-      }
-    })
+    mount_point_obj = Provision::Storage::Mount_point.new('/',       :size     => '5G',
+                                                                     :prepare  => {
+                                                                       :method  => :image,
+                                                                       :options => {
+                                                                         :path    => "#{@tmpdir}/resize_true",
+                                                                         :resize  => true
+                                                                       }
+                                                                     })
     @storage_type.should_receive(:grow_filesystem)
     @storage_type.init_filesystem('resize_true', mount_point_obj)
   end
 
   it 'initialises the names storage from an image file path' do
-    File.open("#{@tmpdir}/source", 'w') { |file|
+    File.open("#{@tmpdir}/source", 'w') do |file|
       file.write("source file contents")
-    }
+    end
 
-    mount_point_obj = Provision::Storage::Mount_point.new('/', {
-      :size     => '5G',
-      :prepare  => {
-        :method  => :image,
-        :options => {
-          :path    => "#{@tmpdir}/source"
-        }
-      }
-    })
+    mount_point_obj = Provision::Storage::Mount_point.new('/',       :size     => '5G',
+                                                                     :prepare  => {
+                                                                       :method  => :image,
+                                                                       :options => {
+                                                                         :path    => "#{@tmpdir}/source"
+                                                                       }
+                                                                     })
     @storage_type.stub(:grow_filesystem)
     @storage_type.should_receive(:grow_filesystem).with('working', mount_point_obj)
     @storage_type.init_filesystem('working', mount_point_obj)
@@ -120,15 +112,13 @@ describe Provision::Storage::Local do
   end
 
   it 'should download the gold image if the path is a url' do
-    mount_point_obj = Provision::Storage::Mount_point.new('/', {
-      :size     => '5G',
-      :prepare  => {
-        :method  => :image,
-        :options => {
-          :path    => "http://someplace/gold.img"
-        }
-      }
-    })
+    mount_point_obj = Provision::Storage::Mount_point.new('/',       :size     => '5G',
+                                                                     :prepare  => {
+                                                                       :method  => :image,
+                                                                       :options => {
+                                                                         :path    => "http://someplace/gold.img"
+                                                                       }
+                                                                     })
     @storage_type.should_receive(:cmd).with("curl -Ss --fail http://someplace/gold.img | dd bs=1M of=#{@tmpdir}/interfoo")
     @storage_type.stub(:grow_filesystem)
     @storage_type.stub(:cmd) do |arg|
@@ -144,20 +134,16 @@ describe Provision::Storage::Local do
     @storage_type.init_filesystem('interfoo', mount_point_obj)
   end
 
-
-
   it 'complains if initialising the storage fails' do
     @storage_type.stub(:grow_filesystem)
     FileUtils.touch "#{@tmpdir}/empty_gold.img"
-    mount_point_obj = Provision::Storage::Mount_point.new('/', {
-      :size     => '5G',
-      :prepare  => {
-        :method  => :image,
-        :options => {
-          :path    => "#{@tmpdir}/empty_gold.img"
-        }
-      }
-    })
+    mount_point_obj = Provision::Storage::Mount_point.new('/',       :size     => '5G',
+                                                                     :prepare  => {
+                                                                       :method  => :image,
+                                                                       :options => {
+                                                                         :path    => "#{@tmpdir}/empty_gold.img"
+                                                                       }
+                                                                     })
     @storage_type.stub(:cmd) do |arg|
       case arg
       when "dd bs=1M if=#{@tmpdir}/empty_gold.img of=#{@tmpdir}/full"
@@ -167,26 +153,24 @@ describe Provision::Storage::Local do
       end
       FileUtils.remove_entry_secure "#{@tmpdir}/empty_gold.img"
     end
-    expect {
+    expect do
       @storage_type.init_filesystem('full', mount_point_obj)
-    }.to raise_error("command dd bs=1M if=#{@tmpdir}/empty_gold.img of=#{@tmpdir}/full returned a non-zero error code 1")
+    end.to raise_error("command dd bs=1M if=#{@tmpdir}/empty_gold.img of=#{@tmpdir}/full returned a non-zero error code 1")
   end
 
-    it 'complains if source image file to copy from does not exist' do
+  it 'complains if source image file to copy from does not exist' do
     @storage_type.stub(:grow_filesystem)
-    mount_point_obj = Provision::Storage::Mount_point.new('/', {
-        :size     => '5G',
-        :prepare  => {
-          :method  => :image,
-          :options => {
-            :path    => "#{@tmpdir}/non-existant-source"
-          }
-        }
-      })
-      expect {
-        @storage_type.init_filesystem('valid_name', mount_point_obj)
-      }.to raise_error("Source image file #{@tmpdir}/non-existant-source does not exist")
-    end
+    mount_point_obj = Provision::Storage::Mount_point.new('/', :size     => '5G',
+                                                               :prepare  => {
+                                                                 :method  => :image,
+                                                                 :options => {
+                                                                   :path    => "#{@tmpdir}/non-existant-source"
+                                                                 }
+                                                               })
+    expect do
+      @storage_type.init_filesystem('valid_name', mount_point_obj)
+    end.to raise_error("Source image file #{@tmpdir}/non-existant-source does not exist")
+  end
 
   it 'should remove and re-create partition' do
     name = 'rebuild'
@@ -286,13 +270,12 @@ describe Provision::Storage::Local do
   end
 
   describe 'check_persistent_storage' do
-
     it 'will raise an exception if persistent storage was not found' do
       mount_point_hash = { :size => '10G', :persistent => true }
       mount_point_obj = Provision::Storage::Mount_point.new('/var/lib/mysql'.to_sym, mount_point_hash)
-      expect {
+      expect do
         @storage_type.check_persistent_storage('oy-foodb-001', mount_point_obj)
-      }.to raise_error("Persistent storage was not found for #{@tmpdir}/oy-foodb-001_var_lib_mysql")
+      end.to raise_error("Persistent storage was not found for #{@tmpdir}/oy-foodb-001_var_lib_mysql")
     end
 
     it 'will create storage if persistent storage was not found' do
@@ -342,36 +325,36 @@ describe Provision::Storage::Local do
       end
       transport = 'dd_from_source,gzip,ssh_cmd,gunzip,dd_of,end_ssh_cmd'
       transport_options = 'ssh_cmd__username:grichards,ssh_cmd__host:grichards-desktop.youdevise.com'
-      expect {
-      @storage_type.copy_to("test", mount_point_obj, transport, transport_options)
-      }.to raise_error('transport dd_of requires option path')
+      expect do
+        @storage_type.copy_to("test", mount_point_obj, transport, transport_options)
+      end.to raise_error('transport dd_of requires option path')
     end
 
     it 'blows up if a transport that expect input is provided no input' do
       mount_point_obj = Provision::Storage::Mount_point.new('/'.to_sym, {})
       transport = 'gzip,ssh_cmd,gunzip,dd_of,end_ssh_cmd'
       transport_options = 'ssh_cmd__username:grichards,ssh_cmd__host:grichards-desktop.youdevise.com'
-      expect {
+      expect do
         @storage_type.copy_to("test", mount_point_obj, transport, transport_options)
-      }.to raise_error('transport gzip expects input, but previous command start provides no output')
+      end.to raise_error('transport gzip expects input, but previous command start provides no output')
     end
 
     it 'blows up if a transport that is not expecting input is provided input' do
       mount_point_obj = Provision::Storage::Mount_point.new('/'.to_sym, {})
       transport = 'dd_from_source,dd_from_source'
       transport_options = ''
-      expect {
+      expect do
         @storage_type.copy_to("test", mount_point_obj, transport, transport_options)
-      }.to raise_error('transport dd_from_source does not expect any input, but previous command dd_from_source provides output')
+      end.to raise_error('transport dd_from_source does not expect any input, but previous command dd_from_source provides output')
     end
 
     it 'blows up if a transport option is provided for a transport that is not used' do
       mount_point_obj = Provision::Storage::Mount_point.new('/'.to_sym, {})
       transport = 'dd_from_source,dd_of'
       transport_options = 'dd_of__path:/some/where,ssh_cmd__username:test'
-      expect {
+      expect do
         @storage_type.copy_to("test", mount_point_obj, transport, transport_options)
-      }.to raise_error('option: username for unused transport: ssh_cmd provided')
+      end.to raise_error('option: username for unused transport: ssh_cmd provided')
     end
 
     it 'blows up with a storage not found error if the source storage does not exist' do
@@ -384,9 +367,9 @@ describe Provision::Storage::Local do
       mount_point_obj = Provision::Storage::Mount_point.new('/'.to_sym, {})
       transport = 'dd_from_source,dd_of'
       transport_options = 'dd_of__path:/some/where'
-      expect {
+      expect do
         @storage_type.copy_to("test", mount_point_obj, transport, transport_options)
-      }.to raise_error(Provision::Storage::StorageNotFoundError, "Source device: #{@tmpdir}/test does not exist")
+      end.to raise_error(Provision::Storage::StorageNotFoundError, "Source device: #{@tmpdir}/test does not exist")
     end
   end
 end

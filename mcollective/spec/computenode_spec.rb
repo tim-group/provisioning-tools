@@ -4,7 +4,6 @@ require 'pp'
 require 'provision'
 
 describe 'provisionvm', :mcollective => true do
-
   before do
     agent_file = File.join([File.dirname(__FILE__)], '../../mcollective/agent/computenode.rb')
     @agent = MCollective::Test::LocalAgentTest.new("computenode", :agent_file =>  agent_file).plugin
@@ -26,7 +25,7 @@ describe 'provisionvm', :mcollective => true do
   end
 
   class Provision::Config
-    def get()
+    def get
       nil
     end
   end
@@ -39,9 +38,8 @@ describe 'provisionvm', :mcollective => true do
       :hostname => "machine2"
     }
 
-    @agent.expects(:provision).with([m1, m2], anything).returns({ "machine1" => "success", "machine2" => "success" })
+    @agent.expects(:provision).with([m1, m2], anything).returns("machine1" => "success", "machine2" => "success")
     reply = @agent.call(:launch, :specs => [m1, m2])
-    reply[:data].should eq({ "machine1" => "success", "machine2" => "success" })
+    reply[:data].should eq("machine1" => "success", "machine2" => "success")
   end
-
 end

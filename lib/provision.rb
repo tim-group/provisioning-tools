@@ -12,11 +12,11 @@ require 'pp'
 
 module Provision
   def self.base(dir = "")
-    return File.expand_path(File.join(File.dirname(__FILE__), "../#{dir}"))
+    File.expand_path(File.join(File.dirname(__FILE__), "../#{dir}"))
   end
 
   def self.home(dir = "")
-    return File.expand_path(File.join(File.dirname(__FILE__), "../home/#{dir}"))
+    File.expand_path(File.join(File.dirname(__FILE__), "../home/#{dir}"))
   end
 end
 
@@ -30,7 +30,7 @@ class Provision::Config
     [:dns_backend, :dns_backend_options, :networks]
   end
 
-  def get()
+  def get
     return nil unless File.exists? @configfile
     config = @symbol_utils.symbolize_keys(YAML.load(File.new(@configfile)))
     # FIXME: Once new code is everywhere, undo this conditional
@@ -39,10 +39,10 @@ class Provision::Config
     if config[:vm_storage_type] == 'new'
       missing_keys << :storage
     end
-    missing_keys = missing_keys - config.keys
+    missing_keys -= config.keys
     raise "#{@configfile} has missing properties (#{missing_keys.join(', ')})" unless missing_keys.empty?
 
-    return config
+    config
   end
 end
 
@@ -50,10 +50,10 @@ class Provision::Factory
   attr_reader :logger
   def initialize(options = {})
     @logger = options[:logger] || Logger.new(STDOUT)
-    @config = Provision::Config.new(:configfile => options[:configfile]).get()
+    @config = Provision::Config.new(:configfile => options[:configfile]).get
   end
 
-  def numbering_service()
+  def numbering_service
     options = @config[:dns_backend_options]
     options[:logger] = @logger
     numbering_service = Provision::DNS.get_backend(@config[:dns_backend], options)
@@ -68,7 +68,7 @@ class Provision::Factory
       numbering_service.add_network(name, net_config[:net], my_options)
     end
 
-    return numbering_service
+    numbering_service
   end
 
   def home(dir = "")
@@ -83,7 +83,7 @@ class Provision::Factory
     Provision::VM::Virsh.new(@config)
   end
 
-  def provisioning_service()
+  def provisioning_service
     targetdir = File.join(File.dirname(__FILE__), "../target")
 
     (puts "@config[:defaults] is undefined, are you sure this is a compute node?"; exit 1) if !defined?(@config[:defaults])
@@ -113,7 +113,7 @@ class Provision::Factory
     logger.info("Building work queue")
     Provision::WorkQueue.new(
       :listener => options[:listener],
-      :provisioning_service => provisioning_service(),
+      :provisioning_service => provisioning_service,
       :worker_count => options[:worker_count],
       :logger => logger
     )
@@ -129,5 +129,4 @@ class Provision::Factory
     image_service.build_image("gold-#{distid}-#{distcodename}", spec)
     image_service.build_image("shrink", spec)
   end
-
 end

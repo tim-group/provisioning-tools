@@ -21,8 +21,8 @@ define "win7boot" do
     "#{mountpoint}/ProgramData/Microsoft/Windows/Start\ Menu/Programs/Startup/"
   end
 
-  run("copy gold image") {
-    win7_partition_location = 105906176
+  run("copy gold image") do
+    win7_partition_location = 105_906_176
     case config[:vm_storage_type]
     when 'lvm', 'image'
       cmd "mkdir -p #{spec[:temp_dir]}"
@@ -42,22 +42,22 @@ define "win7boot" do
     when 'new'
       # do nothing now mounted by storage service.
     end
-  }
+  end
 
-  on_error {
+  on_error do
     case config[:vm_storage_type]
     when 'lvm'
       if File.exists?("/dev/#{spec[:lvm_vg]}/#{spec[:hostname]}")
         cmd "lvremove -f /dev/#{spec[:lvm_vg]}/#{spec[:hostname]}"
       end
     end
-  }
+  end
 
-  run("Remove batch file which initates a fresh sysprep on boot") {
+  run("Remove batch file which initates a fresh sysprep on boot") do
     FileUtils.rm "#{start_menu_location}/dosysprep.bat"
-  }
+  end
 
-  run("inject hostname and ip address") {
+  run("inject hostname and ip address") do
     gateway = "127.0.0.1"
     spec[:routes].each do |route|
       route =~ /via (.+)$/
@@ -74,9 +74,9 @@ define "win7boot" do
       cmd "sed -i s/%%IPADDRESS%%/#{config[:address]}/g #{sysprep_answer_file}"
       cmd "sed -i s/%%GATEWAY%%/#{gateway}/g #{sysprep_answer_file}"
     end
-  }
+  end
 
-  run("install Selenium") {
+  run("install Selenium") do
     selenium_dir = "#{common_files}/selenium"
     java_dir     = "#{common_files}/java"
     start_menu_grid_file = "#{mountpoint}/selenium/start-grid.bat"
@@ -94,35 +94,34 @@ define "win7boot" do
     FileUtils.cp "#{mountpoint}/selenium/IEDriverServer-#{spec[:selenium_version]}.exe", "#{mountpoint}/selenium/IEDriverServer.exe"
 
     cmd "sed -i s/%IEVERSION%/#{spec[:ie_version]}/g \"#{start_menu_grid_file}\""
-  }
+  end
 
-  run("Configure and start Selenium node on boot") {
+  run("Configure and start Selenium node on boot") do
     if spec[:selenium_hub_host]
       start_menu_grid_file = "#{mountpoint}/selenium/start-grid.bat"
 
       cmd "sed -i s/%HUBHOST%/#{spec[:selenium_hub_host]}/g \"#{start_menu_grid_file}\""
       FileUtils.cp start_menu_grid_file, start_menu_location
     end
-  }
+  end
 
-  run("Install registry hack to make Selenium work on IE") {
+  run("Install registry hack to make Selenium work on IE") do
     FileUtils.cp "#{mountpoint}/selenium/hack-registry.bat", start_menu_location
-  }
+  end
 
-  run("stamp time") {
-     tmp_date_file = "#{mountpoint}/build-date.txt"
+  run("stamp time") do
+    tmp_date_file = "#{mountpoint}/build-date.txt"
     `date +"%m-%d-%y.%k:%M" > #{tmp_date_file}`
-  }
+  end
 
   case config[:vm_storage_type]
   when 'lvm', 'image'
-    cleanup {
+    cleanup do
       cmd "umount -l #{mountpoint}"
       cmd "sleep 1"
       suppress_error.cmd "rmdir #{mountpoint}"
-    }
+    end
   when 'new'
     # do nothing
   end
-
 end

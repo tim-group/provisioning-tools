@@ -46,7 +46,7 @@ class Provision::Storage::Service
   end
 
   def get_storage(type)
-    return @storage_types[type]
+    @storage_types[type]
   end
 
   def get_host_device(name, mount_point)
@@ -62,11 +62,11 @@ class Provision::Storage::Service
   end
 
   def get_mount_point(name, mount_point)
-    return @storage_configs[name].mount_point(mount_point)
+    @storage_configs[name].mount_point(mount_point)
   end
 
   def get_mount_point_config(name, mount_point)
-    return @storage_configs[name].mount_point(mount_point).config
+    @storage_configs[name].mount_point(mount_point).config
   end
 
   def create_storage(name)
@@ -95,7 +95,6 @@ class Provision::Storage::Service
       storage.init_filesystem(name, mount_point_obj) if newly_created
     end
   end
-
 
   def mount_filesystems(name, tempdir)
     @storage_configs[name].mount_points.each do |mount_point|
@@ -176,8 +175,8 @@ class Provision::Storage::Service
       bus = virtio ? 'virtio' : 'ide'
       target = "dev='#{disk_type}#{drive_letters[current_drive_letter]}'"
       template = ERB.new(File.read(template_file))
-      xml_output = xml_output + template.result(binding)
-      current_drive_letter = current_drive_letter + 1
+      xml_output += template.result(binding)
+      current_drive_letter += 1
     end
     xml_output
   end
@@ -204,7 +203,7 @@ class Provision::Storage::Service
             end
           end
           f.puts("/dev/vd#{drive_letters[current_drive_letter]}1 #{mount_point_obj.name}  #{fstype} defaults 0 0")
-          current_drive_letter = current_drive_letter + 1
+          current_drive_letter += 1
         end
       end
     end

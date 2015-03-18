@@ -6,7 +6,7 @@ module MCollective
   module Agent
     class Computenodestoragelong < RPC::Agent
       def copy(source, transport, transport_options)
-        config = Provision::Config.new.get()
+        config = Provision::Config.new.get
         storage_service = Provision::Storage::Service.new(config[:storage])
         name, type, path = source.split(':')
         path = '/' if path.nil?

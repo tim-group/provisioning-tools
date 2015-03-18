@@ -7,31 +7,26 @@ class Provision::Storage::Image < Provision::Storage
     raise "Image storage requires a path as an option, named path" if options[:image_path].nil?
     @image_path = options[:image_path]
     super(options)
-
   end
 
   def create(name, mount_point_obj)
     underscore_name = underscore_name(name, mount_point_obj.name)
     size = mount_point_obj.config[:size]
     raise "Image file #{device(underscore_name)} already exists" if File.exist?("#{device(underscore_name)}")
-    run_task(name, "create #{underscore_name}", {
-      :task => lambda {
-        cmd "qemu-img create #{device(underscore_name)} #{size}"
-      },
-      :cleanup => lambda {
-        remove(name, mount_point_obj.name)
-      }
-    })
+    run_task(name, "create #{underscore_name}",                :task => lambda do
+      cmd "qemu-img create #{device(underscore_name)} #{size}"
+    end,
+                                                               :cleanup => lambda do
+                                                                 remove(name, mount_point_obj.name)
+                                                               end)
   end
 
   def grow_filesystem(name, mount_point_obj)
     underscore_name = underscore_name(name, mount_point_obj.name)
     size = mount_point_obj.config[:size]
-    run_task(name, "grow #{underscore_name}", {
-      :task => lambda {
-        cmd "qemu-img resize #{device(underscore_name)} #{size}"
-      }
-    })
+    run_task(name, "grow #{underscore_name}",                :task => lambda do
+      cmd "qemu-img resize #{device(underscore_name)} #{size}"
+    end)
     rebuild_partition(name, mount_point_obj)
     check_and_resize_filesystem(name, mount_point_obj)
   end
@@ -43,11 +38,9 @@ class Provision::Storage::Image < Provision::Storage
 
     newsize = `parted -sm #{device(underscore_name)} print | grep -e '^1:' | awk -F ':' '{ print $3 }'`
 
-    run_task(name, "shrink image #{underscore_name}", {
-      :task => lambda {
-        cmd "qemu-img resize #{device(underscore_name)} #{newsize}"
-      }
-    })
+    run_task(name, "shrink image #{underscore_name}",                :task => lambda do
+      cmd "qemu-img resize #{device(underscore_name)} #{newsize}"
+    end)
   end
 
   def device(underscore_name)
@@ -60,7 +53,6 @@ class Provision::Storage::Image < Provision::Storage
   end
 
   def partition_name(name, mount_point_obj)
-    return mount_point_obj.get(:loopback_part)
+    mount_point_obj.get(:loopback_part)
   end
-
 end

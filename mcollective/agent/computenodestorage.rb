@@ -4,7 +4,6 @@ require 'pp'
 module MCollective
   module Agent
     class Computenodestorage < RPC::Agent
-
       def get_vg_data(volume_group)
         total = 0
         used = 0

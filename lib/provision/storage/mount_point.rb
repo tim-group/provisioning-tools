@@ -1,5 +1,4 @@
 class Provision::Storage::Mount_point
-
   attr_reader :name, :config
 
   def initialize(mount_point, mount_point_spec)
@@ -22,22 +21,18 @@ class Provision::Storage::Mount_point
     }
 
     if mount_point == '/'.to_sym
-      default_config = recurse_merge(default_config, {
-        :prepare => {
-          :method => "image",
-          :options => {
-            :path => "/var/local/images/gold/generic.img"
-          }
-        }
-      })
+      default_config = recurse_merge(default_config, :prepare => {
+                                       :method => "image",
+                                       :options => {
+                                         :path => "/var/local/images/gold/generic.img"
+                                       }
+                                     })
     else
-      default_config = recurse_merge(default_config, {
-        :prepare => {
-          :method => 'format',
-          :options => {
-          }
-        }
-      })
+      default_config = recurse_merge(default_config, :prepare => {
+                                       :method => 'format',
+                                       :options => {
+                                       }
+                                     })
     end
 
     @config = recurse_merge(default_config, mount_point_spec)
@@ -53,10 +48,11 @@ class Provision::Storage::Mount_point
   end
 
   def get(key)
-    return @temp_data[key]
+    @temp_data[key]
   end
 
   private
+
   def recurse_merge(a, b)
     a.merge(b) do |_, x, y|
       (x.is_a?(Hash) && y.is_a?(Hash)) ? recurse_merge(x, y) : y

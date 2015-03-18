@@ -2,7 +2,6 @@ require 'provision/image/catalogue'
 require 'provision/image/commands'
 
 class Provision::Image::Service
-
   def initialize(options)
     @configdir = options[:configdir]
     @config = options[:config]
@@ -10,7 +9,7 @@ class Provision::Image::Service
   end
 
   def build_image(template, spec)
-    Provision::Image::Catalogue.build(template, spec, @config).execute()
+    Provision::Image::Catalogue.build(template, spec, @config).execute
   end
 
   def remove_image(spec)

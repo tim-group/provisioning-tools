@@ -23,51 +23,35 @@ module Provision::Storage::Local
     underscore_name = underscore_name(name, mount_point_obj.name)
     image_file_path = mount_point_obj.config[:prepare][:options][:path]
 
-    run_task(name, "image #{underscore_name}", {
-      :task => lambda {
-        case image_file_path
-        when /^\/.*/
-          raise "Source image file #{image_file_path} does not exist" if !File.exist?(image_file_path)
-          cmd "dd bs=1M if=#{image_file_path} of=#{device(underscore_name)}"
-        when /^https?:\/\//
-          cmd "curl -Ss --fail #{image_file_path} | dd bs=1M of=#{device(underscore_name)}"
-        else
-          raise "Not sure how to deal with image_file_path: '#{image_file_path}'"
-        end
-      }
-    })
+    run_task(name, "image #{underscore_name}", :task => lambda do
+      case image_file_path
+      when /^\/.*/
+        raise "Source image file #{image_file_path} does not exist" if !File.exist?(image_file_path)
+        cmd "dd bs=1M if=#{image_file_path} of=#{device(underscore_name)}"
+      when /^https?:\/\//
+        cmd "curl -Ss --fail #{image_file_path} | dd bs=1M of=#{device(underscore_name)}"
+      else
+        raise "Not sure how to deal with image_file_path: '#{image_file_path}'"
+      end
+    end)
   end
 
   def format_filesystem(name, mount_point_obj)
     underscore_name = underscore_name(name, mount_point_obj.name)
     fs_type = mount_point_obj.config[:prepare][:options][:type]
 
-    run_task(name, "create partition #{underscore_name}", {
-      :task => lambda {
-        cmd "parted -s #{device(underscore_name)} mklabel msdos"
-        cmd "parted -s #{device(underscore_name)} mkpart primary #{fs_type} 2048s 100%"
-      }
-    })
+    run_task(name, "create partition #{underscore_name}", :task => lambda do
+      cmd "parted -s #{device(underscore_name)} mklabel msdos"
+      cmd "parted -s #{device(underscore_name)} mkpart primary #{fs_type} 2048s 100%"
+    end)
 
-    run_task(name, "create partition device nodes #{underscore_name}", {
-      :task => lambda {
-        kpartxa(name, mount_point_obj)
-      },
-      :cleanup => lambda {
-        kpartxd(name, mount_point_obj)
-      }
-    })
-    run_task(name, "create filesystem #{underscore_name}", {
-      :task => lambda {
-        cmd "mkfs.#{fs_type} /dev/mapper/#{partition_name(name, mount_point_obj)}"
-      }
-    })
-    run_task(name, "undo create partition device nodes #{underscore_name}", {
-      :task => lambda {
-        kpartxd(name, mount_point_obj)
-      },
-      :remove_cleanup => "create partition device nodes #{underscore_name}"
-    })
+    run_task(name, "create partition device nodes #{underscore_name}", :task => lambda { kpartxa(name, mount_point_obj) },
+                                                                       :cleanup => lambda { kpartxd(name, mount_point_obj) })
+    run_task(name, "create filesystem #{underscore_name}", :task => lambda do
+      cmd "mkfs.#{fs_type} /dev/mapper/#{partition_name(name, mount_point_obj)}"
+    end)
+    run_task(name, "undo create partition device nodes #{underscore_name}", :task => lambda { kpartxd(name, mount_point_obj) },
+                                                                            :remove_cleanup => "create partition device nodes #{underscore_name}")
   end
 
   def rebuild_partition(name, mount_point_obj, size = :maximum)
@@ -76,21 +60,13 @@ module Provision::Storage::Local
 
     case size
     when :maximum
-      run_task(name, "resize partition #{underscore_name}", {
-        :task => lambda {
-          cmd "parted -s #{device(underscore_name)} rm 1"
-          cmd "parted -s #{device(underscore_name)} mkpart primary #{fs_type} 2048s 100%"
-        }
-      })
+      run_task(name, "resize partition #{underscore_name}", :task => lambda do
+        cmd "parted -s #{device(underscore_name)} rm 1"
+        cmd "parted -s #{device(underscore_name)} mkpart primary #{fs_type} 2048s 100%"
+      end)
     when :minimum
-      run_task(name, "create partition device nodes #{underscore_name}", {
-        :task => lambda {
-          kpartxa(name, mount_point_obj)
-        },
-        :cleanup => lambda {
-          kpartxd(name, mount_point_obj)
-        }
-      })
+      run_task(name, "create partition device nodes #{underscore_name}", :task => lambda { kpartxa(name, mount_point_obj) },
+                                                                         :cleanup => lambda { kpartxd(name, mount_point_obj) })
 
       vm_partition_name = partition_name(name, mount_point_obj)
       blockcount = cmd("dumpe2fs -h /dev/mapper/#{vm_partition_name} | grep -F 'Block count:' | awk -F ':' '{ print $2 }' | sed 's/ //g'").chomp.to_i
@@ -100,19 +76,13 @@ module Provision::Storage::Local
       kpartxd(name, mount_point_obj)
 
       underscore_name = underscore_name(name, mount_point_obj.name)
-      run_task(name, "resize partition #{underscore_name}", {
-        :task => lambda {
-          cmd "parted -s #{device(underscore_name)} rm 1"
-          cmd "parted -s #{device(underscore_name)} mkpart primary #{fs_type} 2048s #{sectors}s"
-        }
-      })
+      run_task(name, "resize partition #{underscore_name}", :task => lambda do
+        cmd "parted -s #{device(underscore_name)} rm 1"
+        cmd "parted -s #{device(underscore_name)} mkpart primary #{fs_type} 2048s #{sectors}s"
+      end)
 
-      run_task(name, "undo create partition device nodes #{underscore_name}", {
-        :task => lambda {
-          kpartxd(name, mount_point_obj)
-        },
-        :remove_cleanup => "create partition device nodes #{underscore_name}"
-      })
+      run_task(name, "undo create partition device nodes #{underscore_name}", :task => lambda { kpartxd(name, mount_point_obj) },
+                                                                              :remove_cleanup => "create partition device nodes #{underscore_name}")
     end
   end
 
@@ -135,38 +105,26 @@ module Provision::Storage::Local
 
   def check_and_resize_filesystem(name, mount_point_obj, resize = :maximum)
     underscore_name = underscore_name(name, mount_point_obj.name)
-    run_task(name, "create partition device nodes #{underscore_name}", {
-      :task => lambda {
-        kpartxa(name, mount_point_obj)
-      },
-      :cleanup => lambda {
-        kpartxd(name, mount_point_obj)
-      }
-    })
+    run_task(name, "create partition device nodes #{underscore_name}", :task => lambda { kpartxa(name, mount_point_obj) },
+                                                                       :cleanup => lambda { kpartxd(name, mount_point_obj) })
 
     vm_partition_name = partition_name(name, mount_point_obj)
-    run_task(name, "check and resize filesystem #{vm_partition_name}", {
-      :task => lambda {
-        cmd "e2fsck -f -p /dev/mapper/#{vm_partition_name}"
-        case resize
-        when :maximum
-          cmd "resize2fs /dev/mapper/#{vm_partition_name}"
-        when :minimum
-          cmd "resize2fs -M /dev/mapper/#{vm_partition_name}"
-        when false
-          # no action
-        else
-          raise "unsure how to deal with resize option: #{resize}"
-        end
-      }
-    })
+    run_task(name, "check and resize filesystem #{vm_partition_name}", :task => lambda do
+      cmd "e2fsck -f -p /dev/mapper/#{vm_partition_name}"
+      case resize
+      when :maximum
+        cmd "resize2fs /dev/mapper/#{vm_partition_name}"
+      when :minimum
+        cmd "resize2fs -M /dev/mapper/#{vm_partition_name}"
+      when false
+        # no action
+      else
+        raise "unsure how to deal with resize option: #{resize}"
+      end
+    end)
 
-    run_task(name, "undo create partition device nodes #{underscore_name}", {
-      :task => lambda {
-        kpartxd(name, mount_point_obj)
-      },
-      :remove_cleanup => "create partition device nodes #{underscore_name}"
-    })
+    run_task(name, "undo create partition device nodes #{underscore_name}", :task => lambda { kpartxd(name, mount_point_obj) },
+                                                                            :remove_cleanup => "create partition device nodes #{underscore_name}")
   end
 
   def kpartxa(name, mount_point_obj)
@@ -208,34 +166,20 @@ module Provision::Storage::Local
     underscore_name = underscore_name(name, mount_point_obj.name)
     dir_existed_at_start = File.exists? dir
 
-    run_task(name, "make directory #{dir}", {
-      :task => lambda {
-        FileUtils.mkdir(dir) if temp_mountpoint and !dir_existed_at_start
-      },
-      :cleanup => lambda {
-        FileUtils.rmdir(dir) if temp_mountpoint and !dir_existed_at_start
-      }
-    })
+    run_task(name, "make directory #{dir}", :task => lambda { FileUtils.mkdir(dir) if temp_mountpoint && !dir_existed_at_start },
+                                            :cleanup => lambda { FileUtils.rmdir(dir) if temp_mountpoint && !dir_existed_at_start })
 
-    run_task(name, "create partition device nodes #{underscore_name}", {
-      :task => lambda {
-        kpartxa(name, mount_point_obj)
-      },
-      :cleanup => lambda {
-        kpartxd(name, mount_point_obj)
-      }
-    })
+    run_task(name, "create partition device nodes #{underscore_name}", :task => lambda { kpartxa(name, mount_point_obj) },
+                                                                       :cleanup => lambda { kpartxd(name, mount_point_obj) })
 
     part_name = partition_name(name, mount_point_obj)
-    run_task(name, "mount #{part_name} on #{dir}", {
-      :task => lambda {
-        sleep 1
-        cmd "mount /dev/mapper/#{part_name} #{dir}"
-      },
-      :cleanup => lambda {
-        cmd "umount #{dir}"
-      }
-    })
+    run_task(name, "mount #{part_name} on #{dir}", :task => lambda do
+      sleep 1
+      cmd "mount /dev/mapper/#{part_name} #{dir}"
+    end,
+                                                   :cleanup => lambda do
+                                                     cmd "umount #{dir}"
+                                                   end)
 
     mount_point_obj.set(:dir_existed_at_start, dir_existed_at_start)
   end
@@ -248,34 +192,28 @@ module Provision::Storage::Local
     underscore_name = underscore_name(name, mount_point_obj.name)
     part_name = partition_name(name, mount_point_obj)
 
-    run_task(name, "undo mount #{part_name} on #{dir}", {
-      :task => lambda {
-        sleep 1
-        cmd "umount #{dir}"
-      },
-      :remove_cleanup => "mount #{part_name} on #{dir}"
-    })
+    run_task(name, "undo mount #{part_name} on #{dir}", :task => lambda do
+      sleep 1
+      cmd "umount #{dir}"
+    end,
+                                                        :remove_cleanup => "mount #{part_name} on #{dir}")
 
-    run_task(name, "undo create partition device nodes #{underscore_name}", {
-      :task => lambda {
-        kpartxd(name, mount_point_obj)
-      },
-      :remove_cleanup => "create partition device nodes #{underscore_name}"
-    })
+    run_task(name, "undo create partition device nodes #{underscore_name}", :task => lambda do
+      kpartxd(name, mount_point_obj)
+    end,
+                                                                            :remove_cleanup => "create partition device nodes #{underscore_name}")
 
-    run_task(name, "undo make directory #{dir}", {
-      :task => lambda {
-        FileUtils.rmdir(dir) if delete_mountpoint and dir_existed_at_start
-      },
-      :remove_cleanup => "make directory #{dir}"
-    })
+    run_task(name, "undo make directory #{dir}", :task => lambda do
+      FileUtils.rmdir(dir) if delete_mountpoint && dir_existed_at_start
+    end,
+                                                 :remove_cleanup => "make directory #{dir}")
 
     mount_point_obj.unset(:dir_existed_at_start)
   end
 
   def libvirt_source(name, mount_point)
     underscore_name = underscore_name(name, mount_point)
-    return "dev='#{device(underscore_name)}'"
+    "dev='#{device(underscore_name)}'"
   end
 
   def copy_to(name, mount_point_obj, transport_string, transport_options)
@@ -308,11 +246,11 @@ module Provision::Storage::Local
       t_options = options[transport]
       case transport
       when :dd_from_source
-        raise "transport #{transport} does not expect any input, but previous command #{last_cmd} provides output" if last_cmd_provides_output == true or last_cmd == :ssh_cmd
+        raise "transport #{transport} does not expect any input, but previous command #{last_cmd} provides output" if last_cmd_provides_output == true || last_cmd == :ssh_cmd
         copy_cmd = "#{copy_cmd}dd if=#{source_device}"
         last_cmd_provides_output = true
       when :dd_of
-        raise "transport #{transport} expects input, but previous command #{last_cmd} provides no output" if last_cmd_provides_output == false and last_cmd != :ssh_cmd
+        raise "transport #{transport} expects input, but previous command #{last_cmd} provides no output" if last_cmd_provides_output == false && last_cmd != :ssh_cmd
         if last_cmd_provides_output == true
           copy_cmd = "#{copy_cmd} | "
         end
@@ -322,14 +260,14 @@ module Provision::Storage::Local
         copy_cmd = "#{copy_cmd}dd of=#{t_options[:path]}"
         last_cmd_provides_output = false
       when :gzip
-        raise "transport #{transport} expects input, but previous command #{last_cmd} provides no output" if last_cmd_provides_output == false and last_cmd != :ssh_cmd
+        raise "transport #{transport} expects input, but previous command #{last_cmd} provides no output" if last_cmd_provides_output == false && last_cmd != :ssh_cmd
         if last_cmd_provides_output == true
           copy_cmd = "#{copy_cmd} | "
         end
         copy_cmd = "#{copy_cmd}gzip"
         last_cmd_provides_output = true
       when :gunzip
-        raise "transport gunzip expects input, but previous command #{last_cmd} provides no output" if last_cmd_provides_output == false and last_cmd != :ssh_cmd
+        raise "transport gunzip expects input, but previous command #{last_cmd} provides no output" if last_cmd_provides_output == false && last_cmd != :ssh_cmd
         if last_cmd_provides_output == true
           copy_cmd = "#{copy_cmd} | "
         end
@@ -345,7 +283,7 @@ module Provision::Storage::Local
         copy_cmd = "#{copy_cmd} -o StrictHostKeyChecking=no #{t_options[:username]}@#{t_options[:host]} '"
         last_cmd_provides_output = false
       when :end_ssh_cmd
-        raise "transport #{transport} does not expect any input, but previous command #{last_cmd} provides output" if last_cmd_provides_output == true or last_cmd == :ssh_cmd
+        raise "transport #{transport} does not expect any input, but previous command #{last_cmd} provides output" if last_cmd_provides_output == true || last_cmd == :ssh_cmd
         copy_cmd = "#{copy_cmd}'"
         last_cmd_provides_output = false
       else
@@ -355,11 +293,9 @@ module Provision::Storage::Local
     end
 
     output = nil
-    run_task(name, copy_cmd, {
-      :task => lambda {
-         output = cmd "#{copy_cmd}"
-      }
-    })
-    return output
+    run_task(name, copy_cmd, :task => lambda do
+      output = cmd "#{copy_cmd}"
+    end)
+    output
   end
 end

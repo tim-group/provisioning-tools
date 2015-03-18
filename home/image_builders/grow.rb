@@ -4,7 +4,7 @@ require 'provision/image/commands'
 define "grow" do
   extend Provision::Image::Commands
 
-  run("grow the partition table and filesystem") {
+  run("grow the partition table and filesystem") do
     case config[:vm_storage_type]
     when 'image'
       cmd "cp #{spec[:images_dir]}/gold/generic.img #{spec[:image_path]}"
@@ -34,18 +34,18 @@ define "grow" do
       cmd "e2fsck -f -p /dev/mapper/#{vm_partition_name}"
       cmd "resize2fs /dev/mapper/#{vm_partition_name}"
     end
-  }
+  end
 
-  on_error {
+  on_error do
     case config[:vm_storage_type]
     when 'lvm'
       if File.exists?("/dev/#{spec[:lvm_vg]}/#{spec[:hostname]}")
         cmd "lvremove -f /dev/#{spec[:lvm_vg]}/#{spec[:hostname]}"
       end
     end
-  }
+  end
 
-  cleanup {
+  cleanup do
     case config[:vm_storage_type]
     when 'image'
       cmd "kpartx -d /dev/#{spec[:loop0]}"
@@ -57,6 +57,5 @@ define "grow" do
     else
       raise "provisioning tools does not know about vm_storage_type '#{config[:vm_storage_type]}'"
     end
-  }
-
+  end
 end

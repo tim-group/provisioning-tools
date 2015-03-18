@@ -14,14 +14,12 @@ class Provision::Storage::LVM < Provision::Storage
     if File.exists?("#{device(underscore_name)}")
       raise "Logical volume #{underscore_name} already exists in volume group #{@options[:vg]}"
     end
-    run_task(name, "create #{underscore_name}", {
-      :task => lambda {
-        cmd "lvcreate -n #{underscore_name} -L #{size} #{@options[:vg]}"
-      },
-      :cleanup => lambda {
-        remove(name, mount_point_obj.name)
-      }
-    })
+    run_task(name, "create #{underscore_name}",                :task => lambda do
+      cmd "lvcreate -n #{underscore_name} -L #{size} #{@options[:vg]}"
+    end,
+                                                               :cleanup => lambda do
+                                                                 remove(name, mount_point_obj.name)
+                                                               end)
   end
 
   def grow_filesystem(name, mount_point_obj)
@@ -35,15 +33,13 @@ class Provision::Storage::LVM < Provision::Storage
     underscore_name = underscore_name(name, mount_point_obj.name)
     newsize = cmd("parted -sm #{device(underscore_name)} print | grep -e '^1:' | awk -F ':' '{ print $3 }'")
 
-    run_task(name, "shrink lvm #{underscore_name}", {
-      :task => lambda {
-        cmd "lvreduce -f -L #{newsize} #{device(underscore_name)}"
-      }
-    })
+    run_task(name, "shrink lvm #{underscore_name}",                :task => lambda do
+      cmd "lvreduce -f -L #{newsize} #{device(underscore_name)}"
+    end)
   end
 
   def device(underscore_name)
-    return "/dev/#{@options[:vg]}/#{underscore_name}"
+    "/dev/#{@options[:vg]}/#{underscore_name}"
   end
 
   def remove(name, mount_point)
@@ -68,7 +64,6 @@ class Provision::Storage::LVM < Provision::Storage
     underscore_name = underscore_name(name, mount_point_obj.name)
     vm_partition_name = cmd "kpartx -l #{device(underscore_name)} | grep -v 'loop deleted : /dev/loop' | awk '{ print $1 }' | tail -1"
     raise "unable to work out vm_partition_name" if vm_partition_name.nil?
-    return vm_partition_name
+    vm_partition_name
   end
-
 end

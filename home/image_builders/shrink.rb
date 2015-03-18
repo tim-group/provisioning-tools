@@ -4,7 +4,7 @@ require 'provision/image/commands'
 define "shrink" do
   extend Provision::Image::Commands
 
-  run("loopback devices") {
+  run("loopback devices") do
     cmd "losetup /dev/#{spec[:loop0]} #{spec[:image_path]}"
     cmd "kpartx -a /dev/#{spec[:loop0]}"
     cmd "e2fsck -f -p /dev/mapper/#{spec[:loop0]}p1"
@@ -21,13 +21,13 @@ define "shrink" do
     newsize = `parted -sm /dev/#{spec[:loop0]} print | grep -e '^1:' | awk -F ':' '{ print $3 }'`
 
     cmd "qemu-img resize #{spec[:image_path]} #{newsize}"
-  }
+  end
 
-  cleanup {
-    keep_doing {
+  cleanup do
+    keep_doing do
       suppress_error.cmd "kpartx -d /dev/#{spec[:loop0]}"
-    }.until { `dmsetup ls | grep #{spec[:loop0]}p1 | wc -l`.chomp == "0" }
+    end.until { `dmsetup ls | grep #{spec[:loop0]}p1 | wc -l`.chomp == "0" }
 
     cmd "losetup -d /dev/#{spec[:loop0]}"
-  }
+  end
 end

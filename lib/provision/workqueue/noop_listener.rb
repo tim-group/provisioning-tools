@@ -28,6 +28,6 @@ class NoopListener
   end
 
   def failures
-    return results.select { |k, v| v[0] == "failed" }
+    results.select { |k, v| v[0] == "failed" }
   end
 end

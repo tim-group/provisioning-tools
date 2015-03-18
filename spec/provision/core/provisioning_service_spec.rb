@@ -19,7 +19,7 @@ module RSpec::Mocks::ArgumentMatchers
           mismatches << "expected #{key} to be #{@expected[key].inspect} but it was #{actual[key].inspect}" unless actual[key] == @expected[key]
         end
         raise mismatches.join("\n") unless mismatches.empty?
-        return true
+        true
       end
 
       def description
@@ -28,7 +28,7 @@ module RSpec::Mocks::ArgumentMatchers
     end
 
     def spec_with(expected)
-      return HasSpecEntries.new(expected)
+      HasSpecEntries.new(expected)
     end
   end
 end
@@ -40,9 +40,9 @@ end
 describe Provision::Core::ProvisioningService do
   describe "without a storage service" do
     before do
-      @image_service = double()
-      @vm_service = double()
-      @numbering_service = double()
+      @image_service = double
+      @vm_service = double
+      @numbering_service = double
       @provisioning_service = Provision::Core::ProvisioningService.new(
         :image_service => @image_service,
         :vm_service => @vm_service,
@@ -55,9 +55,9 @@ describe Provision::Core::ProvisioningService do
       @vm_service.stub(:is_defined).and_return(true)
       @vm_service.stub(:start_vm).and_return(true)
 
-      expect {
+      expect do
         @provisioning_service.provision_vm(:hostname => "vmx1", :template => "ubuntuprecise").should eql(false)
-      }.to raise_error("failed to launch vmx1 already exists")
+      end.to raise_error("failed to launch vmx1 already exists")
     end
 
     it 'allows the user to define vm from an image catalogue and vmdescription catalogue' do
@@ -142,15 +142,14 @@ describe Provision::Core::ProvisioningService do
       @numbering_service.should_receive(:allocate_ips_for).with(spec_with(spec)).and_return(networking)
       @provisioning_service.allocate_ip(spec)
     end
-
   end
 
   describe "with a storage service" do
     before do
-      @image_service = double()
-      @vm_service = double()
-      @numbering_service = double()
-      @storage_service = double()
+      @image_service = double
+      @vm_service = double
+      @numbering_service = double
+      @storage_service = double
       @provisioning_service = Provision::Core::ProvisioningService.new(
         :image_service => @image_service,
         :vm_service => @vm_service,
@@ -172,15 +171,15 @@ describe Provision::Core::ProvisioningService do
       @vm_service.stub(:is_defined).and_return(true)
       @vm_service.stub(:start_vm).and_return(true)
 
-      expect {
+      expect do
         @provisioning_service.provision_vm(:hostname => "vmx1", :template => "ubuntuprecise", :storage => @storage_hash).should eql(false)
-      }.to raise_error("failed to launch vmx1 already exists")
+      end.to raise_error("failed to launch vmx1 already exists")
     end
 
     it 'allows the user to define vm from an image catalogue and vmdescription catalogue' do
       @numbering_service.should_receive(:allocate_ips_for)
       @numbering_service.should_receive(:add_cnames_for)
-      @storage_service.should_receive(:create_config).with("vmx1", { '/'.to_sym => { :type => "os", :size => "10G" } }).ordered
+      @storage_service.should_receive(:create_config).with("vmx1", '/'.to_sym => { :type => "os", :size => "10G" }).ordered
       @storage_service.should_receive(:spec_to_xml).with("vmx1").ordered
       @vm_service.should_receive(:define_vm).with(kind_of(Provision::Core::MachineSpec), "some xml").ordered
       @storage_service.should_receive(:prepare_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
@@ -202,7 +201,7 @@ describe Provision::Core::ProvisioningService do
       @numbering_service.stub(:allocate_ips_for).and_return(network_address)
       @numbering_service.stub(:add_cnames_for)
 
-      @storage_service.should_receive(:create_config).with("vmx1", { '/'.to_sym => { :type => "os", :size => "10G" } }).ordered
+      @storage_service.should_receive(:create_config).with("vmx1", '/'.to_sym => { :type => "os", :size => "10G" }).ordered
       @storage_service.should_receive(:spec_to_xml).with("vmx1").ordered
       @vm_service.should_receive(:define_vm).ordered
       @storage_service.should_receive(:prepare_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
@@ -216,7 +215,7 @@ describe Provision::Core::ProvisioningService do
 
     it 'allows the user to clean up vms' do
       @vm_service.should_receive(:is_running).ordered
-      @storage_service.should_receive(:create_config).with("vmx1", { '/'.to_sym => { :type => "os", :size => "10G" } }).ordered
+      @storage_service.should_receive(:create_config).with("vmx1", '/'.to_sym => { :type => "os", :size => "10G" }).ordered
       @storage_service.should_receive(:clean_storage).with("vmx1", @storage_hash).ordered
       @vm_service.should_receive(:undefine_vm).ordered
       @provisioning_service.clean_vm(:hostname => "vmx1", :template => "ubuntuprecise", :storage => @storage_hash)
@@ -235,7 +234,7 @@ describe Provision::Core::ProvisioningService do
       )
       @numbering_service.should_receive(:allocate_ips_for)
       @numbering_service.should_receive(:add_cnames_for)
-      @storage_service.should_receive(:create_config).with("vmx1", { '/'.to_sym => { :type => "os", :size => "10G" } }).ordered
+      @storage_service.should_receive(:create_config).with("vmx1", '/'.to_sym => { :type => "os", :size => "10G" }).ordered
       @storage_service.should_receive(:spec_to_xml).with("vmx1").ordered
       @vm_service.should_receive(:define_vm).ordered
       @storage_service.should_receive(:prepare_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
@@ -260,7 +259,7 @@ describe Provision::Core::ProvisioningService do
       )
       @numbering_service.should_receive(:allocate_ips_for)
       @numbering_service.should_receive(:add_cnames_for)
-      @storage_service.should_receive(:create_config).with("vmx1", { '/'.to_sym => { :type => "os", :size => "10G" } }).ordered
+      @storage_service.should_receive(:create_config).with("vmx1", '/'.to_sym => { :type => "os", :size => "10G" }).ordered
       @storage_service.should_receive(:spec_to_xml).with("vmx1").ordered
       @vm_service.should_receive(:define_vm).ordered
       @storage_service.should_receive(:prepare_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
@@ -278,6 +277,5 @@ describe Provision::Core::ProvisioningService do
       @numbering_service.should_receive(:allocate_ips_for).with(spec_with(spec)).and_return(networking)
       @provisioning_service.allocate_ip(spec)
     end
-
   end
 end

@@ -12,13 +12,13 @@ require 'provision'
 require 'provision/workqueue'
 require 'util/symbol_utils'
 
-symbol_utils = Util::SymbolUtils.new()
+symbol_utils = Util::SymbolUtils.new
 specs = YAML::load($stdin).map do |spec|
   symbol_utils.symbolize_keys(spec)
 end
 
-listener = NoopListener.new()
-work_queue = Provision::Factory.new().work_queue(:worker_count => 4, :listener => listener)
+listener = NoopListener.new
+work_queue = Provision::Factory.new.work_queue(:worker_count => 4, :listener => listener)
 work_queue.launch_all(specs)
 
 failures = listener.failures

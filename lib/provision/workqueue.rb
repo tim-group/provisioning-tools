@@ -33,7 +33,7 @@ class Provision::WorkQueue
     specs.each do |spec|
       launch(spec)
     end
-    process()
+    process
   end
 
   def destroy_all(specs)
@@ -41,7 +41,7 @@ class Provision::WorkQueue
     specs.each do |spec|
       destroy(spec)
     end
-    process()
+    process
   end
 
   def allocate_ip_all(specs)
@@ -49,7 +49,7 @@ class Provision::WorkQueue
     specs.each do |spec|
       allocate_ip(spec)
     end
-    process()
+    process
   end
 
   def free_ip_all(specs)
@@ -57,7 +57,7 @@ class Provision::WorkQueue
     specs.each do |spec|
       free_ip(spec)
     end
-    process()
+    process
   end
 
   def add_cnames(specs)
@@ -66,7 +66,7 @@ class Provision::WorkQueue
         @provisioning_service.add_cnames(spec)
       end
     end
-    process()
+    process
   end
 
   def remove_cnames(specs)
@@ -75,7 +75,7 @@ class Provision::WorkQueue
         @provisioning_service.remove_cnames(spec)
       end
     end
-    process()
+    process
   end
 
   def launch(spec)
@@ -105,19 +105,19 @@ class Provision::WorkQueue
     end
   end
 
-  def process()
+  def process
     @logger.info("Process work queue")
     threads = []
-    total = @queue.size()
-    @worker_count.times {|i|
-      threads << Thread.new {
-        while not @queue.empty?
+    total = @queue.size
+    @worker_count.times do|i|
+      threads << Thread.new do
+        while !@queue.empty?
           task = @queue.pop(true)
           task.spec[:thread_number] = i
           require 'yaml'
           error = nil
           begin
-            msg = task.execute()
+            msg = task.execute
           rescue Exception => e
             print e.backtrace
             @listener.error(task.spec, e)
@@ -126,8 +126,8 @@ class Provision::WorkQueue
             @listener.passed(task.spec, msg) if error.nil?
           end
         end
-      }
-    }
-    threads.each { |thread| thread.join() }
+      end
+    end
+    threads.each { |thread| thread.join }
   end
 end

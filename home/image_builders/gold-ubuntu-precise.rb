@@ -9,7 +9,7 @@ require 'provision/image/commands'
 define "gold-ubuntu-precise" do
   extend Provision::Image::Commands
 
-  run("loopback devices") {
+  run("loopback devices") do
     cmd "mkdir #{spec[:temp_dir]}"
     cmd "kvm-img create -fraw #{spec[:image_path]} 3G"
     cmd "losetup /dev/#{spec[:loop0]} #{spec[:image_path]}"
@@ -17,128 +17,128 @@ define "gold-ubuntu-precise" do
     suppress_error.cmd "parted -sm /dev/#{spec[:loop0]} mkpart primary ext3 1 100%"
     cmd "kpartx -a -v /dev/#{spec[:loop0]}"
     cmd "mkfs.ext4 /dev/mapper/#{spec[:loop0]}p1"
-  }
+  end
 
-  cleanup {
-    keep_doing {
-    suppress_error.cmd "kpartx -d /dev/#{spec[:loop0]}"
-    }.until { `dmsetup ls | grep #{spec[:loop0]}p1 | wc -l`.chomp == "0" }
+  cleanup do
+    keep_doing do
+      suppress_error.cmd "kpartx -d /dev/#{spec[:loop0]}"
+    end.until { `dmsetup ls | grep #{spec[:loop0]}p1 | wc -l`.chomp == "0" }
 
-  cmd "udevadm settle"
+    cmd "udevadm settle"
 
-  keep_doing {
-    suppress_error.cmd "losetup -d /dev/#{spec[:loop0]}"
-  }.until { `losetup -a | grep /dev/#{spec[:loop0]} | wc -l`.chomp == "0" }
+    keep_doing do
+      suppress_error.cmd "losetup -d /dev/#{spec[:loop0]}"
+    end.until { `losetup -a | grep /dev/#{spec[:loop0]} | wc -l`.chomp == "0" }
 
-  keep_doing {
-    suppress_error.cmd "umount #{spec[:temp_dir]}"
-    suppress_error.cmd "rmdir #{spec[:temp_dir]}"
-  }.until { `ls -d  #{spec[:temp_dir]} 2> /dev/null | wc -l`.chomp == "0" }
+    keep_doing do
+      suppress_error.cmd "umount #{spec[:temp_dir]}"
+      suppress_error.cmd "rmdir #{spec[:temp_dir]}"
+    end.until { `ls -d  #{spec[:temp_dir]} 2> /dev/null | wc -l`.chomp == "0" }
 
-  cmd "udevadm settle"
-  cmd "rmdir #{spec[:temp_dir]}"
-  }
+    cmd "udevadm settle"
+    cmd "rmdir #{spec[:temp_dir]}"
+  end
 
-  run("loopback devices 2") {
+  run("loopback devices 2") do
     cmd "losetup /dev/#{spec[:loop1]} /dev/mapper/#{spec[:loop0]}p1"
     cmd "mount /dev/#{spec[:loop1]} #{spec[:temp_dir]}"
-  }
+  end
 
-  cleanup {
-    keep_doing {
+  cleanup do
+    keep_doing do
       suppress_error.cmd "umount -d /dev/#{spec[:loop1]}"
       suppress_error.cmd "losetup -d /dev/#{spec[:loop1]}"
-    }.until {
+    end.until do
       `losetup -a | grep /dev/#{spec[:loop1]} | wc -l`.chomp == "0"
-    }
-  }
+    end
+  end
 
-  run("running debootstrap") {
+  run("running debootstrap") do
     cmd "debootstrap --arch amd64 --exclude=resolvconf,ubuntu-minimal precise #{spec[:temp_dir]} http://aptproxy:3142/ubuntu"
     cmd "mkdir -p #{spec[:temp_dir]}/etc/default"
-  }
+  end
 
-  run("mounting devices") {
+  run("mounting devices") do
     cmd "mount --bind /dev #{spec[:temp_dir]}/dev"
     cmd "mount -t proc none #{spec[:temp_dir]}/proc"
     cmd "mount -t sysfs none #{spec[:temp_dir]}/sys"
-  }
+  end
 
-  cleanup {
+  cleanup do
     log.debug("cleaning up procs")
     log.debug(`mount -l | grep #{spec[:hostname]}/proc | wc -l`.chomp)
-    keep_doing {
+    keep_doing do
       suppress_error.cmd "umount -l #{spec[:temp_dir]}/proc"
-    }.until { `mount -l | grep #{spec[:hostname]}/proc | wc -l`.chomp == "0" }
+    end.until { `mount -l | grep #{spec[:hostname]}/proc | wc -l`.chomp == "0" }
 
-    keep_doing {
+    keep_doing do
       suppress_error.cmd "umount -l #{spec[:temp_dir]}/sys"
-    }.until { `mount -l | grep #{spec[:hostname]}/sys | wc -l`.chomp == "0" }
+    end.until { `mount -l | grep #{spec[:hostname]}/sys | wc -l`.chomp == "0" }
 
-    keep_doing {
+    keep_doing do
       suppress_error.cmd "umount -l #{spec[:temp_dir]}/dev"
-    }.until { `mount -l | grep #{spec[:hostname]}/dev | wc -l`.chomp == "0" }
-  }
+    end.until { `mount -l | grep #{spec[:hostname]}/dev | wc -l`.chomp == "0" }
+  end
 
-  run("set locale") {
-    open("#{spec[:temp_dir]}/etc/default/locale", 'w') { |f|
+  run("set locale") do
+    open("#{spec[:temp_dir]}/etc/default/locale", 'w') do |f|
       f.puts 'LANG="en_GB.UTF-8"'
-    }
+    end
     chroot "locale-gen en_GB.UTF-8"
-  }
+  end
 
-  run("set timezone") {
-    open("#{spec[:temp_dir]}/etc/timezone", 'w') { |f|
+  run("set timezone") do
+    open("#{spec[:temp_dir]}/etc/timezone", 'w') do |f|
       f.puts 'Europe/London'
-    }
+    end
     chroot "dpkg-reconfigure --frontend noninteractive tzdata"
-  }
+  end
 
-  run("set hostname") {
-    open("#{spec[:temp_dir]}/etc/hostname", 'w') { |f|
+  run("set hostname") do
+    open("#{spec[:temp_dir]}/etc/hostname", 'w') do |f|
       f.puts "#{spec[:hostname]}"
-    }
-    open("#{spec[:temp_dir]}/etc/dhcp/dhclient.conf", 'w') { |f|
-f.puts ""
-    }
-  }
+    end
+    open("#{spec[:temp_dir]}/etc/dhcp/dhclient.conf", 'w') do |f|
+      f.puts ""
+    end
+  end
 
-  run("set root password") {
+  run("set root password") do
     chroot "echo 'root:root' | chpasswd"
-  }
+  end
 
-  run("deploy the root key") {
+  run("deploy the root key") do
     cmd "mkdir -p #{spec[:temp_dir]}/root/.ssh/"
     #    cmd "cp #{Dir.pwd}/files/id_rsa.pub #{spec[:temp_dir]}/root/.ssh/authorized_keys"
-  }
+  end
 
-  run("enable serial so we can use virsh console") {
-    open("#{spec[:temp_dir]}/etc/init/ttyS0.conf", 'w') { |f|
+  run("enable serial so we can use virsh console") do
+    open("#{spec[:temp_dir]}/etc/init/ttyS0.conf", 'w') do |f|
       f.puts """
 start on stopped rc RUNLEVEL=[2345]
 stop on runlevel [!2345]
 respawn
 exec /sbin/getty -L ttyS0 115200 vt102
     """
-    }
-  }
+    end
+  end
 
-  run("install misc packages") {
+  run("install misc packages") do
     apt_install "acpid openssh-server curl vim dnsutils lsof"
-  }
+  end
 
   # A few daemons hang around at the end of the bootstrapping process that prevent us unmounting.
-  cleanup {
+  cleanup do
     chroot "/etc/init.d/dbus stop"
     chroot "/etc/init.d/acpid stop"
     chroot "/etc/init.d/cron stop"
     chroot "/etc/init.d/udev stop"
     chroot "/etc/init.d/rsyslog stop"
     chroot "killall -9u syslog"
-  }
+  end
 
-  run("configure precise repo") {
-    open("#{spec[:temp_dir]}/etc/apt/sources.list", 'w') { |f|
+  run("configure precise repo") do
+    open("#{spec[:temp_dir]}/etc/apt/sources.list", 'w') do |f|
       f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ precise main\n"
       f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ precise universe\n"
       f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ precise-updates main\n"
@@ -147,46 +147,46 @@ exec /sbin/getty -L ttyS0 115200 vt102
       f.puts "deb http://deb.youdevise.com all main\n"
       f.puts "deb http://deb-transitional.youdevise.com/stable precise main\n"
       f.puts "deb http://deb-transitional.youdevise.com/stable all main\n"
-    }
+    end
     chroot "curl -Ss http://deb.youdevise.com/pubkey.gpg | apt-key add -"
     chroot "curl -Ss http://deb-transitional.youdevise.com/pubkey.gpg | apt-key add -"
-  }
+  end
 
-  run("prevent apt from making stupid suggestions") {
-    open("#{spec[:temp_dir]}/etc/apt/apt.conf.d/99no-recommends", 'w') { |f|
+  run("prevent apt from making stupid suggestions") do
+    open("#{spec[:temp_dir]}/etc/apt/apt.conf.d/99no-recommends", 'w') do |f|
       f.puts "APT::Install-Recommends \"false\";\n"
       f.puts "APT::Install-Suggests \"false\";\n"
-    }
-  }
+    end
+  end
 
-  run("configure aptproxy") {
-    open("#{spec[:temp_dir]}/etc/apt/apt.conf.d/01proxy", 'w') { |f|
+  run("configure aptproxy") do
+    open("#{spec[:temp_dir]}/etc/apt/apt.conf.d/01proxy", 'w') do |f|
       f.puts "Acquire::http::Proxy \"http://#{spec[:aptproxy]}:3142\";\n"
-    }
-  }
+    end
+  end
 
-  run("ensure the correct mailutils gets instaled") {
-    open("#{spec[:temp_dir]}/etc/apt/preferences.d/mailutils", 'w') { |f|
+  run("ensure the correct mailutils gets instaled") do
+    open("#{spec[:temp_dir]}/etc/apt/preferences.d/mailutils", 'w') do |f|
       f.puts "Package: mailutils
 Pin: release o=TIMGroup,a=precise
 Pin-Priority: 1001\n"
-    }
-    open("#{spec[:temp_dir]}/etc/apt/preferences.d/libmailutils2", 'w') { |f|
+    end
+    open("#{spec[:temp_dir]}/etc/apt/preferences.d/libmailutils2", 'w') do |f|
       f.puts "Package: libmailutils2
 Pin: release o=TIMGroup,a=precise
 Pin-Priority: 1001\n"
-    }
-  }
+    end
+  end
 
-  run("run apt-update ") {
+  run("run apt-update ") do
     chroot "apt-get -y --force-yes update"
-  }
+  end
 
-  run("temp fix to update ssl packages for puppet to run") {
+  run("temp fix to update ssl packages for puppet to run") do
     chroot "DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes dist-upgrade"
-  }
+  end
 
-  run("install some other useful stuff") {
+  run("install some other useful stuff") do
     apt_install "nagios-nrpe-server"
     apt_install "psmisc"
     apt_install "vim"
@@ -201,9 +201,9 @@ Pin-Priority: 1001\n"
     apt_install "iptables"
     apt_install "telnet"
     apt_install "postfix"
-  }
+  end
 
-  run("install puppet managed packages to speed up initial runs") {
+  run("install puppet managed packages to speed up initial runs") do
     apt_install "collectd"
     apt_install "dstat"
     apt_install "git-svn"
@@ -225,10 +225,10 @@ Pin-Priority: 1001\n"
     apt_install "unzip"
     apt_install "zip"
     apt_install "zsh"
-  }
+  end
 
-  run("pre-accept sun licences") {
-    open("#{spec[:temp_dir]}/var/cache/debconf/java-license.seeds", 'w') { |f|
+  run("pre-accept sun licences") do
+    open("#{spec[:temp_dir]}/var/cache/debconf/java-license.seeds", 'w') do |f|
       f.puts """
 sun-java6-bin   shared/accepted-sun-dlj-v1-1    boolean true
 sun-java6-jdk   shared/accepted-sun-dlj-v1-1    boolean true
@@ -239,25 +239,25 @@ sun-java6-bin   shared/present-sun-dlj-v1-1     note
 sun-java6-jdk   shared/present-sun-dlj-v1-1     note
 sun-java6-jre   shared/present-sun-dlj-v1-1     note
     """
-    }
+    end
 
     chroot "/usr/bin/debconf-set-selections /var/cache/debconf/java-license.seeds"
 
     apt_install "sun-java6-jdk"
     apt_install "sun-java6-jre"
-  }
+  end
 
-  run("install kernel and grub") {
+  run("install kernel and grub") do
     chroot "apt-get -y --force-yes update"
     apt_install "linux-image-virtual"
     apt_install "grub-pc"
     cmd "mkdir -p #{spec[:temp_dir]}/boot/grub"
     cmd "tune2fs -Lmain /dev/#{spec[:loop1]}"
 
-    open("#{spec[:temp_dir]}/boot/grub/device.map", 'w') { |f|
+    open("#{spec[:temp_dir]}/boot/grub/device.map", 'w') do |f|
       f.puts "(hd0) /dev/#{spec[:loop0]}"
       f.puts "(hd0,1) /dev/#{spec[:loop1]}"
-    }
+    end
 
     find_kernel = `ls -c #{spec[:temp_dir]}/boot/vmlinuz-* | head -1`.chomp
     find_kernel =~ /vmlinuz-(.+)/
@@ -267,7 +267,7 @@ sun-java6-jre   shared/present-sun-dlj-v1-1     note
     initrd = "/boot/initrd.img-#{kernel_version}"
     uuid = `blkid -o value /dev/mapper/#{spec[:loop0]}p1 | head -n1`.chomp
 
-    open("#{spec[:temp_dir]}/boot/grub/grub.cfg", 'w') { |f|
+    open("#{spec[:temp_dir]}/boot/grub/grub.cfg", 'w') do |f|
       f.puts "
           set default=\"0\"
           set timeout=1
@@ -279,39 +279,39 @@ sun-java6-jre   shared/present-sun-dlj-v1-1     note
           linux #{kernel} root=/dev/disk/by-label/main ro
           initrd #{initrd}
           }"
-    }
+    end
 
     chroot "grub-install --no-floppy --grub-mkdevicemap=/boot/grub/device.map /dev/#{spec[:loop0]}"
-  }
+  end
 
-  run("remove cached packages") {
+  run("remove cached packages") do
 #    chroot "rm -rf /var/cache/apt/archives/*"
     chroot "DEBIAN_FRONTEND=noninteractive apt-get clean"
-  }
+  end
 
-  run("download packages that we would like") {
+  run("download packages that we would like") do
     apt_download "mcollective"
     apt_download "puppet"
-  }
+  end
 
-  run("Fix up remote logging") {
+  run("Fix up remote logging") do
     # This will get overridden by the local logcollector when puppet runs, but that's fine.
     # In the meantime, we throw syslogd at a CNAME whilst we bootstrap
-    open("#{spec[:temp_dir]}/etc/rsyslog.d/00-logcollector.conf", 'w') { |f|
+    open("#{spec[:temp_dir]}/etc/rsyslog.d/00-logcollector.conf", 'w') do |f|
       f.puts '*.* @logs'
-    }
-  }
+    end
+  end
 
-  run("Fix syslog rate limiting") {
-    open("/etc/rsyslog.conf", 'a') { |f|
+  run("Fix syslog rate limiting") do
+    open("/etc/rsyslog.conf", 'a') do |f|
       f.puts '$SystemLogRateLimitInterval 0
       $SystemLogRateLimitBurst 0'
-    }
-  }
+    end
+  end
 
-  run("install ntp and give it a sensible default config") {
+  run("install ntp and give it a sensible default config") do
     apt_install "ntp"
-    open("#{spec[:temp_dir]}/etc/ntp.conf", 'w') { |f|
+    open("#{spec[:temp_dir]}/etc/ntp.conf", 'w') do |f|
       f.puts <<-EOF
 driftfile /var/lib/ntp/ntp.drift
 
@@ -356,8 +356,6 @@ restrict ::1
 #disable auth
 #broadcastclient
 EOF
-
-    }
-  }
-
+    end
+  end
 end

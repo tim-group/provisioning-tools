@@ -39,10 +39,10 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
     $etc_hosts_mutex.synchronize do
       parse_hosts
       return false if @by_ip[ip.to_s]
-      File.open(@hosts_file, 'a') { |f|
+      File.open(@hosts_file, 'a') do |f|
         f.write "#{ip.to_s} #{all_hostnames.join(" ")}\n"
         f.chmod(0644)
-      }
+      end
       reload_dnsmasq
       return true
     end
@@ -114,7 +114,7 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
     @by_name = {}
     @by_ip = {}
     @cnames_by_fqdn = {}
-    File.open(@hosts_file).each { |l|
+    File.open(@hosts_file).each do |l|
       next if l =~ /^#/
       next if l =~ /^\s*$/
       next unless l =~ /^\d+\.\d+\.\d+\.\d+/
@@ -122,13 +122,13 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
       ip = splits[0]
       names = splits[1..-1]
       next unless @subnet.include?(ip)
-      names.each_index { |i|
+      names.each_index do |i|
         name = names[i]
         @by_name[name] = ip
         @by_ip[ip] = name if i == 0
         @cnames_by_fqdn[name] = names[0] if i > 0
-      }
-    }
+      end
+    end
   end
 
   # This does nothing in this class
@@ -153,16 +153,15 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
     found = 0
     tmp_file = Tempfile.new('remove_temp')
     File.open(file, 'r') do |f|
-      f.each_line {|line|
+      f.each_line do|line|
         matching_line = line =~ regex
         matching_line ? (found += 1) : (tmp_file.puts line)
-      }
+      end
     end
     tmp_file.close
     File.new(tmp_file.path, 'a').chmod(0644)
     found > 0 ? FileUtils.mv(tmp_file.path, file) : false
     puts "#{found} lines removed from #{file}"
-    return found
+    found
   end
-
 end

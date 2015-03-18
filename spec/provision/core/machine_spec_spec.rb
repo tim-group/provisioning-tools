@@ -1,7 +1,6 @@
 require 'provision/core/machine_spec'
 
 describe Provision::Core::MachineSpec do
-
   it 'fields in the spec hash are available as accessor methods' do
     machine_spec = Provision::Core::MachineSpec.new(:f1 => 5, :f2 => 25)
     machine_spec[:f1].should eql(5)
@@ -29,10 +28,7 @@ describe Provision::Core::MachineSpec do
     machine_spec[:value2].should eql(25)
   end
 
-
   it 'renders a valid xml from the template' do
     machine_spec = Provision::Core::MachineSpec.new(:value1 => 5, :value2 => 25)
-
   end
-
 end

@@ -1,7 +1,5 @@
 define "seedapply" do
-
   copyboot
-
 
   run("install puppet") {
     apt_install "puppet"

@@ -17,7 +17,7 @@ class Provision::Core::MachineSpec
     FileUtils.mkdir_p(@build_dir)
 
     default_log_dir = '/var/log/provisioning-tools'
-    if File.directory?(default_log_dir) and File.writable?(default_log_dir)
+    if File.directory?(default_log_dir) && File.writable?(default_log_dir)
       @log_dir = default_log_dir
     else
       @log_dir = '/tmp/provisioning-tools/log'
@@ -25,7 +25,7 @@ class Provision::Core::MachineSpec
     end
 
     @spec = spec
-    apply_conventions()
+    apply_conventions
   end
 
   def self.spec_for_name(fqdn)
@@ -33,10 +33,10 @@ class Provision::Core::MachineSpec
     raise "the alleged FQDN '#{fqdn}' must look like <hostname>.[<network>.]<fabric>.net.local" unless _
 
     suffix = 'net.local'
-    domain = "#{fabric}.#{suffix}"
-    case fabric
-      when 'local'
-        domain = "dev.#{suffix}"
+    if fabric == 'local'
+      domain = "dev.#{suffix}"
+    else
+      domain = "#{fabric}.#{suffix}"
     end
     network ||= 'prod'
 
@@ -50,7 +50,7 @@ class Provision::Core::MachineSpec
     )
   end
 
-  def apply_conventions()
+  def apply_conventions
     if_nil_define_var(:thread_number, 0)
     if_nil_define_var(:vm_storage_type, "image")
     if_nil_define_var(:spindle, "/var/local/images")
@@ -79,11 +79,11 @@ class Provision::Core::MachineSpec
   end
 
   def if_nil_define_var(var, value)
-    @spec[var] = value if @spec[var] == nil
+    @spec[var] = value if @spec[var].nil?
   end
 
   def [](key)
-    return @spec[key]
+    @spec[key]
   end
 
   def []=(key, value)
@@ -91,7 +91,7 @@ class Provision::Core::MachineSpec
   end
 
   def get_binding
-    return binding()
+    binding
   end
 
   def get_logger(fn)
@@ -99,21 +99,21 @@ class Provision::Core::MachineSpec
   end
 
   def networks
-    return @spec[:networks]
+    @spec[:networks]
   end
 
   def interfaces
     nics = []
     slot = 6
-    networks.each {|net|
+    networks.each do|net|
       nics << {
         :slot => slot,
         :mac => mac("#{@spec[:hostname]}.#{@spec[:domain]}.#{net}"),
         :bridge => "br_#{net}",
         :network => "#{net}"
       }
-      slot = slot + 1
-    }
+      slot += 1
+    end
     nics
   end
 
@@ -128,10 +128,10 @@ class Provision::Core::MachineSpec
   def all_hostnames_on(network)
     hostnames = [hostname_on(network)]
     # the way we do aliases is pretty feeble; these should be per-interface
-    if network == :mgmt and !@spec[:aliases].nil?
+    if network == :mgmt && !@spec[:aliases].nil?
       hostnames << @spec[:aliases].collect { |a| "#{a}.#{network.to_s}.#{@spec[:domain]}" }
     end
-    return hostnames
+    hostnames
   end
 
   def mac(fqdn = @spec[:fqdn])

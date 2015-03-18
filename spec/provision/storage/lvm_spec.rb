@@ -6,8 +6,8 @@ require 'provision/storage/lvm'
 describe Provision::Storage::LVM do
   before do
     @storage_type = Provision::Storage::LVM.new(:vg => 'main')
-    @mount_point_obj = Provision::Storage::Mount_point.new('/', { :size => '10G' })
-    @large_mount_point_obj = Provision::Storage::Mount_point.new('/', { :size => '5000G' })
+    @mount_point_obj = Provision::Storage::Mount_point.new('/', :size => '10G')
+    @large_mount_point_obj = Provision::Storage::Mount_point.new('/', :size => '5000G')
   end
 
   it 'creates some storage given a name and a size' do
@@ -27,9 +27,9 @@ describe Provision::Storage::LVM do
         true
       end
     end
-    expect {
+    expect do
       @storage_type.create('existing', @mount_point_obj)
-    }.to raise_error("Logical volume existing already exists in volume group main")
+    end.to raise_error("Logical volume existing already exists in volume group main")
   end
 
   it 'complains if something bad happens trying to create storage' do
@@ -39,9 +39,9 @@ describe Provision::Storage::LVM do
         raise "command lvcreate -n existing -L 5000G main returned non-zero error code 5"
       end
     end
-    expect {
+    expect do
       @storage_type.create('working', @large_mount_point_obj)
-    }.to raise_error("command lvcreate -n existing -L 5000G main returned non-zero error code 5")
+    end.to raise_error("command lvcreate -n existing -L 5000G main returned non-zero error code 5")
   end
 
   it 'runs lvremove when trying to remove a VMs storage' do
@@ -61,9 +61,9 @@ describe Provision::Storage::LVM do
     end
 
     @storage_type.should_receive(:cmd).with('lvremove -f /dev/main/oy-deletedb-001_var_lib_mysql')
-    expect {
+    expect do
       @storage_type.remove('oy-deletedb-001', '/var/lib/mysql')
-    }.to raise_error("fake exception")
+    end.to raise_error("fake exception")
   end
 
   it 'runs lvremove 100 times if removing the storage fails every time' do
@@ -73,13 +73,12 @@ describe Provision::Storage::LVM do
     100.times do
       @storage_type.should_receive(:cmd).with('lvremove -f /dev/main/oy-deletedb-001_var_lib_mysql')
     end
-    expect {
+    expect do
       @storage_type.remove('oy-deletedb-001', '/var/lib/mysql')
-    }.to raise_error("Tried to lvremove but failed 100 times and didn't raise an exception!?")
+    end.to raise_error("Tried to lvremove but failed 100 times and didn't raise an exception!?")
   end
 
   describe 'grow' do
-
     it 'runs the commands required to grow a filesystem' do
       name = 'grow_ok'
       device_name = @storage_type.device(name)
@@ -107,5 +106,4 @@ describe Provision::Storage::LVM do
     end
     @storage_type.partition_name('magical', @mount_point_obj).should eql "magical"
   end
-
 end

@@ -8,7 +8,7 @@ end
 
 describe XYZ do
   before do
-    @commands = double()
+    @commands = double
     MockFunctions.commands = @commands
   end
 
@@ -26,11 +26,10 @@ describe XYZ do
     end
 
     def returns_something
-      return "something"
+      "something"
     end
 
     def blah
-
     end
   end
 
@@ -46,14 +45,13 @@ describe XYZ do
       }
     end
 
-    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({ :hostname => "myfirstmachine" }), { :item => "run", :item2 => "clean" })
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new(:hostname => "myfirstmachine"), :item => "run", :item2 => "clean")
 
     @commands.should_receive(:action).with("run")
     @commands.should_receive(:action).with("clean")
 
-    build.execute()
+    build.execute
   end
-
 
   it 'cleanup blocks run after run blocks' do
     require 'provision/image/catalogue'
@@ -74,7 +72,7 @@ describe XYZ do
       }
     end
 
-    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({ :hostname => "myfirstmachine" }), {})
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new(:hostname => "myfirstmachine"), {})
 
     @commands.should_receive(:action).with("1")
     @commands.should_receive(:action).with("2")
@@ -84,7 +82,7 @@ describe XYZ do
     @commands.should_receive(:action).with("6")
     @commands.should_receive(:action).with("7")
 
-    build.execute()
+    build.execute
   end
 
   it 'cleanup blocks run in reverse order' do
@@ -105,7 +103,7 @@ describe XYZ do
       }
     end
 
-    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({ :hostname => "myfirstmachine" }), {})
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new(:hostname => "myfirstmachine"), {})
 
     @commands.should_receive(:action).with("6").ordered
     @commands.should_receive(:action).with("5").ordered
@@ -114,7 +112,7 @@ describe XYZ do
     @commands.should_receive(:action).with("2").ordered
     @commands.should_receive(:action).with("1").ordered
 
-    build.execute()
+    build.execute
   end
 
   it 'cleanup blocks ignore exceptions' do
@@ -127,9 +125,9 @@ describe XYZ do
       }
     end
 
-    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({ :hostname => "myfirstmachine" }), {})
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new(:hostname => "myfirstmachine"), {})
     @commands.should_receive(:action).with("5")
-    build.execute()
+    build.execute
   end
 
   it 'can ignore exceptions if chosen to' do
@@ -142,9 +140,9 @@ describe XYZ do
       }
     end
 
-    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({ :hostname => "myfirstmachine" }), {})
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new(:hostname => "myfirstmachine"), {})
     @commands.should_receive(:action).with("5")
-    build.execute()
+    build.execute
   end
 
   it 'stops executing run commands after a failure' do
@@ -157,11 +155,11 @@ describe XYZ do
         action("3")
       }
     end
-    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({ :hostname => "myfirstmachine" }), {})
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new(:hostname => "myfirstmachine"), {})
     @commands.should_receive(:action).with("1")
     @commands.should_not_receive(:action).with("3")
 
-    lambda {  build.execute() }.should raise_error
+    lambda {  build.execute }.should raise_error
   end
 
   it 'I can pass options through to my build' do
@@ -169,16 +167,16 @@ describe XYZ do
     define "vanillavm" do
       extend MockFunctions
       run("configure hostname") {
-        hostname = self.spec[:hostname]
+        hostname = spec[:hostname]
         action(hostname)
       }
     end
 
-    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({ :hostname => "myfirstmachine" }), {})
+    build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new(:hostname => "myfirstmachine"), {})
 
     @commands.should_receive(:action).with("myfirstmachine")
 
-    build.execute()
+    build.execute
   end
 
   it 'I can provide defaults' do
@@ -190,7 +188,7 @@ describe XYZ do
     end
     define "vanillavm" do
       extend MockFunctions
-      defaults()
+      defaults
 
       run("configure disk") {
         disksize = spec[:disksize]
@@ -200,7 +198,7 @@ describe XYZ do
 
     build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({}), {})
     @commands.should_receive(:action).with("3G")
-    build.execute()
+    build.execute
   end
 
   it 'can load files from a specified directory' do
@@ -215,12 +213,10 @@ describe XYZ do
       }
     end
 
-
     build = Provision::Image::Catalogue::build("defaults", {}, {})
     expect {
-      build.execute()
+      build.execute
     }.to raise_error NameError
-
   end
 
   it 'passes through the result when using suppress_error' do
@@ -229,12 +225,12 @@ describe XYZ do
     define "defaults" do
       extend MockFunctions
       run("configure defaults") {
-        something = suppress_error.returns_something()
+        something = suppress_error.returns_something
       }
     end
 
     build = Provision::Image::Catalogue::build("defaults", Provision::Core::MachineSpec.new({}), {})
-    build.execute()
+    build.execute
 
     something.should eql("something")
   end
@@ -249,15 +245,15 @@ describe XYZ do
       }
       cleanup {
         keep_doing {
-        suppress_error.die("this line should throw an error and be swallowed")
-        something = returns_something()
-        print "something = #{something} \n"
+          suppress_error.die("this line should throw an error and be swallowed")
+          something = returns_something
+          print "something = #{something} \n"
         }.until { something == "something" }
       }
     end
 
     build = Provision::Image::Catalogue::build("defaults", Provision::Core::MachineSpec.new({}), {})
-    build.execute()
+    build.execute
 
     something.should eql("something")
   end
@@ -276,9 +272,9 @@ describe XYZ do
     end
 
     build = Provision::Image::Catalogue::build("defaults", Provision::Core::MachineSpec.new({}), {})
-    build.execute()
+    build.execute
 
-    something.should be_nil()
+    something.should be_nil
   end
   it 'execute a clean up block on error' do
     require 'provision/image/catalogue'
@@ -297,12 +293,11 @@ describe XYZ do
     build = Provision::Image::Catalogue::build("defaults", Provision::Core::MachineSpec.new({}), {})
 
     expect {
-      build.execute()
+      build.execute
     }.to raise_error "an error"
 
     something.should eql("I was executed")
   end
-
 
   it 'raises a meaningful error when a non-existent template is defined' do
     require 'provision/image/catalogue'
@@ -310,5 +305,4 @@ describe XYZ do
       Provision::Image::Catalogue::build("noexist", Provision::Core::MachineSpec.new({}), {})
     }.to raise_error("attempt to execute a template that is not in the catalogue: noexist")
   end
-
 end

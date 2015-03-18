@@ -8,7 +8,6 @@ class Provision::DNS::Fake
 end
 
 describe Provision::DNS::Fake do
-
   it 'constructs once' do
     Provision::DNS::Fake.set_max_ip(IPAddr.new("192.168.5.1"))
     thing = Provision::DNS.get_backend("Fake")

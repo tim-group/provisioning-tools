@@ -23,7 +23,6 @@ define 'puppetmaster' do
     cmd "mkdir #{spec[:temp_dir]}/seed"
     cmd "cp -r #{File.dirname(__FILE__)}/seed  #{spec[:temp_dir]}/"
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
-
       f.puts "#!/bin/bash
 echo 'Run ntpdate' | logger
 /etc/init.d/ntp stop | logger 2>&1
@@ -36,5 +35,4 @@ puppet agent --debug --verbose --waitforcert 10 --onetime 2>&1 | tee /seed/init.
 echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local"
     }
   }
-
 end

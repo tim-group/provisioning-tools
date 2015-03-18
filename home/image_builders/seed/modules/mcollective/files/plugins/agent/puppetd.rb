@@ -17,7 +17,6 @@ module MCollective
     #    puppetd.pidfile   - Where to find puppet agent's pid file; defaults to
     #                        /var/run/puppet/agent.pid
     class Puppetd < RPC::Agent
-
       def startup_hook
         @splaytime = @config.pluginconf["puppetd.splaytime"].to_i || 0
         @lockfile = @config.pluginconf["puppetd.lockfile"] || "/var/lib/puppet/state/puppetdlock"
@@ -48,8 +47,8 @@ module MCollective
       end
 
       private
-      def last_run_summary
 
+      def last_run_summary
         summary = nil
         10.times do |i|
           summary = YAML.load_file(@last_summary)
@@ -59,17 +58,16 @@ module MCollective
 
         raise "summary['resources'] is nil" if summary["resources"].nil?
 
-
         begin
-        reply[:resources] = { "failed" => 0, "changed" => 0, "total" => 0, "restarted" => 0, "out_of_sync" => 0 }.merge(summary["resources"])
+          reply[:resources] = { "failed" => 0, "changed" => 0, "total" => 0, "restarted" => 0, "out_of_sync" => 0 }.merge(summary["resources"])
 
-        ["time", "events", "changes", "version"].each do |dat|
-          reply[dat.to_sym] = summary[dat]
-        end
-        rescue Exception => e
-          logger.error(e)
-          logger.error(e.backtrace)
-raise e
+          %w(time events changes version).each do |dat|
+            reply[dat.to_sym] = summary[dat]
+          end
+          rescue Exception => e
+            logger.error(e)
+            logger.error(e.backtrace)
+            raise e
         end
       end
 
@@ -107,7 +105,7 @@ raise e
           end
           FileUtils.rm(@pidfile)
         end
-        return false
+        false
       end
 
       def runonce

@@ -24,7 +24,7 @@ define "xpboot" do
     "#{mountpoint}/Documents\ and\ Settings/All Users/Start\ Menu/Programs/Startup/"
   end
 
-  run("copy gold image") {
+  run("copy gold image") do
     cmd "mkdir -p #{spec[:temp_dir]}"
     case config[:vm_storage_type]
     when 'lvm'
@@ -38,18 +38,18 @@ define "xpboot" do
     when 'new'
       # do nothing
     end
-  }
+  end
 
-  on_error {
+  on_error do
     case config[:vm_storage_type]
     when 'lvm'
       if File.exists?("/dev/#{spec[:lvm_vg]}/#{spec[:hostname]}")
         cmd "lvremove -f /dev/#{spec[:lvm_vg]}/#{spec[:hostname]}"
       end
     end
-  }
+  end
 
-  run("inject hostname and ip address") {
+  run("inject hostname and ip address") do
     key = "WJG3W-CHHC2-2R97W-7BC2F-MM9JD"
     answer_file = "#{mountpoint}/sysprep/sysprep.inf"
     network_file = "#{mountpoint}/sysprep/net.txt"
@@ -72,9 +72,9 @@ define "xpboot" do
       cmd "sed -i s/\"<%NETMASK%>\"/#{config[:netmask]}/g #{network_file}"
       cmd "sed -i s/\"<%GATEWAY%>\"/#{gateway}/g #{network_file}"
     end
-  }
+  end
 
-  run("install Selenium") {
+  run("install Selenium") do
     selenium_dir = "#{common_files}/selenium"
     java_dir     = "#{common_files}/java"
     start_menu_grid_file = "#{mountpoint}/selenium/start-grid.bat"
@@ -93,9 +93,9 @@ define "xpboot" do
       FileUtils.cp "#{mountpoint}/selenium/IEDriverServer-2.41.0.exe", "#{mountpoint}/selenium/IEDriverServer.exe"
     end
     cmd "sed -i s/%IEVERSION%/#{spec[:ie_version]}/g \"#{start_menu_grid_file}\""
-  }
+  end
 
-  run("Configure and start Selenium node on boot") {
+  run("Configure and start Selenium node on boot") do
     start_menu_grid_file = "#{mountpoint}/selenium/start-grid.bat"
 
     if spec[:selenium_hub_host]
@@ -103,26 +103,25 @@ define "xpboot" do
       cmd "rm \"#{start_menu_location}\"/*"
       FileUtils.cp start_menu_grid_file, start_menu_location
     end
-  }
+  end
 
-  run("Apply registry settings on first boot") {
+  run("Apply registry settings on first boot") do
     FileUtils.cp "#{xp_files}/startmenu/apply-reg-settings.bat", start_menu_location
-  }
+  end
 
-  run("stamp time") {
-     tmp_date_file = "#{mountpoint}/build-date.txt"
+  run("stamp time") do
+    tmp_date_file = "#{mountpoint}/build-date.txt"
     `date +"%m-%d-%y.%k:%M" > #{tmp_date_file}`
-  }
+  end
 
   case config[:vm_storage_type]
   when 'lvm', 'image'
-    cleanup {
+    cleanup do
       cmd "umount -l #{mountpoint}"
       cmd "sleep 1"
       suppress_error.cmd "rmdir #{mountpoint}"
-    }
+    end
   when 'new'
     # do nothing
   end
-
 end

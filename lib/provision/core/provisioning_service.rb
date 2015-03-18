@@ -23,7 +23,7 @@ class Provision::Core::ProvisioningService
     host = `hostname`.strip
     start_time = Time.now
 
-    if not @vm_service.is_defined(spec_hash)
+    if !@vm_service.is_defined(spec_hash)
       @logger.info("Provisioning a newly allocated VM")
       @logger.info("#{Time.now}: #{host}: #{spec[:hostname]}: 01 - starting provision (#{Time.now - start_time} secs)")
       if with_numbering
@@ -100,14 +100,14 @@ class Provision::Core::ProvisioningService
       @storage_service.clean_storage(spec[:hostname], spec[:storage])
     end
     @vm_service.undefine_vm(spec)
-    return nil
+    nil
   end
 
   def allocate_ip(spec_hash)
     spec = Provision::Core::MachineSpec.new(spec_hash)
     networking = @numbering_service.allocate_ips_for(spec)
     @logger.info("Allocated #{networking.inspect} to #{spec}")
-    return networking.values.map { |n| n[:address] }.sort.join(", ")
+    networking.values.map { |n| n[:address] }.sort.join(", ")
   end
 
   def add_cnames(spec_hash)
@@ -124,6 +124,6 @@ class Provision::Core::ProvisioningService
     spec = Provision::Core::MachineSpec.new(spec_hash)
     @numbering_service.remove_ips_for(spec)
     @logger.info("Freed IP address for #{spec.inspect}")
-    return nil
+    nil
   end
 end

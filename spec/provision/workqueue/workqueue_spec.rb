@@ -5,12 +5,12 @@ require 'provision/workqueue'
 
 describe Provision::WorkQueue do
   before do
-    @listener = NoopListener.new()
+    @listener = NoopListener.new
   end
 
   it 'processes many launch requests' do
-    mock_virsh = double()
-    @provisioning_service = double()
+    mock_virsh = double
+    @provisioning_service = double
     @workqueue = Provision::WorkQueue.new(:provisioning_service => @provisioning_service, :worker_count => 1, :listener => @listener, :virsh => mock_virsh)
     spec = { :hostname => "myvm1", :thread_number => 1 }
     @provisioning_service.should_receive(:provision_vm).with(spec)
@@ -18,9 +18,9 @@ describe Provision::WorkQueue do
   end
 
   it 'processes many clean requests' do
-    mock_virsh = double()
+    mock_virsh = double
     mock_virsh.stub(:is_defined).and_return(true)
-    @provisioning_service = double()
+    @provisioning_service = double
     @workqueue = Provision::WorkQueue.new(:provisioning_service => @provisioning_service, :worker_count => 1, :listener => @listener, :virsh => mock_virsh)
     spec = { :hostname => "myvm1", :thread_number => 1 }
     @provisioning_service.should_receive(:clean_vm).with(spec)
@@ -28,8 +28,8 @@ describe Provision::WorkQueue do
   end
 
   it 'processes many allocate IP requests' do
-    mock_virsh = double()
-    @provisioning_service = double()
+    mock_virsh = double
+    @provisioning_service = double
     @workqueue = Provision::WorkQueue.new(:provisioning_service => @provisioning_service, :worker_count => 1, :listener => @listener, :virsh => mock_virsh)
     spec = { :hostname => "myvm1", :thread_number => 1 }
     @provisioning_service.should_receive(:allocate_ip).with(spec)
@@ -37,7 +37,7 @@ describe Provision::WorkQueue do
   end
 
   it 'processes work items' do
-    @provisioning_service = double()
+    @provisioning_service = double
     @workqueue = Provision::WorkQueue.new(:provisioning_service => @provisioning_service, :worker_count => 1, :listener => @listener)
 
     spec = { :hostname => "myvm1",
@@ -45,23 +45,23 @@ describe Provision::WorkQueue do
 
     @provisioning_service.should_receive(:provision_vm).with(spec)
     @workqueue.launch(spec)
-    @workqueue.process()
+    @workqueue.process
   end
 
   it 'processes a number of work items between threads' do
-    @provisioning_service = double()
+    @provisioning_service = double
     @workqueue = Provision::WorkQueue.new(:provisioning_service => @provisioning_service, :worker_count => 1, :listener => @listener)
     10.times { |i|
       spec = { :hostname => "myvm_#{i}", :ram => "256Mb" }
       @workqueue.launch(spec)
       @provisioning_service.should_receive(:provision_vm).with(spec)
     }
-    @workqueue.process()
+    @workqueue.process
   end
 
   it 'allows a class to listen to what is going on' do
-    @provisioning_service = double()
-    @listener = double()
+    @provisioning_service = double
+    @listener = double
     @workqueue = Provision::WorkQueue.new(:provisioning_service => @provisioning_service,
                                           :worker_count => 1,
                                           :listener => @listener)
@@ -75,28 +75,28 @@ describe Provision::WorkQueue do
       @listener.should_receive(:passed)
     }
 
-    @workqueue.process()
+    @workqueue.process
   end
 
   it 'cleans up vms' do
-    @provisioning_service = double()
-    mock_virsh = double()
+    @provisioning_service = double
+    mock_virsh = double
     mock_virsh.stub(:is_defined).and_return(true)
     @workqueue = Provision::WorkQueue.new(:provisioning_service => @provisioning_service, :worker_count => 1, :listener => @listener, :virsh => mock_virsh)
     spec = { :hostname => "myvm1", :ram => "256Mb" }
     @provisioning_service.should_receive(:clean_vm).with(spec)
     @workqueue.destroy(spec)
-    @workqueue.process()
+    @workqueue.process
   end
 
   it 'cleans only vms this compute node houses' do
-    @provisioning_service = double()
-    mock_virsh = double()
+    @provisioning_service = double
+    mock_virsh = double
     @workqueue = Provision::WorkQueue.new(
-                    :provisioning_service => @provisioning_service,
-                    :worker_count => 1,
-                    :listener => @listener,
-                    :virsh => mock_virsh)
+      :provisioning_service => @provisioning_service,
+      :worker_count => 1,
+      :listener => @listener,
+      :virsh => mock_virsh)
 
     spec = { :hostname => "myvm1", :thread_number => 0 }
     spec2 = { :hostname => "myvm2", :thread_number => 0 }
@@ -106,9 +106,9 @@ describe Provision::WorkQueue do
     @provisioning_service.should_receive(:clean_vm)
     @workqueue.destroy(spec)
     @workqueue.destroy(spec2)
-    @workqueue.process()
+    @workqueue.process
 
-    @listener.results.should eql({ "myvm1" => ["success", nil] })
+    @listener.results.should eql("myvm1" => ["success", nil])
   end
 
   it 'passes the message returned from the provisioning service to the listener' do
@@ -119,9 +119,8 @@ describe Provision::WorkQueue do
     @provisioning_service.stub(:allocate_ip).and_return("1.2.3.4")
 
     @workqueue.allocate_ip_all([spec])
-    @workqueue.process()
+    @workqueue.process
 
-    @listener.results.should eql({ "my_vip" => ["success", "1.2.3.4"] })
+    @listener.results.should eql("my_vip" => ["success", "1.2.3.4"])
   end
-
 end

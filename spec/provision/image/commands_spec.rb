@@ -20,12 +20,11 @@ describe Provision::Image::Commands do
     extend Provision::Log
     extend Provision::Image::Commands
     i = 0;
-    keep_doing {
+    keep_doing do
       i += 1
       print i
-    }.until { i == 5 }
+    end.until { i == 5 }
 
     i.should eql(5)
   end
-
 end

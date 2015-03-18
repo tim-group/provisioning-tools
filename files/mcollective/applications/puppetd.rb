@@ -1,6 +1,6 @@
 class MCollective::Application::Puppetd < MCollective::Application
   description "Run puppet agent, get its status, and enable/disable it"
-    usage <<-END_OF_USAGE
+  usage <<-END_OF_USAGE
 mco puppetd [OPTIONS] [FILTERS] <ACTION> [CONCURRENCY]
 
 The ACTION can be one of the following:
@@ -18,23 +18,23 @@ The ACTION can be one of the following:
     END_OF_USAGE
 
   option :force,
-  :description    => "Force the puppet run to happen immediately without splay",
-  :arguments      => ["--force", "-f"],
-  :type           => :bool
+         :description    => "Force the puppet run to happen immediately without splay",
+         :arguments      => ["--force", "-f"],
+         :type           => :bool
 
   option :tags,
-  :description    => "Execute a puppet run using tags",
-  :arguments      => ["--tags <TAGS>"]
+         :description    => "Execute a puppet run using tags",
+         :arguments      => ["--tags <TAGS>"]
 
   option :noop,
-  :description    => "Execute puppet in no-operation mode",
-  :arguments      => ["--noop"],
-  :type           => :bool
+         :description    => "Execute puppet in no-operation mode",
+         :arguments      => ["--noop"],
+         :type           => :bool
 
   def post_option_parser(configuration)
     if ARGV.length >= 1
       configuration[:command] = ARGV.shift
-      configuration[:concurrency] = ARGV.shift.to_i or 0
+      configuration[:concurrency] = ARGV.shift.to_i || 0
 
       unless configuration[:command].match(/^(enable|disable|runonce|runall|status|summary|count)$/)
         raise "Action must be enable, disable, runonce, runonce, runall, status, summary, or count"
@@ -104,7 +104,7 @@ The ACTION can be one of the following:
         hosts.each do |host|
           running = waitfor(configuration[:concurrency], mc)
           log("Running #{host}, concurrency is #{running}")
-          result = mc.custom_request("runonce", parameters, host, { "identity" => host })
+          result = mc.custom_request("runonce", parameters, host, "identity" => host)
 
           begin
             log("#{host} schedule status: #{result[0][:statusmsg]}")

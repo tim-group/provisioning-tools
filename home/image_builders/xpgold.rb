@@ -22,34 +22,34 @@ define "xpgold" do
 
   case config[:vm_storage_type]
   when "image"
-    run ("download master image") {
+    run ("download master image") do
       master_url = "#{spec[:master_image_url]}"
       cmd "curl -Ss --fail -o #{spec[:image_path]} #{master_url}"
       suppress_error.cmd "mkdir -p #{spec[:temp_dir]}"
       cmd "mount -o offset=32256  #{spec[:image_path]} #{spec[:temp_dir]}"
-    }
+    end
 
-    cleanup {
+    cleanup do
       cmd "umount -l #{spec[:temp_dir]}"
       cmd "sleep 1"
       suppress_error.cmd "rmdir #{spec[:temp_dir]}"
-    }
+    end
   when "new"
      # do nothing
   else
     raise "Unsure how to build xpgold with vm_storage_type of #{config[:vm_storage_type]}"
   end
 
-  run("install sysprep") {
+  run("install sysprep") do
     cmd "rm \"#{start_menu_location}\"/*"
     FileUtils.mkdir_p("#{mountpoint}/settings")
     FileUtils.cp_r("#{xp_files}/support/", "#{spec[:temp_dir]}/")
     FileUtils.cp_r("#{xp_files}/sysprep/", "#{spec[:temp_dir]}/")
     FileUtils.cp "#{xp_files}/startmenu/dosysprep.bat", start_menu_location
-  }
+  end
 
-  run("stamp gold image build date") {
+  run("stamp gold image build date") do
     tmp_date_file = "#{spec[:temp_dir]}/gold-build-date.txt"
     `date +"%m-%d-%y.%k:%M" > #{tmp_date_file}`
-  }
+  end
 end

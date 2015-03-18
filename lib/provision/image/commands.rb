@@ -1,7 +1,6 @@
 require 'util/symbol_utils'
 
 module Provision::Image::Commands
-
   def cmd(cmd)
     start_time = Time.now
     log.debug("running command #{cmd}")
@@ -12,7 +11,7 @@ module Provision::Image::Commands
       pipe.close_write
       pipe.each_line do |line|
         log.debug("> " + line.chomp)
-        output = output + line.chomp
+        output += line.chomp
       end
     end
 
@@ -23,7 +22,7 @@ module Provision::Image::Commands
     end
     elapsed_time = Time.now - start_time
     log.debug("command #{cmd} took #{elapsed_time}s")
-    return output
+    output
   end
 
   def chroot(cmd)
@@ -43,38 +42,36 @@ module Provision::Image::Commands
   end
 
   def symbol_utils
-    return Util::SymbolUtils.new
+    Util::SymbolUtils.new
   end
 
   class Continuation
-      def initialize(target_object, block)
-        raise "nil block given " unless block != nil
-        @block = block
-        @target_object = target_object
-      end
+    def initialize(target_object, block)
+      raise "nil block given " unless !block.nil?
+      @block = block
+      @target_object = target_object
+    end
 
-      def until(&condition)
-
-        100.times {
-          return if (@target_object.instance_eval(&condition) == true)
-          @target_object.instance_eval(&@block)
-          sleep(0.5)
-        }
-        raise "timeout waiting for condition"
+    def until(&condition)
+      100.times do
+        return if (@target_object.instance_eval(&condition) == true)
+        @target_object.instance_eval(&@block)
+        sleep(0.5)
       end
+      raise "timeout waiting for condition"
+    end
   end
 
   def keep_doing(&block)
-    return Continuation.new(self, block)
+    Continuation.new(self, block)
   end
 
   def wait_until(desc = "", options = { :retry_attempts => 100 }, &block)
-    options[:retry_attempts].times {
+    options[:retry_attempts].times do
       log.debug("waiting until: #{desc}")
-      return if block != nil and block.call() == true
+      return if !block.nil? && block.call == true
       sleep(0.4)
-    }
+    end
     raise "timeout waiting for condition"
   end
-
 end

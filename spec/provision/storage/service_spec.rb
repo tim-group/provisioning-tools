@@ -11,7 +11,6 @@ describe Provision::Storage::Service do
   end
 
   describe 'common' do
-
     before do
       @settings = {
         :os => {
@@ -32,7 +31,6 @@ describe Provision::Storage::Service do
     end
   end
   describe 'LVM' do
-
     before do
       @settings = {
         :os => {
@@ -56,11 +54,10 @@ describe Provision::Storage::Service do
       settings = {
         :os => { :arch    => 'LVM' }
       }
-      expect {
+      expect do
         storage_service = Provision::Storage::Service.new(settings)
-      }.to raise_error "Storage service requires each storage type to specify the 'options' setting"
+      end.to raise_error "Storage service requires each storage type to specify the 'options' setting"
     end
-
 
     it 'generates the correct XML to put into a libvirt template for a single storage setup' do
       storage_hash = {
@@ -109,7 +106,6 @@ describe Provision::Storage::Service do
   end
 
   describe 'image' do
-
     before do
       @tmpdir = Dir.mktmpdir
       FileUtils.mkdir "#{@tmpdir}/os"
@@ -145,9 +141,9 @@ describe Provision::Storage::Service do
           :arch    => 'Image'
         }
       }
-      expect {
+      expect do
         @storage_service = Provision::Storage::Service.new(settings)
-      }.to raise_error "Storage service requires each storage type to specify the 'options' setting"
+      end.to raise_error "Storage service requires each storage type to specify the 'options' setting"
     end
 
     it 'should not remove persistent storage' do
