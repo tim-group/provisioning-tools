@@ -17,7 +17,7 @@ define "copyboot" do
   case config[:vm_storage_type]
   when 'image'
     run("mount loopback device") do
-      cmd "mount -o offset=1048576  #{spec[:image_path]} #{spec[:temp_dir]}"
+      cmd "mount -o offset=1048576 #{spec[:image_path]} #{spec[:temp_dir]}"
     end
   when 'lvm'
     run("mount lvm device") do
@@ -86,7 +86,7 @@ iface lo inet loopback
 auto #{nic[:network]}
 iface #{nic[:network]} inet static
 address #{config[:address]}
-netmask   #{config[:netmask]}
+netmask #{config[:netmask]}
 "
         else
           f.puts "
@@ -111,7 +111,7 @@ iface #{nic[:network]} inet manual
     open("#{spec[:temp_dir]}/etc/udev/rules.d/70-persistent-net.rules", 'w') do |f|
       spec.interfaces.each do |nic|
         f.puts %[
-SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="#{nic[:mac]}", ATTR{type}=="1",  NAME="#{nic[:network]}"\n
+SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="#{nic[:mac]}", ATTR{type}=="1", NAME="#{nic[:network]}"\n
       ]
       end
     end
@@ -124,7 +124,7 @@ SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="#{nic[:mac]}", A
   end
 
   run("set owner fact") do
-    fact =  '/etc/facts.d/owner.fact'
+    fact = '/etc/facts.d/owner.fact'
     if File.exists?(fact)
       cmd "mkdir -p #{spec[:temp_dir]}/etc/facts.d"
       cmd "cp /etc/facts.d/owner.fact #{spec[:temp_dir]}/etc/facts.d"
