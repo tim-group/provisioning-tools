@@ -18,13 +18,17 @@ specs = YAML::load($stdin).map do |spec|
 end
 
 listener = NoopListener.new
-Provision::Factory.new.work_queue(:worker_count => 4, :listener => listener).launch_all(specs)
+work_queue = Provision::Factory.new.work_queue(:worker_count => 4, :listener => listener)
+work_queue.launch_all(specs)
 
-if !listener.failures.empty?
+failures = listener.failures
+if failures.empty?
+  exit(0)
+else
   puts "FAILURES:"
-  listener.failures.each do |hostname, result|
+  failures.each do |hostname, result|
     state, msg = result
     puts "#{hostname}: #{msg}"
   end
-  exit 1
+  exit(1)
 end
