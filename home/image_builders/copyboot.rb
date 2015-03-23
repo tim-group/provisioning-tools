@@ -17,11 +17,6 @@ define "copyboot" do
   case config[:vm_storage_type]
   when 'image'
     run("mount loopback device") do
-      # cmd "cp /mnt/generic.img #{spec[:image_path]}"
-      #    cmd "dd if=/mnt/generic.img of=/dev/mapper/MYMACHINE"
-      #
-      # print "mounting #{spec[:image_path]} to #{spec[:temp_dir]}\n"
-#      pp spec
       cmd "mount -o offset=1048576  #{spec[:image_path]} #{spec[:temp_dir]}"
     end
   when 'lvm'
@@ -70,7 +65,6 @@ search #{spec[:dns_search_path]}
 
     cmd "chmod a+x #{spec[:temp_dir]}/etc/network/if-up.d/routes_mgmt"
 
-    #   chroot "hostname -F /etc/hostname"
     open("#{spec[:temp_dir]}/etc/hosts", 'a') do |f|
       f.puts "\n127.0.0.1		localhost\n"
       f.puts "127.0.1.1		#{spec[:fqdn]}	#{spec[:hostname]}\n"
