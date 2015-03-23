@@ -86,7 +86,10 @@ class Provision::Factory
   def provisioning_service
     targetdir = File.join(File.dirname(__FILE__), "../target")
 
-    (puts "@config[:defaults] is undefined, are you sure this is a compute node?"; exit 1) if !defined?(@config[:defaults])
+    if !defined?(@config[:defaults])
+      puts "@config[:defaults] is undefined, are you sure this is a compute node?"
+      exit 1
+    end
 
     defaults = @config[:defaults]
 

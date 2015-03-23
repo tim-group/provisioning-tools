@@ -65,7 +65,7 @@ class Provision::DNSNetwork
     @network = IPAddr.new(parts[0]).mask(parts[1])
     @broadcast = @network | IPAddr.new(broadcast_mask, Socket::AF_INET)
 
-    min_allocation = options[:min_allocation] ||  @network.to_i + 10
+    min_allocation = options[:min_allocation] || @network.to_i + 10
     @min_allocation = IPAddr.new(min_allocation, Socket::AF_INET)
 
     max_allocation = options[:max_allocation] || @broadcast.to_i - 1
