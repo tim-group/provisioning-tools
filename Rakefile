@@ -64,7 +64,7 @@ end
 
 desc "Generate CTags"
 task :ctags do
-  sh "ctags -R --exclude=.git --exclude=build *"
+  sh "ctags -R --exclude=.git --exclude=build ."
 end
 
 desc "Run specs"
