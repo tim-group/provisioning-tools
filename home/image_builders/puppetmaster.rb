@@ -23,16 +23,17 @@ define 'puppetmaster' do
     cmd "mkdir #{spec[:temp_dir]}/seed"
     cmd "cp -r #{File.dirname(__FILE__)}/seed  #{spec[:temp_dir]}/"
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
-      f.puts "#!/bin/bash
-echo 'Run ntpdate' | logger
-/etc/init.d/ntp stop | logger 2>&1
-/usr/sbin/ntpdate -s ci-1.youdevise.com | logger 2>&1
-/etc/init.d/ntp start | logger 2>&1
-echo 'Run puppet apply' | logger
-/usr/bin/puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/modules --logdest=syslog /etc/puppet/manifests
-/etc/init.d/apache2-puppetmaster restart 2>&1 | logger
-puppet agent --debug --verbose --waitforcert 10 --onetime 2>&1 | tee /seed/init.log
-echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local"
+      f.puts "#!/bin/bash\n" \
+             "\n" \
+             "echo 'Run ntpdate' | logger\n" \
+             "/etc/init.d/ntp stop | logger 2>&1\n" \
+             "/usr/sbin/ntpdate -s ci-1.youdevise.com | logger 2>&1\n" \
+             "/etc/init.d/ntp start | logger 2>&1\n" \
+             "echo 'Run puppet apply' | logger\n" \
+             "/usr/bin/puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/modules --logdest=syslog /etc/puppet/manifests\n" \
+             "/etc/init.d/apache2-puppetmaster restart 2>&1 | logger\n" \
+             "puppet agent --debug --verbose --waitforcert 10 --onetime 2>&1 | tee /seed/init.log\n" \
+             "echo \"#!/bin/sh -e\n\nexit 0\" > /etc/rc.local\n"
     }
   }
 end
