@@ -74,10 +74,6 @@ exec /sbin/getty -L ttyS0 115200 vt102
     end
   end
 
-  run("install misc packages") do
-    apt_install "acpid openssh-server curl vim dnsutils lsof"
-  end
-
   # A few daemons hang around at the end of the bootstrapping process that prevent us unmounting.
   cleanup do
     chroot "/etc/init.d/dbus stop"
@@ -135,6 +131,10 @@ Pin-Priority: 1001\n"
 
   run("temp fix to update ssl packages for puppet to run") do
     chroot "DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes dist-upgrade"
+  end
+
+  run("install misc packages") do
+    apt_install "acpid openssh-server curl vim dnsutils lsof"
   end
 
   run("install some other useful stuff") do
