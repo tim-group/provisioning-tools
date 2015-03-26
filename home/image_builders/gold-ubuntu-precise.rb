@@ -54,7 +54,7 @@ define "gold-ubuntu-precise" do
   end
 
   run("running debootstrap") do
-    cmd "debootstrap --arch amd64 --exclude=resolvconf,ubuntu-minimal precise #{spec[:temp_dir]} http://aptproxy:3142/ubuntu"
+    cmd "http_proxy=http://aptproxy:3142 debootstrap --arch amd64 --exclude=resolvconf,ubuntu-minimal precise #{spec[:temp_dir]} http://gb.archive.ubuntu.com/ubuntu"
     cmd "mkdir -p #{spec[:temp_dir]}/etc/default"
   end
 
