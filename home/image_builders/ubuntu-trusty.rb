@@ -84,6 +84,16 @@ exec /sbin/getty -L ttyS0 115200 vt102
     chroot "killall -9u syslog"
   end
 
+  run("configure aptproxy") do
+    open("#{spec[:temp_dir]}/etc/apt/apt.conf.d/01proxy", 'w') do |f|
+      f.puts "Acquire::http::Proxy \"http://#{spec[:aptproxy]}:3142\";\n"
+    end
+  end
+
+  run("install misc packages") do
+    apt_install "acpid openssh-server curl vim dnsutils lsof"
+  end
+
   run("configure trusty repo") do
     open("#{spec[:temp_dir]}/etc/apt/sources.list", 'w') do |f|
       f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ trusty main\n"
@@ -102,12 +112,6 @@ exec /sbin/getty -L ttyS0 115200 vt102
     open("#{spec[:temp_dir]}/etc/apt/apt.conf.d/99no-recommends", 'w') do |f|
       f.puts "APT::Install-Recommends \"false\";\n"
       f.puts "APT::Install-Suggests \"false\";\n"
-    end
-  end
-
-  run("configure aptproxy") do
-    open("#{spec[:temp_dir]}/etc/apt/apt.conf.d/01proxy", 'w') do |f|
-      f.puts "Acquire::http::Proxy \"http://#{spec[:aptproxy]}:3142\";\n"
     end
   end
 
@@ -130,10 +134,6 @@ Pin-Priority: 1001\n"
 
   run("temp fix to update ssl packages for puppet to run") do
     chroot "DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes dist-upgrade"
-  end
-
-  run("install misc packages") do
-    apt_install "acpid openssh-server curl vim dnsutils lsof"
   end
 
   run("install some other useful stuff") do
