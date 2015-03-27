@@ -1,3 +1,4 @@
+require 'spec_helper'
 require 'provision/image/service'
 require 'provision/image/catalogue'
 require 'tempfile'

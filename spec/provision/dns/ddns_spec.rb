@@ -1,3 +1,4 @@
+require 'spec_helper'
 require 'provision/dns'
 require 'provision/dns/ddns'
 require 'tmpdir'

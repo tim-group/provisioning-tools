@@ -1,3 +1,4 @@
+require 'spec_helper'
 require 'provision/image/namespace'
 require 'provision/image/commands'
 require 'provision/log'
