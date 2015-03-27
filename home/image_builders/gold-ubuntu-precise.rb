@@ -107,11 +107,6 @@ define "gold-ubuntu-precise" do
     chroot "echo 'root:root' | chpasswd"
   end
 
-  run("deploy the root key") do
-    cmd "mkdir -p #{spec[:temp_dir]}/root/.ssh/"
-    #    cmd "cp #{Dir.pwd}/files/id_rsa.pub #{spec[:temp_dir]}/root/.ssh/authorized_keys"
-  end
-
   run("enable serial so we can use virsh console") do
     open("#{spec[:temp_dir]}/etc/init/ttyS0.conf", 'w') do |f|
       f.puts """
