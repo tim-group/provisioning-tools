@@ -139,8 +139,8 @@ exec /sbin/getty -L ttyS0 115200 vt102
     end
   end
 
-  run("install misc packages") do
-    apt_install "acpid openssh-server curl vim dnsutils lsof"
+  run("install curl to be used for key download") do
+    apt_install "curl"
   end
 
   run("configure precise repo") do
@@ -186,45 +186,47 @@ Pin-Priority: 1001\n"
     chroot "DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes dist-upgrade"
   end
 
-  run("install some other useful stuff") do
-    apt_install "nagios-nrpe-server"
-    apt_install "psmisc"
-    apt_install "vim"
-    apt_install "nmap"
-    apt_install "traceroute"
-    apt_install "tcptraceroute"
-    apt_install "ngrep"
-    apt_install "tcpdump"
-    apt_install "git-core"
-    apt_install "rubygems"
-    apt_install "libstomp-ruby"
-    apt_install "iptables"
-    apt_install "telnet"
-    apt_install "postfix"
-  end
-
-  run("install puppet managed packages to speed up initial runs") do
-    apt_install "collectd"
-    apt_install "dstat"
-    apt_install "git-svn"
-    apt_install "htop"
-    apt_install "iftop"
-    apt_install "iotop"
-    apt_install "libnet-ping-ruby"
-    apt_install "libstomp-ruby1.8"
-    apt_install "lvm2"
-    apt_install "mailutils"
-    apt_install "nagios-nrpe-server"
-    apt_install "nagios-plugins"
-    apt_install "nagios-plugins-standard"
-    apt_install "screen"
-    apt_install "strace"
-    apt_install "subversion"
-    apt_install "sysstat"
-    apt_install "tmux"
-    apt_install "unzip"
-    apt_install "zip"
-    apt_install "zsh"
+  run("misc packages we want on all machines") do
+    apt_install "
+    acpid
+    collectd
+    dnsutils
+    dstat
+    git-core
+    git-svn
+    htop
+    iftop
+    iotop
+    iptables
+    libnet-ping-ruby
+    libstomp-ruby
+    libstomp-ruby1.8
+    lsof
+    lvm2
+    mailutils
+    nagios-nrpe-server
+    nagios-plugins
+    nagios-plugins-standard
+    ngrep
+    nmap
+    openssh-server
+    postfix
+    psmisc
+    rubygems
+    screen
+    strace
+    subversion
+    sysstat
+    tcpdump
+    tcptraceroute
+    telnet
+    tmux
+    traceroute
+    unzip
+    vim
+    zip
+    zsh
+    "
   end
 
   run("pre-accept sun licences") do
