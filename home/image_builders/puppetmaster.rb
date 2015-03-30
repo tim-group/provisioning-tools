@@ -21,12 +21,6 @@ define 'puppetmaster' do
   }
 
   run('deploy puppetmaster') {
-    # the puppetmaster needs the masterbranch to can bootstrap
-    cmd "git clone --mirror http://git/puppet /etc/puppet/puppet.git"
-    cmd "mkdir -p /etc/puppet/environments"
-    cmd "mkdir -p /etc/puppet/environments/masterbranch"
-    cmd "git clone http://git.youdevise.com/git/puppet #{spec[:temp_dir]}/etc/puppet/environments/masterbranch"
-
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
       f.puts "#!/bin/bash\n" \
              "\n" \
