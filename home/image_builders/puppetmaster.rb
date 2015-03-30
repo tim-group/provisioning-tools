@@ -33,7 +33,7 @@ define 'puppetmaster' do
              "git clone --mirror git://git/puppet.git /etc/puppet/puppet.git\n" \
              "mkdir -p /etc/puppet/environments\n" \
              "mkdir -p /etc/puppet/environments/masterbranch\n" \
-             "git clone http://git.youdevise.com/git/puppet #{spec[:temp_dir]}/etc/puppet/environments/masterbranch\n" \
+             "git clone http://git.youdevise.com/git/puppet /etc/puppet/environments/masterbranch\n" \
              "echo 'Run puppet apply' | logger\n" \
              "/usr/bin/puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/modules --logdest=syslog /etc/puppet/manifests\n" \
              "/etc/init.d/apache2-puppetmaster restart 2>&1 | logger\n" \
