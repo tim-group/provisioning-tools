@@ -35,9 +35,10 @@ define 'puppetmaster' do
              "mkdir -p /etc/puppet/environments/masterbranch\n" \
              "git clone http://git.youdevise.com/git/puppet /etc/puppet/environments/masterbranch\n" \
              "echo 'Run puppet apply' | logger\n" \
-             "/usr/bin/puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/modules --logdest=syslog /etc/puppet/manifests\n" \
+             "puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/modules --logdest=syslog /etc/puppet/manifests\n" \
              "/etc/init.d/apache2-puppetmaster restart 2>&1 | logger\n" \
-             "puppet agent --debug --verbose --waitforcert 10 --onetime 2>&1 | tee /var/log/bootstrap-puppet.log\n" \
+             "puppet cert sign $(hostname -f) 2>&1 | logger\n" \
+             "puppet agent --debug --verbose --waitforcert 10 --onetime 2>&1 | logger\n" \
              "echo \"#!/bin/sh -e\n\nexit 0\" > /etc/rc.local\n"
     }
   }
