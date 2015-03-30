@@ -20,7 +20,8 @@ define 'puppetmaster' do
     apt_install 'rubygem-rspec'
   }
 
-  run('deploy puppetmaster')  {
+  run('deploy puppetmaster') {
+    # the puppetmaster needs the masterbranch to can bootstrap
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
       f.puts "#!/bin/bash\n" \
              "\n" \
@@ -28,6 +29,11 @@ define 'puppetmaster' do
              "/etc/init.d/ntp stop | logger 2>&1\n" \
              "/usr/sbin/ntpdate -s ci-1.youdevise.com | logger 2>&1\n" \
              "/etc/init.d/ntp start | logger 2>&1\n" \
+             "echo 'Clone the masterbranch puppet branch' | logger\n" \
+             "git clone --mirror git://git/puppet.git /etc/puppet/puppet.git"
+             "mkdir -p /etc/puppet/environments"
+             "mkdir -p /etc/puppet/environments/masterbranch"
+             "git clone http://git.youdevise.com/git/puppet #{spec[:temp_dir]}/etc/puppet/environments/masterbranch"
              "echo 'Run puppet apply' | logger\n" \
              "/usr/bin/puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/modules --logdest=syslog /etc/puppet/manifests\n" \
              "/etc/init.d/apache2-puppetmaster restart 2>&1 | logger\n" \
