@@ -20,7 +20,7 @@ define 'puppetmaster' do
     apt_install 'rubygem-rspec'
   }
 
-  run('deploy puppetmaster') {
+  run('deploy puppetmaster')  {
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
       f.puts "#!/bin/bash\n" \
              "\n" \
