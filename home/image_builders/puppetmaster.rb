@@ -30,10 +30,10 @@ define 'puppetmaster' do
              "/usr/sbin/ntpdate -s ci-1.youdevise.com | logger 2>&1\n" \
              "/etc/init.d/ntp start | logger 2>&1\n" \
              "echo 'Clone the masterbranch puppet branch' | logger\n" \
-             "git clone --mirror git://git/puppet.git /etc/puppet/puppet.git"
-             "mkdir -p /etc/puppet/environments"
-             "mkdir -p /etc/puppet/environments/masterbranch"
-             "git clone http://git.youdevise.com/git/puppet #{spec[:temp_dir]}/etc/puppet/environments/masterbranch"
+             "git clone --mirror git://git/puppet.git /etc/puppet/puppet.git\n" \
+             "mkdir -p /etc/puppet/environments\n" \
+             "mkdir -p /etc/puppet/environments/masterbranch\n" \
+             "git clone http://git.youdevise.com/git/puppet #{spec[:temp_dir]}/etc/puppet/environments/masterbranch\n" \
              "echo 'Run puppet apply' | logger\n" \
              "/usr/bin/puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/modules --logdest=syslog /etc/puppet/manifests\n" \
              "/etc/init.d/apache2-puppetmaster restart 2>&1 | logger\n" \
