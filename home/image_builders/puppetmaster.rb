@@ -19,9 +19,14 @@ define 'puppetmaster' do
     apt_install 'rubygems1.8'
     apt_install 'rubygem-rspec'
   }
+
   run('deploy puppetmaster') {
-    cmd "mkdir #{spec[:temp_dir]}/seed"
-    cmd "cp -r #{File.dirname(__FILE__)}/seed  #{spec[:temp_dir]}/"
+    # the puppetmaster needs the masterbranch to can bootstrap
+    cmd "git clone --mirror http://git/puppet /etc/puppet/puppet.git"
+    cmd "mkdir -p /etc/puppet/environments"
+    cmd "mkdir -p /etc/puppet/environments/masterbranch"
+    cmd "git clone http://git.youdevise.com/git/puppet #{spec[:temp_dir]}/etc/puppet/environments/masterbranch"
+
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
       f.puts "#!/bin/bash\n" \
              "\n" \
@@ -32,7 +37,7 @@ define 'puppetmaster' do
              "echo 'Run puppet apply' | logger\n" \
              "/usr/bin/puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/modules --logdest=syslog /etc/puppet/manifests\n" \
              "/etc/init.d/apache2-puppetmaster restart 2>&1 | logger\n" \
-             "puppet agent --debug --verbose --waitforcert 10 --onetime 2>&1 | tee /seed/init.log\n" \
+             "puppet agent --debug --verbose --waitforcert 10 --onetime 2>&1 | tee /var/log/bootstrap-puppet.log\n" \
              "echo \"#!/bin/sh -e\n\nexit 0\" > /etc/rc.local\n"
     }
   }
