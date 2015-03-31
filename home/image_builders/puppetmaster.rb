@@ -21,7 +21,7 @@ define 'puppetmaster' do
   }
 
   run('deploy puppetmaster') {
-    # the puppetmaster needs the masterbranch to can bootstrap
+    # the puppetmaster needs the masterbranch to bootstrap
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
       f.puts "#!/bin/bash\n" \
              "\n" \
