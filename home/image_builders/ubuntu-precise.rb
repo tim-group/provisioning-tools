@@ -133,7 +133,44 @@ Pin-Priority: 1001\n"
   end
 
   run("misc packages we want on all machines") do
-    apt_install "acpid collectd dnsutils dstat git-core git-svn htop iftop iotop iptables libnet-ping-ruby libstomp-ruby libstomp-ruby1.8 lsof lvm2 mailutils nagios-nrpe-server nagios-plugins nagios-plugins-standard ngrep nmap openssh-server postfix psmisc rubygems screen strace subversion sysstat tcpdump tcptraceroute telnet tmux traceroute unzip vim zip zsh"
+    apt_install 'acpid '\
+                'collectd '\
+                'dnsutils '\
+                'dstat '\
+                'git-core '\
+                'git-svn '\
+                'htop '\
+                'iftop '\
+                'iotop '\
+                'iptables '\
+                'libnet-ping-ruby '\
+                'libstomp-ruby '\
+                'libstomp-ruby1.8 '\
+                'lsof '\
+                'lvm2 '\
+                'mailutils '\
+                'nagios-nrpe-server '\
+                'nagios-plugins '\
+                'nagios-plugins-standard '\
+                'ngrep '\
+                'nmap '\
+                'openssh-server '\
+                'postfix '\
+                'psmisc '\
+                'rubygems '\
+                'screen '\
+                'strace '\
+                'subversion '\
+                'sysstat '\
+                'tcpdump '\
+                'tcptraceroute '\
+                'telnet '\
+                'tmux '\
+                'traceroute '\
+                'unzip '\
+                'vim '\
+                'zip '\
+                'zsh '
   end
 
   run("pre-accept sun licences") do
