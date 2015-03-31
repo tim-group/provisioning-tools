@@ -7,7 +7,7 @@ define 'puppetmaster' do
 
   run('clone puppet') {
     cmd "rm -rf #{spec[:temp_dir]}/etc/puppet"
-    cmd "git clone http://git.youdevise.com/git/puppet #{spec[:temp_dir]}/etc/puppet"
+    cmd "git clone git://git.youdevise.com/puppet.git #{spec[:temp_dir]}/etc/puppet"
     cmd "cp #{spec[:temp_dir]}/etc/puppet/modules/puppetmaster/files/hiera.yaml #{spec[:temp_dir]}/etc/puppet/hiera.yaml"
     cmd "cp #{spec[:temp_dir]}/etc/puppet/modules/puppetmaster/files/auth.conf #{spec[:temp_dir]}/etc/puppet/auth.conf"
     cmd "cp #{spec[:temp_dir]}/etc/puppet/modules/puppetmaster/files/routes.yaml #{spec[:temp_dir]}/etc/puppet/routes.yaml"
@@ -30,10 +30,10 @@ define 'puppetmaster' do
              "/usr/sbin/ntpdate -s ci-1.youdevise.com | logger 2>&1\n" \
              "/etc/init.d/ntp start | logger 2>&1\n" \
              "echo 'Clone the masterbranch puppet branch' | logger\n" \
-             "git clone --mirror git://git/puppet.git /etc/puppet/puppet.git\n" \
+             "git clone --mirror git://git.youdevise.com/puppet.git /etc/puppet/puppet.git\n" \
              "mkdir -p /etc/puppet/environments\n" \
              "mkdir -p /etc/puppet/environments/masterbranch\n" \
-             "git clone http://git.youdevise.com/git/puppet /etc/puppet/environments/masterbranch\n" \
+             "git clone git://git.youdevise.com/puppet.git /etc/puppet/environments/masterbranch\n" \
              "echo 'Run puppet apply' | logger\n" \
              "puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/modules --logdest=syslog /etc/puppet/manifests\n" \
              "/etc/init.d/apache2-puppetmaster restart 2>&1 | logger\n" \
