@@ -22,7 +22,7 @@ define "puppetclient" do
     require 'rubygems'
     require 'rotp'
     totp = ROTP::TOTP.new(config[:otp_secret], :interval => 120)
-    onetime =  totp.now
+    onetime = totp.now
     open("#{spec[:temp_dir]}/etc/puppet/csr_attributes.yaml", 'w') do |f|
       f.puts """extension_requests:
   pp_preshared_key: #{onetime}
