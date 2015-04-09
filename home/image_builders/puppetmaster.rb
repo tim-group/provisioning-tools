@@ -42,7 +42,7 @@ define 'puppetmaster' do
                "for puppet apply\n" \
              "\n" \
              "echo 'running puppet apply...' | logger\n" \
-             "puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/environments/masterbranch/modules" \
+             "puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/environments/masterbranch/modules " \
                "--logdest=syslog /etc/puppet/environments/masterbranch/manifests\n" \
              "rm /etc/puppet/hieradata # XXX no longer needed\n" \
              "/etc/init.d/apache2-puppetmaster restart 2>&1 | logger\n" \
