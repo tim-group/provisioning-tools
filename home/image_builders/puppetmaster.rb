@@ -5,14 +5,6 @@ define 'puppetmaster' do
     apt_install 'puppet'
   }
 
-  run('clone puppet') {
-    cmd "rm -rf #{spec[:temp_dir]}/etc/puppet"
-    cmd "git clone git://git.youdevise.com/puppet.git #{spec[:temp_dir]}/etc/puppet"
-    cmd "cp #{spec[:temp_dir]}/etc/puppet/modules/puppetmaster/files/hiera.yaml #{spec[:temp_dir]}/etc/puppet/hiera.yaml"
-    cmd "cp #{spec[:temp_dir]}/etc/puppet/modules/puppetmaster/files/auth.conf #{spec[:temp_dir]}/etc/puppet/auth.conf"
-    cmd "cp #{spec[:temp_dir]}/etc/puppet/modules/puppetmaster/files/routes.yaml #{spec[:temp_dir]}/etc/puppet/routes.yaml"
-  }
-
   run('install ruby') {
     apt_install 'ruby1.8'
     apt_install 'rubygems'
@@ -21,7 +13,9 @@ define 'puppetmaster' do
   }
 
   run('deploy puppetmaster') {
-    # the puppetmaster needs the masterbranch to bootstrap
+    # * sets up puppet.git and environments/masterbranch for puppetupdate
+    # * the puppetmaster needs environments/masterbranch to bootstrap
+    # XXX dev-puppetmaster currently broken, clone into /etc/puppet for it to work
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
       f.puts "#!/bin/bash\n" \
              "\n" \
@@ -30,9 +24,14 @@ define 'puppetmaster' do
              "/usr/sbin/ntpdate -s ci-1.youdevise.com | logger 2>&1\n" \
              "/etc/init.d/ntp start | logger 2>&1\n" \
              "\n" \
-             "echo 'cloning the masterbranch puppet branch...' | logger\n" \
+             "echo 'mirroring puppet.git...' | logger\n" \
+             "git clone --mirror git://git.youdevise.com/puppet.git /etc/puppet/puppet.git\n" \
              "mkdir -p /etc/puppet/environments/masterbranch/\n" \
-             "git clone git://git.youdevise.com/puppet.git /etc/puppet/environments/masterbranch/\n" \
+             "echo 'checking out the master branch...' | logger\n" \
+             "git --git-dir=/etc/puppet/puppet.git --work-tree=/etc/puppet/environments/masterbranch/ checkout --detach --force master\n" \
+             "ln -s /etc/puppet/environments/masterbranch/modules/puppetmaster/files/hiera.yaml /etc/puppet/hiera.yaml\n" \
+             "ln -s /etc/puppet/environments/masterbranch/modules/puppetmaster/files/auth.conf /etc/puppet/auth.conf\n" \
+             "ln -s /etc/puppet/environments/masterbranch/modules/puppetmaster/files/routes.yaml /etc/puppet/routes.yaml\n" \
              "\n" \
              "echo 'running puppet apply...' | logger\n" \
              "puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/environments/masterbranch/modules --logdest=syslog /etc/puppet/environments/masterbranch/manifests\n" \
