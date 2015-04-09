@@ -38,7 +38,8 @@ define 'puppetmaster' do
                "/etc/puppet/auth.conf\n" \
              "ln -s /etc/puppet/environments/masterbranch/modules/puppetmaster/files/routes.yaml " \
                "/etc/puppet/routes.yaml\n" \
-             "ln -s /etc/puppet/environments/masterbranch/hieradata/ hieradata # XXX needed for puppet apply\n" \
+             "ln -s /etc/puppet/environments/masterbranch/hieradata/ /etc/puppet/hieradata # XXX needed " \
+               "for puppet apply\n" \
              "\n" \
              "echo 'running puppet apply...' | logger\n" \
              "puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/environments/masterbranch/modules" \
