@@ -33,10 +33,13 @@ class Provision::Storage
       end
     end
 
+    @@logger.debug("Existing cleanup tasks for #{name}: #{@@cleanup_tasks[name]}")
     @@cleanup_tasks[name] = {} if @@cleanup_tasks[name].nil?
     @@cleanup_tasks_order[name] = [] if @@cleanup_tasks_order[name].nil?
 
     unless task_hash[:cleanup].nil?
+      @@logger.debug("Cleanup task with identifier #{identifier} nil?: #{@@cleanup_tasks[name][identifier].nil?}")
+      @@logger.debug("Cleanup task with identifer #{identifier} contains: #{@@cleanup_tasks[name][identifier]}")
       raise "Tried to add cleanup task for host '#{name}' with identifier '#{identifier}' as it already exists" unless @@cleanup_tasks[name][identifier].nil?
       @@logger.debug("adding cleanup task for '#{name}' with identifier '#{identifier}'")
       @@cleanup_tasks[name][identifier] = task_hash[:cleanup]
@@ -49,6 +52,7 @@ class Provision::Storage
         @@cleanup_tasks[name].delete id
         @@cleanup_tasks_order[name].delete id
       end
+      @@logger.debug("Cleanup tasks left over after this process for #{name}: #{@@cleanup_tasks[name]}")
     end
   end
 
