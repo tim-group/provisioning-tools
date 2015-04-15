@@ -4,53 +4,42 @@ define "puppetclient" do
   run("install puppet") do
     apt_install "puppet"
     open("#{spec[:temp_dir]}/etc/puppet/puppet.conf", 'w') do |f|
-      f.puts "[main]
-  vardir                         = /var/lib/puppet
-  logdir                         = /var/log/puppet
-  rundir                         = /var/run/puppet
-  ssldir                         = $vardir/ssl
-  factpath                       = $vardir/lib/facter
-  templatedir                    = $confdir/templates
-  pluginsync                     = true
-  environment                    = masterbranch
-  configtimeout                  = 3000
-"
+      f.puts "[main]\n" \
+        "  vardir                         = /var/lib/puppet\n" \
+        "  logdir                         = /var/log/puppet\n" \
+        "  rundir                         = /var/run/puppet\n" \
+        "  ssldir                         = $vardir/ssl\n" \
+        "  factpath                       = $vardir/lib/facter\n" \
+        "  templatedir                    = $confdir/templates\n" \
+        "  pluginsync                     = true\n" \
+        "  environment                    = masterbranch\n" \
+        "  configtimeout                  = 3000\n"
     end
   end
 
-  run("setup one time password") do
+  run('setup one time password') do
     require 'rubygems'
     require 'rotp'
+
     totp = ROTP::TOTP.new(config[:otp_secret], :interval => 120)
     onetime = totp.now
     open("#{spec[:temp_dir]}/etc/puppet/csr_attributes.yaml", 'w') do |f|
-      f.puts """extension_requests:
-  pp_preshared_key: #{onetime}
-      """
+      f.puts "extension_requests:\n" \
+        "  pp_preshared_key: #{onetime}\n"
     end
   end
 
-  run("seedapply") do
-    cmd "mkdir #{spec[:temp_dir]}/seed"
-
-    open("#{spec[:temp_dir]}/seed/puppet.sh", 'w') do |f|
-      f.puts """#!/bin/sh -e
-puppet agent --debug --verbose --waitforcert 10 --onetime 2>&1 | tee /seed/init.log
-      """
-    end
-
-    cmd "chmod 700 #{spec[:temp_dir]}/seed/puppet.sh"
-
+  run('install rc.local') do
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') do |f|
-      f.puts """#!/bin/sh -e
-echo 'Run ntpdate'
-(/usr/sbin/ntpdate -b -v -d -s ci-1.youdevise.com > /tmp/ntpdate.log 2>&1 || exit 0)
-echo 'Running seed puppet'
-/seed/puppet.sh
-echo \"#!/bin/sh -e\nexit 0\" > /etc/rc.local
-echo 'Finished running seed puppet'
-exit 0
-      """
+      f.puts "#!/bin/sh -e\n" \
+        "echo 'Running rc.local'\n" \
+        "echo 'Run ntpdate'\n" \
+        "(/usr/sbin/ntpdate -b -v -d -s ci-1.youdevise.com 2>&1 | tee -a /tmp/bootstrap.log || exit 0)\n" \
+        "echo 'Running puppet agent'\n" \
+        "puppet agent --debug --verbose --waitforcert 10 --onetime 2>&1 | tee -a /tmp/bootstrap.log\n" \
+        "echo \"#!/bin/sh -e\\nexit 0\" > /etc/rc.local\n" \
+        "echo 'Finished running rc.local'\n" \
+        "exit 0\n"
     end
   end
 end
