@@ -52,11 +52,11 @@ describe Provision::WorkQueue do
   it 'processes a number of work items between threads' do
     @provisioning_service = double
     @workqueue = Provision::WorkQueue.new(:provisioning_service => @provisioning_service, :worker_count => 1, :listener => @listener)
-    10.times { |i|
+    10.times do |i|
       spec = { :hostname => "myvm_#{i}", :ram => "256Mb" }
       @workqueue.launch(spec)
       @provisioning_service.should_receive(:provision_vm).with(spec)
-    }
+    end
     @workqueue.process
   end
 
@@ -67,14 +67,14 @@ describe Provision::WorkQueue do
                                           :worker_count => 1,
                                           :listener => @listener)
 
-    10.times { |i|
+    10.times do |i|
       spec = { :hostname => "myvm_#{i}",
                :ram => "256Mb" }
       @workqueue.launch(spec)
       completed = i + 1
       @provisioning_service.should_receive(:provision_vm)
       @listener.should_receive(:passed)
-    }
+    end
 
     @workqueue.process
   end

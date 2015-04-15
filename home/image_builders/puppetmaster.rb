@@ -1,11 +1,11 @@
 define 'puppetmaster' do
   copyboot
 
-  run('install puppet') {
+  run('install puppet') do
     apt_install 'puppet'
-  }
+  end
 
-  run('configure puppet') {
+  run('configure puppet') do
     open("#{spec[:temp_dir]}/etc/puppet/puppet.conf", 'w') do |f|
       f.puts \
         "[main]\n" \
@@ -42,22 +42,22 @@ define 'puppetmaster' do
         "    end\n" \
         "  }\n"
     end
-  }
+  end
 
-  run('install ruby') {
+  run('install ruby') do
     apt_install 'ruby1.8'
     apt_install 'rubygems'
     apt_install 'rubygems1.8'
     apt_install 'rubygem-rspec'
-  }
+  end
 
-  run('deploy puppetmaster') {
+  run('deploy puppetmaster') do
     # * sets up puppet.git and environments/masterbranch for puppetupdate
     # * runs puppet apply from the checked out masterbranch
     # * runs a proper puppet agent, signs the cert for itself
     # * XXX symlink hieradata for the puppet apply run, a better way would be to specify hieradata path as an argument
     # XXX dev-puppetmaster currently broken, clone into /etc/puppet for it to work
-    open("#{spec[:temp_dir]}/etc/rc.local", 'w') { |f|
+    open("#{spec[:temp_dir]}/etc/rc.local", 'w') do |f|
       f.puts "#!/bin/bash\n" \
              "\n" \
              "exit # XXX temporary\n" \
@@ -95,6 +95,6 @@ define 'puppetmaster' do
              "\n" \
              "echo 'all done' | logger\n" \
              "echo \"#!/bin/sh -e\n\nexit 0\" > /etc/rc.local\n"
-    }
-  }
+    end
+  end
 end

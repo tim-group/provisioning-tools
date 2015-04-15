@@ -38,12 +38,12 @@ describe XYZ do
     require 'provision/image/catalogue'
     define "vanillavm" do
       extend MockFunctions
-      run("do stuff") {
+      run("do stuff") do
         action(config[:item])
-      }
-      cleanup {
+      end
+      cleanup do
         action(config[:item2])
-      }
+      end
     end
 
     build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new(:hostname => "myfirstmachine"), :item => "run", :item2 => "clean")
@@ -58,19 +58,19 @@ describe XYZ do
     require 'provision/image/catalogue'
     define "vanillavm" do
       extend MockFunctions
-      run("do stuff") {
+      run("do stuff") do
         action("1")
         action("2")
         action("3")
-      }
-      cleanup {
+      end
+      cleanup do
         action("6")
         action("7")
-      }
-      run("do more stuff") {
+      end
+      run("do more stuff") do
         action("4")
         action("5")
-      }
+      end
     end
 
     build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new(:hostname => "myfirstmachine"), {})
@@ -90,18 +90,18 @@ describe XYZ do
     require 'provision/image/catalogue'
     define "vanillavm" do
       extend MockFunctions
-      cleanup {
+      cleanup do
         action("2")
         action("1")
-      }
-      cleanup {
+      end
+      cleanup do
         action("4")
         action("3")
-      }
-      cleanup {
+      end
+      cleanup do
         action("6")
         action("5")
-      }
+      end
     end
 
     build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new(:hostname => "myfirstmachine"), {})
@@ -120,10 +120,10 @@ describe XYZ do
     require 'provision/image/catalogue'
     define "vanillavm" do
       extend MockFunctions
-      cleanup {
+      cleanup do
         die("6")
         action("5")
-      }
+      end
     end
 
     build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new(:hostname => "myfirstmachine"), {})
@@ -135,10 +135,10 @@ describe XYZ do
     require 'provision/image/catalogue'
     define "vanillavm" do
       extend MockFunctions
-      run("do stuff") {
+      run("do stuff") do
         suppress_error.die("6")
         action("5")
-      }
+      end
     end
 
     build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new(:hostname => "myfirstmachine"), {})
@@ -150,11 +150,11 @@ describe XYZ do
     require 'provision/image/catalogue'
     define "vanillavm" do
       extend MockFunctions
-      run("do stuff") {
+      run("do stuff") do
         action("1")
         die("2")
         action("3")
-      }
+      end
     end
     build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new(:hostname => "myfirstmachine"), {})
     @commands.should_receive(:action).with("1")
@@ -167,10 +167,10 @@ describe XYZ do
     require 'provision/image/catalogue'
     define "vanillavm" do
       extend MockFunctions
-      run("configure hostname") {
+      run("configure hostname") do
         hostname = spec[:hostname]
         action(hostname)
-      }
+      end
     end
 
     build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new(:hostname => "myfirstmachine"), {})
@@ -183,18 +183,18 @@ describe XYZ do
   it 'I can provide defaults' do
     require 'provision/image/catalogue'
     define "defaults" do
-      run("configure defaults") {
+      run("configure defaults") do
         spec[:disksize] = '3G'
-      }
+      end
     end
     define "vanillavm" do
       extend MockFunctions
       defaults
 
-      run("configure disk") {
+      run("configure disk") do
         disksize = spec[:disksize]
         action(disksize)
-      }
+      end
     end
 
     build = Provision::Image::Catalogue::build("vanillavm", Provision::Core::MachineSpec.new({}), {})
@@ -209,15 +209,15 @@ describe XYZ do
   it 'fails with a good error message' do
     require 'provision/image/catalogue'
     define "defaults" do
-      run("configure defaults") {
+      run("configure defaults") do
         bing
-      }
+      end
     end
 
     build = Provision::Image::Catalogue::build("defaults", {}, {})
-    expect {
+    expect do
       build.execute
-    }.to raise_error NameError
+    end.to raise_error NameError
   end
 
   it 'passes through the result when using suppress_error' do
@@ -225,9 +225,9 @@ describe XYZ do
     something = nil
     define "defaults" do
       extend MockFunctions
-      run("configure defaults") {
+      run("configure defaults") do
         something = suppress_error.returns_something
-      }
+      end
     end
 
     build = Provision::Image::Catalogue::build("defaults", Provision::Core::MachineSpec.new({}), {})
@@ -242,15 +242,15 @@ describe XYZ do
     define "defaults" do
       extend Provision::Image::Commands
       extend MockFunctions
-      run("configure defaults") {
-      }
-      cleanup {
-        keep_doing {
+      run("configure defaults") do
+      end
+      cleanup do
+        keep_doing do
           suppress_error.die("this line should throw an error and be swallowed")
           something = returns_something
           print "something = #{something} \n"
-        }.until { something == "something" }
-      }
+        end.until { something == "something" }
+      end
     end
 
     build = Provision::Image::Catalogue::build("defaults", Provision::Core::MachineSpec.new({}), {})
@@ -265,11 +265,11 @@ describe XYZ do
     define "defaults" do
       extend Provision::Image::Commands
       extend MockFunctions
-      run("configure defaults") {
-      }
-      on_error {
+      run("configure defaults") do
+      end
+      on_error do
         something = "I was executed"
-      }
+      end
     end
 
     build = Provision::Image::Catalogue::build("defaults", Provision::Core::MachineSpec.new({}), {})
@@ -283,27 +283,27 @@ describe XYZ do
     define "defaults" do
       extend Provision::Image::Commands
       extend MockFunctions
-      run("configure defaults") {
+      run("configure defaults") do
         raise "an error"
-      }
-      on_error {
+      end
+      on_error do
         something = "I was executed"
-      }
+      end
     end
 
     build = Provision::Image::Catalogue::build("defaults", Provision::Core::MachineSpec.new({}), {})
 
-    expect {
+    expect do
       build.execute
-    }.to raise_error "an error"
+    end.to raise_error "an error"
 
     something.should eql("I was executed")
   end
 
   it 'raises a meaningful error when a non-existent template is defined' do
     require 'provision/image/catalogue'
-    expect {
+    expect do
       Provision::Image::Catalogue::build("noexist", Provision::Core::MachineSpec.new({}), {})
-    }.to raise_error("attempt to execute a template that is not in the catalogue: noexist")
+    end.to raise_error("attempt to execute a template that is not in the catalogue: noexist")
   end
 end

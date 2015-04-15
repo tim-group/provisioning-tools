@@ -36,9 +36,9 @@ describe 'role_router' do
     '192.168.5.239'
   end
 
-  subject {
+  subject do
     platform
-  }
+  end
 
   def server(name)
     subject.find_environment("dev").find_server(name)
