@@ -81,8 +81,8 @@ define 'puppetmaster' do
              "ln -s /etc/puppet/environments/masterbranch/hieradata/ /etc/puppet/hieradata # XXX needed " \
                "for puppet apply\n" \
              "\n" \
-             "sed -i -e 's/HOSTNAME/\$(hostname -f)/' /etc/puppet/puppet.conf\n" \
-             "sed -i -e 's/DOMAIN/\$(hostname -d)/' /etc/puppet/puppet.conf\n" \
+             "sed -i -e \"s/HOSTNAME/\$(hostname -f)/\" /etc/puppet/puppet.conf\n" \
+             "sed -i -e \"s/DOMAIN/\$(hostname -d)/\" /etc/puppet/puppet.conf\n" \
              "echo 'running puppet apply...' | logger\n" \
              "puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/environments/masterbranch/modules " \
                "--logdest=syslog /etc/puppet/environments/masterbranch/manifests\n" \
