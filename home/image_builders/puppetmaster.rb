@@ -34,7 +34,7 @@ define 'puppetmaster' do
         "  hostprivkey       = /var/lib/puppet/ssl/private_keys/puppet.DOMAIN.pem\n" \
         "  hostpubkey        = /var/lib/puppet/ssl/public_keys/puppet.DOMAIN.pem\n" \
         "  certname          = puppet.DOMAIN\n" \
-        "  dns_alt_names     = puppet.DOMAIN,HOSTNAME.DOMAIN,puppet\n" \
+        "  dns_alt_names     = puppet.DOMAIN,HOSTNAME,puppet\n" \
         "  node_terminus   = stacks\n" \
         "  trusted_node_data = true\n" \
         "  autosign        = /usr/bin/autosign.rb\n" \
@@ -81,8 +81,8 @@ define 'puppetmaster' do
              "ln -s /etc/puppet/environments/masterbranch/hieradata/ /etc/puppet/hieradata # XXX needed " \
                "for puppet apply\n" \
              "\n" \
-             "sed -i -e \"s/HOSTNAME/\$(hostname -f)/\" /etc/puppet/puppet.conf\n" \
-             "sed -i -e \"s/DOMAIN/\$(hostname -d)/\" /etc/puppet/puppet.conf\n" \
+             "sed -i -e \"s/HOSTNAME/\$(hostname -f)/g\" /etc/puppet/puppet.conf\n" \
+             "sed -i -e \"s/DOMAIN/\$(hostname -d)/g\" /etc/puppet/puppet.conf\n" \
              "echo 'running puppet apply...' | logger\n" \
              "puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/environments/masterbranch/modules " \
                "--logdest=syslog /etc/puppet/environments/masterbranch/manifests\n" \
