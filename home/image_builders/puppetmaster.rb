@@ -4,6 +4,42 @@ define 'puppetmaster' do
   run('install puppet') {
     apt_install 'puppet'
   }
+  run('configure puppet') {
+    open("#{spec[:temp_dir]}/etc/puppet/puppet.conf", 'w') do |f|
+      f.puts \
+        "[main]\n" \
+        "  vardir        = /var/lib/puppet\n" \
+        "  logdir        = /var/log/puppet\n" \
+        "  rundir        = /var/run/puppet\n" \
+        "  confdir       = /etc/puppet\n" \
+        "  ssldir        = $vardir/ssl\n" \
+        "  runinterval   = 600\n" \
+        "  pluginsync    = true\n" \
+        "  factpath      = $vardir/lib/facter\n" \
+        "  splay         = false\n" \
+        "  environment   = masterbranch\n" \
+        "  configtimeout = 3000\n" \
+        "  reports       = graphite,successful_run_commit_id,stomp\n" \
+        "  preferred_serialization_format = pson\n" \
+        "  strict_variables = false\n" \
+        "[agent]\n" \
+        "  report            = true\n" \
+        "[master]\n" \
+        "  servertype        = passenger\n" \
+        "  reportdir         = $vardir/reports\n" \
+        "  storeconfigs      = true\n" \
+        "  storeconfigs_backend = puppetdb\n" \
+        "  hostcert          = /var/lib/puppet/ssl/certs/puppet.DOMAIN.pem\n" \
+        "  hostprivkey       = /var/lib/puppet/ssl/private_keys/puppet.DOMAIN.pem\n" \
+        "  hostpubkey        = /var/lib/puppet/ssl/public_keys/puppet.DOMAIN.pem\n" \
+        "  certname          = puppet.DOMAIN\n" \
+        "  dns_alt_names     = puppet.DOMAIN,HOSTNAME.DOMAIN,puppet\n" \
+        "  node_terminus   = stacks\n" \
+        "  trusted_node_data = true\n" \
+        "  autosign        = /usr/bin/autosign.rb\n" \
+        "  environmentpath = $confdir/environments\n" \
+        "    end\n" \
+        "  }\n"
 
   run('install ruby') {
     apt_install 'ruby1.8'
@@ -42,6 +78,8 @@ define 'puppetmaster' do
              "ln -s /etc/puppet/environments/masterbranch/hieradata/ /etc/puppet/hieradata # XXX needed " \
                "for puppet apply\n" \
              "\n" \
+             "sed -i -e 's/HOSTNAME/\$(hostname -f)/' /etc/puppet/puppet.conf\n" \
+             "sed -i -e 's/DOMAIN/\$(hostname -d)/' /etc/puppet/puppet.conf\n" \
              "echo 'running puppet apply...' | logger\n" \
              "puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/environments/masterbranch/modules " \
                "--logdest=syslog /etc/puppet/environments/masterbranch/manifests\n" \
