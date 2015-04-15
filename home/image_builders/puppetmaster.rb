@@ -90,7 +90,8 @@ define 'puppetmaster' do
              "puppet agent --debug --verbose --waitforcert 10 --onetime 2>&1 | logger\n" \
              "sleep 10 ; puppet cert sign $(hostname -f) 2>&1 | logger\n" \
              "\n" \
-             "echo 'all done' | logger\n"
+             "echo 'all done' | logger\n" \
+             "echo \"#!/bin/sh -e\n\nexit 0\" > /etc/rc.local\n"
     }
   }
 end
