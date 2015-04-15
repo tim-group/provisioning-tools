@@ -4,6 +4,7 @@ define 'puppetmaster' do
   run('install puppet') {
     apt_install 'puppet'
   }
+
   run('configure puppet') {
     open("#{spec[:temp_dir]}/etc/puppet/puppet.conf", 'w') do |f|
       f.puts \
@@ -40,6 +41,8 @@ define 'puppetmaster' do
         "  environmentpath = $confdir/environments\n" \
         "    end\n" \
         "  }\n"
+    end
+  }
 
   run('install ruby') {
     apt_install 'ruby1.8'
