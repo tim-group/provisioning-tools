@@ -141,7 +141,7 @@ The ACTION can be one of the following:
           msg = node[:statusmsg]
         end
 
-        puts "%-40s %s" % [node[:sender], msg]
+        puts sprintf("%-40s %s", node[:sender], msg)
       end
 
     when "summary"

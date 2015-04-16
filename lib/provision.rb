@@ -36,9 +36,7 @@ class Provision::Config
     # FIXME: Once new code is everywhere, undo this conditional
     # and move :storage into the required_config_keys method
     missing_keys = required_config_keys
-    if config[:vm_storage_type] == 'new'
-      missing_keys << :storage
-    end
+    missing_keys << :storage if config[:vm_storage_type] == 'new'
     missing_keys -= config.keys
     raise "#{@configfile} has missing properties (#{missing_keys.join(', ')})" unless missing_keys.empty?
 

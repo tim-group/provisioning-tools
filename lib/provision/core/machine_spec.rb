@@ -65,7 +65,7 @@ class Provision::Core::MachineSpec
 
     if_nil_define_var(:temp_dir, "#{@build_dir}/#{@spec[:hostname]}")
 
-    if @spec.has_key?(:qualified_hostnames)
+    if @spec.key?(:qualified_hostnames)
       if_nil_define_var(:fqdn, "#{@spec[:qualified_hostnames][:mgmt]}")
     end
     if_nil_define_var(:fqdn, "#{@spec[:hostname]}.#{@spec[:domain]}")
@@ -140,6 +140,6 @@ class Provision::Core::MachineSpec
     raise 'a fully-qualified domain name cannot be an empty string' if fqdn.empty?
     sha1 = Digest::SHA1.new
     bytes = sha1.digest(fqdn + host)
-    "52:54:00:%s" % bytes.unpack('H2x9H2x8H2').join(':')
+    sprintf("52:54:00:%s", bytes.unpack('H2x9H2x8H2').join(':'))
   end
 end

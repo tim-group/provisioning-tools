@@ -90,9 +90,7 @@ class Provision::Image::Build
     end
     summary_log.info("[\e[0;32mDONE\e[0m]\n")
 
-    if !error.nil?
-      raise error
-    end
+    raise error if !error.nil?
   end
 
   def summary_log

@@ -151,9 +151,7 @@ module MCollective
           reply[:output] = "Running with custom tags given: #{request[:tags]}"
         end
 
-        if request[:noop]
-          cmd << "--noop"
-        end
+        cmd << "--noop" if request[:noop]
 
         cmd = cmd.join(" ")
 

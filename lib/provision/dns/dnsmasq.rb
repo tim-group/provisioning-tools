@@ -13,9 +13,7 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
   attr_reader :by_cname
 
   def initialize(name, range, options = {})
-    if !options[:primary_nameserver]
-      options[:primary_nameserver] = '127.0.0.1'
-    end
+    options[:primary_nameserver] = '127.0.0.1' if !options[:primary_nameserver]
     super(name, range, options)
     @hosts_file = options[:hosts_file] || "/etc/hosts"
     @cnames_file = options[:cnames_file] || "/etc/dnsmasq.d/cnames"
@@ -142,11 +140,10 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
   end
 
   def reload_dnsmasq
-    if File.exists?(@dnsmasq_pid_file)
-      pid = File.open(@dnsmasq_pid_file).first.to_i
-      puts "Reloading dnsmasq (#{pid})"
-      Process.kill('HUP', pid)
-    end
+    return if !File.exists?(@dnsmasq_pid_file)
+    pid = File.open(@dnsmasq_pid_file).first.to_i
+    puts "Reloading dnsmasq (#{pid})"
+    Process.kill('HUP', pid)
   end
 
   def remove_lines_from_file(regex, file)

@@ -57,9 +57,7 @@ class Provision::DNSNetwork
     @primary_nameserver = options[:primary_nameserver] || raise("must specify a primary_nameserver")
     @checker = options[:checker] || Provision::DNSChecker.new(:logger => @logger, :primary_nameserver => @primary_nameserver)
     parts = range.split('/')
-    if parts.size != 2
-      raise(":network_range must be of the format X.X.X.X/Y")
-    end
+    raise(":network_range must be of the format X.X.X.X/Y") if parts.size != 2
     broadcast_mask = (IPAddr::IN4MASK >> parts[1].to_i)
     @subnet_mask = IPAddr.new(IPAddr::IN4MASK ^ broadcast_mask, Socket::AF_INET)
     @network = IPAddr.new(parts[0]).mask(parts[1])
@@ -212,7 +210,7 @@ class Provision::DNS
 
       @logger.info("Trying to allocate IPs for #{spec[:hostname]} in network #{network}")
 
-      unless @networks.has_key?(network)
+      unless @networks.key?(network)
         @logger.info("Skipping IP allocation for #{spec[:hostname]} in network #{network}: no such network on this node")
         next
       end
@@ -225,7 +223,7 @@ class Provision::DNS
     raise("No networks allocated for this machine, cannot be sane") if allocations.empty?
 
     elapsed_time = (Time.now - start_time).to_f
-    @logger.info("IP allocation for #{spec[:hostname]} took %.6f seconds" % elapsed_time)
+    @logger.info(sprintf("IP allocation for #{spec[:hostname]} took %.6f seconds", elapsed_time))
 
     allocations
   end
@@ -234,7 +232,7 @@ class Provision::DNS
     remove_results = {}
 
     spec.networks.each do |name|
-      if !@networks.has_key?(name.to_sym)
+      if !@networks.key?(name.to_sym)
         @logger.warn "can't remove an ip on #{name} because there is no config on the compute node. Known networks #{@networks.keys.inspect}"
         next
       end
@@ -252,8 +250,8 @@ class Provision::DNS
     spec.networks.each do |network_name|
       network = network_name.to_sym
       @logger.info("Trying to add CNAME's for network #{network}")
-      next unless @networks.has_key?(network)
-      next unless spec[:cnames].has_key?(network)
+      next unless @networks.key?(network)
+      next unless spec[:cnames].key?(network)
       result.merge!(@networks[network].add_cnames_for(spec))
     end
     result.each { |cname, destination| @logger.info("Added CNAME #{cname} -> #{destination}") }
@@ -267,8 +265,8 @@ class Provision::DNS
     spec.networks.each do |network_name|
       network = network_name.to_sym
       @logger.info("Trying to remove CNAME's for network #{network}")
-      next unless @networks.has_key?(network)
-      next unless spec[:cnames].has_key?(network)
+      next unless @networks.key?(network)
+      next unless spec[:cnames].key?(network)
       result.merge!(@networks[network].remove_cnames_for(spec))
     end
     @logger.info("Removed #{result}")

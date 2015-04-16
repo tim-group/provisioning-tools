@@ -23,9 +23,7 @@ module Provision::Image::Catalogue
   def call_define(name, build)
     closure = @@catalogue[name]
 
-    if closure.nil?
-      raise NameError.new(name)
-    end
+    raise NameError.new(name) if closure.nil?
 
     build.instance_eval(&closure)
     build

@@ -45,6 +45,7 @@ class Provision::Storage
       @@cleanup_tasks[name][identifier] = task_hash[:cleanup]
       @@cleanup_tasks_order[name] << identifier
     end
+
     unless task_hash[:remove_cleanup].nil?
       tasks = task_hash[:remove_cleanup].class == Array ? task_hash[:remove_cleanup] : [task_hash[:remove_cleanup]]
       tasks.each do |id|

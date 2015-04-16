@@ -70,7 +70,7 @@ class Provision::Storage::Service
       mount_point_obj = get_mount_point(name, mount_point)
       type = mount_point_obj.config[:type].to_sym
       persistent = mount_point_obj.config[:persistent]
-      raise 'Persistent options not found' unless mount_point_obj.config.has_key?(:persistence_options)
+      raise 'Persistent options not found' unless mount_point_obj.config.key?(:persistence_options)
       storage = get_storage(type)
       if persistent
         storage.check_persistent_storage(name, mount_point_obj)
@@ -134,9 +134,7 @@ class Provision::Storage::Service
       storage = get_storage(type)
 
       shrink = mount_point_obj.config[:prepare][:options][:shrink_after_unmount]
-      if shrink
-        storage.shrink_filesystem(name, mount_point_obj)
-      end
+      storage.shrink_filesystem(name, mount_point_obj) if shrink
     end
   end
 

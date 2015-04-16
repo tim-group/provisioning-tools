@@ -128,18 +128,8 @@ Style/ColonMethodCall:
 Style/CommentAnnotation:
   Enabled: false
 
-# Offense count: 8
-# Cop supports --auto-correct.
-Style/DeprecatedHashMethods:
-  Enabled: false
-
 # Offense count: 56
 Style/Documentation:
-  Enabled: false
-
-# Offense count: 3
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/FormatString:
   Enabled: false
 
 # Offense count: 4
@@ -154,17 +144,6 @@ Style/GuardClause:
 
 # Offense count: 15
 # Configuration parameters: MaxLineLength.
-Style/IfUnlessModifier:
-  Enabled: false
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/Lambda:
-  Enabled: false
-
-# Offense count: 29
-Style/MultilineBlockChain:
-  Enabled: false
 
 # Offense count: 2
 # Configuration parameters: EnforcedStyle, MinBodyLength, SupportedStyles.

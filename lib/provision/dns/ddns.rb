@@ -18,16 +18,12 @@ end
 
 class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
   def initialize(name, range, options = {})
-    if !options[:primary_nameserver]
-      options[:primary_nameserver] = '127.0.0.1'
-    end
+    options[:primary_nameserver] = '127.0.0.1' if !options[:primary_nameserver]
     @reverse_zone_override = options[:reverse_zone_override]
     super(name, range, options)
     @debug = false
     parts = range.split('/')
-    if parts.size != 2
-      raise(":network_range must be of the format X.X.X.X/Y")
-    end
+    raise(":network_range must be of the format X.X.X.X/Y") if parts.size != 2
     @rndc_key = options[:rndc_key] || raise("No :rndc_key supplied")
   end
 

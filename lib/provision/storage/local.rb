@@ -249,9 +249,7 @@ module Provision::Storage::Local
         last_cmd_provides_output = true
       when :dd_of
         raise "transport #{transport} expects input, but previous command #{last_cmd} provides no output" if last_cmd_provides_output == false && last_cmd != :ssh_cmd
-        if last_cmd_provides_output == true
-          copy_cmd = "#{copy_cmd} | "
-        end
+        copy_cmd = "#{copy_cmd} | " if last_cmd_provides_output == true
         [:path].each do |opt|
           raise "transport #{transport} requires option #{opt}" if t_options[opt].nil?
         end
@@ -259,16 +257,12 @@ module Provision::Storage::Local
         last_cmd_provides_output = false
       when :gzip
         raise "transport #{transport} expects input, but previous command #{last_cmd} provides no output" if last_cmd_provides_output == false && last_cmd != :ssh_cmd
-        if last_cmd_provides_output == true
-          copy_cmd = "#{copy_cmd} | "
-        end
+        copy_cmd = "#{copy_cmd} | " if last_cmd_provides_output == true
         copy_cmd = "#{copy_cmd}gzip"
         last_cmd_provides_output = true
       when :gunzip
         raise "transport gunzip expects input, but previous command #{last_cmd} provides no output" if last_cmd_provides_output == false && last_cmd != :ssh_cmd
-        if last_cmd_provides_output == true
-          copy_cmd = "#{copy_cmd} | "
-        end
+        copy_cmd = "#{copy_cmd} | " if last_cmd_provides_output == true
         copy_cmd = "#{copy_cmd}gunzip"
         last_cmd_provides_output = true
       when :ssh_cmd

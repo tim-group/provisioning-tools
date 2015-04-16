@@ -16,11 +16,8 @@ class Provision::Image::Service
     raise 'VM marked as non-destroyable' if spec[:disallow_destroy]
     case @config[:vm_storage_type]
     when 'image'
-      if File.exist?(spec[:image_path])
-        File.delete(spec[:image_path])
-      end
+      File.delete(spec[:image_path]) if File.exist?(spec[:image_path])
     when 'lvm'
-      # lvrmeove ..
       if File.exist?("/dev/#{spec[:lvm_vg]}/#{spec[:hostname]}")
         system "lvremove -f /dev/#{spec[:lvm_vg]}/#{spec[:hostname]}"
       end

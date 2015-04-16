@@ -9,9 +9,7 @@ class Provision::VM::Virsh
   end
 
   def safe_system(cli)
-    if system(cli) != true
-      raise("Failed to run: #{cli}")
-    end
+    raise("Failed to run: #{cli}") if system(cli) != true
   end
 
   def is_defined(spec)
@@ -59,9 +57,7 @@ class Provision::VM::Virsh
 
   def wait_for_shutdown(spec, timeout = 120)
     timeout.times do
-      if !is_running(spec)
-        return
-      end
+      return if !is_running(spec)
       sleep 1
     end
 

@@ -86,10 +86,9 @@ class Provision::WorkQueue
   end
 
   def destroy(spec)
-    if @virsh.is_defined(spec)
-      @queue << SpecTask.new(spec) do
-        @provisioning_service.clean_vm(spec)
-      end
+    return if !@virsh.is_defined(spec)
+    @queue << SpecTask.new(spec) do
+      @provisioning_service.clean_vm(spec)
     end
   end
 
