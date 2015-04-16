@@ -204,11 +204,6 @@ sun-java6-jre   shared/present-sun-dlj-v1-1     note
 
     cmd "tune2fs -Lmain #{host_device_partition}"
 
-#    open("#{spec[:temp_dir]}/boot/grub/device.map", 'w') { |f|
-#      f.puts "(hd0) #{host_device}"
-#      f.puts "(hd0,1) #{host_device_partition}"
-#    }
-
     find_kernel = `ls -c #{spec[:temp_dir]}/boot/vmlinuz-* | head -1`.chomp
     find_kernel =~ /vmlinuz-(.+)/
     kernel_version = Regexp.last_match(1)
@@ -231,12 +226,10 @@ sun-java6-jre   shared/present-sun-dlj-v1-1     note
           }"
     end
 
-#    chroot "grub-install --no-floppy --grub-mkdevicemap=/boot/grub/device.map #{host_device}"
     chroot "grub-install --no-floppy #{host_device}"
   end
 
   run("remove cached packages") do
-#    chroot "rm -rf /var/cache/apt/archives/*"
     chroot "DEBIAN_FRONTEND=noninteractive apt-get clean"
   end
 

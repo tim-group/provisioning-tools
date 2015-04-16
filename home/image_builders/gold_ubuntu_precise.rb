@@ -6,7 +6,7 @@ require 'provision/image/commands'
 # Its currecntly used by the bin/gold script, which will also go away.
 # Please clean it up once that happens :)
 
-define "gold-ubuntu-trusty" do
+define "gold-ubuntu-precise" do
   extend Provision::Image::Commands
 
   run("loopback devices") do
@@ -54,7 +54,7 @@ define "gold-ubuntu-trusty" do
   end
 
   run("running debootstrap") do
-    cmd "http_proxy=http://aptproxy:3142 debootstrap --arch amd64 --exclude=resolvconf,ubuntu-minimal trusty #{spec[:temp_dir]} http://gb.archive.ubuntu.com/ubuntu"
+    cmd "http_proxy=http://aptproxy:3142 debootstrap --arch amd64 --exclude=resolvconf,ubuntu-minimal precise #{spec[:temp_dir]} http://gb.archive.ubuntu.com/ubuntu"
     cmd "mkdir -p #{spec[:temp_dir]}/etc/default"
   end
 
@@ -138,15 +138,15 @@ exec /sbin/getty -L ttyS0 115200 vt102
     apt_install "curl"
   end
 
-  run("configure trusty repo") do
+  run("configure precise repo") do
     open("#{spec[:temp_dir]}/etc/apt/sources.list", 'w') do |f|
-      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ trusty main\n"
-      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ trusty universe\n"
-      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ trusty-updates main\n"
-      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ trusty-updates universe\n"
-      f.puts "deb http://deb.youdevise.com trusty main\n"
+      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ precise main\n"
+      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ precise universe\n"
+      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ precise-updates main\n"
+      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ precise-updates universe\n"
+      f.puts "deb http://deb.youdevise.com precise main\n"
       f.puts "deb http://deb.youdevise.com all main\n"
-      f.puts "deb http://deb-transitional.youdevise.com/stable trusty main\n"
+      f.puts "deb http://deb-transitional.youdevise.com/stable precise main\n"
       f.puts "deb http://deb-transitional.youdevise.com/stable all main\n"
     end
     chroot "curl -Ss http://deb.youdevise.com/pubkey.gpg | apt-key add -"
@@ -163,12 +163,12 @@ exec /sbin/getty -L ttyS0 115200 vt102
   run("ensure the correct mailutils gets instaled") do
     open("#{spec[:temp_dir]}/etc/apt/preferences.d/mailutils", 'w') do |f|
       f.puts "Package: mailutils
-Pin: release o=TIMGroup,a=trusty
+Pin: release o=TIMGroup,a=precise
 Pin-Priority: 1001\n"
     end
     open("#{spec[:temp_dir]}/etc/apt/preferences.d/libmailutils2", 'w') do |f|
       f.puts "Package: libmailutils2
-Pin: release o=TIMGroup,a=trusty
+Pin: release o=TIMGroup,a=precise
 Pin-Priority: 1001\n"
     end
   end
@@ -280,7 +280,6 @@ sun-java6-jre   shared/present-sun-dlj-v1-1     note
   end
 
   run("remove cached packages") do
-#    chroot "rm -rf /var/cache/apt/archives/*"
     chroot "DEBIAN_FRONTEND=noninteractive apt-get clean"
   end
 

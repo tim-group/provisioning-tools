@@ -22,7 +22,7 @@ define "xpgold" do
 
   case config[:vm_storage_type]
   when "image"
-    run ("download master image") do
+    run("download master image") do
       master_url = "#{spec[:master_image_url]}"
       cmd "curl -Ss --fail -o #{spec[:image_path]} #{master_url}"
       suppress_error.cmd "mkdir -p #{spec[:temp_dir]}"
@@ -35,7 +35,7 @@ define "xpgold" do
       suppress_error.cmd "rmdir #{spec[:temp_dir]}"
     end
   when "new"
-     # do nothing
+    # do nothing
   else
     raise "Unsure how to build xpgold with vm_storage_type of #{config[:vm_storage_type]}"
   end

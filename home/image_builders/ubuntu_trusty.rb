@@ -1,60 +1,11 @@
 require 'provision/image/catalogue'
 require 'provision/image/commands'
 
-# TODO:
-# This file is legacy once gold images are built in a normal stacks way
-# Its currecntly used by the bin/gold script, which will also go away.
-# Please clean it up once that happens :)
-
-define "gold-ubuntu-precise" do
+define "ubuntu-trusty" do
   extend Provision::Image::Commands
 
-  run("loopback devices") do
-    cmd "mkdir #{spec[:temp_dir]}"
-    cmd "kvm-img create -fraw #{spec[:image_path]} 3G"
-    cmd "losetup /dev/#{spec[:loop0]} #{spec[:image_path]}"
-    cmd "parted -sm /dev/#{spec[:loop0]} mklabel msdos"
-    suppress_error.cmd "parted -sm /dev/#{spec[:loop0]} mkpart primary ext3 1 100%"
-    cmd "kpartx -a -v /dev/#{spec[:loop0]}"
-    cmd "mkfs.ext4 /dev/mapper/#{spec[:loop0]}p1"
-  end
-
-  cleanup do
-    keep_doing do
-      suppress_error.cmd "kpartx -d /dev/#{spec[:loop0]}"
-    end.until { `dmsetup ls | grep #{spec[:loop0]}p1 | wc -l`.chomp == "0" }
-
-    cmd "udevadm settle"
-
-    keep_doing do
-      suppress_error.cmd "losetup -d /dev/#{spec[:loop0]}"
-    end.until { `losetup -a | grep /dev/#{spec[:loop0]} | wc -l`.chomp == "0" }
-
-    keep_doing do
-      suppress_error.cmd "umount #{spec[:temp_dir]}"
-      suppress_error.cmd "rmdir #{spec[:temp_dir]}"
-    end.until { `ls -d  #{spec[:temp_dir]} 2> /dev/null | wc -l`.chomp == "0" }
-
-    cmd "udevadm settle"
-    cmd "rmdir #{spec[:temp_dir]}"
-  end
-
-  run("loopback devices 2") do
-    cmd "losetup /dev/#{spec[:loop1]} /dev/mapper/#{spec[:loop0]}p1"
-    cmd "mount /dev/#{spec[:loop1]} #{spec[:temp_dir]}"
-  end
-
-  cleanup do
-    keep_doing do
-      suppress_error.cmd "umount -d /dev/#{spec[:loop1]}"
-      suppress_error.cmd "losetup -d /dev/#{spec[:loop1]}"
-    end.until do
-      `losetup -a | grep /dev/#{spec[:loop1]} | wc -l`.chomp == "0"
-    end
-  end
-
   run("running debootstrap") do
-    cmd "http_proxy=http://aptproxy:3142 debootstrap --arch amd64 --exclude=resolvconf,ubuntu-minimal precise #{spec[:temp_dir]} http://gb.archive.ubuntu.com/ubuntu"
+    cmd "http_proxy=http://aptproxy:3142 debootstrap --arch amd64 --exclude=resolvconf,ubuntu-minimal trusty #{spec[:temp_dir]} http://gb.archive.ubuntu.com/ubuntu"
     cmd "mkdir -p #{spec[:temp_dir]}/etc/default"
   end
 
@@ -138,15 +89,14 @@ exec /sbin/getty -L ttyS0 115200 vt102
     apt_install "curl"
   end
 
-  run("configure precise repo") do
+  run("configure trusty repo") do
     open("#{spec[:temp_dir]}/etc/apt/sources.list", 'w') do |f|
-      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ precise main\n"
-      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ precise universe\n"
-      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ precise-updates main\n"
-      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ precise-updates universe\n"
-      f.puts "deb http://deb.youdevise.com precise main\n"
+      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ trusty main\n"
+      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ trusty universe\n"
+      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ trusty-updates main\n"
+      f.puts "deb http://gb.archive.ubuntu.com/ubuntu/ trusty-updates universe\n"
       f.puts "deb http://deb.youdevise.com all main\n"
-      f.puts "deb http://deb-transitional.youdevise.com/stable precise main\n"
+      f.puts "deb http://deb-transitional.youdevise.com/stable trusty main\n"
       f.puts "deb http://deb-transitional.youdevise.com/stable all main\n"
     end
     chroot "curl -Ss http://deb.youdevise.com/pubkey.gpg | apt-key add -"
@@ -163,12 +113,12 @@ exec /sbin/getty -L ttyS0 115200 vt102
   run("ensure the correct mailutils gets instaled") do
     open("#{spec[:temp_dir]}/etc/apt/preferences.d/mailutils", 'w') do |f|
       f.puts "Package: mailutils
-Pin: release o=TIMGroup,a=precise
+Pin: release o=TIMGroup,a=trusty
 Pin-Priority: 1001\n"
     end
     open("#{spec[:temp_dir]}/etc/apt/preferences.d/libmailutils2", 'w') do |f|
       f.puts "Package: libmailutils2
-Pin: release o=TIMGroup,a=precise
+Pin: release o=TIMGroup,a=trusty
 Pin-Priority: 1001\n"
     end
   end
@@ -246,13 +196,12 @@ sun-java6-jre   shared/present-sun-dlj-v1-1     note
     chroot "apt-get -y --force-yes update"
     apt_install "linux-image-virtual"
     apt_install "grub-pc"
+    puts "vm_storage_type: #{config[:vm_storage_type]}"
     cmd "mkdir -p #{spec[:temp_dir]}/boot/grub"
-    cmd "tune2fs -Lmain /dev/#{spec[:loop1]}"
+    host_device = cmd("readlink -f -n #{spec[:host_device]}")
+    host_device_partition = cmd("readlink -f -n #{spec[:host_device_partition]}")
 
-    open("#{spec[:temp_dir]}/boot/grub/device.map", 'w') do |f|
-      f.puts "(hd0) /dev/#{spec[:loop0]}"
-      f.puts "(hd0,1) /dev/#{spec[:loop1]}"
-    end
+    cmd "tune2fs -Lmain #{host_device_partition}"
 
     find_kernel = `ls -c #{spec[:temp_dir]}/boot/vmlinuz-* | head -1`.chomp
     find_kernel =~ /vmlinuz-(.+)/
@@ -260,7 +209,7 @@ sun-java6-jre   shared/present-sun-dlj-v1-1     note
 
     kernel = "/boot/vmlinuz-#{kernel_version}"
     initrd = "/boot/initrd.img-#{kernel_version}"
-    uuid = `blkid -o value /dev/mapper/#{spec[:loop0]}p1 | head -n1`.chomp
+    uuid = `blkid -o value #{host_device_partition} | head -n1`.chomp
 
     open("#{spec[:temp_dir]}/boot/grub/grub.cfg", 'w') do |f|
       f.puts "
@@ -276,11 +225,10 @@ sun-java6-jre   shared/present-sun-dlj-v1-1     note
           }"
     end
 
-    chroot "grub-install --no-floppy --grub-mkdevicemap=/boot/grub/device.map /dev/#{spec[:loop0]}"
+    chroot "grub-install --no-floppy #{host_device}"
   end
 
   run("remove cached packages") do
-#    chroot "rm -rf /var/cache/apt/archives/*"
     chroot "DEBIAN_FRONTEND=noninteractive apt-get clean"
   end
 

@@ -27,15 +27,6 @@ define "senode" do
     end.until { `mount -l | grep #{spec[:hostname]}/dev | wc -l`.chomp == "0" }
   end
 
-# run("configure google apt repo") {
-#    open("#{spec[:temp_dir]}/etc/apt/sources.list.d/google.list", 'w') { |f|
-#      f.puts "deb http://dl.google.com/linux/deb/ stable main\n"
-#    }
-
-#    chroot "curl -Ss https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -"
-#    suppress_error.chroot "apt-get update"
-#  }
-
   run("create ci user") do
     chroot "/usr/sbin/adduser ci"
   end
