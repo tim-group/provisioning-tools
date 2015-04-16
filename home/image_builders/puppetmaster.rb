@@ -51,7 +51,6 @@ define 'puppetmaster' do
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') do |f|
       f.puts "#!/bin/bash\n" \
              "\n" \
-             "exit # XXX temporary\n" \
              "echo 'running ntpdate...' | logger\n" \
              "/etc/init.d/ntp stop | logger 2>&1\n" \
              "/usr/sbin/ntpdate -s ci-1.youdevise.com | logger 2>&1\n" \
