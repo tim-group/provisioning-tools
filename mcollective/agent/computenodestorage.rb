@@ -73,7 +73,7 @@ module MCollective
 
       action "details" do
         config = YAML.load_file('/etc/provision/config.yaml')
-        raise "Un-supported host vm_storage_type is #{config['vm_storage_type']}" unless config['vm_storage_type'] = 'new'
+        raise "Un-supported host vm_storage_type is #{config['vm_storage_type']}" unless config['vm_storage_type'] == 'new'
         storage = config['storage']
         raise "Storage key was not found in config.yaml" if storage.nil?
         storage.keys.sort.each do |storage_type|

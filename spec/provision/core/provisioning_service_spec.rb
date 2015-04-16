@@ -14,10 +14,10 @@ module RSpec::Mocks::ArgumentMatchers
         @expected = expected
       end
 
-      def ==(actual)
+      def ==(other)
         mismatches = []
         @expected.keys.each do |key|
-          mismatches << "expected #{key} to be #{@expected[key].inspect} but it was #{actual[key].inspect}" unless actual[key] == @expected[key]
+          mismatches << "expected #{key} to be #{@expected[key].inspect} but it was #{other[key].inspect}" unless other[key] == @expected[key]
         end
         raise mismatches.join("\n") unless mismatches.empty?
         true

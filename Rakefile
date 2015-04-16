@@ -69,13 +69,13 @@ end
 
 desc "Run specs"
 RSpec::Core::RakeTask.new do |t|
-  t.rspec_opts = %w[--color]
+  t.rspec_opts = %w(--color)
   t.pattern = "spec/**/*_spec.rb"
 end
 
 desc "MCollective Run specs"
 RSpec::Core::RakeTask.new(:mcollective_spec) do |t|
-  t.rspec_opts = %w[--color]
+  t.rspec_opts = %w(--color)
   t.pattern = "mcollective/spec/**/*_spec.rb"
 end
 

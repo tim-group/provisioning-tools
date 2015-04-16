@@ -40,7 +40,7 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
       parse_hosts
       return false if @by_ip[ip.to_s]
       File.open(@hosts_file, 'a') do |f|
-        f.write "#{ip.to_s} #{all_hostnames.join(" ")}\n"
+        f.write "#{ip.to_s} #{all_hostnames.join(' ')}\n"
         f.chmod(0644)
       end
       reload_dnsmasq

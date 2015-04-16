@@ -45,10 +45,11 @@ define "copyboot" do
     end
 
     open("#{spec[:temp_dir]}/etc/resolv.conf", 'w') do |f|
-      f.puts %[domain mgmt.#{spec[:domain]}
+      f.puts %(domain mgmt.#{spec[:domain]}
 nameserver #{spec[:nameserver]}
 search #{spec[:dns_search_path]}
-]
+
+)
     end
 
     open("#{spec[:temp_dir]}/etc/dhcp/dhclient.conf", 'w') do |f|
@@ -56,11 +57,13 @@ search #{spec[:dns_search_path]}
     end
 
     open("#{spec[:temp_dir]}/etc/network/if-up.d/routes_mgmt", 'w') do |f|
-      f.puts %[#!/bin/bash\nif [ "${IFACE}" == "mgmt" ]; then\n]
+      f.puts %(#!/bin/bash
+if [ "${IFACE}" == "mgmt" ]; then
+)
       spec[:routes].each do |route|
-        f.puts %[ip route add #{route}]
+        f.puts %(ip route add #{route})
       end
-      f.puts %[fi]
+      f.puts %(fi)
     end
 
     cmd "chmod a+x #{spec[:temp_dir]}/etc/network/if-up.d/routes_mgmt"
@@ -110,9 +113,9 @@ iface #{nic[:network]} inet manual
 
     open("#{spec[:temp_dir]}/etc/udev/rules.d/70-persistent-net.rules", 'w') do |f|
       spec.interfaces.each do |nic|
-        f.puts %[
+        f.puts %(
 SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="#{nic[:mac]}", ATTR{type}=="1", NAME="#{nic[:network]}"\n
-      ]
+            )
       end
     end
   end

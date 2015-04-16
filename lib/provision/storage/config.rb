@@ -19,13 +19,9 @@ class Provision::Storage::Config
   private
 
   def order_keys(keys)
-    keys.map! do |key|
-      key.to_s
-    end
+    keys.map!(&:to_s)
     keys.sort!
-    keys.map! do |key|
-      key.to_sym
-    end
+    keys.map!(&:to_sym)
     keys
   end
 end

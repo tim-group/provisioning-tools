@@ -210,7 +210,7 @@ sun-java6-jre   shared/present-sun-dlj-v1-1     note
 
     find_kernel = `ls -c #{spec[:temp_dir]}/boot/vmlinuz-* | head -1`.chomp
     find_kernel =~ /vmlinuz-(.+)/
-    kernel_version = $1
+    kernel_version = Regexp.last_match(1)
 
     kernel = "/boot/vmlinuz-#{kernel_version}"
     initrd = "/boot/initrd.img-#{kernel_version}"

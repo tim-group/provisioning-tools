@@ -132,8 +132,8 @@ module Provision::Storage::Local
     cmd "udevadm settle"
     output = cmd "kpartx -av #{device(underscore_name)}"
     if output =~ /^add map (loop\d+)(p\d+) \(\d+:\d+\): \d+ \d+ linear \/dev\/loop\d+ \d+$/
-      mount_point_obj.set(:loopback_dev, $1)
-      mount_point_obj.set(:loopback_part, "#{$1}#{$2}")
+      mount_point_obj.set(:loopback_dev, Regexp.last_match(1))
+      mount_point_obj.set(:loopback_part, "#{Regexp.last_match(1)}#{Regexp.last_match(2)}")
     end
     sleep 1
   end
@@ -221,9 +221,7 @@ module Provision::Storage::Local
     raise Provision::Storage::StorageNotFoundError, "Source device: #{source_device} does not exist" unless File.exists?(source_device)
 
     transports = transport_string.split(',')
-    transports.map! do |t|
-      t.to_sym
-    end
+    transports.map!(&:to_sym)
 
     options = {}
     transports.each do |transport|

@@ -61,7 +61,7 @@ define "win7boot" do
     gateway = "127.0.0.1"
     spec[:routes].each do |route|
       route =~ /via (.+)$/
-      gateway = $1
+      gateway = Regexp.last_match(1)
     end
 
     dns_domain = spec[:dns_search_path].split(' ')[0]

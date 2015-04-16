@@ -49,12 +49,12 @@ describe Provision::Storage::Local do
   it 'should symbolize the value of method' do
     File.open("#{@tmpdir}/symbolize_method", 'w').write("source file contents")
     mount_point_obj = Provision::Storage::MountPoint.new('/', :size => '5G',
-                                                                :prepare => {
-                                                                  :method => 'image',
-                                                                  :options => {
-                                                                    :path => "#{@tmpdir}/symbolize_method"
-                                                                  }
-                                                                })
+                                                              :prepare => {
+                                                                :method => 'image',
+                                                                :options => {
+                                                                  :path => "#{@tmpdir}/symbolize_method"
+                                                                }
+                                                              })
     @storage_type.stub(:image_filesystem)
     @storage_type.stub(:grow_filesystem)
     @storage_type.should_receive(:image_filesystem)
@@ -63,13 +63,13 @@ describe Provision::Storage::Local do
   it 'should not resize the filesystem when resize is false' do
     File.open("#{@tmpdir}/resize_false", 'w').write("source file contents")
     mount_point_obj = Provision::Storage::MountPoint.new('/', :size => '5G',
-                                                                :prepare => {
-                                                                  :method => :image,
-                                                                  :options => {
-                                                                    :path   => "#{@tmpdir}/resize_false",
-                                                                    :resize => false
-                                                                  }
-                                                                })
+                                                              :prepare => {
+                                                                :method => :image,
+                                                                :options => {
+                                                                  :path   => "#{@tmpdir}/resize_false",
+                                                                  :resize => false
+                                                                }
+                                                              })
     @storage_type.should_not_receive(:grow_filesystem)
     @storage_type.init_filesystem('resize_false', mount_point_obj)
   end
@@ -83,13 +83,13 @@ describe Provision::Storage::Local do
   it 'should resize the filesystem when resize is true' do
     File.open("#{@tmpdir}/resize_true", 'w').write("source file contents")
     mount_point_obj = Provision::Storage::MountPoint.new('/', :size => '5G',
-                                                                :prepare => {
-                                                                  :method => :image,
-                                                                  :options => {
-                                                                    :path   => "#{@tmpdir}/resize_true",
-                                                                    :resize => true
-                                                                  }
-                                                                })
+                                                              :prepare => {
+                                                                :method => :image,
+                                                                :options => {
+                                                                  :path   => "#{@tmpdir}/resize_true",
+                                                                  :resize => true
+                                                                }
+                                                              })
     @storage_type.should_receive(:grow_filesystem)
     @storage_type.init_filesystem('resize_true', mount_point_obj)
   end
@@ -100,12 +100,12 @@ describe Provision::Storage::Local do
     end
 
     mount_point_obj = Provision::Storage::MountPoint.new('/', :size => '5G',
-                                                                :prepare => {
-                                                                  :method => :image,
-                                                                  :options => {
-                                                                    :path => "#{@tmpdir}/source"
-                                                                  }
-                                                                })
+                                                              :prepare => {
+                                                                :method => :image,
+                                                                :options => {
+                                                                  :path => "#{@tmpdir}/source"
+                                                                }
+                                                              })
     @storage_type.stub(:grow_filesystem)
     @storage_type.should_receive(:grow_filesystem).with('working', mount_point_obj)
     @storage_type.init_filesystem('working', mount_point_obj)
@@ -114,12 +114,12 @@ describe Provision::Storage::Local do
 
   it 'should download the gold image if the path is a url' do
     mount_point_obj = Provision::Storage::MountPoint.new('/', :size => '5G',
-                                                                :prepare => {
-                                                                  :method => :image,
-                                                                  :options => {
-                                                                    :path => "http://someplace/gold.img"
-                                                                  }
-                                                                })
+                                                              :prepare => {
+                                                                :method => :image,
+                                                                :options => {
+                                                                  :path => "http://someplace/gold.img"
+                                                                }
+                                                              })
     @storage_type.should_receive(:cmd).with("curl -Ss --fail http://someplace/gold.img | dd bs=1M of=#{@tmpdir}/interfoo")
     @storage_type.stub(:grow_filesystem)
     @storage_type.stub(:cmd) do |arg|
@@ -139,12 +139,12 @@ describe Provision::Storage::Local do
     @storage_type.stub(:grow_filesystem)
     FileUtils.touch "#{@tmpdir}/empty_gold.img"
     mount_point_obj = Provision::Storage::MountPoint.new('/', :size => '5G',
-                                                                :prepare => {
-                                                                  :method => :image,
-                                                                  :options => {
-                                                                    :path => "#{@tmpdir}/empty_gold.img"
-                                                                  }
-                                                                })
+                                                              :prepare => {
+                                                                :method => :image,
+                                                                :options => {
+                                                                  :path => "#{@tmpdir}/empty_gold.img"
+                                                                }
+                                                              })
     @storage_type.stub(:cmd) do |arg|
       case arg
       when "dd bs=1M if=#{@tmpdir}/empty_gold.img of=#{@tmpdir}/full"
@@ -162,12 +162,12 @@ describe Provision::Storage::Local do
   it 'complains if source image file to copy from does not exist' do
     @storage_type.stub(:grow_filesystem)
     mount_point_obj = Provision::Storage::MountPoint.new('/', :size => '5G',
-                                                                :prepare => {
-                                                                  :method => :image,
-                                                                  :options => {
-                                                                    :path => "#{@tmpdir}/non-existant-source"
-                                                                  }
-                                                                })
+                                                              :prepare => {
+                                                                :method => :image,
+                                                                :options => {
+                                                                  :path => "#{@tmpdir}/non-existant-source"
+                                                                }
+                                                              })
     expect do
       @storage_type.init_filesystem('valid_name', mount_point_obj)
     end.to raise_error("Source image file #{@tmpdir}/non-existant-source does not exist")

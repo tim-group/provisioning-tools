@@ -128,6 +128,6 @@ class Provision::WorkQueue
         end
       end
     end
-    threads.each { |thread| thread.join }
+    threads.each(&:join)
   end
 end

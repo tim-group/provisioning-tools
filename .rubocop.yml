@@ -233,3 +233,8 @@ Style/TrivialAccessors:
 # Configuration parameters: EnforcedStyle, SupportedStyles.
 Style/VariableName:
   Enabled: false
+
+# Offense count: 20
+# # Cop supports --auto-correct.
+Lint/DeprecatedClassMethods:
+  Enabled: false

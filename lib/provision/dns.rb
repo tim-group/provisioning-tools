@@ -35,7 +35,7 @@ class Provision::DNSChecker
 
     logger.info("SUCCESS: #{msg} resolved to #{addrinfo.join(' ')}")
     addrinfo
-   end
+  end
 
   def resolve_forward(hostname)
     resolve(hostname, 3)
@@ -81,7 +81,8 @@ class Provision::DNSNetwork
     all_hostnames = spec.all_hostnames_on(@name)
     ip = nil
 
-    if ip = lookup_ip_for(hostname)
+    ip = lookup_ip_for(hostname)
+    if ip
       @logger.info("No new allocation for #{hostname}, already allocated to #{ip}")
       puts "No new allocation for #{hostname}, already allocated"
       return {

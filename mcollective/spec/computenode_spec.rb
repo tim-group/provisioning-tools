@@ -15,9 +15,7 @@ describe 'provisionvm', :mcollective => true do
       response[:statuscode] == 0
     end
 
-    failure_message_for_should do |response|
-      response.pretty_inspect
-    end
+    failure_message_for_should(&:pretty_inspect)
 
     description do |response|
       "the agent returned an error"
