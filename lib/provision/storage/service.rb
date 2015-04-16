@@ -20,7 +20,7 @@ class Provision::Storage::Service
     end
   end
 
-  def prepare_storage(name, storage_spec, temp_dir)
+  def prepare_storage(name, temp_dir)
     create_storage(name)
     init_filesystems(name)
     mount_filesystems(name, temp_dir)
@@ -31,10 +31,6 @@ class Provision::Storage::Service
     unmount_filesystems(name)
     post_unmount_tasks(name)
     Provision::Storage.finished(name)
-  end
-
-  def clean_storage(name, storage_spec)
-    remove_storage(name)
   end
 
   def create_config(name, storage_spec)

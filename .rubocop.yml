@@ -3,6 +3,9 @@ AllCops:
   Exclude:
     - 'build/**/*'
 
+Style/StringLiterals:
+  Enabled: false
+
 Style/NegatedIf:
   Enabled: false
 
@@ -36,10 +39,6 @@ Style/HashSyntax:
 # versions of RuboCop, may require this file to be generated again.
 
 # Offense count: 1
-Lint/DuplicateMethods:
-  Enabled: false
-
-# Offense count: 1
 Lint/HandleExceptions:
   Enabled: false
 
@@ -49,15 +48,6 @@ Lint/ParenthesesAsGroupedExpression:
 
 # Offense count: 21
 Lint/RescueException:
-  Enabled: false
-
-# Offense count: 6
-# Cop supports --auto-correct.
-Lint/StringConversionInInterpolation:
-  Enabled: false
-
-# Offense count: 1
-Lint/UnderscorePrefixedVariableName:
   Enabled: false
 
 # Offense count: 23
@@ -217,21 +207,10 @@ Style/SignalException:
 Style/SpecialGlobalVars:
   Enabled: false
 
-# Offense count: 1169
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/StringLiterals:
-  Enabled: false
-
 # Offense count: 2
 # Cop supports --auto-correct.
 # Configuration parameters: ExactNameMatch, AllowPredicates, AllowDSLWriters, Whitelist.
 Style/TrivialAccessors:
-  Enabled: false
-
-# Offense count: 5
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/VariableName:
   Enabled: false
 
 # Offense count: 20

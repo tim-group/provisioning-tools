@@ -61,7 +61,7 @@ class Provision::Factory
     @config[:networks].each do |name, net_config|
       my_options = options.clone
       my_options.merge!(
-        net_config.reject do |key, value|
+        net_config.reject do |key, _value|
           key == :net
         end
       )

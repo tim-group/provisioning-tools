@@ -103,8 +103,8 @@ class Provision::DNSNetwork
       add_forward_lookup(ip, hostname)
     end
 
-    raise "unable to resolve forward #{hostname} -> #{ip.to_s}" unless @checker.resolve_forward(hostname).include?(ip.to_s)
-    raise "unable to resolve reverse #{ip.to_s} -> #{hostname}" unless @checker.resolve_reverse(ip.to_s).include?(hostname)
+    raise "unable to resolve forward #{hostname} -> #{ip}" unless @checker.resolve_forward(hostname).include?(ip.to_s)
+    raise "unable to resolve reverse #{ip} -> #{hostname}" unless @checker.resolve_reverse(ip.to_s).include?(hostname)
 
     {
       :netmask => @subnet_mask.to_s,

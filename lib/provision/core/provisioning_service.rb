@@ -45,7 +45,7 @@ class Provision::Core::ProvisioningService
           @logger.info("#{Time.now}: #{host}: #{spec[:hostname]}: 01b2 - storage prep (#{Time.now - start_time} secs)")
           @vm_service.define_vm(spec, storage_xml)
           @logger.info("#{Time.now}: #{host}: #{spec[:hostname]}: 01b3 - storage prep (#{Time.now - start_time} secs)")
-          @storage_service.prepare_storage(spec[:hostname], spec[:storage], spec[:temp_dir])
+          @storage_service.prepare_storage(spec[:hostname], spec[:temp_dir])
 
           # FIXME:
           # Need to get some storage things into the spec, can't do it where spec
@@ -97,7 +97,7 @@ class Provision::Core::ProvisioningService
       @image_service.remove_image(spec)
     else
       @storage_service.create_config(spec[:hostname], spec[:storage])
-      @storage_service.clean_storage(spec[:hostname], spec[:storage])
+      @storage_service.remove_storage(spec[:hostname])
     end
     @vm_service.undefine_vm(spec)
     nil

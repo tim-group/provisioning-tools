@@ -29,8 +29,8 @@ class Provision::Core::MachineSpec
   end
 
   def self.spec_for_name(fqdn)
-    _, hostname, network, fabric = /([\w-]+)\.(?:(\w+)\.)?([\w-]+)\.net\.local$/.match(fqdn).to_a
-    raise "the alleged FQDN '#{fqdn}' must look like <hostname>.[<network>.]<fabric>.net.local" unless _
+    x, hostname, network, fabric = /([\w-]+)\.(?:(\w+)\.)?([\w-]+)\.net\.local$/.match(fqdn).to_a
+    raise "the alleged FQDN '#{fqdn}' must look like <hostname>.[<network>.]<fabric>.net.local" unless x
 
     suffix = 'net.local'
     if fabric == 'local'
@@ -129,7 +129,7 @@ class Provision::Core::MachineSpec
     hostnames = [hostname_on(network)]
     # the way we do aliases is pretty feeble; these should be per-interface
     if network == :mgmt && !@spec[:aliases].nil?
-      hostnames << @spec[:aliases].collect { |a| "#{a}.#{network.to_s}.#{@spec[:domain]}" }
+      hostnames << @spec[:aliases].collect { |a| "#{a}.#{network}.#{@spec[:domain]}" }
     end
     hostnames
   end

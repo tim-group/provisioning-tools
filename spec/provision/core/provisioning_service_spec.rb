@@ -183,7 +183,7 @@ describe Provision::Core::ProvisioningService do
       @storage_service.should_receive(:create_config).with("vmx1", '/'.to_sym => { :type => "os", :size => "10G" }).ordered
       @storage_service.should_receive(:spec_to_xml).with("vmx1").ordered
       @vm_service.should_receive(:define_vm).with(kind_of(Provision::Core::MachineSpec), "some xml").ordered
-      @storage_service.should_receive(:prepare_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
+      @storage_service.should_receive(:prepare_storage).with('vmx1', '/tmp/provisioning-tools/build/vmx1').ordered
       @storage_service.should_receive(:get_host_device).with('vmx1', :/).ordered
       @storage_service.should_receive(:get_host_device_partition).with('vmx1', :/).ordered
       @image_service.should_receive(:build_image).with("ubuntuprecise", anything).ordered
@@ -205,7 +205,7 @@ describe Provision::Core::ProvisioningService do
       @storage_service.should_receive(:create_config).with("vmx1", '/'.to_sym => { :type => "os", :size => "10G" }).ordered
       @storage_service.should_receive(:spec_to_xml).with("vmx1").ordered
       @vm_service.should_receive(:define_vm).ordered
-      @storage_service.should_receive(:prepare_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
+      @storage_service.should_receive(:prepare_storage).with('vmx1', '/tmp/provisioning-tools/build/vmx1').ordered
       @storage_service.should_receive(:get_host_device).with('vmx1', :/).ordered
       @storage_service.should_receive(:get_host_device_partition).with('vmx1', :/).ordered
       @image_service.should_receive(:build_image).with("ubuntuprecise", anything).ordered
@@ -217,7 +217,7 @@ describe Provision::Core::ProvisioningService do
     it 'allows the user to clean up vms' do
       @vm_service.should_receive(:is_running).ordered
       @storage_service.should_receive(:create_config).with("vmx1", '/'.to_sym => { :type => "os", :size => "10G" }).ordered
-      @storage_service.should_receive(:clean_storage).with("vmx1", @storage_hash).ordered
+      @storage_service.should_receive(:remove_storage).with("vmx1").ordered
       @vm_service.should_receive(:undefine_vm).ordered
       @provisioning_service.clean_vm(:hostname => "vmx1", :template => "ubuntuprecise", :storage => @storage_hash)
     end
@@ -238,7 +238,7 @@ describe Provision::Core::ProvisioningService do
       @storage_service.should_receive(:create_config).with("vmx1", '/'.to_sym => { :type => "os", :size => "10G" }).ordered
       @storage_service.should_receive(:spec_to_xml).with("vmx1").ordered
       @vm_service.should_receive(:define_vm).ordered
-      @storage_service.should_receive(:prepare_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
+      @storage_service.should_receive(:prepare_storage).with('vmx1', '/tmp/provisioning-tools/build/vmx1').ordered
       @storage_service.should_receive(:get_host_device).with('vmx1', :/).ordered
       @storage_service.should_receive(:get_host_device_partition).with('vmx1', :/).ordered
       @image_service.should_receive(:build_image).with("ubuntuprecise", anything).ordered
@@ -263,7 +263,7 @@ describe Provision::Core::ProvisioningService do
       @storage_service.should_receive(:create_config).with("vmx1", '/'.to_sym => { :type => "os", :size => "10G" }).ordered
       @storage_service.should_receive(:spec_to_xml).with("vmx1").ordered
       @vm_service.should_receive(:define_vm).ordered
-      @storage_service.should_receive(:prepare_storage).with("vmx1", @storage_hash, "/tmp/provisioning-tools/build/vmx1").ordered
+      @storage_service.should_receive(:prepare_storage).with('vmx1', '/tmp/provisioning-tools/build/vmx1').ordered
       @storage_service.should_receive(:get_host_device).with('vmx1', :/).ordered
       @storage_service.should_receive(:get_host_device_partition).with('vmx1', :/).ordered
       @image_service.should_receive(:build_image).with("ubuntuprecise", anything).ordered

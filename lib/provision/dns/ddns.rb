@@ -90,10 +90,6 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     tmp_file
   end
 
-  def get_primary_nameserver
-    @primary_nameserver
-  end
-
   def try_add_reverse_lookup(ip, fqdn, all_hostnames)
     ip_rev = ip.to_s.split('.').reverse.join('.')
     tmp_file = Tempfile.new('remove_temp')
@@ -103,7 +99,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     tmp_file.puts "update add #{ip_rev}.in-addr.arpa. 86400 PTR #{fqdn}."
     tmp_file.puts "send"
     tmp_file.close
-    nsupdate(tmp_file, "Add reverse from #{ip.to_s} to #{fqdn}")
+    nsupdate(tmp_file, "Add reverse from #{ip} to #{fqdn}")
   end
 
   def exec_nsupdate(update_file)
@@ -204,6 +200,6 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     tmp_file.puts "update delete #{ip_rev}.in-addr.arpa. PTR"
     tmp_file.puts "send"
     tmp_file.close
-    nsupdate(tmp_file, "Remove reverse for #{ip.to_s}")
+    nsupdate(tmp_file, "Remove reverse for #{ip}")
   end
 end

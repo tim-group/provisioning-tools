@@ -91,17 +91,17 @@ task :package_main do
   sh "gem build provisioning-tools.gemspec && mv provisioning-tools-*.gem build/"
   sh "cp postinst.sh build/"
 
-  commandLine = "cd build",
-                "&&",
-                "fpm",
-                "-s", "gem",
-                "-t", "deb",
-                "-n", "provisioning-tools",
-                "-d", "provisioning-tools-gold-image-precise",
-                "-d", "debootstrap",
-                "provisioning-tools-*.gem"
+  command_line = "cd build",
+                 "&&",
+                 "fpm",
+                 "-s", "gem",
+                 "-t", "deb",
+                 "-n", "provisioning-tools",
+                 "-d", "provisioning-tools-gold-image-precise",
+                 "-d", "debootstrap",
+                 "provisioning-tools-*.gem"
 
-  sh commandLine.join(' ')
+  sh command_line.join(' ')
 end
 
 desc "Generate deb file for the Precise Gold image"
@@ -110,7 +110,7 @@ task :package_gold_precise do
   v_part = ENV['BUILD_NUMBER'] || "0.#{hash.hex}"
   version = "0.0.#{v_part}"
 
-  commandLine  = "fpm",
+  command_line = "fpm",
                  "-s", "dir",
                  "-t", "deb",
                  "-n", "provisioning-tools-gold-image-precise",
@@ -121,7 +121,7 @@ task :package_gold_precise do
                  "--prefix", "/var/local/images/",
                  "gold-precise"
 
-  sh commandLine.join(' ')
+  sh command_line.join(' ')
 end
 
 desc "Generate deb file for the Trusty Gold image"
@@ -130,7 +130,7 @@ task :package_gold_trusty do
   v_part = ENV['BUILD_NUMBER'] || "0.#{hash.hex}"
   version = "0.0.#{v_part}"
 
-  commandLine  = "fpm",
+  command_line = "fpm",
                  "-s", "dir",
                  "-t", "deb",
                  "-n", "provisioning-tools-gold-image-trusty",
@@ -140,7 +140,7 @@ task :package_gold_trusty do
                  "-p", "build/provisioning-tools-gold-image-trusty_#{version}.deb",
                  "--prefix", "/var/local/images/",
                  "gold-trusty"
-  sh commandLine.join(' ')
+  sh command_line.join(' ')
 end
 
 desc "Generate deb file for the MCollective agent"
@@ -150,7 +150,7 @@ task :package_agent do
   v_part = ENV['BUILD_NUMBER'] || "0.#{hash.hex}"
   version = "0.0.#{v_part}"
 
-  commandLine  = "fpm",
+  command_line = "fpm",
                  "-s", "dir",
                  "-t", "deb",
                  "-n", "provisioning-tools-mcollective-plugin",
@@ -165,9 +165,9 @@ task :package_agent do
                  "-x", "agent/*.ddl",
                  "../mcollective/agent"
 
-  sh commandLine.join(' ')
+  sh command_line.join(' ')
 
-  commandLine  = "fpm",
+  command_line = "fpm",
                  "-s", "dir",
                  "-t", "deb",
                  "-n", "provisioning-tools-mcollective-plugin-ddl",
@@ -179,7 +179,7 @@ task :package_agent do
                  "-x", "agent/*.rb",
                  "../mcollective/agent"
 
-  sh commandLine.join(' ')
+  sh command_line.join(' ')
 
   #      '-m',"youDevise <support@timgroup.com>",
   #      '--description',"TIM Account Management Report Tool (Import)",
