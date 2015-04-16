@@ -4,7 +4,7 @@ class Provision::Storage::Config
   def initialize(storage_spec)
     @mount_points = {}
     order_keys(storage_spec.keys).each do |mount_point|
-      @mount_points[mount_point] = Provision::Storage::Mount_point.new(mount_point, storage_spec[mount_point])
+      @mount_points[mount_point] = Provision::Storage::MountPoint.new(mount_point, storage_spec[mount_point])
     end
   end
 

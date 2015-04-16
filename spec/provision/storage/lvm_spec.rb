@@ -7,8 +7,8 @@ require 'provision/storage/lvm'
 describe Provision::Storage::LVM do
   before do
     @storage_type = Provision::Storage::LVM.new(:vg => 'main')
-    @mount_point_obj = Provision::Storage::Mount_point.new('/', :size => '10G')
-    @large_mount_point_obj = Provision::Storage::Mount_point.new('/', :size => '5000G')
+    @mount_point_obj = Provision::Storage::MountPoint.new('/', :size => '10G')
+    @large_mount_point_obj = Provision::Storage::MountPoint.new('/', :size => '5000G')
   end
 
   it 'creates some storage given a name and a size' do

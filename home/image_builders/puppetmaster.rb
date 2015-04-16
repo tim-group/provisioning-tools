@@ -30,17 +30,8 @@ define 'puppetmaster' do
         "  reportdir         = $vardir/reports\n" \
         "  storeconfigs      = true\n" \
         "  storeconfigs_backend = puppetdb\n" \
-        "  hostcert          = /var/lib/puppet/ssl/certs/puppet.DOMAIN.pem\n" \
-        "  hostprivkey       = /var/lib/puppet/ssl/private_keys/puppet.DOMAIN.pem\n" \
-        "  hostpubkey        = /var/lib/puppet/ssl/public_keys/puppet.DOMAIN.pem\n" \
         "  certname          = puppet.DOMAIN\n" \
-        "  dns_alt_names     = puppet.DOMAIN,HOSTNAME,puppet\n" \
-        "  node_terminus   = stacks\n" \
-        "  trusted_node_data = true\n" \
-        "  autosign        = /usr/bin/autosign.rb\n" \
-        "  environmentpath = $confdir/environments\n" \
-        "    end\n" \
-        "  }\n"
+        "  dns_alt_names     = puppet.DOMAIN,HOSTNAME,puppet"
     end
   end
 

@@ -25,7 +25,7 @@ describe Provision::Storage::Image do
 
     it 'complains if the storage to be created already exists' do
       FileUtils.touch "#{@tmpdir}/existing.img"
-      mount_point_obj = Provision::Storage::Mount_point.new('/', {})
+      mount_point_obj = Provision::Storage::MountPoint.new('/', {})
       expect do
         @storage_type.create('existing', mount_point_obj)
       end.to raise_error("Image file #{@tmpdir}/existing.img already exists")
@@ -33,7 +33,7 @@ describe Provision::Storage::Image do
 
     it 'should create an empty file' do
       device_name = "#{@tmpdir}/ok.img"
-      mount_point_obj = Provision::Storage::Mount_point.new('/', :size => '1M')
+      mount_point_obj = Provision::Storage::MountPoint.new('/', :size => '1M')
       @storage_type.create('ok', mount_point_obj)
       File.exist?(device_name).should eql true
       File.size(device_name).should eql 1_048_576 # 1M
@@ -59,7 +59,7 @@ describe Provision::Storage::Image do
       @storage_type.stub(:cmd) do |arg|
         true
       end
-      mount_point_obj = Provision::Storage::Mount_point.new('/', :size => '5G')
+      mount_point_obj = Provision::Storage::MountPoint.new('/', :size => '5G')
       @storage_type.should_receive(:cmd).with("qemu-img resize #{device_name} 5G")
       @storage_type.should_receive(:rebuild_partition).with(name, mount_point_obj)
       @storage_type.should_receive(:check_and_resize_filesystem).with(name, mount_point_obj)

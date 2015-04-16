@@ -1,4 +1,4 @@
-class Provision::Storage::Mount_point
+class Provision::Storage::MountPoint
   attr_reader :name, :config
 
   def initialize(mount_point, mount_point_spec)

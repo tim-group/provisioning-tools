@@ -214,7 +214,7 @@ class Provision::Storage::Service
   # to work from, so we have to provide all the details ourself
   def copy(name, storage_type, mount_point, transport, transport_options)
     storage = @storage_types[storage_type.to_sym]
-    mount_point_obj = Provision::Storage::Mount_point.new(mount_point, {})
+    mount_point_obj = Provision::Storage::MountPoint.new(mount_point, {})
     storage.copy_to(name, mount_point_obj, transport, transport_options)
   end
 end
