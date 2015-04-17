@@ -61,7 +61,7 @@ define 'puppetmaster' do
              "  rm -rf /etc/puppet/\n" \
              "  git clone git://git.youdevise.com/puppet.git /etc/puppet/\n" \
              "  ln -s /etc/puppet/modules/puppetmaster/files/hiera.yaml /etc/puppet/\n" \
-             "  ln -s /etc/puppet/modules/puppetmaster/files/auth.yaml /etc/puppet/\n" \
+             "  ln -s /etc/puppet/modules/puppetmaster/files/auth.conf /etc/puppet/\n" \
              "  ln -s /etc/puppet/modules/puppetmaster/files/routes.yaml /etc/puppet/\n" \
              "  puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/modules " \
                "--logdest=syslog /etc/puppet/manifests\n" \
