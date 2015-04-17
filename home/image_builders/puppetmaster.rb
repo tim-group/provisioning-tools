@@ -58,7 +58,7 @@ define 'puppetmaster' do
              "\n" \
              "echo 'mirroring puppet.git...' | logger\n" \
              "if [[ $(hostname) == dev-* || $(hostname) == ephemeral-* ]]; then\n" \
-             "  mkdir -p /etc/puppet/\n" \
+             "  rm -rf /etc/puppet/\n" \
              "  git clone git://git.youdevise.com/puppet.git /etc/puppet/\n" \
              "  ln -s /etc/puppet/modules/puppetmaster/files/hiera.yaml /etc/puppet/\n" \
              "  ln -s /etc/puppet/modules/puppetmaster/files/auth.yaml /etc/puppet/\n" \
