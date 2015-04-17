@@ -43,12 +43,19 @@ define 'puppetmaster' do
   end
 
   run('deploy puppetmaster') do
-    # * sets up puppet.git and environments/masterbranch for puppetupdate
-    # * runs puppet apply from the checked out masterbranch
-    # * runs a proper puppet agent, signs the cert for itself
-    # * XXX symlink hieradata for the puppet apply run, a better way would be to specify hieradata path as an argument
-    # XXX dev-puppetmaster currently broken, clone into /etc/puppet for it to work
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') do |f|
+      f.puts "#!/bin/bash\n" \
+             "\n" \
+             "echo 'mirroring puppet.git...' | logger\n" \
+             "if [[ $(hostname) == dev-* || $(hostname) == ephemeral-* ]]; then\n" \
+             "  test -e /etc/rc.local-dev_puppetmaster && sh /etc/rc.local-dev_puppetmaster\n" \
+             "else\n" \
+             "  test -e /etc/rc.local-prod_puppetmaster && sh /etc/rc.local-prod_puppetmaster\n" \
+             "fi\n"
+    end
+
+    # need to save puppet.conf in /tmp when removing /etc/puppet/ (git clone will fail if /etc/puppet is non-empty)
+    open("#{spec[:temp_dir]}/etc/rc.local-dev_puppetmaster", 'w') do |f|
       f.puts "#!/bin/bash\n" \
              "\n" \
              "echo 'running ntpdate...' | logger\n" \
@@ -57,35 +64,17 @@ define 'puppetmaster' do
              "/etc/init.d/ntp start | logger 2>&1\n" \
              "\n" \
              "echo 'mirroring puppet.git...' | logger\n" \
-             "if [[ $(hostname) == dev-* || $(hostname) == ephemeral-* ]]; then\n" \
-             "  rm -rf /etc/puppet/\n" \
-             "  git clone git://git.youdevise.com/puppet.git /etc/puppet/\n" \
-             "  ln -s /etc/puppet/modules/puppetmaster/files/hiera.yaml /etc/puppet/\n" \
-             "  ln -s /etc/puppet/modules/puppetmaster/files/auth.conf /etc/puppet/\n" \
-             "  ln -s /etc/puppet/modules/puppetmaster/files/routes.yaml /etc/puppet/\n" \
-             "  puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/modules " \
+             "mv /etc/puppet/puppet.conf /tmp\n" \
+             "rm -rf /etc/puppet/\n" \
+             "git clone git://git.youdevise.com/puppet.git /etc/puppet/\n" \
+             "mv /tmp/puppet.conf /etc/puppet\n" \
+             "sed -i -e \"s/HOSTNAME/\$(hostname -f)/g\" /etc/puppet/puppet.conf\n" \
+             "sed -i -e \"s/DOMAIN/\$(hostname -d)/g\" /etc/puppet/puppet.conf\n" \
+             "ln -s /etc/puppet/modules/puppetmaster/files/hiera.yaml /etc/puppet/\n" \
+             "ln -s /etc/puppet/modules/puppetmaster/files/auth.conf /etc/puppet/\n" \
+             "ln -s /etc/puppet/modules/puppetmaster/files/routes.yaml /etc/puppet/\n" \
+             "puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/modules " \
                "--logdest=syslog /etc/puppet/manifests\n" \
-             "else\n" \
-             "  git clone --mirror git://git.youdevise.com/puppet.git /etc/puppet/puppet.git\n" \
-             "  mkdir -p /etc/puppet/environments/masterbranch/\n" \
-             "  echo 'checking out the master branch...' | logger\n" \
-             "  git --git-dir=/etc/puppet/puppet.git --work-tree=/etc/puppet/environments/masterbranch/ checkout " \
-               "--detach --force master\n" \
-             "  ln -s /etc/puppet/environments/masterbranch/modules/puppetmaster/files/hiera.yaml " \
-               "/etc/puppet/hiera.yaml\n" \
-             "  ln -s /etc/puppet/environments/masterbranch/modules/puppetmaster/files/auth.conf " \
-               "/etc/puppet/auth.conf\n" \
-             "  ln -s /etc/puppet/environments/masterbranch/modules/puppetmaster/files/routes.yaml " \
-               "/etc/puppet/routes.yaml\n" \
-             "  ln -s /etc/puppet/environments/masterbranch/hieradata/ /etc/puppet/hieradata # XXX needed " \
-               "for puppet apply\n" \
-             "  sed -i -e \"s/HOSTNAME/\$(hostname -f)/g\" /etc/puppet/puppet.conf\n" \
-             "  sed -i -e \"s/DOMAIN/\$(hostname -d)/g\" /etc/puppet/puppet.conf\n" \
-             "  echo 'running puppet apply...' | logger\n" \
-             "  puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/environments/masterbranch/modules " \
-               "--logdest=syslog /etc/puppet/environments/masterbranch/manifests\n" \
-             "  rm /etc/puppet/hieradata # XXX no longer needed\n" \
-             "fi\n" \
              "/etc/init.d/apache2-puppetmaster restart 2>&1 | logger\n" \
              "\n" \
              "echo 'running puppet agent...' | logger\n" \
@@ -93,7 +82,45 @@ define 'puppetmaster' do
              "sleep 10 ; puppet cert sign $(hostname -f) 2>&1 | logger\n" \
              "\n" \
              "echo 'all done' | logger\n" \
-             "echo \"#!/bin/sh -e\n\nexit 0\" > /etc/rc.local\n" # XXX this overwrites what the sysctl module creates
+             "mv /etc/rc.local-dev_puppetmaster /etc/rc.local-dev_puppetmaster-done\n"
+    end
+
+    # * XXX symlink hieradata for the puppet apply run, a better way would be to specify hieradata path as an argument
+    open("#{spec[:temp_dir]}/etc/rc.local-prod_puppetmaster", 'w') do |f|
+      f.puts "#!/bin/bash\n" \
+             "\n" \
+             "echo 'running ntpdate...' | logger\n" \
+             "/etc/init.d/ntp stop | logger 2>&1\n" \
+             "/usr/sbin/ntpdate -s ci-1.youdevise.com | logger 2>&1\n" \
+             "/etc/init.d/ntp start | logger 2>&1\n" \
+             "\n" \
+             "git clone --mirror git://git.youdevise.com/puppet.git /etc/puppet/puppet.git\n" \
+             "mkdir -p /etc/puppet/environments/masterbranch/\n" \
+             "echo 'checking out the master branch...' | logger\n" \
+             "git --git-dir=/etc/puppet/puppet.git --work-tree=/etc/puppet/environments/masterbranch/ checkout " \
+               "--detach --force master\n" \
+             "ln -s /etc/puppet/environments/masterbranch/modules/puppetmaster/files/hiera.yaml " \
+               "/etc/puppet/hiera.yaml\n" \
+             "ln -s /etc/puppet/environments/masterbranch/modules/puppetmaster/files/auth.conf " \
+               "/etc/puppet/auth.conf\n" \
+             "ln -s /etc/puppet/environments/masterbranch/modules/puppetmaster/files/routes.yaml " \
+               "/etc/puppet/routes.yaml\n" \
+             "ln -s /etc/puppet/environments/masterbranch/hieradata/ /etc/puppet/hieradata # XXX needed " \
+               "for puppet apply\n" \
+             "sed -i -e \"s/HOSTNAME/\$(hostname -f)/g\" /etc/puppet/puppet.conf\n" \
+             "sed -i -e \"s/DOMAIN/\$(hostname -d)/g\" /etc/puppet/puppet.conf\n" \
+             "echo 'running puppet apply...' | logger\n" \
+             "puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/environments/masterbranch/modules " \
+               "--logdest=syslog /etc/puppet/environments/masterbranch/manifests\n" \
+             "rm /etc/puppet/hieradata # XXX no longer needed\n" \
+             "/etc/init.d/apache2-puppetmaster restart 2>&1 | logger\n" \
+             "\n" \
+             "echo 'running puppet agent...' | logger\n" \
+             "puppet agent --debug --verbose --waitforcert 10 --onetime 2>&1 | logger\n" \
+             "sleep 10 ; puppet cert sign $(hostname -f) 2>&1 | logger\n" \
+             "\n" \
+             "echo 'all done' | logger\n" \
+             "mv /etc/rc.local-prod_puppetmaster /etc/rc.local-prod_puppetmaster-done\n"
     end
   end
 end
