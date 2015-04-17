@@ -93,7 +93,7 @@ define 'puppetmaster' do
              "sleep 10 ; puppet cert sign $(hostname -f) 2>&1 | logger\n" \
              "\n" \
              "echo 'all done' | logger\n" \
-             "echo \"#!/bin/sh -e\n\nexit 0\" > /etc/rc.local\n"
+             "echo \"#!/bin/sh -e\n\nexit 0\" > /etc/rc.local\n" # XXX this overwrites what the sysctl module creates
     end
   end
 end
