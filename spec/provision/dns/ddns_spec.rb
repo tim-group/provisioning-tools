@@ -143,8 +143,10 @@ describe Provision::DNS::DDNS do
                             :primary_nameserver => "mars"
     )
     dns.checker = double
-    dns.checker.should_receive(:resolve_forward).with('st-testmachine-001.mgmt.st.net.local').and_return(['192.168.0.10'])
-    dns.checker.should_receive(:resolve_reverse).with('192.168.0.10').and_return(['st-testmachine-001.mgmt.st.net.local'])
+    dns.checker.should_receive(:resolve_forward).with('st-testmachine-001.mgmt.st.net.local').
+      and_return(['192.168.0.10'])
+    dns.checker.should_receive(:resolve_reverse).with('192.168.0.10').
+      and_return(['st-testmachine-001.mgmt.st.net.local'])
     ip = dns.allocate_ip_for(get_spec)
     ip[:address].to_s.should eql('192.168.0.10')
     ip[:netmask].should eql('255.255.0.0')

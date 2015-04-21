@@ -45,7 +45,8 @@ define "senode" do
     apt_install "selenium=#{selenium_version}"
     apt_install "selenium-node"
     chroot "update-rc.d selenium-node defaults"
-    chroot "sed -i'.bak' -e 's#^securerandom.source=file:/dev/urandom#securerandom.source=file:/dev/../dev/urandom#g' /etc/java-7-openjdk/security/java.security"
+    chroot "sed -i'.bak' -e 's#^securerandom.source=file:/dev/urandom#securerandom.source=file:" \
+      "/dev/../dev/urandom#g' /etc/java-7-openjdk/security/java.security"
     chroot "ln -s /usr/lib/firefox/firefox /usr/bin/firefox-bin"
   end
 

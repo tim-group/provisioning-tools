@@ -38,7 +38,8 @@ task :build_gold_precise do
   require 'pp'
 
   dest = File.dirname(__FILE__) + '/build/gold-precise'
-  result = Provision::Factory.new.create_gold_image(:spindle => dest, :hostname => "generic", :distid => "ubuntu", :distcodename => "precise")
+  result = Provision::Factory.new.create_gold_image(:spindle => dest, :hostname => "generic", :distid => "ubuntu",
+                                                    :distcodename => "precise")
   sh "chmod a+w -R build"
 end
 
@@ -51,7 +52,8 @@ task :build_gold_trusty do
   require 'pp'
 
   dest = File.dirname(__FILE__) + '/build/gold-trusty'
-  result = Provision::Factory.new.create_gold_image(:spindle => dest, :hostname => "generic", :distid => "ubuntu", :distcodename => "trusty")
+  result = Provision::Factory.new.create_gold_image(:spindle => dest, :hostname => "generic", :distid => "ubuntu",
+                                                    :distcodename => "trusty")
   sh "chmod a+w -R build"
 end
 
@@ -59,7 +61,8 @@ desc "Run puppet"
 task :run_puppet do
   sh "ssh-keygen -R $(dig dev-puppetmaster-001.dev.net.local @192.168.5.1 +short)"
   sh "chmod 600 files/id_rsa"
-  sh "ssh -o StrictHostKeyChecking=no -i files/id_rsa root@$(dig dev-puppetmaster-001.dev.net.local @192.168.5.1 +short) 'mco puppetd runall 4'"
+  sh "ssh -o StrictHostKeyChecking=no -i files/id_rsa root@$(dig dev-puppetmaster-001.dev.net.local @192.168.5.1 " \
+     "+short) 'mco puppetd runall 4'"
 end
 
 desc "Generate CTags"
@@ -196,5 +199,6 @@ task :test => [:spec, :mcollective_spec]
 
 desc "Run lint (Rubocop)"
 task :lint do
-  sh "/var/lib/gems/1.9.1/bin/rubocop --require rubocop/formatter/checkstyle_formatter --format RuboCop::Formatter::CheckstyleFormatter --out tmp/checkstyle.xml"
+  sh "/var/lib/gems/1.9.1/bin/rubocop --require rubocop/formatter/checkstyle_formatter --format " \
+     "RuboCop::Formatter::CheckstyleFormatter --out tmp/checkstyle.xml"
 end

@@ -5,7 +5,8 @@ define "ubuntu-trusty" do
   extend Provision::Image::Commands
 
   run("running debootstrap") do
-    cmd "http_proxy=http://aptproxy:3142 debootstrap --arch amd64 --exclude=resolvconf,ubuntu-minimal trusty #{spec[:temp_dir]} http://gb.archive.ubuntu.com/ubuntu"
+    cmd "http_proxy=http://aptproxy:3142 debootstrap --arch amd64 --exclude=resolvconf,ubuntu-minimal trusty " \
+      "#{spec[:temp_dir]} http://gb.archive.ubuntu.com/ubuntu"
     cmd "mkdir -p #{spec[:temp_dir]}/etc/default"
   end
 

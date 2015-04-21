@@ -114,7 +114,7 @@ iface #{nic[:network]} inet manual
     open("#{spec[:temp_dir]}/etc/udev/rules.d/70-persistent-net.rules", 'w') do |f|
       spec.interfaces.each do |nic|
         f.puts %(
-SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="#{nic[:mac]}", ATTR{type}=="1", NAME="#{nic[:network]}"\n
+SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="#{nic[:mac]}", ATTR{type}=="1", NAME="#{nic[:network]}"
             )
       end
     end

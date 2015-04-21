@@ -55,7 +55,8 @@ class Provision::DNSNetwork
     @subnet.extend(IPAddrExtensions)
     @logger = options[:logger] || Logger.new(STDERR)
     @primary_nameserver = options[:primary_nameserver] || raise("must specify a primary_nameserver")
-    @checker = options[:checker] || Provision::DNSChecker.new(:logger => @logger, :primary_nameserver => @primary_nameserver)
+    @checker = options[:checker] || Provision::DNSChecker.new(:logger => @logger,
+                                                              :primary_nameserver => @primary_nameserver)
     parts = range.split('/')
     raise(":network_range must be of the format X.X.X.X/Y") if parts.size != 2
     broadcast_mask = (IPAddr::IN4MASK >> parts[1].to_i)
@@ -166,7 +167,8 @@ class Provision::DNSNetwork
             remove_cname_lookup(fqdn, cname_fqdn)
             result.merge!(fqdn => cname_fqdn)
           else
-            raise "#{fqdn} resolves to CNAME: '#{existing_cname}', not CNAME: '#{cname_fqdn}' that was expected, not removing"
+            raise "#{fqdn} resolves to CNAME: '#{existing_cname}', not CNAME: '#{cname_fqdn}' that was expected, " \
+              "not removing"
           end
         end
       end
@@ -211,7 +213,8 @@ class Provision::DNS
       @logger.info("Trying to allocate IPs for #{spec[:hostname]} in network #{network}")
 
       unless @networks.key?(network)
-        @logger.info("Skipping IP allocation for #{spec[:hostname]} in network #{network}: no such network on this node")
+        @logger.info("Skipping IP allocation for #{spec[:hostname]} in network #{network}: no such network on " \
+          "this node")
         next
       end
 
@@ -233,7 +236,8 @@ class Provision::DNS
 
     spec.networks.each do |name|
       if !@networks.key?(name.to_sym)
-        @logger.warn "can't remove an ip on #{name} because there is no config on the compute node. Known networks #{@networks.keys.inspect}"
+        @logger.warn "can't remove an ip on #{name} because there is no config on the compute node. Known networks " \
+          "#{@networks.keys.inspect}"
         next
       end
 

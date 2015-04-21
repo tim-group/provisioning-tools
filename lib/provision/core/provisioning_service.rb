@@ -53,7 +53,8 @@ class Provision::Core::ProvisioningService
           @logger.info("#{Time.now}: #{host}: #{spec[:hostname]}: 01b4 - storage prep (#{Time.now - start_time} secs)")
           spec[:host_device] = @storage_service.get_host_device(spec[:hostname], '/'.to_sym)
           @logger.info("#{Time.now}: #{host}: #{spec[:hostname]}: 01b5 - storage prep (#{Time.now - start_time} secs)")
-          spec[:host_device_partition] = "/dev/mapper/#{@storage_service.get_host_device_partition(spec[:hostname], '/'.to_sym)}"
+          spec[:host_device_partition] = "/dev/mapper/#{@storage_service.get_host_device_partition(spec[:hostname],
+                                                                                                   '/'.to_sym)}"
           # end FIXME
 
           @logger.debug("calling build image")

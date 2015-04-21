@@ -10,7 +10,7 @@ Metrics/ParameterLists:
   Max: 8
 
 Metrics/LineLength:
-  Max: 300 # 120
+  Max: 120
 
 Metrics/BlockNesting:
   Max: 6
@@ -142,9 +142,6 @@ Style/GlobalVars:
 Style/GuardClause:
   Enabled: false
 
-# Offense count: 15
-# Configuration parameters: MaxLineLength.
-
 # Offense count: 2
 # Configuration parameters: EnforcedStyle, MinBodyLength, SupportedStyles.
 Style/Next:
@@ -182,6 +179,6 @@ Style/TrivialAccessors:
   Enabled: false
 
 # Offense count: 20
-# # Cop supports --auto-correct.
+# XXX breaks in ruby 1.9
 Lint/DeprecatedClassMethods:
   Enabled: false

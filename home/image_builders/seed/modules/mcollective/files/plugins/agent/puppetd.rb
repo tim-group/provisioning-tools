@@ -59,7 +59,8 @@ module MCollective
         raise "summary['resources'] is nil" if summary["resources"].nil?
 
         begin
-          reply[:resources] = { "failed" => 0, "changed" => 0, "total" => 0, "restarted" => 0, "out_of_sync" => 0 }.merge(summary["resources"])
+          reply[:resources] = { "failed" => 0, "changed" => 0, "total" => 0, "restarted" => 0, "out_of_sync" => 0 }.
+                              merge(summary["resources"])
 
           %w(time events changes version).each do |dat|
             reply[dat.to_sym] = summary[dat]
@@ -79,7 +80,8 @@ module MCollective
         reply[:stopped] = reply[:status] == 'stopped'  ? 1 : 0
         reply[:lastrun] = 0
         reply[:lastrun] = File.stat(@statefile).mtime.to_i if File.exists?(@statefile)
-        reply[:output]  = "Currently #{reply[:status]}; last completed run #{Time.now.to_i - reply[:lastrun]} seconds ago"
+        reply[:output]  = "Currently #{reply[:status]}; last completed run #{Time.now.to_i - reply[:lastrun]} " \
+          "seconds ago"
       end
 
       def puppet_daemon_status
@@ -121,7 +123,8 @@ module MCollective
           pid = File.read(@pidfile)
           begin
             ::Process.kill("USR1", Integer(pid))
-            reply[:output] = "Signalled daemonized puppet agent to run (process #{Integer(pid)}); " + (reply[:output] || '')
+            reply[:output] = "Signalled daemonized puppet agent to run (process #{Integer(pid)}); " +
+                             (reply[:output] || '')
           rescue Exception => e
             reply.fail "Failed to signal the puppet agent daemon (process #{pid}): #{e}"
           rescue Errno::ESRCH => e

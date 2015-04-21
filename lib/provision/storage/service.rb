@@ -10,7 +10,8 @@ class Provision::Storage::Service
     @storage_types = {}
     storage_options.each do |storage_type, settings|
       arch = settings[:arch] || raise("Storage service requires each storage type to specify the 'arch' setting")
-      options = settings[:options] || raise("Storage service requires each storage type to specify the 'options' setting")
+      options = settings[:options] || raise("Storage service requires each storage type to specify the " \
+                                            "'options' setting")
 
       require "provision/storage/#{arch.downcase}"
       instance = Provision::Storage.const_get(arch).new(options)

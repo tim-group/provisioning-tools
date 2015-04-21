@@ -33,8 +33,11 @@ describe Provision::DNS::DNSMasq do
 
   def undertest(dir, options = {})
     dnsmasq = Provision::DNS.get_backend("DNSMasq", options)
-    dnsmasq.add_network(:mgmt, "192.168.5.0/24", :min_allocation => "192.168.5.2", :max_allocation => "192.168.5.250", :hosts_file => "#{dir}/etc/hosts", :pid_file => "#{dir}/var/run/dnsmasq.pid", :checker => @checker)
-    dnsmasq.add_network(:prod, "192.168.6.0/24", :min_allocation => "192.168.6.2", :hosts_file => "#{dir}/etc/hosts", :pid_file => "#{dir}/var/run/dnsmasq.pid", :checker => @checker)
+    dnsmasq.add_network(:mgmt, "192.168.5.0/24", :min_allocation => "192.168.5.2", :max_allocation => "192.168.5.250",
+                                                 :hosts_file => "#{dir}/etc/hosts",
+                                                 :pid_file => "#{dir}/var/run/dnsmasq.pid", :checker => @checker)
+    dnsmasq.add_network(:prod, "192.168.6.0/24", :min_allocation => "192.168.6.2", :hosts_file => "#{dir}/etc/hosts",
+                                                 :pid_file => "#{dir}/var/run/dnsmasq.pid", :checker => @checker)
     dnsmasq
   end
 
@@ -151,7 +154,13 @@ describe Provision::DNS::DNSMasq do
   it 'parses wacky /etc/hosts' do
     Dir.mktmpdir do |dir|
       mksubdirs(dir)
-      File.open("#{dir}/etc/hosts", 'w') { |f| f.write "192.168.5.5\t    fnar fnar.example.com\n192.168.5.2   \t boo.example.com\tboo   \n# Example hosts file\n192.168.5.1 flib   \n" }
+      File.open("#{dir}/etc/hosts", 'w') do |f|
+        f.write \
+          "192.168.5.5\t    fnar fnar.example.com\n" \
+          "192.168.5.2   \t boo.example.com\tboo   \n" \
+          "# Example hosts file\n" \
+          "192.168.5.1 flib   \n"
+      end
       thing = undertest(dir)
       thing.hosts_by_name(:mgmt).should eql("fnar" => "192.168.5.5",
                                             "fnar.example.com" => "192.168.5.5",
@@ -181,7 +190,10 @@ describe Provision::DNS::DNSMasq do
 
       thing.allocate_ips_for(spec)
 
-      File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("\n192.168.5.2 example.mgmt.youdevise.com puppet.mgmt.youdevise.com broker.mgmt.youdevise.com\n192.168.6.2 example.youdevise.com\n") }
+      File.open("#{dir}/etc/hosts", 'r') do |f|
+        f.read.should eql("\n192.168.5.2 example.mgmt.youdevise.com puppet.mgmt.youdevise.com " \
+                          "broker.mgmt.youdevise.com\n192.168.6.2 example.youdevise.com\n")
+      end
     end
   end
 
@@ -273,7 +285,8 @@ describe Provision::DNS::DNSMasq do
         :networks => ['noexist']
       )
 
-      expect { thing.allocate_ips_for(spec1) }.to raise_exception(Exception, "No networks allocated for this machine, cannot be sane")
+      expect { thing.allocate_ips_for(spec1) }.
+        to raise_exception(Exception, "No networks allocated for this machine, cannot be sane")
 
       File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("") }
     end
@@ -311,7 +324,10 @@ describe Provision::DNS::DNSMasq do
       thing.allocate_ips_for(spec)
       thing.add_cnames_for(spec)
 
-      File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("\n192.168.5.2 example.mgmt.youdevise.com\n192.168.6.2 example.youdevise.com cname1.youdevise.com\n") }
+      File.open("#{dir}/etc/hosts", 'r') do |f|
+        f.read.should eql("\n192.168.5.2 example.mgmt.youdevise.com\n" \
+                          "192.168.6.2 example.youdevise.com cname1.youdevise.com\n")
+      end
     end
   end
 end

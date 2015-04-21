@@ -120,7 +120,8 @@ describe Provision::Storage::Local do
                                                                   :path => "http://someplace/gold.img"
                                                                 }
                                                               })
-    @storage_type.should_receive(:cmd).with("curl -Ss --fail http://someplace/gold.img | dd bs=1M of=#{@tmpdir}/interfoo")
+    @storage_type.should_receive(:cmd).with("curl -Ss --fail http://someplace/gold.img | " \
+                                            "dd bs=1M of=#{@tmpdir}/interfoo")
     @storage_type.stub(:grow_filesystem)
     @storage_type.stub(:cmd) do |arg|
       case arg
@@ -156,7 +157,8 @@ describe Provision::Storage::Local do
     end
     expect do
       @storage_type.init_filesystem('full', mount_point_obj)
-    end.to raise_error("command dd bs=1M if=#{@tmpdir}/empty_gold.img of=#{@tmpdir}/full returned a non-zero error code 1")
+    end.to raise_error("command dd bs=1M if=#{@tmpdir}/empty_gold.img of=#{@tmpdir}/full returned a non-zero " \
+                       "error code 1")
   end
 
   it 'complains if source image file to copy from does not exist' do
@@ -315,8 +317,11 @@ describe Provision::Storage::Local do
         arg
       end
       transport = 'dd_from_source,gzip,ssh_cmd,gunzip,dd_of,end_ssh_cmd'
-      transport_options = 'ssh_cmd__username:grichards,ssh_cmd__host:grichards-desktop.youdevise.com,dd_of__path:/tmp/something.img'
-      @storage_type.copy_to("test", mount_point_obj, transport, transport_options).should eql("dd if=#{@tmpdir}/test | gzip | ssh -o StrictHostKeyChecking=no grichards@grichards-desktop.youdevise.com 'gunzip | dd of=/tmp/something.img'")
+      transport_options = 'ssh_cmd__username:grichards,ssh_cmd__host:grichards-desktop.youdevise.com,' \
+                          'dd_of__path:/tmp/something.img'
+      @storage_type.copy_to("test", mount_point_obj, transport, transport_options).
+        should eql("dd if=#{@tmpdir}/test | gzip | ssh -o StrictHostKeyChecking=no " \
+                   "grichards@grichards-desktop.youdevise.com 'gunzip | dd of=/tmp/something.img'")
     end
 
     it 'blows up if a required transport option is not set' do
@@ -346,7 +351,8 @@ describe Provision::Storage::Local do
       transport_options = ''
       expect do
         @storage_type.copy_to("test", mount_point_obj, transport, transport_options)
-      end.to raise_error('transport dd_from_source does not expect any input, but previous command dd_from_source provides output')
+      end.to raise_error('transport dd_from_source does not expect any input, but previous command dd_from_source ' \
+                         'provides output')
     end
 
     it 'blows up if a transport option is provided for a transport that is not used' do
