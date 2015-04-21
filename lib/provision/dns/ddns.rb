@@ -27,13 +27,9 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     @rndc_key = options[:rndc_key] || raise("No :rndc_key supplied")
   end
 
-  def get_primary_nameserver
-    @primary_nameserver
-  end
-
   def lookup_ip_for(fqdn)
     resolver = Resolv::DNS.new(
-      :nameserver => get_primary_nameserver,
+      :nameserver => @primary_nameserver,
       :search => [],
       :ndots => 1
     )
@@ -48,7 +44,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
 
   def lookup_cname_for(fqdn)
     resolver = Resolv::DNS.new(
-      :nameserver => get_primary_nameserver,
+      :nameserver => @primary_nameserver,
       :search => [],
       :ndots => 1
     )
@@ -89,7 +85,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
   def try_add_reverse_lookup(ip, fqdn, all_hostnames)
     ip_rev = ip.to_s.split('.').reverse.join('.')
     tmp_file = Tempfile.new('remove_temp')
-    tmp_file.puts "server #{get_primary_nameserver}"
+    tmp_file.puts "server #{@primary_nameserver}"
     tmp_file.puts "zone #{reverse_zone}"
     tmp_file.puts "prereq nxdomain #{ip_rev}.in-addr.arpa"
     tmp_file.puts "update add #{ip_rev}.in-addr.arpa. 86400 PTR #{fqdn}."
@@ -150,7 +146,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
 
   def add_forward_lookup(ip, fqdn)
     tmp_file = Tempfile.new('remove_temp')
-    tmp_file.puts "server #{get_primary_nameserver}"
+    tmp_file.puts "server #{@primary_nameserver}"
     tmp_file.puts "zone #{get_zone(fqdn)}"
     tmp_file.puts "update add #{fqdn}. 86400 A #{ip}"
     tmp_file.puts "send"
@@ -160,7 +156,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
 
   def add_cname_lookup(fqdn, cname_fqdn)
     tmp_file = Tempfile.new('remove_temp')
-    tmp_file.puts "server #{get_primary_nameserver}"
+    tmp_file.puts "server #{@primary_nameserver}"
     tmp_file.puts "zone #{get_zone(fqdn)}"
     tmp_file.puts "update add #{fqdn}. 86400 CNAME #{cname_fqdn}"
     tmp_file.puts "send"
@@ -170,7 +166,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
 
   def remove_forward_lookup(fqdn)
     tmp_file = Tempfile.new('remove_temp')
-    tmp_file.puts "server #{get_primary_nameserver}"
+    tmp_file.puts "server #{@primary_nameserver}"
     tmp_file.puts "zone #{get_zone(fqdn)}"
     tmp_file.puts "update delete #{fqdn}. A"
     tmp_file.puts "send"
@@ -180,7 +176,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
 
   def remove_cname_lookup(fqdn, cname_fqdn)
     tmp_file = Tempfile.new('remove_temp')
-    tmp_file.puts "server #{get_primary_nameserver}"
+    tmp_file.puts "server #{@primary_nameserver}"
     tmp_file.puts "zone #{get_zone(fqdn)}"
     tmp_file.puts "update delete #{fqdn}. CNAME"
     tmp_file.puts "send"
@@ -191,7 +187,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
   def remove_reverse_lookup(ip)
     ip_rev = ip.to_s.split('.').reverse.join('.')
     tmp_file = Tempfile.new('remove_temp')
-    tmp_file.puts "server #{get_primary_nameserver}"
+    tmp_file.puts "server #{@primary_nameserver}"
     tmp_file.puts "zone #{reverse_zone}"
     tmp_file.puts "update delete #{ip_rev}.in-addr.arpa. PTR"
     tmp_file.puts "send"

@@ -172,12 +172,6 @@ Style/SignalException:
 Style/SpecialGlobalVars:
   Enabled: false
 
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: ExactNameMatch, AllowPredicates, AllowDSLWriters, Whitelist.
-Style/TrivialAccessors:
-  Enabled: false
-
 # Offense count: 20
 # XXX breaks in ruby 1.9
 Lint/DeprecatedClassMethods:
