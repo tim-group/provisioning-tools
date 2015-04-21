@@ -5,26 +5,16 @@ require 'provision/storage'
 require 'provision/storage/service'
 
 describe Provision::Storage::Service do
-  class ExtendedStorageService < Provision::Storage::Service
-    def get_storage_types
-      @storage_types
-    end
-  end
-
   describe 'common' do
     before do
       @settings = {
         :os => {
           :arch    => 'LVM',
-          :options => {
-            :vg => 'main'
-          }
+          :options => { :vg => 'main' }
         },
         :data => {
           :arch    => 'LVM',
-          :options => {
-            :vg => 'data'
-          }
+          :options => { :vg => 'data' }
         }
       }
 
@@ -36,15 +26,11 @@ describe Provision::Storage::Service do
       @settings = {
         :os => {
           :arch    => 'LVM',
-          :options => {
-            :vg => 'main'
-          }
+          :options => { :vg => 'main' }
         },
         :data => {
           :arch    => 'LVM',
-          :options => {
-            :vg => 'data'
-          }
+          :options => { :vg => 'data' }
         }
       }
 
