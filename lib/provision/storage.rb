@@ -40,7 +40,7 @@ class Provision::Storage
     unless task_hash[:cleanup].nil?
       @@logger.debug("Cleanup task with identifier #{identifier} nil?: #{@@cleanup_tasks[name][identifier].nil?}")
       @@logger.debug("Cleanup task with identifer #{identifier} contains: #{@@cleanup_tasks[name][identifier]}")
-      raise "Tried to add cleanup task for host '#{name}' with identifier '#{identifier}' as it already exists" \
+      fail "Tried to add cleanup task for host '#{name}' with identifier '#{identifier}' as it already exists" \
         unless @@cleanup_tasks[name][identifier].nil?
       @@logger.debug("adding cleanup task for '#{name}' with identifier '#{identifier}'")
       @@cleanup_tasks[name][identifier] = task_hash[:cleanup]

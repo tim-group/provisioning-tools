@@ -29,7 +29,7 @@ class Provision::WorkQueue
   end
 
   def launch_all(specs)
-    raise "an array of machine specifications is expected" unless specs.kind_of?(Array)
+    fail "an array of machine specifications is expected" unless specs.kind_of?(Array)
     specs.each do |spec|
       launch(spec)
     end
@@ -37,7 +37,7 @@ class Provision::WorkQueue
   end
 
   def destroy_all(specs)
-    raise "an array of machine specifications is expected" unless specs.kind_of?(Array)
+    fail "an array of machine specifications is expected" unless specs.kind_of?(Array)
     specs.each do |spec|
       destroy(spec)
     end
@@ -45,7 +45,7 @@ class Provision::WorkQueue
   end
 
   def allocate_ip_all(specs)
-    raise "an array of machine specifications is expected" unless specs.kind_of?(Array)
+    fail "an array of machine specifications is expected" unless specs.kind_of?(Array)
     specs.each do |spec|
       allocate_ip(spec)
     end
@@ -53,7 +53,7 @@ class Provision::WorkQueue
   end
 
   def free_ip_all(specs)
-    raise "an array of machine specifications is expected" unless specs.kind_of?(Array)
+    fail "an array of machine specifications is expected" unless specs.kind_of?(Array)
     specs.each do |spec|
       free_ip(spec)
     end

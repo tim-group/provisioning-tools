@@ -14,8 +14,8 @@ class MockProvision < Provision::DNS::DDNSNetwork
 
   def initialize(name, net, options = {})
     super(name, net, options)
-    @nsupdate_replies = options[:nsupdate_replies] || raise("Need :nsupdate_replies")
-    @lookup_table = options[:lookup_table] || raise("Need :lookup_table")
+    @nsupdate_replies = options[:nsupdate_replies] || fail("Need :nsupdate_replies")
+    @lookup_table = options[:lookup_table] || fail("Need :lookup_table")
     @update_files = []
   end
 

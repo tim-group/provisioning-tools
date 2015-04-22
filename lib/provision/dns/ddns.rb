@@ -23,8 +23,8 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     super(name, range, options)
     @debug = false
     parts = range.split('/')
-    raise(":network_range must be of the format X.X.X.X/Y") if parts.size != 2
-    @rndc_key = options[:rndc_key] || raise("No :rndc_key supplied")
+    fail(":network_range must be of the format X.X.X.X/Y") if parts.size != 2
+    @rndc_key = options[:rndc_key] || fail("No :rndc_key supplied")
   end
 
   def lookup_ip_for(fqdn)
@@ -118,14 +118,14 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     when /update failed: YXDOMAIN/
       return false
     when /update failed: NOTAUTH\(BADKEY\)/
-      raise(Provision::DNS::DDNS::Exception::BadKey.new(failure))
+      fail(Provision::DNS::DDNS::Exception::BadKey.new(failure))
     when /Communication with server failed: timed out/
-      raise(Provision::DNS::DDNS::Exception::Timeout.new(failure))
+      fail(Provision::DNS::DDNS::Exception::Timeout.new(failure))
     when /^$/
       puts "SUCCESS: #{txt}"
       return true
     else
-      raise(Provision::DNS::DDNS::Exception::UnknownError.new(failure))
+      fail(Provision::DNS::DDNS::Exception::UnknownError.new(failure))
     end
   end
 

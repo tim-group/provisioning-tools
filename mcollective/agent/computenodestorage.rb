@@ -11,7 +11,7 @@ module MCollective
         f = open("|vgdisplay #{volume_group} --units K")
         f.readlines.each do |line|
           if line.match(/Volume group "${volume_group}" not found/)
-            raise line
+            fail line
           elsif line.match(/VG\s+Size/)
             total = line.match(/[\d.]+/).to_s
           elsif line.match(/Alloc\s+PE/)
@@ -30,7 +30,7 @@ module MCollective
         name = ''
         f.readlines.each do |line|
           if line.match(/Volume group "${volume_group}" not found/)
-            raise line
+            fail line
           elsif line.match(/LV\s+Name/)
             name = line.match(/LV\s+Name\s+\/\w+\/\w+\/(.+)/).captures.first.to_s
           elsif line.match(/LV\s+Size/)
@@ -43,7 +43,7 @@ module MCollective
       end
 
       def df_for_image_path(image_path)
-        raise "Image path #{image_path} does not exist" unless File.directory?(image_path)
+        fail "Image path #{image_path} does not exist" unless File.directory?(image_path)
         f = open("|df #{image_path}")
         line = f.readlines[1]
         match_data = line.match(/(.+)\s+(\d+)\s+(\d+)\s+(\d+)\s+\d+%\s+.+/).to_a
@@ -54,7 +54,7 @@ module MCollective
       end
 
       def du_for_image(image)
-        raise "Image #{image} does not exist" unless File.exists?(image)
+        fail "Image #{image} does not exist" unless File.exists?(image)
         f = open("|du --apparent-size #{image}")
         line = f.readlines.first
         size = line.match(/^(\d+).+img$/).captures.first
@@ -73,10 +73,10 @@ module MCollective
 
       action "details" do
         config = YAML.load_file('/etc/provision/config.yaml')
-        raise "Un-supported host vm_storage_type is #{config['vm_storage_type']}" \
+        fail "Un-supported host vm_storage_type is #{config['vm_storage_type']}" \
           unless config['vm_storage_type'] == 'new'
         storage = config['storage']
-        raise "Storage key was not found in config.yaml" if storage.nil?
+        fail "Storage key was not found in config.yaml" if storage.nil?
         storage.keys.sort.each do |storage_type|
           storage_type_arch = storage[storage_type]['arch']
           case storage_type_arch
@@ -90,7 +90,7 @@ module MCollective
             reply[storage_type][:existing_storage] =
               get_images_for_image_path(storage[storage_type]['options']['image_path'])
           else
-            raise "Unsure how to deal with architecture: #{arch}"
+            fail "Unsure how to deal with architecture: #{arch}"
           end
         end
       end

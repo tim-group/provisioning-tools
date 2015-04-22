@@ -23,7 +23,7 @@ module Provision::Image::Catalogue
   def call_define(name, build)
     closure = @@catalogue[name]
 
-    raise NameError.new(name) if closure.nil?
+    fail NameError.new(name) if closure.nil?
 
     build.instance_eval(&closure)
     build
@@ -32,7 +32,7 @@ module Provision::Image::Catalogue
   def build(name, options, config)
     build = Provision::Image::Build.new(name, options, config)
     closure = @@catalogue[name]
-    raise "attempt to execute a template that is not in the catalogue: #{name}" if closure.nil?
+    fail "attempt to execute a template that is not in the catalogue: #{name}" if closure.nil?
     build.instance_eval(&closure)
     build
   end

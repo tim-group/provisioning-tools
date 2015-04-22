@@ -15,14 +15,14 @@ define "grow" do
     when 'lvm'
       vm_disk_location = "/dev/#{spec[:lvm_vg]}/#{spec[:hostname]}"
       if File.exists?(vm_disk_location)
-        raise "Logical volume '#{vm_disk_location}' already exists!"
+        fail "Logical volume '#{vm_disk_location}' already exists!"
       end
       cmd "lvcreate -n #{spec[:hostname]} -L #{spec[:image_size]} #{spec[:lvm_vg]}"
       cmd "dd if=#{spec[:images_dir]}/gold/generic.img of=/dev/#{spec[:lvm_vg]}/#{spec[:hostname]}"
     when 'new'
       # do nothing
     else
-      raise "provisioning tools does not know about vm_storage_type '#{config[:vm_storage_type]}'"
+      fail "provisioning tools does not know about vm_storage_type '#{config[:vm_storage_type]}'"
     end
 
     if config[:vm_storage_type] != 'new'
@@ -55,7 +55,7 @@ define "grow" do
     when 'new'
       # do nothing
     else
-      raise "provisioning tools does not know about vm_storage_type '#{config[:vm_storage_type]}'"
+      fail "provisioning tools does not know about vm_storage_type '#{config[:vm_storage_type]}'"
     end
   end
 end

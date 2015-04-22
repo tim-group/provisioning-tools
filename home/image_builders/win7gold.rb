@@ -34,7 +34,7 @@ define "win7gold" do
   when "new"
     # do nothing
   else
-    raise "Unsure how to build xpgold with vm_storage_type of #{config[:vm_storage_type]}"
+    fail "Unsure how to build xpgold with vm_storage_type of #{config[:vm_storage_type]}"
   end
 
   run("install sysprep") do

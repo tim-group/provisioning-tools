@@ -37,10 +37,10 @@ The ACTION can be one of the following:
       configuration[:concurrency] = ARGV.shift.to_i || 0
 
       unless configuration[:command].match(/^(enable|disable|runonce|runall|status|summary|count)$/)
-        raise "Action must be enable, disable, runonce, runonce, runall, status, summary, or count"
+        fail "Action must be enable, disable, runonce, runonce, runall, status, summary, or count"
       end
     else
-      raise "Please specify an action."
+      fail "Please specify an action."
     end
   end
 

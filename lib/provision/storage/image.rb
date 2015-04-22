@@ -4,7 +4,7 @@ class Provision::Storage::Image < Provision::Storage
   include Provision::Storage::Local
 
   def initialize(options)
-    raise "Image storage requires a path as an option, named path" if options[:image_path].nil?
+    fail "Image storage requires a path as an option, named path" if options[:image_path].nil?
     @image_path = options[:image_path]
     super(options)
   end
@@ -12,7 +12,7 @@ class Provision::Storage::Image < Provision::Storage
   def create(name, mount_point_obj)
     underscore_name = underscore_name(name, mount_point_obj.name)
     size = mount_point_obj.config[:size]
-    raise "Image file #{device(underscore_name)} already exists" if File.exist?("#{device(underscore_name)}")
+    fail "Image file #{device(underscore_name)} already exists" if File.exist?("#{device(underscore_name)}")
     run_task(name, "create #{underscore_name}",                :task => lambda do
       cmd "qemu-img create #{device(underscore_name)} #{size}"
     end,

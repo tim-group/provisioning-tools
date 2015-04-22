@@ -7,11 +7,11 @@ require 'provision/core/machine_spec'
 
 class Provision::Core::ProvisioningService
   def initialize(options)
-    @vm_service = options[:vm_service] || raise("No :vm_service option passed")
+    @vm_service = options[:vm_service] || fail("No :vm_service option passed")
     # FIXME: When old vm_storage_type's go away, uncomment this..
     @storage_service = options[:storage_service] # || raise("No :storage_service option passed")
-    @image_service = options[:image_service] || raise("No :image_service option passed")
-    @numbering_service = options[:numbering_service] || raise("No :numbering_service option passed")
+    @image_service = options[:image_service] || fail("No :image_service option passed")
+    @numbering_service = options[:numbering_service] || fail("No :numbering_service option passed")
     @machinespec_defaults = options[:defaults] || { :enc => { :classes => {} } }
     @logger = options[:logger] || Logger.new(STDERR)
   end
@@ -85,7 +85,7 @@ class Provision::Core::ProvisioningService
       @logger.info("#{Time.now}: #{host}: #{spec[:hostname]}: 04 - end provision (#{Time.now - start_time} secs)")
       true
     else
-      raise "failed to launch #{spec_hash[:hostname]} already exists"
+      fail "failed to launch #{spec_hash[:hostname]} already exists"
     end
   end
 

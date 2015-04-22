@@ -9,8 +9,8 @@ class Provision::Storage::Service
   def initialize(storage_options)
     @storage_types = {}
     storage_options.each do |storage_type, settings|
-      arch = settings[:arch] || raise("Storage service requires each storage type to specify the 'arch' setting")
-      options = settings[:options] || raise("Storage service requires each storage type to specify the " \
+      arch = settings[:arch] || fail("Storage service requires each storage type to specify the 'arch' setting")
+      options = settings[:options] || fail("Storage service requires each storage type to specify the " \
                                             "'options' setting")
 
       require "provision/storage/#{arch.downcase}"
@@ -71,7 +71,7 @@ class Provision::Storage::Service
       mount_point_obj = get_mount_point(name, mount_point)
       type = mount_point_obj.config[:type].to_sym
       persistent = mount_point_obj.config[:persistent]
-      raise 'Persistent options not found' unless mount_point_obj.config.key?(:persistence_options)
+      fail 'Persistent options not found' unless mount_point_obj.config.key?(:persistence_options)
       storage = get_storage(type)
       if persistent
         storage.check_persistent_storage(name, mount_point_obj)

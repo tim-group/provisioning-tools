@@ -23,7 +23,7 @@ describe XYZ do
     end
 
     def die(args = nil)
-      raise "I was asked to die"
+      fail "I was asked to die"
     end
 
     def returns_something
@@ -291,7 +291,7 @@ describe XYZ do
       extend Provision::Image::Commands
       extend MockFunctions
       run("configure defaults") do
-        raise "an error"
+        fail "an error"
       end
       on_error do
         something = "I was executed"

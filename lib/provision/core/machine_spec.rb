@@ -30,7 +30,7 @@ class Provision::Core::MachineSpec
 
   def self.spec_for_name(fqdn)
     x, hostname, network, fabric = /([\w-]+)\.(?:(\w+)\.)?([\w-]+)\.net\.local$/.match(fqdn).to_a
-    raise "the alleged FQDN '#{fqdn}' must look like <hostname>.[<network>.]<fabric>.net.local" unless x
+    fail "the alleged FQDN '#{fqdn}' must look like <hostname>.[<network>.]<fabric>.net.local" unless x
 
     suffix = 'net.local'
     if fabric == 'local'
@@ -118,7 +118,7 @@ class Provision::Core::MachineSpec
   end
 
   def hostname_on(network)
-    @spec[:qualified_hostnames][network] || raise("unknown network #{network}")
+    @spec[:qualified_hostnames][network] || fail("unknown network #{network}")
   end
 
   def domain_on(network)
@@ -136,8 +136,8 @@ class Provision::Core::MachineSpec
 
   def mac(fqdn = @spec[:fqdn])
     host = Socket.gethostname
-    raise 'a fully-qualified domain name must be a string' unless fqdn.is_a?(String)
-    raise 'a fully-qualified domain name cannot be an empty string' if fqdn.empty?
+    fail 'a fully-qualified domain name must be a string' unless fqdn.is_a?(String)
+    fail 'a fully-qualified domain name cannot be an empty string' if fqdn.empty?
     sha1 = Digest::SHA1.new
     bytes = sha1.digest(fqdn + host)
     sprintf("52:54:00:%s", bytes.unpack('H2x9H2x8H2').join(':'))

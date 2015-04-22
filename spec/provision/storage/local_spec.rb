@@ -149,7 +149,7 @@ describe Provision::Storage::Local do
     @storage_type.stub(:cmd) do |arg|
       case arg
       when "dd bs=1M if=#{@tmpdir}/empty_gold.img of=#{@tmpdir}/full"
-        raise "command dd bs=1M if=#{@tmpdir}/empty_gold.img of=#{@tmpdir}/full returned a non-zero error code 1"
+        fail "command dd bs=1M if=#{@tmpdir}/empty_gold.img of=#{@tmpdir}/full returned a non-zero error code 1"
       when "kpartx -d #{@tmpdir}/full"
         true
       end
@@ -190,7 +190,7 @@ describe Provision::Storage::Local do
     @storage_type.stub(:cmd) do |arg|
       case arg
       when "parted -s #{device_name} mkpart primary ext4 2048s 100%"
-        raise "fail"
+        fail "fail"
       end
     end
     @storage_type.should_receive(:cmd).with("parted -s #{device_name} rm 1")
@@ -226,7 +226,7 @@ describe Provision::Storage::Local do
     @storage_type.stub(:cmd) do |arg|
       case arg
       when "e2fsck -f -p /dev/mapper/#{partition_name}"
-        raise "fail"
+        fail "fail"
       else
         true
       end

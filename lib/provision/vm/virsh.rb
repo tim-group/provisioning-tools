@@ -9,7 +9,7 @@ class Provision::VM::Virsh
   end
 
   def safe_system(cli)
-    raise("Failed to run: #{cli}") if system(cli) != true
+    fail("Failed to run: #{cli}") if system(cli) != true
   end
 
   def is_defined(spec)
@@ -27,17 +27,17 @@ class Provision::VM::Virsh
   end
 
   def undefine_vm(spec)
-    raise 'VM marked as non-destroyable' if spec[:disallow_destroy]
+    fail 'VM marked as non-destroyable' if spec[:disallow_destroy]
     safe_system("virsh undefine #{spec[:hostname]} > /dev/null 2>&1")
   end
 
   def destroy_vm(spec)
-    raise 'VM marked as non-destroyable' if spec[:disallow_destroy]
+    fail 'VM marked as non-destroyable' if spec[:disallow_destroy]
     safe_system("virsh destroy #{spec[:hostname]} > /dev/null 2>&1")
   end
 
   def shutdown_vm(spec)
-    raise 'VM marked as non-destroyable' if spec[:disallow_destroy]
+    fail 'VM marked as non-destroyable' if spec[:disallow_destroy]
     safe_system("virsh shutdown #{spec[:hostname]} > /dev/null 2>&1")
   end
 
@@ -61,7 +61,7 @@ class Provision::VM::Virsh
       sleep 1
     end
 
-    raise "giving up waiting for #{spec[:hostname]} to shutdown"
+    fail "giving up waiting for #{spec[:hostname]} to shutdown"
   end
 
   def write_virsh_xml(spec, storage_xml = nil)

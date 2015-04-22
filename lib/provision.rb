@@ -38,7 +38,7 @@ class Provision::Config
     missing_keys = required_config_keys
     missing_keys << :storage if config[:vm_storage_type] == 'new'
     missing_keys -= config.keys
-    raise "#{@configfile} has missing properties (#{missing_keys.join(', ')})" unless missing_keys.empty?
+    fail "#{@configfile} has missing properties (#{missing_keys.join(', ')})" unless missing_keys.empty?
 
     config
   end

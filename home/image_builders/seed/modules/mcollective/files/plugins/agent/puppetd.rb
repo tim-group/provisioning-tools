@@ -56,7 +56,7 @@ module MCollective
           sleep 4
         end
 
-        raise "summary['resources'] is nil" if summary["resources"].nil?
+        fail "summary['resources'] is nil" if summary["resources"].nil?
 
         begin
           reply[:resources] = { "failed" => 0, "changed" => 0, "total" => 0, "restarted" => 0, "out_of_sync" => 0 }.

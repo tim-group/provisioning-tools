@@ -161,12 +161,6 @@ Style/RaiseArgs:
 Style/RegexpLiteral:
   MaxSlashes: 3
 
-# Offense count: 102
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-Style/SignalException:
-  Enabled: false
-
 # Offense count: 6
 # Cop supports --auto-correct.
 Style/SpecialGlobalVars:

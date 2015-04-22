@@ -15,7 +15,7 @@ module Provision::Storage::Local
     when :format
       format_filesystem(name, mount_point_obj)
     else
-      raise "unsure how to init storage using method '#{method}'"
+      fail "unsure how to init storage using method '#{method}'"
     end
   end
 
@@ -26,12 +26,12 @@ module Provision::Storage::Local
     run_task(name, "image #{underscore_name}", :task => lambda do
       case image_file_path
       when /^\/.*/
-        raise "Source image file #{image_file_path} does not exist" if !File.exist?(image_file_path)
+        fail "Source image file #{image_file_path} does not exist" if !File.exist?(image_file_path)
         cmd "dd bs=1M if=#{image_file_path} of=#{device(underscore_name)}"
       when /^https?:\/\//
         cmd "curl -Ss --fail #{image_file_path} | dd bs=1M of=#{device(underscore_name)}"
       else
-        raise "Not sure how to deal with image_file_path: '#{image_file_path}'"
+        fail "Not sure how to deal with image_file_path: '#{image_file_path}'"
       end
     end)
   end
@@ -99,7 +99,7 @@ module Provision::Storage::Local
     if !File.exist?("#{device(underscore_name)}")
       case persistence_options[:on_storage_not_found]
       when :raise_error
-        raise "Persistent storage was not found for #{device(underscore_name)}"
+        fail "Persistent storage was not found for #{device(underscore_name)}"
       when :create_new
         create(name, mount_point_obj)
         mount_point_obj.set(:newly_created, true)
@@ -126,7 +126,7 @@ module Provision::Storage::Local
       when false
         # no action
       else
-        raise "unsure how to deal with resize option: #{resize}"
+        fail "unsure how to deal with resize option: #{resize}"
       end
     end)
 
@@ -226,7 +226,7 @@ module Provision::Storage::Local
 
   def copy_to(name, mount_point_obj, transport_string, transport_options)
     source_device = device(underscore_name(name, mount_point_obj.name))
-    raise Provision::Storage::StorageNotFoundError, "Source device: #{source_device} does not exist" \
+    fail Provision::Storage::StorageNotFoundError, "Source device: #{source_device} does not exist" \
       unless File.exists?(source_device)
 
     transports = transport_string.split(',')
@@ -241,7 +241,7 @@ module Provision::Storage::Local
     split_opts.each do |opt|
       temp_key, value = opt.split(':')
       transport, option = temp_key.split('__', 2)
-      raise "option: #{option} for unused transport: #{transport} provided" if options[transport.to_sym].nil?
+      fail "option: #{option} for unused transport: #{transport} provided" if options[transport.to_sym].nil?
       options[transport.to_sym][option.to_sym] = value
     end
 
@@ -253,48 +253,48 @@ module Provision::Storage::Local
       t_options = options[transport]
       case transport
       when :dd_from_source
-        raise "transport #{transport} does not expect any input, but previous command #{last_cmd} provides output" \
+        fail "transport #{transport} does not expect any input, but previous command #{last_cmd} provides output" \
           if last_cmd_provides_output == true || last_cmd == :ssh_cmd
         copy_cmd = "#{copy_cmd}dd if=#{source_device}"
         last_cmd_provides_output = true
       when :dd_of
-        raise "transport #{transport} expects input, but previous command #{last_cmd} provides no output" \
+        fail "transport #{transport} expects input, but previous command #{last_cmd} provides no output" \
           if last_cmd_provides_output == false && last_cmd != :ssh_cmd
         copy_cmd = "#{copy_cmd} | " if last_cmd_provides_output == true
         [:path].each do |opt|
-          raise "transport #{transport} requires option #{opt}" if t_options[opt].nil?
+          fail "transport #{transport} requires option #{opt}" if t_options[opt].nil?
         end
         copy_cmd = "#{copy_cmd}dd of=#{t_options[:path]}"
         last_cmd_provides_output = false
       when :gzip
-        raise "transport #{transport} expects input, but previous command #{last_cmd} provides no output" \
+        fail "transport #{transport} expects input, but previous command #{last_cmd} provides no output" \
           if last_cmd_provides_output == false && last_cmd != :ssh_cmd
         copy_cmd = "#{copy_cmd} | " if last_cmd_provides_output == true
         copy_cmd = "#{copy_cmd}gzip"
         last_cmd_provides_output = true
       when :gunzip
-        raise "transport gunzip expects input, but previous command #{last_cmd} provides no output" \
+        fail "transport gunzip expects input, but previous command #{last_cmd} provides no output" \
           if last_cmd_provides_output == false && last_cmd != :ssh_cmd
         copy_cmd = "#{copy_cmd} | " if last_cmd_provides_output == true
         copy_cmd = "#{copy_cmd}gunzip"
         last_cmd_provides_output = true
       when :ssh_cmd
-        raise "transport #{transport} expects input, but previous command #{last_cmd} provides no output" \
+        fail "transport #{transport} expects input, but previous command #{last_cmd} provides no output" \
           if last_cmd_provides_output == false
         [:host, :username].each do |opt|
-          raise "transport #{transport} requires option #{opt}" if t_options[opt].nil?
+          fail "transport #{transport} requires option #{opt}" if t_options[opt].nil?
         end
         copy_cmd = "#{copy_cmd} | ssh"
         copy_cmd = "#{copy_cmd} -i #{t_options[:key]}" if t_options[:key]
         copy_cmd = "#{copy_cmd} -o StrictHostKeyChecking=no #{t_options[:username]}@#{t_options[:host]} '"
         last_cmd_provides_output = false
       when :end_ssh_cmd
-        raise "transport #{transport} does not expect any input, but previous command #{last_cmd} provides output" \
+        fail "transport #{transport} does not expect any input, but previous command #{last_cmd} provides output" \
           if last_cmd_provides_output == true || last_cmd == :ssh_cmd
         copy_cmd = "#{copy_cmd}'"
         last_cmd_provides_output = false
       else
-        raise "Unknown transport: #{transport}"
+        fail "Unknown transport: #{transport}"
       end
       last_cmd = transport
     end

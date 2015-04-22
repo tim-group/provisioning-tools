@@ -4,7 +4,7 @@ class Provision::Storage::LVM < Provision::Storage
   include Provision::Storage::Local
 
   def initialize(options)
-    raise "LVM storage requires a volume group as an option, named vg" if options[:vg].nil?
+    fail "LVM storage requires a volume group as an option, named vg" if options[:vg].nil?
     super(options)
   end
 
@@ -12,7 +12,7 @@ class Provision::Storage::LVM < Provision::Storage
     underscore_name = underscore_name(name, mount_point_obj.name)
     size = mount_point_obj.config[:size]
     if File.exists?("#{device(underscore_name)}")
-      raise "Logical volume #{underscore_name} already exists in volume group #{@options[:vg]}"
+      fail "Logical volume #{underscore_name} already exists in volume group #{@options[:vg]}"
     end
     run_task(name, "create #{underscore_name}",                :task => lambda do
       cmd "lvcreate -n #{underscore_name} -L #{size} #{@options[:vg]}"
@@ -54,9 +54,9 @@ class Provision::Storage::LVM < Provision::Storage
       return output unless File.exists?(device(underscore_name))
     end
     if exception.nil?
-      raise "Tried to lvremove but failed 100 times and didn't raise an exception!?"
+      fail "Tried to lvremove but failed 100 times and didn't raise an exception!?"
     else
-      raise exception
+      fail exception
     end
   end
 
@@ -64,7 +64,7 @@ class Provision::Storage::LVM < Provision::Storage
     underscore_name = underscore_name(name, mount_point_obj.name)
     vm_partition_name = cmd "kpartx -l #{device(underscore_name)} | grep -v 'loop deleted : /dev/loop' | " \
       "awk '{ print $1 }' | tail -1"
-    raise "unable to work out vm_partition_name" if vm_partition_name.nil?
+    fail "unable to work out vm_partition_name" if vm_partition_name.nil?
     vm_partition_name
   end
 end

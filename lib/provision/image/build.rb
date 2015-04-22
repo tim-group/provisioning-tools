@@ -58,7 +58,7 @@ class Provision::Image::Build
         ensure
           if error
             summary_log.info("[\e[0;31mFAILED\e[0m]\n")
-            raise error
+            fail error
           else
             elapsed_time = Time.now - start
             summary_log.info("[\e[0;32mDONE in #{elapsed_time * 1000} ms\e[0m]\n")
@@ -90,7 +90,7 @@ class Provision::Image::Build
     end
     summary_log.info("[\e[0;32mDONE\e[0m]\n")
 
-    raise error if !error.nil?
+    fail error if !error.nil?
   end
 
   def summary_log

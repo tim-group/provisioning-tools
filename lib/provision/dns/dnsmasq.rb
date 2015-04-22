@@ -72,7 +72,7 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
           temp_file.unlink
         end
       else
-        raise "Unable to add CNAME for '#{fqdn}' as CNAME: '#{cname_fqdn}' does not have an IP address associated " \
+        fail "Unable to add CNAME for '#{fqdn}' as CNAME: '#{cname_fqdn}' does not have an IP address associated " \
           "with it"
       end
     end
@@ -104,7 +104,7 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
           temp_file.unlink
         end
       else
-        raise "Unable to add CNAME for '#{fqdn}' as CNAME: '#{cname_fqdn}' does not have an IP address associated " \
+        fail "Unable to add CNAME for '#{fqdn}' as CNAME: '#{cname_fqdn}' does not have an IP address associated " \
           "with it"
       end
     end

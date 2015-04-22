@@ -37,7 +37,7 @@ describe Provision::Storage::LVM do
     @storage_type.stub(:cmd) do |arg|
       case arg
       when 'lvcreate -n working -L 5000G main'
-        raise "command lvcreate -n existing -L 5000G main returned non-zero error code 5"
+        fail "command lvcreate -n existing -L 5000G main returned non-zero error code 5"
       end
     end
     expect do
@@ -58,7 +58,7 @@ describe Provision::Storage::LVM do
   it 'runs lvremove over and over when trying to remove a VMs storage if removing the storage fails' do
     File.stub(:exists?).and_return(true)
     @storage_type.stub(:cmd) do |arg|
-      raise "fake exception"
+      fail "fake exception"
     end
 
     @storage_type.should_receive(:cmd).with('lvremove -f /dev/main/oy-deletedb-001_var_lib_mysql')
@@ -102,7 +102,7 @@ describe Provision::Storage::LVM do
       when "kpartx -l #{device_name} | grep -v 'loop deleted : /dev/loop' | awk '{ print $1 }' | tail -1"
         "magical"
       else
-        raise "Un-stubbed call to cmd for #{arg}"
+        fail "Un-stubbed call to cmd for #{arg}"
       end
     end
     @storage_type.partition_name('magical', @mount_point_obj).should eql "magical"

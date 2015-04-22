@@ -18,7 +18,7 @@ module Provision::Image::Commands
     exit_status = $?
     if exit_status != 0
       log.debug("command #{cmd} returned non-zero error code #{exit_status}, output: #{output}")
-      raise "command #{cmd} returned non-zero error code #{exit_status}, output: #{output}"
+      fail "command #{cmd} returned non-zero error code #{exit_status}, output: #{output}"
     end
     elapsed_time = Time.now - start_time
     log.debug("command #{cmd} took #{elapsed_time}s")
@@ -47,7 +47,7 @@ module Provision::Image::Commands
 
   class Continuation
     def initialize(target_object, block)
-      raise "nil block given " unless !block.nil?
+      fail "nil block given " unless !block.nil?
       @block = block
       @target_object = target_object
     end
@@ -58,7 +58,7 @@ module Provision::Image::Commands
         @target_object.instance_eval(&@block)
         sleep(0.5)
       end
-      raise "timeout waiting for condition"
+      fail "timeout waiting for condition"
     end
   end
 
@@ -72,6 +72,6 @@ module Provision::Image::Commands
       return if !block.nil? && block.call == true
       sleep(0.4)
     end
-    raise "timeout waiting for condition"
+    fail "timeout waiting for condition"
   end
 end

@@ -20,7 +20,7 @@ module RSpec::Mocks::ArgumentMatchers
           mismatches << "expected #{key} to be #{@expected[key].inspect} but it was #{other[key].inspect}" \
             unless other[key] == @expected[key]
         end
-        raise mismatches.join("\n") unless mismatches.empty?
+        fail mismatches.join("\n") unless mismatches.empty?
         true
       end
 
