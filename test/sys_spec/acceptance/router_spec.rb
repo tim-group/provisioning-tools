@@ -22,7 +22,7 @@ describe 'role_router' do
     end
   end
 
-  def from(host, &block)
+  def from(host, &_block)
     remote_verification = RemoteVerification.new(host)
   end
 
@@ -31,7 +31,7 @@ describe 'role_router' do
 
   let(:blah) { "1" }
 
-  def host(machine)
+  def host(_machine)
     '192.168.5.239'
   end
 

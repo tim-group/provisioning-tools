@@ -30,10 +30,10 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
   end
 
   # This does nothing in this class
-  def add_forward_lookup(ip, hostname)
+  def add_forward_lookup(_ip, _hostname)
   end
 
-  def try_add_reverse_lookup(ip, hostname, all_hostnames)
+  def try_add_reverse_lookup(ip, _hostname, all_hostnames)
     $etc_hosts_mutex.synchronize do
       parse_hosts
       return false if @by_ip[ip.to_s]
@@ -132,7 +132,7 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
   end
 
   # This does nothing in this class
-  def remove_forward_lookup(fqdn)
+  def remove_forward_lookup(_fqdn)
   end
 
   def remove_reverse_lookup(ip)

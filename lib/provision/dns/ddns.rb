@@ -82,7 +82,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     tmp_file
   end
 
-  def try_add_reverse_lookup(ip, fqdn, all_hostnames)
+  def try_add_reverse_lookup(ip, fqdn, _all_hostnames)
     ip_rev = ip.to_s.split('.').reverse.join('.')
     tmp_file = Tempfile.new('remove_temp')
     tmp_file.puts "server #{@primary_nameserver}"

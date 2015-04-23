@@ -20,6 +20,7 @@ class Provision::Storage
     @@logger
   end
 
+  # rubocop:disable Style/GuardClause
   def run_task(name, identifier, task_hash)
     begin
       @@logger.debug("Running task '#{identifier}' for '#{name}'")
@@ -57,6 +58,7 @@ class Provision::Storage
       @@logger.debug("Cleanup tasks left over after this process for #{name}: #{@@cleanup_tasks[name]}")
     end
   end
+  # rubocop:enable Style/GuardClause
 
   def self.cleanup(name)
     @@logger.debug("starting cleanup for '#{name}'")

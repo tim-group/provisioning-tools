@@ -185,21 +185,21 @@ class Provision::Storage::Service
       mount_point_obj = get_mount_point(name, mount_point)
       prepare_options = mount_point_obj.config[:prepare][:options]
       create_in_fstab = prepare_options[:create_in_fstab]
-      if create_in_fstab
-        File.open(fstab, 'a') do |f|
-          fstype = 'ext4'
-          begin
-            fstype = prepare_options[:type]
-          rescue NoMethodError => e
-            if e.name == '[]'.to_sym
-              @log.debug "fstype not found, using default value: #{fstype}"
-            else
-              raise e
-            end
+      next if !create_in_fstab
+
+      File.open(fstab, 'a') do |f|
+        fstype = 'ext4'
+        begin
+          fstype = prepare_options[:type]
+        rescue NoMethodError => e
+          if e.name == '[]'.to_sym
+            @log.debug "fstype not found, using default value: #{fstype}"
+          else
+            raise e
           end
-          f.puts("/dev/vd#{drive_letters[current_drive_letter]}1 #{mount_point_obj.name}  #{fstype} defaults 0 0")
-          current_drive_letter += 1
         end
+        f.puts("/dev/vd#{drive_letters[current_drive_letter]}1 #{mount_point_obj.name}  #{fstype} defaults 0 0")
+        current_drive_letter += 1
       end
     end
   end

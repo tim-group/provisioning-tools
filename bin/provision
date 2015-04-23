@@ -13,7 +13,7 @@ require 'provision/workqueue'
 require 'util/symbol_utils'
 
 symbol_utils = Util::SymbolUtils.new
-specs = YAML::load($stdin).map do |spec|
+specs = YAML.load($stdin).map do |spec|
   symbol_utils.symbolize_keys(spec)
 end
 

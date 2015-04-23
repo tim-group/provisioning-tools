@@ -50,7 +50,7 @@ module MCollective
 
       def last_run_summary
         summary = nil
-        10.times do |i|
+        10.times do |_|
           summary = YAML.load_file(@last_summary)
           break unless summary["resources"].nil?
           sleep 4
@@ -90,7 +90,7 @@ module MCollective
         has_pid = check_pid_running
 
         return 'disabled' if disabled
-        return 'running'  if   locked && has_pid
+        return 'running'  if locked && has_pid
         return 'idling'   if !locked && has_pid
         return 'stopped'  if !has_pid
       end
@@ -99,11 +99,13 @@ module MCollective
         if File.exists?(@pidfile)
           pid = File.read(@pidfile)
           if pid =~ /^\d+$/
+            # rubocop:disable Lint/HandleExceptions
             begin
               ::Process.kill(0, Integer(pid)) # check that pid is alive
               return true
             rescue Errno::ESRCH => e
             end
+            # rubocop:enable Lint/HandleExceptions
           end
           FileUtils.rm(@pidfile)
         end
@@ -185,7 +187,7 @@ module MCollective
           stat.zero? ? reply.fail("Already disabled") : reply.fail("Currently running; can't remove lock")
         else
           begin
-            File.open(@lockfile, "w") { |file| }
+            File.open(@lockfile, "w") { |_file| }
 
             reply[:output] = "Lock created"
           rescue Exception => e

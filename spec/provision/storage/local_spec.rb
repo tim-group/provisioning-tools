@@ -20,7 +20,7 @@ describe Provision::Storage::Local do
       "dev='#{device(name)}'"
     end
 
-    def remove(name)
+    def remove(_name)
       true
     end
   end
@@ -201,11 +201,11 @@ describe Provision::Storage::Local do
   it 'should check and resize the filesystem' do
     name = 'check_and_resize'
     device_name = @storage_type.device(name)
-    @storage_type.stub(:partition_name) do |a_name, mount_point_obj|
+    @storage_type.stub(:partition_name) do |_a_name, _mount_point_obj|
       name
     end
     partition_name = @storage_type.partition_name(name)
-    @storage_type.stub(:cmd) do |arg|
+    @storage_type.stub(:cmd) do |_arg|
       true
     end
     @storage_type.should_receive(:cmd).with("kpartx -av #{device_name}")
@@ -219,7 +219,7 @@ describe Provision::Storage::Local do
     name = 'check_and_resize'
     underscore_name = @storage_type.underscore_name(name, '/'.to_sym)
     device_name = @storage_type.device(underscore_name)
-    @storage_type.stub(:partition_name) do |a_name, mount_point_obj|
+    @storage_type.stub(:partition_name) do |_a_name, _mount_point_obj|
       name
     end
     partition_name = @storage_type.partition_name(name)
@@ -246,7 +246,7 @@ describe Provision::Storage::Local do
 
   it 'tries to create the mountpoint when mounting if it is considered temporary' do
     File.exist?("#{@tmpdir}/place").should eql false
-    @storage_type.stub(:partition_name) do |name, mount_point_obj|
+    @storage_type.stub(:partition_name) do |_name, _mount_point_obj|
       'name'
     end
     @storage_type.should_receive(:cmd).with("udevadm settle")
@@ -260,7 +260,7 @@ describe Provision::Storage::Local do
 
   it 'does not try to create the mountpoint when mounting if it is not considered temporary' do
     @storage_type.should_not_receive(:cmd).with('mkdir /some/name1')
-    @storage_type.stub(:partition_name) do |name, mount_point_obj|
+    @storage_type.stub(:partition_name) do |_name, _mount_point_obj|
       'mount'
     end
     @mount_point_obj.set(:actual_mount_point, "/some/name1")
@@ -306,7 +306,7 @@ describe Provision::Storage::Local do
 
   describe 'copying storage' do
     before do
-      File.stub(:exists?) do |arg|
+      File.stub(:exists?) do |_arg|
         true
       end
     end
@@ -365,7 +365,7 @@ describe Provision::Storage::Local do
     end
 
     it 'blows up with a storage not found error if the source storage does not exist' do
-      File.stub(:exists?) do |arg|
+      File.stub(:exists?) do |_arg|
         false
       end
       @storage_type.stub(:cmd) do |arg|

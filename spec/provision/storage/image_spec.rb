@@ -53,10 +53,10 @@ describe Provision::Storage::Image do
     it 'runs the commands required to grow a filesystem' do
       name = 'grow_ok'
       device_name = @storage_type.device(name)
-      @storage_type.stub(:partition_name) do |arg|
+      @storage_type.stub(:partition_name) do |_arg|
         name
       end
-      @storage_type.stub(:cmd) do |arg|
+      @storage_type.stub(:cmd) do |_arg|
         true
       end
       mount_point_obj = Provision::Storage::MountPoint.new('/', :size => '5G')

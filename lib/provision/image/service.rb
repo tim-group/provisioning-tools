@@ -5,7 +5,7 @@ class Provision::Image::Service
   def initialize(options)
     @configdir = options[:configdir]
     @config = options[:config]
-    Provision::Image::Catalogue::loadconfig(@configdir)
+    Provision::Image::Catalogue.loadconfig(@configdir)
   end
 
   def build_image(template, spec)

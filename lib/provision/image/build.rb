@@ -34,7 +34,7 @@ class Provision::Image::Build
     call_define(method, self)
   end
 
-  def method_missing(name, *args, &block)
+  def method_missing(name, *_args, &_block)
     call(name.to_s)
   end
 

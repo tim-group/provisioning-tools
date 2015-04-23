@@ -47,7 +47,7 @@ describe Provision::Storage::LVM do
 
   it 'runs lvremove when trying to remove a VMs storage' do
     File.stub(:exists?).and_return(true, false)
-    @storage_type.stub(:cmd) do |arg|
+    @storage_type.stub(:cmd) do |_arg|
       true
     end
 
@@ -57,7 +57,7 @@ describe Provision::Storage::LVM do
 
   it 'runs lvremove over and over when trying to remove a VMs storage if removing the storage fails' do
     File.stub(:exists?).and_return(true)
-    @storage_type.stub(:cmd) do |arg|
+    @storage_type.stub(:cmd) do |_arg|
       fail "fake exception"
     end
 
@@ -83,10 +83,10 @@ describe Provision::Storage::LVM do
     it 'runs the commands required to grow a filesystem' do
       name = 'grow_ok'
       device_name = @storage_type.device(name)
-      @storage_type.stub(:partition_name) do |arg|
+      @storage_type.stub(:partition_name) do |_arg|
         name
       end
-      @storage_type.stub(:cmd) do |arg|
+      @storage_type.stub(:cmd) do |_arg|
         true
       end
       @storage_type.should_receive(:rebuild_partition).with(name, @mount_point_obj)

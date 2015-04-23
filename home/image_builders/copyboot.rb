@@ -108,7 +108,7 @@ iface #{nic[:network]} inet manual
       end
     end
 
-    open("#{spec[:temp_dir]}/etc/udev/rules.d/70-persistent-net.rules", 'w') do |f|
+    open("#{spec[:temp_dir]}/etc/udev/rules.d/70-persistent-net.rules", 'w') do |_f|
     end
 
     open("#{spec[:temp_dir]}/etc/udev/rules.d/70-persistent-net.rules", 'w') do |f|
