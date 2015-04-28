@@ -81,7 +81,7 @@ class Provision::Image::Build
     txt = "cleaning up #{@cleanups.size} blocks"
     summary_log.info "#{txt}"
     padding = position - txt.length
-    @cleanups.reverse.each do |command|
+    @cleanups.reverse_each do |command|
       begin
         command.call
       rescue Exception => e

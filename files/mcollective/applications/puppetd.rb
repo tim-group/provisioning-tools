@@ -155,7 +155,7 @@ The ACTION can be one of the following:
         begin
           running += resp[:body][:data][:running].to_i
           enabled += resp[:body][:data][:enabled].to_i
-          idling  += resp[:body][:data][:idling].to_i
+          idling += resp[:body][:data][:idling].to_i
           stopped += resp[:body][:data][:stopped].to_i
           total += 1
         rescue Exception => e

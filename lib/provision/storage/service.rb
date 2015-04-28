@@ -114,7 +114,7 @@ class Provision::Storage::Service
   end
 
   def unmount_filesystems(name)
-    @storage_configs[name].mount_points.reverse.each do |mount_point|
+    @storage_configs[name].mount_points.reverse_each do |mount_point|
       mount_point_obj = get_mount_point(name, mount_point)
 
       type = mount_point_obj.config[:type].to_sym
@@ -128,7 +128,7 @@ class Provision::Storage::Service
   end
 
   def post_unmount_tasks(name)
-    @storage_configs[name].mount_points.reverse.each do |mount_point|
+    @storage_configs[name].mount_points.reverse_each do |mount_point|
       mount_point_obj = get_mount_point(name, mount_point)
 
       type = mount_point_obj.config[:type].to_sym

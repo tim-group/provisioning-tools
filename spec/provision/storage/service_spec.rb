@@ -61,7 +61,7 @@ describe Provision::Storage::Service do
       <target dev='vda' bus='virtio'/>
     </disk>
   EOS
-      )
+                                                     )
     end
 
     it 'generates the correct XML to put into a libvirt template for a multi storage setup' do
@@ -88,7 +88,7 @@ describe Provision::Storage::Service do
       <target dev='vdb' bus='virtio'/>
     </disk>
   EOS
-      )
+                                                     )
     end
   end
 
@@ -211,7 +211,7 @@ describe Provision::Storage::Service do
       <target dev='vda' bus='virtio'/>
     </disk>
   EOS
-      )
+                                                     )
     end
 
     it 'generates the correct XML to put into a libvirt template for a multi storage setup' do
@@ -238,7 +238,7 @@ describe Provision::Storage::Service do
       <target dev='vdb' bus='virtio'/>
     </disk>
   EOS
-      )
+                                                     )
     end
   end
 end

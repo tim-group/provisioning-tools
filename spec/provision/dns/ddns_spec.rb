@@ -41,7 +41,7 @@ describe Provision::DNS::DDNS do
     dns = Provision::DNS::DDNSNetwork.new('prod', '192.168.1.0/24',
                                           :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
                                           :primary_nameserver => "mars"
-    )
+                                         )
     dns.network.to_s.should eql('192.168.1.0')
     dns.broadcast.to_s.should eql('192.168.1.255')
     dns.min_allocation.to_s.should eql('192.168.1.10')
@@ -58,7 +58,7 @@ describe Provision::DNS::DDNS do
                                           :primary_nameserver => "mars",
                                           :min_allocation => "192.168.1.99",
                                           :max_allocation => "192.168.1.150"
-    )
+                                         )
     dns.network.to_s.should eql('192.168.1.0')
     dns.broadcast.to_s.should eql('192.168.1.255')
     dns.min_allocation.to_s.should eql('192.168.1.99')
@@ -73,7 +73,7 @@ describe Provision::DNS::DDNS do
                               'foo.example.com' => '172.16.0.1'
                             },
                             :primary_nameserver => "mars"
-    )
+                           )
     dns.reverse_zone.should eql('1.168.192.in-addr.arpa')
     dns.lookup_ip_for('foo.example.com').should eql('172.16.0.1')
     dns.lookup_ip_for('foo2example.com').should eql(false)
@@ -86,7 +86,7 @@ describe Provision::DNS::DDNS do
                             :lookup_table => {
                             },
                             :primary_nameserver => "mars"
-    )
+                           )
     dns.reverse_zone.should eql('168.192.in-addr.arpa')
   end
 
@@ -97,7 +97,7 @@ describe Provision::DNS::DDNS do
                             :lookup_table => {
                             },
                             :primary_nameserver => "mars"
-    )
+                           )
     dns.reverse_zone.should eql('1.168.192.in-addr.arpa')
   end
 
@@ -109,7 +109,7 @@ describe Provision::DNS::DDNS do
                             :lookup_table => {
                             },
                             :primary_nameserver => "mars"
-    )
+                           )
     dns.reverse_zone.should eql('1.168.192.in-addr.arpa')
   end
 
@@ -121,7 +121,7 @@ describe Provision::DNS::DDNS do
                       '],
                             :lookup_table => {},
                             :primary_nameserver => "mars"
-    )
+                           )
     expect { dns.allocate_ip_for(get_spec) }.to raise_error(Provision::DNS::DDNS::Exception::BadKey)
   end
 
@@ -131,7 +131,7 @@ describe Provision::DNS::DDNS do
                             :nsupdate_replies => ['; Communication with server failed: timed out'],
                             :lookup_table => {},
                             :primary_nameserver => "mars"
-    )
+                           )
     expect { dns.allocate_ip_for(get_spec) }.to raise_error(Provision::DNS::DDNS::Exception::Timeout)
   end
 
@@ -141,7 +141,7 @@ describe Provision::DNS::DDNS do
                             :nsupdate_replies => ['', ''],
                             :lookup_table => {},
                             :primary_nameserver => "mars"
-    )
+                           )
     dns.checker = double
     dns.checker.should_receive(:resolve_forward).with('st-testmachine-001.mgmt.st.net.local').
       and_return(['192.168.0.10'])
@@ -158,7 +158,7 @@ describe Provision::DNS::DDNS do
                             :nsupdate_replies => ['', '', '', ''],
                             :lookup_table => { 'st-testmachine-001.mgmt.st.net.local' => '192.168.0.10' },
                             :primary_nameserver => "mars"
-    )
+                           )
     ip = dns.allocate_ip_for(get_spec)
     dns.remove_ip_for(get_spec)
     dns.update_files.size.should eql(2)
@@ -172,7 +172,7 @@ describe Provision::DNS::DDNS do
                             :nsupdate_replies => [],
                             :lookup_table => {},
                             :primary_nameserver => "mars"
-    )
+                           )
     dns.remove_ip_for(get_spec)
     dns.update_files.size.should eql(0)
   end
@@ -183,7 +183,7 @@ describe Provision::DNS::DDNS do
                             :nsupdate_replies => ['', ''],
                             :lookup_table => {},
                             :primary_nameserver => "mars"
-    )
+                           )
     dns.checker = double
     dns.checker.should_receive(:resolve_forward).with('st-testmachine-001.mgmt.st.net.local').and_return([])
     expect do

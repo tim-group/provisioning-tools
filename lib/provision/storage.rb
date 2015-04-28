@@ -68,10 +68,10 @@ class Provision::Storage
       end
     end
     unless @@cleanup_tasks_order[name].empty?
-      @@cleanup_tasks_order[name].reverse.each do |id|
+      @@cleanup_tasks_order[name].reverse_each do |id|
         @@logger.debug("Cleanup task: #{id}")
       end
-      @@cleanup_tasks_order[name].reverse.each do |id|
+      @@cleanup_tasks_order[name].reverse_each do |id|
         @@logger.debug("starting cleanup for '#{name}' with identifier '#{id}'")
         begin
           @@cleanup_tasks[name][id].call
