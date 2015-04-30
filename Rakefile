@@ -183,12 +183,6 @@ task :package_agent do
                  "../mcollective/agent"
 
   sh command_line.join(' ')
-
-  #      '-m',"youDevise <support@timgroup.com>",
-  #      '--description',"TIM Account Management Report Tool (Import)",
-  #      '--pre-install','build-scripts/deb-pre-install.rb',
-  #      '--post-install','build-scripts/deb-post-install.rb',
-  #      '-C','build/package',
 end
 
 task :package => [:clean, :package_main, :package_agent]
