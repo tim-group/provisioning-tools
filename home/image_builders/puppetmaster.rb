@@ -40,6 +40,7 @@ define 'puppetmaster' do
     apt_install 'rubygems'
     apt_install 'rubygems1.8'
     apt_install 'rubygem-rspec'
+    apt_install 'rubygem-mongo'
   end
 
   run('deploy puppetmaster') do
