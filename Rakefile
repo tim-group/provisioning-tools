@@ -103,19 +103,19 @@ task :package_main do
     sh "cp postinst.sh build/"
 
     command_line = "cd build &&",
-                  "fpm",
-                  "-n provisioning-tools",
-                  "--url 'http://www.timgroup.com'",
-                  "--maintainer 'infra@timgroup.com'",
-                  "-v #{version}",
-                  "--prefix /var/lib/gems/",
-                  "-d provisioning-tools-gold-image-precise",
-                  "-d debootstrap",
-                  "-t deb",
-                  "-a all",
-                  "-s dir",
-                  "-C #{tmp}",
-                  "."
+                   "fpm",
+                   "-n provisioning-tools",
+                   "--url 'http://www.timgroup.com'",
+                   "--maintainer 'infra@timgroup.com'",
+                   "-v #{version}",
+                   "--prefix /var/lib/gems/",
+                   "-d provisioning-tools-gold-image-precise",
+                   "-d debootstrap",
+                   "-t deb",
+                   "-a all",
+                   "-s dir",
+                   "-C #{tmp}",
+                   "."
 
     sh command_line.join(' ')
   end
