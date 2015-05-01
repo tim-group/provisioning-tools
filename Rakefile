@@ -89,22 +89,36 @@ end
 
 desc "Generate deb file for the gem and command-line tools"
 task :package_main do
-  sh "mkdir -p build"
-  sh "rm -f *.gem"
-  sh "gem build provisioning-tools.gemspec && mv provisioning-tools-*.gem build/"
-  sh "cp postinst.sh build/"
+  hash = `git rev-parse --short HEAD`.chomp
+  v_part = ENV['BUILD_NUMBER'] || "0.#{hash.hex}"
+  version = "0.0.#{v_part}"
 
-  command_line = "cd build",
-                 "&&",
-                 "fpm",
-                 "-s", "gem",
-                 "-t", "deb",
-                 "-n", "provisioning-tools",
-                 "-d", "provisioning-tools-gold-image-precise",
-                 "-d", "debootstrap",
-                 "provisioning-tools-*.gem"
+  Dir.mktmpdir do |tmp|
+    sh "mkdir -p build"
+    sh "rm -f *.gem"
+    sh "gem1.8   build provisioning-tools.gemspec && mv provisioning-tools-*.gem build/provisioning-tools-1.8.gem"
+    sh "gem1.8   install --no-ri --no-rdoc --install-dir #{tmp}/1.8 build/provisioning-tools-1.8.gem"
+    sh "gem1.9.1 build provisioning-tools.gemspec && mv provisioning-tools-*.gem build/provisioning-tools-1.9.gem"
+    sh "gem1.9.1 install --no-ri --no-rdoc --install-dir #{tmp}/1.9.1 build/provisioning-tools-1.9.gem"
+    sh "cp postinst.sh build/"
 
-  sh command_line.join(' ')
+    command_line = "cd build &&",
+                  "fpm",
+                  "-n provisioning-tools",
+                  "--url 'http://www.timgroup.com'",
+                  "--maintainer 'infra@timgroup.com'",
+                  "-v #{version}",
+                  "--prefix /var/lib/gems/",
+                  "-d provisioning-tools-gold-image-precise",
+                  "-d debootstrap",
+                  "-t deb",
+                  "-a all",
+                  "-s dir",
+                  "-C #{tmp}",
+                  "."
+
+    sh command_line.join(' ')
+  end
 end
 
 desc "Generate deb file for the Precise Gold image"
