@@ -298,7 +298,7 @@ sun-java6-jre   shared/present-sun-dlj-v1-1     note
   end
 
   run("Fix syslog rate limiting") do
-    open("/etc/rsyslog.conf", 'a') do |f|
+    open("#{spec[:temp_dir]}/etc/rsyslog.conf", 'a') do |f|
       f.puts '$SystemLogRateLimitInterval 0
       $SystemLogRateLimitBurst 0'
     end
