@@ -9,7 +9,7 @@ class Provision::Storage::MountPoint
         :on_storage_not_found     => :raise_error,
         :on_storage_size_mismatch => :raise_error
       },
-      :prepare    => {
+      :prepare => {
         :options => {
           :create_in_fstab => true,
           :resize          => true,
@@ -20,6 +20,7 @@ class Provision::Storage::MountPoint
       :size => "3G"
     }
 
+    default_config = recurse_merge(default_config, :chmod => 01777) if mount_point == '/tmp'.to_sym
     if mount_point == '/'.to_sym
       default_config = recurse_merge(default_config, :prepare => {
                                        :method => "image",

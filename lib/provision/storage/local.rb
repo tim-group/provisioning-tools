@@ -170,6 +170,7 @@ module Provision::Storage::Local
   def mount(name, mount_point_obj)
     dir = mount_point_obj.get(:actual_mount_point)
     temp_mountpoint = mount_point_obj.get(:temp_mount_point)
+    chmod = mount_point_obj.config[:chmod]
 
     underscore_name = underscore_name(name, mount_point_obj.name)
     dir_existed_at_start = File.exists? dir
@@ -189,6 +190,11 @@ module Provision::Storage::Local
                cmd "mount /dev/mapper/#{part_name} #{dir}"
              end,
              :cleanup => lambda { cmd "umount #{dir}" })
+
+    if chmod
+      run_task(name, "chmod directory #{dir}",
+               :task => lambda { FileUtils.chmod(chmod, dir) })
+    end
 
     mount_point_obj.set(:dir_existed_at_start, dir_existed_at_start)
   end
