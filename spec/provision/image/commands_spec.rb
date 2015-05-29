@@ -1,4 +1,3 @@
-require 'spec_helper'
 require 'provisioning-tools/provision/image/namespace'
 require 'provisioning-tools/provision/image/commands'
 require 'provisioning-tools/provision/log'

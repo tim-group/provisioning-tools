@@ -1,9 +1,6 @@
-require 'spec_helper'
 require 'provisioning-tools/provision'
-require 'rspec'
 require 'yaml'
 require 'tempfile'
-require 'rspec/expectations'
 
 describe Provision::Config do
   it 'Blows up when config is empty' do

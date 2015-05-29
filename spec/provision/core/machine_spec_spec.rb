@@ -1,4 +1,3 @@
-require 'spec_helper'
 require 'provisioning-tools/provision/core/machine_spec'
 
 describe Provision::Core::MachineSpec do

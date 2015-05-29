@@ -1,8 +1,7 @@
-require 'spec_helper'
 require 'provisioning-tools/provision/dns'
 require 'provisioning-tools/provision/dns/dnsmasq'
-require 'tmpdir'
 require 'provisioning-tools/provision/core/machine_spec'
+require 'tmpdir'
 
 class Provision::DNS::DNSMasqNetwork
   attr_reader :network, :broadcast, :min_allocation, :max_allocation

@@ -57,10 +57,7 @@ task :ctags do
 end
 
 desc "Run specs"
-RSpec::Core::RakeTask.new do |t|
-  t.rspec_opts = %w(--color)
-  t.pattern = "spec/**/*_spec.rb"
-end
+RSpec::Core::RakeTask.new
 
 desc "MCollective Run specs"
 RSpec::Core::RakeTask.new(:mcollective_spec) do |t|

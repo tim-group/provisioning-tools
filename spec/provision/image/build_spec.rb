@@ -1,7 +1,3 @@
-require 'spec_helper'
-$: << File.join(File.dirname(__FILE__), "..", "../lib")
-require 'rubygems'
-require 'rspec'
 require 'provisioning-tools/provision/core/machine_spec'
 
 class XYZ

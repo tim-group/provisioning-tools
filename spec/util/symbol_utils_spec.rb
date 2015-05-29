@@ -1,4 +1,3 @@
-require 'spec_helper'
 require 'provisioning-tools/util/symbol_utils'
 
 describe Util::SymbolUtils do

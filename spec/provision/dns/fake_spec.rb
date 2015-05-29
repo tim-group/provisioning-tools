@@ -1,4 +1,3 @@
-require 'spec_helper'
 require 'provisioning-tools/provision/dns'
 require 'provisioning-tools/provision/dns/fake'
 

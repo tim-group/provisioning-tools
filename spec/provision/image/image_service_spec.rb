@@ -1,4 +1,3 @@
-require 'spec_helper'
 require 'provisioning-tools/provision/image/service'
 require 'provisioning-tools/provision/image/catalogue'
 require 'tempfile'

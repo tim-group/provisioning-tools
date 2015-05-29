@@ -1,5 +1,4 @@
-require 'spec_helper'
-require 'rspec'
+# XXX fails when running with --order=rand
 require 'provisioning-tools/provision'
 require 'provisioning-tools/provision/storage'
 

@@ -1,5 +1,3 @@
-require 'spec_helper'
-require 'rspec'
 require 'provisioning-tools/provision'
 require 'provisioning-tools/provision/storage'
 require 'provisioning-tools/provision/storage/image'

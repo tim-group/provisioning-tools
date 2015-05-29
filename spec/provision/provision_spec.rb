@@ -1,5 +1,3 @@
-require 'spec_helper'
-require 'rspec'
 require 'provisioning-tools/provision'
 
 describe Provision::Factory do

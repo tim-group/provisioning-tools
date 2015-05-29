@@ -1,6 +1,3 @@
-require 'spec_helper'
-require 'rubygems'
-require 'rspec'
 require 'provisioning-tools/provision'
 require 'provisioning-tools/provision/vm/virsh'
 require 'provisioning-tools/provision/core/machine_spec'
