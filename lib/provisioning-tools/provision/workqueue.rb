@@ -1,8 +1,8 @@
 require 'logger'
-require 'provision/namespace'
+require 'provisioning-tools/provision/namespace'
 require 'thread'
-require 'provision/workqueue/noop_listener'
-require 'provision/vm/virsh'
+require 'provisioning-tools/provision/workqueue/noop_listener'
+require 'provisioning-tools/provision/vm/virsh'
 
 class Provision::WorkQueue
   class SpecTask

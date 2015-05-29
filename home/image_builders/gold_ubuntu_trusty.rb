@@ -1,5 +1,5 @@
-require 'provision/image/catalogue'
-require 'provision/image/commands'
+require 'provisioning-tools/provision/image/catalogue'
+require 'provisioning-tools/provision/image/commands'
 
 # TODO:
 # This file is legacy once gold images are built in a normal stacks way

@@ -1,10 +1,10 @@
 require 'spec_helper'
 require 'rubygems'
 require 'rspec'
-require 'provision'
-require 'provision/vm/virsh'
-require 'provision/core/provisioning_service'
-require 'provision/dns'
+require 'provisioning-tools/provision'
+require 'provisioning-tools/provision/vm/virsh'
+require 'provisioning-tools/provision/core/provisioning_service'
+require 'provisioning-tools/provision/dns'
 require 'pp'
 
 module RSpec::Mocks::ArgumentMatchers

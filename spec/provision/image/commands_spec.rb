@@ -1,7 +1,7 @@
 require 'spec_helper'
-require 'provision/image/namespace'
-require 'provision/image/commands'
-require 'provision/log'
+require 'provisioning-tools/provision/image/namespace'
+require 'provisioning-tools/provision/image/commands'
+require 'provisioning-tools/provision/log'
 
 describe Provision::Image::Commands do
   it 'times out when condition never comes true' do

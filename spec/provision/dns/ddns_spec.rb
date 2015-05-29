@@ -1,8 +1,8 @@
 require 'spec_helper'
-require 'provision/dns'
-require 'provision/dns/ddns'
+require 'provisioning-tools/provision/dns'
+require 'provisioning-tools/provision/dns/ddns'
 require 'tmpdir'
-require 'provision/core/machine_spec'
+require 'provisioning-tools/provision/core/machine_spec'
 
 class Provision::DNS::DDNSNetwork
   attr_reader :network, :broadcast, :min_allocation, :max_allocation

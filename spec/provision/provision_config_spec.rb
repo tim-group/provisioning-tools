@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'provision'
+require 'provisioning-tools/provision'
 require 'rspec'
 require 'yaml'
 require 'tempfile'

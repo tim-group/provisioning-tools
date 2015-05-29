@@ -1,5 +1,5 @@
-require 'provision/image/namespace'
-require 'provision/log'
+require 'provisioning-tools/provision/image/namespace'
+require 'provisioning-tools/provision/log'
 
 class Provision::Image::Build
   include Provision::Log

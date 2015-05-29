@@ -1,6 +1,6 @@
 require 'spec_helper'
 require 'rspec'
-require 'provision'
+require 'provisioning-tools/provision'
 
 describe Provision::Factory do
   TEST_CONFIG = File.join(File.dirname(__FILE__), "config.yaml")

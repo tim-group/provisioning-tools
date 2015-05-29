@@ -1,5 +1,5 @@
-require 'provision/image/catalogue'
-require 'provision/image/commands'
+require 'provisioning-tools/provision/image/catalogue'
+require 'provisioning-tools/provision/image/commands'
 
 class Provision::Image::Service
   def initialize(options)

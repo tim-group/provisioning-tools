@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'util/symbol_utils'
+require 'provisioning-tools/util/symbol_utils'
 
 describe Util::SymbolUtils do
   it 'symbolizes keys' do

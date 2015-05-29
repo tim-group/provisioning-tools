@@ -1,6 +1,6 @@
 require 'spec_helper'
-require 'provision/dns'
-require 'provision/dns/fake'
+require 'provisioning-tools/provision/dns'
+require 'provisioning-tools/provision/dns/fake'
 
 class Provision::DNS::Fake
   def self.set_max_ip(ip)

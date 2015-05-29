@@ -1,7 +1,7 @@
 require 'mcollective'
-require 'provision'
-require 'provision/workqueue'
-require 'util/symbol_utils'
+require 'provisioning-tools/provision'
+require 'provisioning-tools/provision/workqueue'
+require 'provisioning-tools/util/symbol_utils'
 
 module MCollective
   module Agent

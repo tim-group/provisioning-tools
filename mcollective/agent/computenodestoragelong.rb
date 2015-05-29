@@ -1,6 +1,6 @@
-require 'provision'
-require 'provision/storage'
-require 'provision/storage/service'
+require 'provisioning-tools/provision'
+require 'provisioning-tools/provision/storage'
+require 'provisioning-tools/provision/storage/service'
 
 module MCollective
   module Agent

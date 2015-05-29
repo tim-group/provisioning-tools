@@ -1,4 +1,4 @@
-require 'provision/storage/local'
+require 'provisioning-tools/provision/storage/local'
 
 class Provision::Storage::LVM < Provision::Storage
   include Provision::Storage::Local

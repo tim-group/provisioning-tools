@@ -1,6 +1,6 @@
 require 'spec_helper'
-require 'provision/image/service'
-require 'provision/image/catalogue'
+require 'provisioning-tools/provision/image/service'
+require 'provisioning-tools/provision/image/catalogue'
 require 'tempfile'
 
 describe Provision::Image::Service  do

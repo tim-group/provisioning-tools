@@ -2,7 +2,7 @@ require 'spec_helper'
 $: << File.join(File.dirname(__FILE__), "..", "../lib")
 require 'rubygems'
 require 'rspec'
-require 'provision/core/machine_spec'
+require 'provisioning-tools/provision/core/machine_spec'
 
 class XYZ
 end
@@ -35,7 +35,7 @@ describe XYZ do
   end
 
   it 'has access to the config object' do
-    require 'provision/image/catalogue'
+    require 'provisioning-tools/provision/image/catalogue'
     define "vanillavm" do
       extend MockFunctions
       run("do stuff") do
@@ -56,7 +56,7 @@ describe XYZ do
   end
 
   it 'cleanup blocks run after run blocks' do
-    require 'provision/image/catalogue'
+    require 'provisioning-tools/provision/image/catalogue'
     define "vanillavm" do
       extend MockFunctions
       run("do stuff") do
@@ -89,7 +89,7 @@ describe XYZ do
   end
 
   it 'cleanup blocks run in reverse order' do
-    require 'provision/image/catalogue'
+    require 'provisioning-tools/provision/image/catalogue'
     define "vanillavm" do
       extend MockFunctions
       cleanup do
@@ -120,7 +120,7 @@ describe XYZ do
   end
 
   it 'cleanup blocks ignore exceptions' do
-    require 'provision/image/catalogue'
+    require 'provisioning-tools/provision/image/catalogue'
     define "vanillavm" do
       extend MockFunctions
       cleanup do
@@ -136,7 +136,7 @@ describe XYZ do
   end
 
   it 'can ignore exceptions if chosen to' do
-    require 'provision/image/catalogue'
+    require 'provisioning-tools/provision/image/catalogue'
     define "vanillavm" do
       extend MockFunctions
       run("do stuff") do
@@ -152,7 +152,7 @@ describe XYZ do
   end
 
   it 'stops executing run commands after a failure' do
-    require 'provision/image/catalogue'
+    require 'provisioning-tools/provision/image/catalogue'
     define "vanillavm" do
       extend MockFunctions
       run("do stuff") do
@@ -170,7 +170,7 @@ describe XYZ do
   end
 
   it 'I can pass options through to my build' do
-    require 'provision/image/catalogue'
+    require 'provisioning-tools/provision/image/catalogue'
     define "vanillavm" do
       extend MockFunctions
       run("configure hostname") do
@@ -188,7 +188,7 @@ describe XYZ do
   end
 
   it 'I can provide defaults' do
-    require 'provision/image/catalogue'
+    require 'provisioning-tools/provision/image/catalogue'
     define "defaults" do
       run("configure defaults") do
         spec[:disksize] = '3G'
@@ -214,7 +214,7 @@ describe XYZ do
   end
 
   it 'fails with a good error message' do
-    require 'provision/image/catalogue'
+    require 'provisioning-tools/provision/image/catalogue'
     define "defaults" do
       run("configure defaults") do
         bing
@@ -228,7 +228,7 @@ describe XYZ do
   end
 
   it 'passes through the result when using suppress_error' do
-    require 'provision/image/catalogue'
+    require 'provisioning-tools/provision/image/catalogue'
     something = nil
     define "defaults" do
       extend MockFunctions
@@ -244,7 +244,7 @@ describe XYZ do
   end
 
   it 'CCCCCc' do
-    require 'provision/image/catalogue'
+    require 'provisioning-tools/provision/image/catalogue'
     something = nil
     define "defaults" do
       extend Provision::Image::Commands
@@ -267,7 +267,7 @@ describe XYZ do
   end
 
   it 'does not execute a clean up block when no errors occur' do
-    require 'provision/image/catalogue'
+    require 'provisioning-tools/provision/image/catalogue'
     something = nil
     define "defaults" do
       extend Provision::Image::Commands
@@ -285,7 +285,7 @@ describe XYZ do
     something.should be_nil
   end
   it 'execute a clean up block on error' do
-    require 'provision/image/catalogue'
+    require 'provisioning-tools/provision/image/catalogue'
     something = nil
     define "defaults" do
       extend Provision::Image::Commands
@@ -308,7 +308,7 @@ describe XYZ do
   end
 
   it 'raises a meaningful error when a non-existent template is defined' do
-    require 'provision/image/catalogue'
+    require 'provisioning-tools/provision/image/catalogue'
     expect do
       Provision::Image::Catalogue.build("noexist", Provision::Core::MachineSpec.new({}), {})
     end.to raise_error("attempt to execute a template that is not in the catalogue: noexist")

@@ -1,8 +1,8 @@
 require 'spec_helper'
 require 'rspec'
-require 'provision'
-require 'provision/storage'
-require 'provision/storage/local'
+require 'provisioning-tools/provision'
+require 'provisioning-tools/provision/storage'
+require 'provisioning-tools/provision/storage/local'
 
 describe Provision::Storage::Local do
   class MockStorage < Provision::Storage

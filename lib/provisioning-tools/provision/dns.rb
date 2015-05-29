@@ -1,5 +1,5 @@
 require 'ipaddr'
-require 'provision/namespace'
+require 'provisioning-tools/provision/namespace'
 require 'logger'
 require 'yaml'
 require 'set'
@@ -182,7 +182,7 @@ class Provision::DNS
 
   def self.get_backend(name, options = {})
     fail("get_backend not supplied a name, cannot continue.") if name.nil? || name == false
-    require "provision/dns/#{name.downcase}"
+    require "provisioning-tools/provision/dns/#{name.downcase}"
     instance = Provision::DNS.const_get(name).new(options)
     instance.backend = name
     instance

@@ -1,9 +1,9 @@
 require 'spec_helper'
 require 'rspec'
-require 'provision'
-require 'provision/storage'
-require 'provision/storage/image'
-require 'provision/storage/mount_point'
+require 'provisioning-tools/provision'
+require 'provisioning-tools/provision/storage'
+require 'provisioning-tools/provision/storage/image'
+require 'provisioning-tools/provision/storage/mount_point'
 require 'tempfile'
 
 describe Provision::Storage::Image do

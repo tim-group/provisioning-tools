@@ -1,22 +1,22 @@
-require 'provision/namespace'
-require 'provision/image/service'
-require 'provision/vm/virsh'
-require 'provision/core/provisioning_service'
-require 'provision/workqueue'
-require 'provision/dns'
-require 'provision/storage'
-require 'provision/storage/service'
-require 'util/symbol_utils'
+require 'provisioning-tools/provision/namespace'
+require 'provisioning-tools/provision/image/service'
+require 'provisioning-tools/provision/vm/virsh'
+require 'provisioning-tools/provision/core/provisioning_service'
+require 'provisioning-tools/provision/workqueue'
+require 'provisioning-tools/provision/dns'
+require 'provisioning-tools/provision/storage'
+require 'provisioning-tools/provision/storage/service'
+require 'provisioning-tools/util/symbol_utils'
 require 'yaml'
 require 'pp'
 
 module Provision
   def self.base(dir = "")
-    File.expand_path(File.join(File.dirname(__FILE__), "../#{dir}"))
+    File.expand_path(File.join(File.dirname(__FILE__), "../../#{dir}"))
   end
 
   def self.home(dir = "")
-    File.expand_path(File.join(File.dirname(__FILE__), "../home/#{dir}"))
+    File.expand_path(File.join(File.dirname(__FILE__), "../../home/#{dir}"))
   end
 end
 

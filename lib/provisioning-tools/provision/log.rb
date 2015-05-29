@@ -1,6 +1,6 @@
 require 'logger'
 
-require 'provision/namespace'
+require 'provisioning-tools/provision/namespace'
 
 module Provision
   module Log

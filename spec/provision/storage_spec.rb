@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'rspec'
-require 'provision'
-require 'provision/storage'
+require 'provisioning-tools/provision'
+require 'provisioning-tools/provision/storage'
 
 describe Provision do
   before do

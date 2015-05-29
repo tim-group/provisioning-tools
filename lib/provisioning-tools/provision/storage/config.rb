@@ -1,4 +1,4 @@
-require 'provision/storage/mount_point'
+require 'provisioning-tools/provision/storage/mount_point'
 
 class Provision::Storage::Config
   def initialize(storage_spec)

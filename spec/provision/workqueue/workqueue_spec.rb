@@ -2,7 +2,7 @@ require 'spec_helper'
 $: << File.join(File.dirname(__FILE__), "..", "../lib")
 require 'rubygems'
 require 'rspec'
-require 'provision/workqueue'
+require 'provisioning-tools/provision/workqueue'
 
 describe Provision::WorkQueue do
   before do

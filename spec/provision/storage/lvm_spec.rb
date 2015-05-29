@@ -1,8 +1,8 @@
 require 'spec_helper'
 require 'rspec'
-require 'provision'
-require 'provision/storage'
-require 'provision/storage/lvm'
+require 'provisioning-tools/provision'
+require 'provisioning-tools/provision/storage'
+require 'provisioning-tools/provision/storage/lvm'
 
 describe Provision::Storage::LVM do
   before do

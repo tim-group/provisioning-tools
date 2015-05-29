@@ -1,4 +1,4 @@
-require 'util/symbol_utils'
+require 'provisioning-tools/util/symbol_utils'
 
 module Provision::Image::Commands
   def cmd(cmd)

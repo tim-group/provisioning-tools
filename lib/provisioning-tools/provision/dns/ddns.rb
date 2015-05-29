@@ -1,7 +1,7 @@
 require 'ipaddr'
 require 'rubygems'
 require 'tempfile'
-require 'provision/dns'
+require 'provisioning-tools/provision/dns'
 require 'resolv'
 
 class Provision::DNS::DDNS < Provision::DNS

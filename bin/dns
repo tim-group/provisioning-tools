@@ -2,7 +2,7 @@
 
 $: << File.join(File.dirname(__FILE__), "..", "lib")
 
-require 'provision'
+require 'provisioning-tools/provision'
 
 actions = {
   'allocate' => :allocate_ips_for,

@@ -1,7 +1,7 @@
 require 'fileutils'
-require 'provision/storage'
-require 'provision/storage/config'
-require 'provision/logger'
+require 'provisioning-tools/provision/storage'
+require 'provisioning-tools/provision/storage/config'
+require 'provisioning-tools/provision/logger'
 
 class Provision::Storage::Service
   attr_accessor :default_persistence_options
@@ -13,7 +13,7 @@ class Provision::Storage::Service
       options = settings[:options] || fail("Storage service requires each storage type to specify the " \
                                             "'options' setting")
 
-      require "provision/storage/#{arch.downcase}"
+      require "provisioning-tools/provision/storage/#{arch.downcase}"
       instance = Provision::Storage.const_get(arch).new(options)
       @storage_types[storage_type] = instance
       @storage_configs = {}

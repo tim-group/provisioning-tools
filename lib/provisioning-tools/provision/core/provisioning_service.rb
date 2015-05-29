@@ -2,8 +2,8 @@ module Provision::Core
 end
 
 require 'logger'
-require 'provision/namespace'
-require 'provision/core/machine_spec'
+require 'provisioning-tools/provision/namespace'
+require 'provisioning-tools/provision/core/machine_spec'
 
 class Provision::Core::ProvisioningService
   def initialize(options)

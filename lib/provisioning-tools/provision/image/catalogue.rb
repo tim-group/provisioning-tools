@@ -1,5 +1,5 @@
-require 'provision/namespace'
-require 'provision/image/build'
+require 'provisioning-tools/provision/namespace'
+require 'provisioning-tools/provision/image/build'
 
 module Provision::Image::Catalogue
   @@catalogue = {}

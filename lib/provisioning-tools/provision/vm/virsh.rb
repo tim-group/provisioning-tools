@@ -1,5 +1,5 @@
-require 'provision/vm/namespace'
-require 'provision'
+require 'provisioning-tools/provision/vm/namespace'
+require 'provisioning-tools/provision'
 require 'erb'
 require 'ostruct'
 

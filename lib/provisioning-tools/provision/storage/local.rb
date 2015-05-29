@@ -1,4 +1,4 @@
-require 'provision/logger'
+require 'provisioning-tools/provision/logger'
 
 module Provision::Storage::Local
   @@logger = Provision::Logger.get_logger('storage')

@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'provision/core/machine_spec'
+require 'provisioning-tools/provision/core/machine_spec'
 
 describe Provision::Core::MachineSpec do
   it 'fields in the spec hash are available as accessor methods' do

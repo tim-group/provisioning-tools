@@ -20,7 +20,7 @@ task :build_gold_precise do
   sh "mkdir -p build/gold-precise"
   $: << File.join(File.dirname(__FILE__), "./lib")
   require 'yaml'
-  require 'provision'
+  require 'provisioning-tools/provision'
   require 'pp'
 
   dest = File.dirname(__FILE__) + '/build/gold-precise'
@@ -34,7 +34,7 @@ task :build_gold_trusty do
   sh "mkdir -p build/gold-trusty"
   $: << File.join(File.dirname(__FILE__), "./lib")
   require 'yaml'
-  require 'provision'
+  require 'provisioning-tools/provision'
   require 'pp'
 
   dest = File.dirname(__FILE__) + '/build/gold-trusty'
@@ -190,6 +190,22 @@ task :install => [:package] do
   sh "sudo dpkg -i build/*.deb"
 end
 task :test => [:spec, :mcollective_spec]
+
+task :omnibus do
+  sh "rm -rf build/omnibus"
+
+  sh "mkdir -p build/omnibus"
+  sh "mkdir -p build/omnibus/bin"
+  sh "mkdir -p build/omnibus/embedded/lib/ruby/site_ruby"
+  sh "mkdir -p build/omnibus/embedded/share/provisioning-tools"
+
+  sh "cp -r bin/* build/omnibus/bin"
+  sh "cp -r lib/* build/omnibus/embedded/lib/ruby/site_ruby"
+  sh "cp -r home build/omnibus/embedded/share/provisioning-tools"
+  sh "cp -r templates build/omnibus/embedded/share/provisioning-tools"
+  sh "cp -r files build/omnibus/embedded/share/provisioning-tools"
+  sh "cp -r test build/omnibus/embedded/share/provisioning-tools"
+end
 
 desc "Run lint (Rubocop)"
 task :lint do

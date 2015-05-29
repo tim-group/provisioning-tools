@@ -8,9 +8,9 @@ configdir = File.join(File.dirname(__FILE__), "../lib/config")
 target_dir = File.join(File.dirname(__FILE__), "../target")
 
 require 'optparse'
-require 'provision'
-require 'provision/workqueue'
-require 'util/symbol_utils'
+require 'provisioning-tools/provision'
+require 'provisioning-tools/provision/workqueue'
+require 'provisioning-tools/util/symbol_utils'
 
 symbol_utils = Util::SymbolUtils.new
 specs = YAML.load($stdin).map do |spec|

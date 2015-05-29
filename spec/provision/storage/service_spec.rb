@@ -1,8 +1,8 @@
 require 'spec_helper'
 require 'rspec'
-require 'provision'
-require 'provision/storage'
-require 'provision/storage/service'
+require 'provisioning-tools/provision'
+require 'provisioning-tools/provision/storage'
+require 'provisioning-tools/provision/storage/service'
 
 describe Provision::Storage::Service do
   describe 'common' do

@@ -1,5 +1,5 @@
-require 'provision/logger'
-require 'provision/image/commands'
+require 'provisioning-tools/provision/logger'
+require 'provisioning-tools/provision/image/commands'
 
 class Provision::Storage
   include Provision::Image::Commands
