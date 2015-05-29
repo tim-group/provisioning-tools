@@ -1,6 +1,4 @@
 require 'rubygems'
-require 'spec_helper'
-require 'pp'
 require 'provisioning-tools/provision'
 
 describe 'provisionvm', :mcollective => true do

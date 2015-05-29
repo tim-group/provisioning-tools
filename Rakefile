@@ -21,7 +21,6 @@ task :build_gold_precise do
   $: << File.join(File.dirname(__FILE__), "./lib")
   require 'yaml'
   require 'provisioning-tools/provision'
-  require 'pp'
 
   dest = File.dirname(__FILE__) + '/build/gold-precise'
   result = Provision::Factory.new.create_gold_image(:spindle => dest, :hostname => "generic", :distid => "ubuntu",
@@ -35,7 +34,6 @@ task :build_gold_trusty do
   $: << File.join(File.dirname(__FILE__), "./lib")
   require 'yaml'
   require 'provisioning-tools/provision'
-  require 'pp'
 
   dest = File.dirname(__FILE__) + '/build/gold-trusty'
   result = Provision::Factory.new.create_gold_image(:spindle => dest, :hostname => "generic", :distid => "ubuntu",

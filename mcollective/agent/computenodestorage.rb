@@ -1,5 +1,4 @@
 require 'yaml'
-require 'pp'
 
 module MCollective
   module Agent

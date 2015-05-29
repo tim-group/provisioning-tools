@@ -8,7 +8,6 @@ require 'provisioning-tools/provision/storage'
 require 'provisioning-tools/provision/storage/service'
 require 'provisioning-tools/util/symbol_utils'
 require 'yaml'
-require 'pp'
 
 module Provision
   def self.base(dir = "")
