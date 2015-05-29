@@ -3,16 +3,10 @@ end
 
 class Util::SymbolUtils
   def symbolize_keys(hash)
-    transform_keys(hash) do |key|
-      key.to_sym
-    end
+    transform_keys(hash) { |key| key.to_sym }
   end
 
-  def stringify_keys(hash)
-    transform_keys(hash) do |key|
-      key.to_s
-    end
-  end
+  private
 
   def transform_keys(hash, &transformation)
     Hash[hash.map do |key, value|
