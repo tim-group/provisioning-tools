@@ -151,7 +151,7 @@ task :package_agent do
                  "-t", "deb",
                  "-n", "provisioning-tools-mcollective-plugin",
                  "-v", version,
-                 "-d", "provisioning-tools",
+                 #"-d", "provisioning-tools", # XXX
                  "-d", "provisioning-tools-mcollective-plugin-ddl",
                  "-a", "all",
                  "-C", "build",
