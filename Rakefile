@@ -186,6 +186,13 @@ task :install => [:package] do
 end
 task :test => [:spec, :mcollective_spec]
 
+desc "Prepare for an omnibus run"
+task :omnibus_prep do
+  sh "rm -rf /opt/provisioning-tools" # XXX very bad
+  sh "mkdir -p /opt/provisioning-tools"
+  sh "chown \$SUDO_UID:\$SUDO_GID /opt/provisioning-tools"
+end
+
 task :omnibus do
   sh "rm -rf build/omnibus"
 
