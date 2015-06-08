@@ -210,6 +210,7 @@ task :omnibus do
   # expose provisioning-tools libs; required by mcollective agents
   sh "ln -s ../../../embedded/lib/ruby/site_ruby/provisioning-tools build/omnibus/lib/ruby/site_ruby/provisioning-tools"
   sh "ln -s ../../embedded/share/provisioning-tools/templates build/omnibus/lib/ruby/templates" # XXX self.templatedir
+  sh "ln -s ../../embedded/share/provisioning-tools/home build/omnibus/lib/ruby/home" # XXX self.homedir
 end
 
 desc "Run lint (Rubocop)"
