@@ -18,7 +18,6 @@ end
 desc "Build Precise Gold Image"
 task :build_gold_precise do
   sh "mkdir -p build/gold-precise"
-  $: << File.join(File.dirname(__FILE__), "./lib")
   require 'yaml'
   require 'provisioning-tools/provision'
 
@@ -31,7 +30,6 @@ end
 desc "Build Trusty Gold Image"
 task :build_gold_trusty do
   sh "mkdir -p build/gold-trusty"
-  $: << File.join(File.dirname(__FILE__), "./lib")
   require 'yaml'
   require 'provisioning-tools/provision'
 
