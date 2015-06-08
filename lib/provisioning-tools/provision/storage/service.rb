@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'provisioning-tools/provision'
 require 'provisioning-tools/provision/storage'
 require 'provisioning-tools/provision/storage/config'
 require 'provisioning-tools/provision/logger'
@@ -155,7 +156,7 @@ class Provision::Storage::Service
   end
 
   def spec_to_xml(name)
-    template_file = "#{Provision.base}/templates/disk.template"
+    template_file = "#{Provision.templatedir}/disk.template"
     xml_output = ""
     drive_letters = ('a'..'z').to_a
     current_drive_letter = 0

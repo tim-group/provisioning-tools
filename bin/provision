@@ -4,18 +4,13 @@ require 'yaml'
 
 $: << File.join(File.dirname(__FILE__), "..", "lib")
 
-configdir = File.join(File.dirname(__FILE__), "../lib/config")
-target_dir = File.join(File.dirname(__FILE__), "../target")
-
 require 'optparse'
 require 'provisioning-tools/provision'
 require 'provisioning-tools/provision/workqueue'
 require 'provisioning-tools/util/symbol_utils'
 
 symbol_utils = Util::SymbolUtils.new
-specs = YAML.load($stdin).map do |spec|
-  symbol_utils.symbolize_keys(spec)
-end
+specs = YAML.load($stdin).map { |spec| symbol_utils.symbolize_keys(spec) }
 
 listener = NoopListener.new
 Provision::Factory.new.work_queue(:worker_count => 4, :listener => listener).launch_all(specs)

@@ -10,12 +10,14 @@ require 'provisioning-tools/util/symbol_utils'
 require 'yaml'
 
 module Provision
-  def self.base(dir = "")
-    File.expand_path(File.join(File.dirname(__FILE__), "../../#{dir}"))
+  def self.homedir
+    # "/opt/provisioning-tools/embedded/share/provisioning-tools/home/image_builders/"
+    File.expand_path(File.join(File.dirname(__FILE__), "../../home/image_builders/"))
   end
 
-  def self.home(dir = "")
-    File.expand_path(File.join(File.dirname(__FILE__), "../../home/#{dir}"))
+  def self.templatedir
+    # "/opt/provisioning-tools/embedded/share/provisioning-tools/templates/"
+    File.expand_path(File.join(File.dirname(__FILE__), "../../templates/"))
   end
 end
 
@@ -68,14 +70,6 @@ class Provision::Factory
     numbering_service
   end
 
-  def home(dir = "")
-    Provision.home(dir)
-  end
-
-  def base(dir = "")
-    Provision.base(dir)
-  end
-
   def virsh
     Provision::VM::Virsh.new(@config)
   end
@@ -97,7 +91,7 @@ class Provision::Factory
 
     @provisioning_service ||= Provision::Core::ProvisioningService.new(
       :image_service => Provision::Image::Service.new(
-        :configdir => home("image_builders"),
+        :homedir => Provision.homedir,
         :targetdir => targetdir,
         :config => @config
       ),
@@ -125,8 +119,7 @@ class Provision::Factory
     distcodename = spec_hash[:distcodename] || 'precise'
     spec = Provision::Core::MachineSpec.new(spec_hash)
     targetdir = File.join(File.dirname(__FILE__), "../target")
-    image_service = Provision::Image::Service.new(:configdir => home("image_builders"), :targetdir => targetdir,
-                                                  :config => @config)
+    image_service = Provision::Image::Service.new(:configdir => Provision.homedir, :targetdir => targetdir, :config => @config)
     image_service.build_image("gold-#{distid}-#{distcodename}", spec)
     image_service.build_image("shrink", spec)
   end

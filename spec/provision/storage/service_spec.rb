@@ -36,9 +36,7 @@ describe Provision::Storage::Service do
     end
 
     it 'should raise exception if provisioning an LVM without specifying a vg' do
-      settings = {
-        :os => { :arch    => 'LVM' }
-      }
+      settings = { :os => { :arch => 'LVM' } }
       expect do
         storage_service = Provision::Storage::Service.new(settings)
       end.to raise_error "Storage service requires each storage type to specify the 'options' setting"

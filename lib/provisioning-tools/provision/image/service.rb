@@ -3,9 +3,9 @@ require 'provisioning-tools/provision/image/commands'
 
 class Provision::Image::Service
   def initialize(options)
-    @configdir = options[:configdir]
+    @homedir = options[:homedir]
     @config = options[:config]
-    Provision::Image::Catalogue.loadconfig(@configdir)
+    Provision::Image::Catalogue.loadconfig(@homedir)
   end
 
   def build_image(template, spec)
