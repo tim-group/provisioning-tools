@@ -66,10 +66,10 @@ class Provision::VM::Virsh
 
   def write_virsh_xml(spec, storage_xml = nil)
     template_file = if spec[:kvm_template]
-      "#{Provision.templatedir}/#{spec[:kvm_template]}.template"
-    else
-      "#{Provision.templatedir}/kvm.template"
-    end
+                      "#{Provision.templatedir}/#{spec[:kvm_template]}.template"
+                    else
+                      "#{Provision.templatedir}/kvm.template"
+                    end
     template = ERB.new(File.read(template_file))
     to = "#{spec[:libvirt_dir]}/#{spec[:hostname]}.xml"
     binding = VirshBinding.new(spec, @config, storage_xml)
