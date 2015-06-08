@@ -1,3 +1,4 @@
+$: << '/opt/provisioning-tools/lib/ruby/site_ruby'
 require 'mcollective'
 require 'provisioning-tools/provision'
 require 'provisioning-tools/provision/workqueue'

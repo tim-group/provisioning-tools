@@ -1,3 +1,4 @@
+$: << '/opt/provisioning-tools/lib/ruby/site_ruby'
 require 'provisioning-tools/provision'
 require 'provisioning-tools/provision/storage'
 require 'provisioning-tools/provision/storage/service'

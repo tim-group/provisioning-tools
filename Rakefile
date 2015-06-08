@@ -196,6 +196,7 @@ task :omnibus do
 
   sh "mkdir -p build/omnibus"
   sh "mkdir -p build/omnibus/bin"
+  sh "mkdir -p build/omnibus/lib/ruby/site_ruby"
   sh "mkdir -p build/omnibus/embedded/lib/ruby/site_ruby"
   sh "mkdir -p build/omnibus/embedded/share/provisioning-tools"
 
@@ -205,6 +206,8 @@ task :omnibus do
   sh "cp -r templates build/omnibus/embedded/share/provisioning-tools"
   sh "cp -r files build/omnibus/embedded/share/provisioning-tools"
   sh "cp -r test build/omnibus/embedded/share/provisioning-tools"
+  # expose provisioning-tools libs; required by mcollective agents
+  sh "ln -s ../../../embedded/lib/ruby/site_ruby/provisioning-tools build/omnibus/lib/ruby/site_ruby/provisioning-tools"
 end
 
 desc "Run lint (Rubocop)"
