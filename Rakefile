@@ -3,7 +3,6 @@ require 'rake'
 require 'rake/testtask'
 require 'fileutils'
 require 'rspec/core/rake_task'
-require 'fpm'
 
 task :default do
   sh "rake -s -T"
