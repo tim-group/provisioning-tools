@@ -3,6 +3,7 @@ require 'rake'
 require 'rake/testtask'
 require 'fileutils'
 require 'rspec/core/rake_task'
+require 'fpm' # needed for Dir.mktmpdir
 
 task :default do
   sh "rake -s -T"
