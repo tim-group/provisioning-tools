@@ -157,7 +157,6 @@ Pin-Priority: 1001\n"
                 'openssh-server '\
                 'postfix '\
                 'psmisc '\
-                'rubygems '\
                 'screen '\
                 'strace '\
                 'subversion '\
