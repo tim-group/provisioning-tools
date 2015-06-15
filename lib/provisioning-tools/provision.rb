@@ -92,7 +92,6 @@ class Provision::Factory
     @provisioning_service ||= Provision::Core::ProvisioningService.new(
       :image_service => Provision::Image::Service.new(
         :homedir => Provision.homedir,
-        :targetdir => targetdir,
         :config => @config
       ),
       :storage_service => storage_service,
@@ -119,8 +118,7 @@ class Provision::Factory
     distcodename = spec_hash[:distcodename] || 'precise'
     spec = Provision::Core::MachineSpec.new(spec_hash)
     targetdir = File.join(File.dirname(__FILE__), "../target")
-    image_service = Provision::Image::Service.new(:configdir => Provision.homedir, :targetdir => targetdir,
-                                                  :config => @config)
+    image_service = Provision::Image::Service.new(:config => @config)
     image_service.build_image("gold-#{distid}-#{distcodename}", spec)
     image_service.build_image("shrink", spec)
   end
