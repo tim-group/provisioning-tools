@@ -9,7 +9,7 @@ define "ubuntu-trusty" do
       "#{spec[:temp_dir]} http://gb.archive.ubuntu.com/ubuntu"
     # XXX line below is a workaround for systemd-udevd in ubuntu trusty
     # XXX see https://bugs.launchpad.net/ubuntu/+source/systemd/+bug/1329684
-    cmd "pkill $(lsof -nt #{spec[:temp_dir]}/lib/systemd/systemd-udevd)"
+    cmd "kill $(lsof -nt #{spec[:temp_dir]}/lib/systemd/systemd-udevd)"
     cmd "mkdir -p #{spec[:temp_dir]}/etc/default"
   end
 
