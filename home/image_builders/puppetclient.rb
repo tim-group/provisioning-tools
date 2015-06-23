@@ -36,6 +36,7 @@ define "puppetclient" do
         "echo 'Run ntpdate'\n" \
         "(/usr/sbin/ntpdate -b -v -d -s ci-1.youdevise.com 2>&1 | tee -a /tmp/bootstrap.log || exit 0)\n" \
         "echo 'Regenerating SSH hostkeys'\n" \
+        "/bin/rm /etc/ssh/ssh_host_*\n" \
         "/usr/sbin/dpkg-reconfigure openssh-server\n" \
         "echo 'Running puppet agent'\n" \
         "puppet agent --debug --verbose --waitforcert 10 --onetime 2>&1 | tee -a /tmp/bootstrap.log\n" \
