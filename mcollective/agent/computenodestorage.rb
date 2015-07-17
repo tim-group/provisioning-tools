@@ -70,7 +70,7 @@ module MCollective
         files
       end
 
-      action "details" do
+      action 'details' do
         config = YAML.load_file('/etc/provision/config.yaml')
         fail "Un-supported host vm_storage_type is #{config['vm_storage_type']}" \
           unless config['vm_storage_type'] == 'new'
@@ -92,6 +92,19 @@ module MCollective
             fail "Unsure how to deal with architecture: #{arch}"
           end
         end
+      end
+
+      action 'lvs_attr' do
+        f = open("|lvs -o lv_name,lv_attr")
+        f.readlines.each do |line|
+          if line.match(/^\s*LV\s+Attr\s*$/)
+            next
+          else
+            vals = line.match(/^\s*(.*?)\s+(.*?)$/).captures
+            reply[vals[0]] = vals[1]
+          end
+        end
+        f.close
       end
     end
   end

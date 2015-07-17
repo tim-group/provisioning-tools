@@ -10,3 +10,6 @@ action "details", :description => "returns all storage details for various stora
    display :always
 end
 
+action "lvs_attr", :description => "returns a formatted output of `lvs -o lv_name,lv_attr`" do
+   display :always
+end
