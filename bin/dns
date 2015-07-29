@@ -5,11 +5,11 @@ $: << File.join(File.dirname(__FILE__), "..", "lib")
 require 'provisioning-tools/provision'
 
 actions = {
-  'allocate' => :allocate_ips_for,
+  'allocate'   => :allocate_ips_for,
   'deallocate' => :remove_ips_for,
-  'free' => :remove_ips_for,
-  'delete' => :remove_ips_for,
-  'release' => :remove_ips_for
+  'free'       => :remove_ips_for,
+  'delete'     => :remove_ips_for,
+  'release'    => :remove_ips_for,
 }
 
 action, fqdn = ARGV
