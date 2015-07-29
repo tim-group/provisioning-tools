@@ -162,7 +162,6 @@ Pin-Priority: 1001\n"
                 'screen '\
                 'strace '\
                 'subversion '\
-                'sysstat '\
                 'tcpdump '\
                 'tcptraceroute '\
                 'telnet '\
