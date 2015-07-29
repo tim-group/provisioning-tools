@@ -151,7 +151,8 @@ task :package_agent do
                  "-t", "deb",
                  "-n", "provisioning-tools-mcollective-plugin",
                  "-v", version,
-                 # "-d", "provisioning-tools", # XXX
+                 "-d", "ruby-bundle",
+                 # "-d", "provisioning-tools", # XXX fix after all this repackaging has settled
                  "-d", "provisioning-tools-mcollective-plugin-ddl",
                  "-a", "all",
                  "-C", "build",
