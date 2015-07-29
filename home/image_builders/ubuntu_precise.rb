@@ -149,7 +149,6 @@ Pin-Priority: 1001\n"
                 'libstomp-ruby1.8 '\
                 'lsof '\
                 'lvm2 '\
-                'mailutils '\
                 'nagios-nrpe-server '\
                 'nagios-plugins '\
                 'nagios-plugins-standard '\
