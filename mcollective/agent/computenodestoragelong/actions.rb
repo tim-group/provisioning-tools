@@ -3,6 +3,7 @@
 require 'json'
 
 $: << '/opt/provisioning-tools/lib/ruby/site_ruby'
+$: << '/usr/local/lib/site_ruby/timgroup/'
 require 'provisioning-tools/provision'
 require 'provisioning-tools/provision/storage'
 require 'provisioning-tools/provision/storage/service'
