@@ -1,10 +1,10 @@
-#! /usr/bin/ruby
-
-require 'yaml'
-
-$: << File.join(File.dirname(__FILE__), "..", "lib")
+#!/opt/ruby-bundle/bin/ruby
 
 require 'optparse'
+require 'yaml'
+
+$: << '/usr/local/lib/site_ruby/timgroup/'
+
 require 'provisioning-tools/provision'
 require 'provisioning-tools/provision/workqueue'
 require 'provisioning-tools/util/symbol_utils'

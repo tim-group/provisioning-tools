@@ -1,6 +1,6 @@
-#! /usr/bin/env ruby
+#!/opt/ruby-bundle/bin/ruby
 
-$: << File.join(File.dirname(__FILE__), "..", "lib")
+$: << '/usr/local/lib/site_ruby/timgroup/'
 
 require 'provisioning-tools/provision'
 

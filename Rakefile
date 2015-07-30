@@ -39,6 +39,7 @@ task :build_gold_trusty do
   sh "chmod a+w -R build"
 end
 
+# XXX what's this for?
 desc "Run puppet"
 task :run_puppet do
   sh "ssh-keygen -R $(dig dev-puppetmaster-001.dev.net.local @192.168.5.1 +short)"
@@ -66,38 +67,42 @@ task :clean do
   sh "rm -rf build"
 end
 
-desc "Generate deb file for the gem and command-line tools"
+desc "Create Debian package"
 task :package_main do
-  hash = `git rev-parse --short HEAD`.chomp
-  v_part = ENV['BUILD_NUMBER'] || "0.#{hash.hex}"
-  version = "0.0.#{v_part}"
+  version = "1.0.#{ENV['BUILD_NUMBER']}"
 
-  Dir.mktmpdir do |tmp|
-    sh "mkdir -p build"
-    sh "rm -f *.gem"
-    sh "gem1.8   build provisioning-tools.gemspec && mv provisioning-tools-*.gem build/provisioning-tools-1.8.gem"
-    sh "gem1.8   install --no-ri --no-rdoc --install-dir #{tmp}/1.8 build/provisioning-tools-1.8.gem"
-    sh "gem1.9.1 build provisioning-tools.gemspec && mv provisioning-tools-*.gem build/provisioning-tools-1.9.gem"
-    sh "gem1.9.1 install --no-ri --no-rdoc --install-dir #{tmp}/1.9.1 build/provisioning-tools-1.9.gem"
-    sh "cp postinst.sh build/"
+  sh 'rm -rf build/package'
+  sh 'mkdir -p build/package/usr/local/lib/site_ruby/timgroup/'
+  sh 'cp -r lib/* build/package/usr/local/lib/site_ruby/timgroup/'
 
-    command_line = "cd build &&",
-                   "fpm",
-                   "-n provisioning-tools",
-                   "--url 'http://www.timgroup.com'",
-                   "--maintainer 'infra@timgroup.com'",
-                   "-v #{version}",
-                   "--prefix /var/lib/gems/",
-                   "-d provisioning-tools-gold-image-precise",
-                   "-d debootstrap",
-                   "-t deb",
-                   "-a all",
-                   "-s dir",
-                   "-C #{tmp}",
-                   "."
+  sh 'mkdir -p build/package/usr/local/bin/'
+  sh 'cp -r bin/* build/package/usr/local/bin/'
 
-    sh command_line.join(' ')
-  end
+  sh 'mkdir -p build/package/usr/local/share/provisioning-tools/'
+  sh 'cp -r home build/package/usr/local/share/provisioning-tools/'
+  sh 'cp -r templates build/package/usr/local/share/provisioning-tools/'
+  # sh 'cp -r files build/package/usr/local/share/provisioning-tools/' # XXX
+  # sh 'cp -r test build/package/usr/local/share/provisioning-tools/' # XXX
+
+  arguments = [
+    '--description', 'provisioning tools',
+    '--url', 'https://github.com/tim-group/provisioning-tools',
+    '-p', "build/provisioning-tools-transition_#{version}.deb",
+    '-n', 'provisioning-tools-transition',
+    '-v', "#{version}",
+    '-m', 'Infrastructure <infra@timgroup.com>',
+    '-d', 'provisioning-tools-gold-image-precise',
+    '-d', 'debootstrap',
+    '-d', 'ruby-bundle',
+    '-a', 'all',
+    '-t', 'deb',
+    '-s', 'dir',
+    '-C', 'build/package'
+  ]
+
+  argv = arguments.map { |x| "'#{x}'" }.join(' ')
+  sh 'rm -f build/*.deb'
+  sh "fpm #{argv}"
 end
 
 desc "Generate deb file for the Precise Gold image"

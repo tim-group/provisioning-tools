@@ -11,13 +11,11 @@ require 'yaml'
 
 module Provision
   def self.homedir
-    # "/opt/provisioning-tools/embedded/share/provisioning-tools/home/image_builders/"
-    File.expand_path(File.join(File.dirname(__FILE__), "../../home/image_builders/"))
+    '/usr/local/share/provisioning-tools/home/'
   end
 
   def self.templatedir
-    # "/opt/provisioning-tools/embedded/share/provisioning-tools/templates/"
-    File.expand_path(File.join(File.dirname(__FILE__), "../../templates/"))
+    '/usr/local/share/provisioning-tools/templates/'
   end
 end
 
