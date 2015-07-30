@@ -9,7 +9,7 @@ actions = {
   'deallocate' => :remove_ips_for,
   'free'       => :remove_ips_for,
   'delete'     => :remove_ips_for,
-  'release'    => :remove_ips_for,
+  'release'    => :remove_ips_for
 }
 
 action, fqdn = ARGV
