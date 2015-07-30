@@ -78,12 +78,6 @@ task :package_main do
   sh 'mkdir -p build/package/usr/local/bin/'
   sh 'cp -r bin/* build/package/usr/local/bin/'
 
-  sh 'mkdir -p build/package/usr/local/share/provisioning-tools/'
-  sh 'cp -r home build/package/usr/local/share/provisioning-tools/'
-  sh 'cp -r templates build/package/usr/local/share/provisioning-tools/'
-  # sh 'cp -r files build/package/usr/local/share/provisioning-tools/' # XXX
-  # sh 'cp -r test build/package/usr/local/share/provisioning-tools/' # XXX
-
   arguments = [
     '--description', 'provisioning tools',
     '--url', 'https://github.com/tim-group/provisioning-tools',

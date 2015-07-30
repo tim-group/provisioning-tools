@@ -7,8 +7,7 @@ describe Provision::VM::Virsh do
   before do
   end
 
-  # XXX temporarily disabled, fix path to templates/
-  xit 'creates a virt machine xml file in libvirt' do
+  it 'creates a virt machine xml file in libvirt' do
     d = Dir.mktmpdir
 
     machine_spec = Provision::Core::MachineSpec.new(
@@ -31,8 +30,7 @@ describe Provision::VM::Virsh do
     IO.read("#{d}/vmx1.xml").should match("build/vmx1.img")
   end
 
-  # XXX temporarily disabled, fix path to templates/
-  xit 'creates a virt machine xml file in libvirt with lvm support' do
+  it 'creates a virt machine xml file in libvirt with lvm support' do
     d = Dir.mktmpdir
 
     machine_spec = Provision::Core::MachineSpec.new(
@@ -58,8 +56,7 @@ describe Provision::VM::Virsh do
     IO.read("#{d}/vmx-1.xml").should match("<target dev='vda' bus='virtio'/>")
   end
 
-  # XXX temporarily disabled, fix path to templates/
-  xit 'creates a virt machine xml file in libvirt with a different format template' do
+  it 'creates a virt machine xml file in libvirt with a different format template' do
     d = Dir.mktmpdir
 
     machine_spec = Provision::Core::MachineSpec.new(
