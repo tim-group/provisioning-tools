@@ -1,0 +1,9 @@
+entry paths into this codebase:
+ - bin/dns
+ - bin/provision
+ - mcollective/agent/computenode
+ - mcollective/agent/computenodestoragelong
+
+DEPENDENCIES:
+ - gems: rake, rspec, fpm, mcollective-client, net-ssh, rotp
+ - ruby-bundle
