@@ -62,14 +62,14 @@ RSpec::Core::RakeTask.new(:mcollective_spec) do |t|
   t.pattern = "mcollective/spec/**/*_spec.rb"
 end
 
-desc "Clean everything up"
+desc 'Clean up the build directory'
 task :clean do
-  sh "rm -rf build"
+  sh 'rm -rf build'
 end
 
 desc "Create Debian package"
 task :package_main do
-  version = "1.0.#{ENV['BUILD_NUMBER']}"
+  version = "1.0.#{ENV['BUILD_NUMBER']}" # XXX 1.0 -> 0.0
 
   sh 'rm -rf build/package'
   sh 'mkdir -p build/package/usr/local/lib/site_ruby/timgroup/'
@@ -146,6 +146,7 @@ task :package_agent do
   version = "0.0.#{v_part}"
 
   command_line = "fpm",
+                 '--description', 'provisioning tools mcollective agent',
                  "-s", "dir",
                  "-t", "deb",
                  "-n", "provisioning-tools-mcollective-plugin",
@@ -164,6 +165,7 @@ task :package_agent do
   sh command_line.join(' ')
 
   command_line = "fpm",
+                 '--description', 'provisioning tools mcollective agent (.ddl files)',
                  "-s", "dir",
                  "-t", "deb",
                  "-n", "provisioning-tools-mcollective-plugin-ddl",
