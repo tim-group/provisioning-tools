@@ -79,7 +79,7 @@ task :package_main do
   sh 'cp -r bin/* build/package/usr/local/bin/'
 
   arguments = [
-    '--description', 'provisioning tools',
+    '--description', '"provisioning tools"',
     '--url', 'https://github.com/tim-group/provisioning-tools',
     '-p', "build/provisioning-tools-transition_#{version}.deb",
     '-n', 'provisioning-tools-transition',
@@ -146,7 +146,7 @@ task :package_agent do
   version = "0.0.#{v_part}"
 
   command_line = "fpm",
-                 '--description', 'provisioning tools mcollective agent',
+                 '--description', '"provisioning tools mcollective agent"',
                  "-s", "dir",
                  "-t", "deb",
                  "-n", "provisioning-tools-mcollective-plugin",
@@ -165,7 +165,7 @@ task :package_agent do
   sh command_line.join(' ')
 
   command_line = "fpm",
-                 '--description', 'provisioning tools mcollective agent (.ddl files)',
+                 '--description', '"provisioning tools mcollective agent (.ddl files)"',
                  "-s", "dir",
                  "-t", "deb",
                  "-n", "provisioning-tools-mcollective-plugin-ddl",
