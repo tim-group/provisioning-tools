@@ -99,9 +99,9 @@ module Provision::Storage::Local
     if !File.exist?("#{device(underscore_name)}")
       @@logger.info("Persistent storage #{device(underscore_name)} does not exist")
       case persistence_options[:on_storage_not_found]
-      when :raise_error
+      when 'raise_error'
         fail "Persistent storage was not found for #{device(underscore_name)}"
-      when :create_new
+      when 'create_new'
         create(name, mount_point_obj)
         mount_point_obj.set(:newly_created, true)
       else

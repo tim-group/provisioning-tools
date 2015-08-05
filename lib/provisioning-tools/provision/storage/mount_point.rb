@@ -6,8 +6,8 @@ class Provision::Storage::MountPoint
     default_config = {
       :persistent => false,
       :persistence_options => {
-        :on_storage_not_found     => :raise_error,
-        :on_storage_size_mismatch => :raise_error
+        :on_storage_not_found     => 'raise_error',
+        :on_storage_size_mismatch => 'raise_error'
       },
       :prepare => {
         :options => {

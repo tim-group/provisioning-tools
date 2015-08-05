@@ -283,7 +283,7 @@ describe Provision::Storage::Local do
       mount_point_hash = {
         :size => '10G',
         :persistent => true,
-        :persistence_options => { :on_storage_not_found => :create_new }
+        :persistence_options => { :on_storage_not_found => 'create_new' }
       }
       mount_point_obj = Provision::Storage::MountPoint.new('/var/lib/mysql'.to_sym, mount_point_hash)
       @storage_type.should_receive(:create).with("oy-foodb-001", mount_point_obj)
