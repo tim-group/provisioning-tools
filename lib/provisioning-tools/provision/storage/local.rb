@@ -104,6 +104,8 @@ module Provision::Storage::Local
       when :create_new
         create(name, mount_point_obj)
         mount_point_obj.set(:newly_created, true)
+      else
+        fail "Persistent storage option on_storage_not_found set to unknown setting: '#{persistence_options[:on_storage_not_found]}'"
       end
     else
       @@logger.info("Persistent storage #{device(underscore_name)} exists")
