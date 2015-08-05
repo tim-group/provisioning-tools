@@ -92,7 +92,7 @@ specs = mco_args[:data][:specs]
 #     provisioning-tools. all keys seem to be symbols, while most values are strings. :networks appears to be the
 #     exception, though there may be others. ruby's json library does not distinguish between strings and symbols,
 #     and thus the conversion must be made manually. this can lead to hard to debug problems.
-specs.each { |s| s[:networks].map!(&:to_sym) } unless mco_args[:action] == 'hello'
+specs.each { |s| s[:networks].map!(&:to_sym) }
 
 mco_reply = case mco_args[:action]
             when 'launch'        then with_lock { provision(specs, new_listener) }
