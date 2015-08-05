@@ -75,8 +75,10 @@ class Provision::Storage::Service
       fail 'Persistent options not found' unless mount_point_obj.config.key?(:persistence_options)
       storage = get_storage(type)
       if persistent
+        @log.info("Persistent storage for #{name} #{mount_point_obj.name}")
         storage.check_persistent_storage(name, mount_point_obj)
       else
+        @log.info("Not persistent storage for #{name} #{mount_point_obj.name}")
         storage.create(name, mount_point_obj)
         mount_point_obj.set(:newly_created, true)
       end

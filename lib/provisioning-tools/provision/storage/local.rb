@@ -97,6 +97,7 @@ module Provision::Storage::Local
     size = mount_point_obj.config[:size]
     persistence_options = mount_point_obj.config[:persistence_options]
     if !File.exist?("#{device(underscore_name)}")
+      @@logger.info("Persistent storage #{device(underscore_name)} does not exist")
       case persistence_options[:on_storage_not_found]
       when :raise_error
         fail "Persistent storage was not found for #{device(underscore_name)}"
@@ -105,6 +106,7 @@ module Provision::Storage::Local
         mount_point_obj.set(:newly_created, true)
       end
     else
+      @@logger.info("Persistent storage #{device(underscore_name)} exists")
       check_and_resize_filesystem(name, mount_point_obj, false)
     end
   end
