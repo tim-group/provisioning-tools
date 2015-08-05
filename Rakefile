@@ -5,6 +5,9 @@ require 'fileutils'
 require 'rspec/core/rake_task'
 require 'fpm' # needed for Dir.mktmpdir
 
+v = ENV['BUILD_NUMBER'] || "0.#{`git rev-parse --short HEAD`.chomp.hex}"
+@version = "0.0.#{v}"
+
 task :default do
   sh "rake -s -T"
 end
@@ -15,6 +18,7 @@ task :network do
   sh "sudo bash 'networking/numbering_service.sh'"
 end
 
+# XXX git grep build_gold_precise in jenkins-backups returns no matches
 desc "Build Precise Gold Image"
 task :build_gold_precise do
   sh "mkdir -p build/gold-precise"
@@ -27,16 +31,20 @@ task :build_gold_precise do
   sh "chmod a+w -R build"
 end
 
-desc "Build Trusty Gold Image"
-task :build_gold_trusty do
-  sh "mkdir -p build/gold-trusty"
-  require 'yaml'
-  require 'provisioning-tools/provision'
+desc "Generate deb file for the Precise Gold image"
+task :package_gold_precise => [:package_main] do
+  command_line = "fpm",
+                 "-s", "dir",
+                 "-t", "deb",
+                 "-n", "provisioning-tools-gold-image-precise",
+                 "-v", @version,
+                 "-a", "all",
+                 "-C", "build",
+                 "-p", "build/provisioning-tools-gold-image-precise_#{@version}.deb",
+                 "--prefix", "/var/local/images/",
+                 "gold-precise"
 
-  dest = File.dirname(__FILE__) + '/build/gold-trusty'
-  result = Provision::Factory.new.create_gold_image(:spindle => dest, :hostname => "generic", :distid => "ubuntu",
-                                                    :distcodename => "trusty")
-  sh "chmod a+w -R build"
+  sh command_line.join(' ')
 end
 
 # XXX what's this for?
@@ -46,11 +54,6 @@ task :run_puppet do
   sh "chmod 600 files/id_rsa"
   sh "ssh -o StrictHostKeyChecking=no -i files/id_rsa root@$(dig dev-puppetmaster-001.dev.net.local @192.168.5.1 " \
      "+short) 'mco puppetd runall 4'"
-end
-
-desc "Generate CTags"
-task :ctags do
-  sh "ctags -R --exclude=.git --exclude=build ."
 end
 
 desc "Run specs"
@@ -69,7 +72,7 @@ end
 
 desc "Create Debian package"
 task :package_main do
-  version = "1.0.#{ENV['BUILD_NUMBER']}" # XXX 1.0 -> 0.0
+  version = "1.0.#{ENV['BUILD_NUMBER']}" # XXX 1.0 -> 0.0, use @version
 
   sh 'rm -rf build/package'
   sh 'mkdir -p build/package/usr/local/lib/site_ruby/timgroup/'
@@ -79,7 +82,7 @@ task :package_main do
   sh 'cp -r bin/* build/package/usr/local/bin/'
 
   arguments = [
-    '--description', '"provisioning tools"',
+    '--description', 'provisioning tools',
     '--url', 'https://github.com/tim-group/provisioning-tools',
     '-p', "build/provisioning-tools-transition_#{version}.deb",
     '-n', 'provisioning-tools-transition',
@@ -95,128 +98,67 @@ task :package_main do
   ]
 
   argv = arguments.map { |x| "'#{x}'" }.join(' ')
-  sh 'rm -f build/*.deb'
+  sh 'rm -f build/provisioning-tools-transition_*.deb'
   sh "fpm #{argv}"
 end
 
-desc "Generate deb file for the Precise Gold image"
-task :package_gold_precise do
-  hash = `git rev-parse --short HEAD`.chomp
-  v_part = ENV['BUILD_NUMBER'] || "0.#{hash.hex}"
-  version = "0.0.#{v_part}"
-
-  command_line = "fpm",
-                 "-s", "dir",
-                 "-t", "deb",
-                 "-n", "provisioning-tools-gold-image-precise",
-                 "-v", version,
-                 "-a", "all",
-                 "-C", "build",
-                 "-p", "build/provisioning-tools-gold-image-precise_#{version}.deb",
-                 "--prefix", "/var/local/images/",
-                 "gold-precise"
-
-  sh command_line.join(' ')
-end
-
-desc "Generate deb file for the Trusty Gold image"
-task :package_gold_trusty do
-  hash = `git rev-parse --short HEAD`.chomp
-  v_part = ENV['BUILD_NUMBER'] || "0.#{hash.hex}"
-  version = "0.0.#{v_part}"
-
-  command_line = "fpm",
-                 "-s", "dir",
-                 "-t", "deb",
-                 "-n", "provisioning-tools-gold-image-trusty",
-                 "-v", version,
-                 "-a", "all",
-                 "-C", "build",
-                 "-p", "build/provisioning-tools-gold-image-trusty_#{version}.deb",
-                 "--prefix", "/var/local/images/",
-                 "gold-trusty"
-  sh command_line.join(' ')
-end
-
 desc "Generate deb file for the MCollective agent"
-task :package_agent do
-  sh "mkdir -p build"
-  hash = `git rev-parse --short HEAD`.chomp
-  v_part = ENV['BUILD_NUMBER'] || "0.#{hash.hex}"
-  version = "0.0.#{v_part}"
+task :package_agent => [:package_main] do
+  arguments = [
+    '--description', 'provisioning tools mcollective agent',
+    '-s', 'dir',
+    '-t', 'deb',
+    '-n', 'provisioning-tools-mcollective-plugin',
+    '-v', "#{@version}",
+    '-d', 'ruby-bundle',
+    # '-d', 'provisioning-tools', # XXX fix after all this repackaging has settled
+    '-d', 'provisioning-tools-mcollective-plugin-ddl',
+    '-a', 'all',
+    '-C', 'build',
+    '-p', "build/provisioning-tools-mcollective-plugin_#{@version}.deb",
+    '--prefix', '/usr/share/mcollective/plugins/mcollective',
+    '--post-install', 'postinst.sh',
+    '-x', 'agent/*.ddl',
+    '../mcollective/agent'
+  ]
 
-  command_line = "fpm",
-                 '--description', '"provisioning tools mcollective agent"',
-                 "-s", "dir",
-                 "-t", "deb",
-                 "-n", "provisioning-tools-mcollective-plugin",
-                 "-v", version,
-                 "-d", "ruby-bundle",
-                 # "-d", "provisioning-tools", # XXX fix after all this repackaging has settled
-                 "-d", "provisioning-tools-mcollective-plugin-ddl",
-                 "-a", "all",
-                 "-C", "build",
-                 "-p", "build/provisioning-tools-mcollective-plugin_#{version}.deb",
-                 "--prefix", "/usr/share/mcollective/plugins/mcollective",
-                 "--post-install", "postinst.sh",
-                 "-x", "agent/*.ddl",
-                 "../mcollective/agent"
+  argv = arguments.map { |x| "'#{x}'" }.join(' ')
+  sh 'rm -f build/provisioning-tools-mcollective-plugin_*.deb'
+  sh "fpm #{argv}"
 
-  sh command_line.join(' ')
+  arguments = [
+    '--description', 'provisioning tools mcollective agent (.ddl files)',
+    '-s', 'dir',
+    '-t', 'deb',
+    '-n', 'provisioning-tools-mcollective-plugin-ddl',
+    '-v', "#{@version}",
+    '-a', 'all',
+    '-C', 'build',
+    '-p', "build/provisioning-tools-mcollective-plugin-ddl_#{@version}.deb",
+    '--prefix', '/usr/share/mcollective/plugins/mcollective',
+    '-x', 'agent/*.rb',
+    '../mcollective/agent'
+  ]
 
-  command_line = "fpm",
-                 '--description', '"provisioning tools mcollective agent (.ddl files)"',
-                 "-s", "dir",
-                 "-t", "deb",
-                 "-n", "provisioning-tools-mcollective-plugin-ddl",
-                 "-v", version,
-                 "-a", "all",
-                 "-C", "build",
-                 "-p", "build/provisioning-tools-mcollective-plugin-ddl_#{version}.deb",
-                 "--prefix", "/usr/share/mcollective/plugins/mcollective",
-                 "-x", "agent/*.rb",
-                 "../mcollective/agent"
-
-  sh command_line.join(' ')
+  argv = arguments.map { |x| "'#{x}'" }.join(' ')
+  sh 'rm -f build/provisioning-tools-mcollective-plugin-ddl_*.deb'
+  sh "fpm #{argv}"
 end
 
 task :package => [:clean, :package_main, :package_agent]
+desc 'build and install packages locally'
 task :install => [:package] do
-  sh "sudo dpkg -i build/*.deb"
+  sh 'sudo dpkg -i build/*.deb'
 end
+
 task :test => [:spec, :mcollective_spec]
 
-desc "Prepare for an omnibus run"
-task :omnibus_prep do
-  sh "rm -rf /opt/provisioning-tools" # XXX very bad
-  sh "mkdir -p /opt/provisioning-tools"
-  sh "chown \$SUDO_UID:\$SUDO_GID /opt/provisioning-tools"
+desc "Generate CTags"
+task :ctags do
+  sh "ctags -R --exclude=.git --exclude=build ."
 end
 
-task :omnibus do
-  sh "rm -rf build/omnibus"
-
-  sh "mkdir -p build/omnibus"
-  sh "mkdir -p build/omnibus/bin"
-  sh "mkdir -p build/omnibus/lib/ruby/site_ruby"
-  sh "mkdir -p build/omnibus/embedded/lib/ruby" # XXX
-  sh "mkdir -p build/omnibus/embedded/lib/ruby/site_ruby"
-  sh "mkdir -p build/omnibus/embedded/share/provisioning-tools"
-
-  sh "cp -r bin/* build/omnibus/bin"
-  sh "cp -r lib/* build/omnibus/embedded/lib/ruby/site_ruby"
-  sh "cp -r home build/omnibus/embedded/share/provisioning-tools"
-  sh "cp -r templates build/omnibus/embedded/share/provisioning-tools"
-  sh "cp -r files build/omnibus/embedded/share/provisioning-tools"
-  sh "cp -r test build/omnibus/embedded/share/provisioning-tools"
-  # expose provisioning-tools libs; required by mcollective agents
-  sh "ln -s ../../../embedded/lib/ruby/site_ruby/provisioning-tools build/omnibus/lib/ruby/site_ruby/provisioning-tools"
-  sh "ln -s ../../embedded/share/provisioning-tools/templates build/omnibus/lib/ruby/templates" # XXX self.templatedir
-  sh "ln -s ../../embedded/share/provisioning-tools/home build/omnibus/lib/ruby/home" # XXX self.homedir
-end
-
-desc "Run lint (Rubocop)"
+desc 'Run lint (Rubocop)'
 task :lint do
-  sh "/var/lib/gems/1.9.1/bin/rubocop --require rubocop/formatter/checkstyle_formatter --format " \
-     "RuboCop::Formatter::CheckstyleFormatter --out tmp/checkstyle.xml"
+  sh 'rubocop'
 end
