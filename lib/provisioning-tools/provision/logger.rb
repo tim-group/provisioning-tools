@@ -1,4 +1,6 @@
 require 'logger'
+require 'fileutils'
+
 class Provision::Logger
   @@logger = nil
   def self.get_logger(log_id = 'provision')
