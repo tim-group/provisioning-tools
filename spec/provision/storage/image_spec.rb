@@ -42,7 +42,8 @@ describe Provision::Storage::Image do
   describe 'remove' do
     it 'should remove the device' do
       FileUtils.touch "#{@tmpdir}/oy-deletedb-001_var_lib_mysql.img"
-      @storage_type.remove('oy-deletedb-001', '/var/lib/mysql')
+      mount_point_obj = Provision::Storage::MountPoint.new('/var/lib/mysql', :size => '1M')
+      @storage_type.remove('oy-deletedb-001', mount_point_obj)
       File.exist?("#{@tmpdir}/oy-deletedb-001_var_lib_mysql.img").should eql false
     end
   end

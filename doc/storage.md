@@ -73,6 +73,9 @@ storage:
       - one of the storage types defined on the host. os or data would be valid examples if we had the previously mentioned storage types in existence.
     - **size**: < size >
       - size in the format <number><units>, for example 25G would mean 25 Gigabytes.
+    - **chmod**: <permissions>
+      - change the permissions of the root of the mount point
+      - permissions in a format compatible with the chmod command
 
 ### All storage spec options
 There are numerous things that can be provided within the storage spec for each mount point, they are as follows:
@@ -110,4 +113,11 @@ There are numerous things that can be provided within the storage spec for each 
           - whether this mount point's underlying storage should use libvirts virtio drivers or not. Mostly introduced to support older Windows images where adding in virtio driver support wasn't easy
         - **shrink_after_unmount**: < true | false >
           - whether this mount point should have its filesystem, partitions, etc. shrunk to the minimum size possible after initialisation etc. Mostly introduced to shrink filesystems to then use as gold images.
+        - **create_guest_lvm**: < true | false >
+          - whether to create lvm PV (and VG and LV) within the underlying block device before creating the filesystem (on the newly created LV)
+          - only useable when method is format and creating a new filesystem
+        - **guest_lvm_pv_size**: < size >
+          - size in the format <number><units>, for example 25G would mean 25 Gigabytes
+          - can only be used when create_guest_lvm is set to true
+          - must be equal to or larger than mount point's size setting.
 

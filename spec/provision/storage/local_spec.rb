@@ -196,6 +196,10 @@ describe Provision::Storage::Local do
     expect { @storage_type.rebuild_partition(name, @mount_point_obj) }.to raise_error
   end
 
+  it 'should call the correct commands if this storage should create lvm within itself' do
+    name = 'create'
+  end
+
   it 'should check and resize the filesystem' do
     name = 'check_and_resize'
     device_name = @storage_type.device(name)

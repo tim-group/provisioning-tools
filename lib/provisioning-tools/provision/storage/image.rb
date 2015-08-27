@@ -10,15 +10,17 @@ class Provision::Storage::Image < Provision::Storage
   end
 
   def create(name, mount_point_obj)
+    fail("it's currently not possible to create lvm that's within an image") if create_lvm?(mount_point_obj)
     underscore_name = underscore_name(name, mount_point_obj.name)
     size = mount_point_obj.config[:size]
     fail "Image file #{device(underscore_name)} already exists" if File.exist?("#{device(underscore_name)}")
     run_task(name, "create #{underscore_name}",
              :task => lambda { cmd "qemu-img create #{device(underscore_name)} #{size}" },
-             :cleanup => lambda { remove(name, mount_point_obj.name) })
+             :cleanup => lambda { remove(name, mount_point_obj) })
   end
 
   def grow_filesystem(name, mount_point_obj)
+    fail("it's currently not possible to grow the filesystem within lvm that's within an image") if create_lvm?(mount_point_obj)
     underscore_name = underscore_name(name, mount_point_obj.name)
     size = mount_point_obj.config[:size]
     run_task(name, "grow #{underscore_name}",
@@ -28,6 +30,7 @@ class Provision::Storage::Image < Provision::Storage
   end
 
   def shrink_filesystem(name, mount_point_obj)
+    fail("it's currently not possible to shrink the filesystem within lvm that's within an image") if create_lvm?(mount_point_obj)
     check_and_resize_filesystem(name, mount_point_obj, :minimum)
     rebuild_partition(name, mount_point_obj, :minimum)
     underscore_name = underscore_name(name, mount_point_obj.name)
@@ -42,12 +45,19 @@ class Provision::Storage::Image < Provision::Storage
     "#{@image_path}/#{underscore_name}.img"
   end
 
-  def remove(name, mount_point)
-    underscore_name = underscore_name(name, mount_point)
+  def remove(name, mount_point_obj)
+    underscore_name = underscore_name(name, mount_point_obj.name)
     FileUtils.remove_entry_secure(device(underscore_name)) if File.exists?(device(underscore_name))
   end
 
-  def partition_name(_name, mount_point_obj)
-    mount_point_obj.get(:loopback_part)
+  def partition_name(name, mount_point_obj)
+    if create_lvm?(mount_point_obj)
+      vm_partition_name = cmd "kpartx -l #{actual_device(name, mount_point_obj)} | grep -v 'loop deleted : /dev/loop' | " \
+        "awk '{ print $1 }' | tail -1"
+      fail "unable to work out vm_partition_name" if vm_partition_name.nil?
+      vm_partition_name
+    else
+      mount_point_obj.get(:loopback_part)
+    end
   end
 end

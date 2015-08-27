@@ -139,6 +139,8 @@ class Provision::Storage::Service
 
       shrink = mount_point_obj.config[:prepare][:options][:shrink_after_unmount]
       storage.shrink_filesystem(name, mount_point_obj) if shrink
+
+      storage.cleanup_lvm_on_host(name, mount_point_obj) if storage.create_lvm?(mount_point_obj)
     end
   end
 
@@ -152,7 +154,7 @@ class Provision::Storage::Service
         @log.info "Unable to remove storage for #{mount_point} on #{name}, storage is marked as persistent, "
       else
         @log.debug "Removing storage for #{mount_point} on #{name}"
-        storage.remove(name, mount_point)
+        storage.remove(name, mount_point_obj)
       end
     end
   end
@@ -186,7 +188,11 @@ class Provision::Storage::Service
 
     @storage_configs[name].mount_points.each do |mount_point|
       mount_point_obj = get_mount_point(name, mount_point)
+      type = mount_point_obj.config[:type].to_sym
+      storage = get_storage(type)
       prepare_options = mount_point_obj.config[:prepare][:options]
+      virtio = prepare_options[:virtio]
+      disk_type = virtio ? 'vd' : 'hd'
       create_in_fstab = prepare_options[:create_in_fstab]
       next if !create_in_fstab
 
@@ -201,7 +207,12 @@ class Provision::Storage::Service
             raise e
           end
         end
-        f.puts("/dev/vd#{drive_letters[current_drive_letter]}1 #{mount_point_obj.name}  #{fstype} defaults 0 0")
+        if storage.create_lvm?(mount_point_obj)
+          device_name = storage.guest_device(name, mount_point_obj)
+        else
+          device_name = "/dev/#{disk_type}#{drive_letters[current_drive_letter]}1"
+        end
+        f.puts("#{device_name} #{mount_point_obj.name} #{fstype} defaults 0 0")
         current_drive_letter += 1
       end
     end

@@ -20,6 +20,7 @@ module Provision::Storage::Local
   end
 
   def image_filesystem(name, mount_point_obj)
+    fail("it's currently not possible to image a filesystem within lvm that's within lvm or an image") if create_lvm?(mount_point_obj)
     underscore_name = underscore_name(name, mount_point_obj.name)
     image_file_path = mount_point_obj.config[:prepare][:options][:path]
 
@@ -39,24 +40,38 @@ module Provision::Storage::Local
   def format_filesystem(name, mount_point_obj)
     underscore_name = underscore_name(name, mount_point_obj.name)
     fs_type = mount_point_obj.config[:prepare][:options][:type]
+    guest_device = create_lvm?(mount_point_obj) ? guest_device(name, mount_point_obj) : underscore_name
 
-    run_task(name, "create partition #{underscore_name}", :task => lambda do
-      cmd "parted -s #{device(underscore_name)} mklabel msdos"
-      cmd "parted -s #{device(underscore_name)} mkpart primary #{fs_type} 2048s 100%"
+    unless create_lvm?(mount_point_obj)
+      run_task(name, "create partition on #{guest_device}", :task => lambda do
+        cmd "parted -s #{guest_device} mklabel msdos"
+        cmd "parted -s #{guest_device} mkpart primary #{fs_type} 2048s 100%"
+      end)
+
+      run_task(name, "create partition device nodes #{guest_device}",
+               :task => create_lvm?(mount_point_obj) ? lambda { kpartxa_new(guest_device) } : lambda { kpartxa(name, mount_point_obj) },
+               :cleanup => create_lvm?(mount_point_obj) ? lambda { kpartxd_new(guest_device) } : lambda { kpartxd(name, mount_point_obj) })
+    end
+
+    partition_name = if create_lvm?(mount_point_obj)
+                       guest_device(name, mount_point_obj)
+                     else
+                       "/dev/mapper/#{partition_name(name, mount_point_obj)}"
+                     end
+
+    run_task(name, "create filesystem on #{partition_name}", :task => lambda do
+      cmd "mkfs.#{fs_type} #{partition_name}"
     end)
 
-    run_task(name, "create partition device nodes #{underscore_name}",
-             :task => lambda { kpartxa(name, mount_point_obj) },
-             :cleanup => lambda { kpartxd(name, mount_point_obj) })
-    run_task(name, "create filesystem #{underscore_name}", :task => lambda do
-      cmd "mkfs.#{fs_type} /dev/mapper/#{partition_name(name, mount_point_obj)}"
-    end)
-    run_task(name, "undo create partition device nodes #{underscore_name}",
-             :task => lambda { kpartxd(name, mount_point_obj) },
-             :remove_cleanup => "create partition device nodes #{underscore_name}")
+    return if create_lvm?(mount_point_obj)
+
+    run_task(name, "undo create partition device nodes #{guest_device}",
+             :task => create_lvm?(mount_point_obj) ? lambda { kpartxd_new(guest_device) } : lambda { kpartxd(name, mount_point_obj) },
+             :remove_cleanup => "create partition device nodes #{guest_device}")
   end
 
   def rebuild_partition(name, mount_point_obj, size = :maximum)
+    fail("it's not possible to rebuild a partition that's within lvm that's within lvm or an image file") if create_lvm?(mount_point_obj)
     underscore_name = underscore_name(name, mount_point_obj.name)
     fs_type = mount_point_obj.config[:prepare][:options][:type]
 
@@ -114,6 +129,7 @@ module Provision::Storage::Local
   end
 
   def check_and_resize_filesystem(name, mount_point_obj, resize = :maximum)
+    fail("its not possible to check and resize the filesystem within lvm thats within lvm or an image file") if create_lvm?(mount_point_obj)
     underscore_name = underscore_name(name, mount_point_obj.name)
     run_task(name, "create partition device nodes #{underscore_name}",
              :task => lambda { kpartxa(name, mount_point_obj) },
@@ -139,19 +155,24 @@ module Provision::Storage::Local
              :remove_cleanup => "create partition device nodes #{underscore_name}")
   end
 
-  def kpartxa(name, mount_point_obj)
+  def kpartxa(name, mount_point_obj, host_device = false, label_prefix = nil)
     underscore_name = underscore_name(name, mount_point_obj.name)
+    the_device = host_device ? device(underscore_name) : actual_device(name, mount_point_obj)
     cmd "udevadm settle"
-    output = cmd "kpartx -av #{device(underscore_name)}"
+    output = cmd "kpartx -av #{the_device}"
     if output =~ /^add map (loop\d+)(p\d+) \(\d+:\d+\): \d+ \d+ linear \/dev\/loop\d+ \d+$/
-      mount_point_obj.set(:loopback_dev, Regexp.last_match(1))
-      mount_point_obj.set(:loopback_part, "#{Regexp.last_match(1)}#{Regexp.last_match(2)}")
+      loopback_dev_label = [label_prefix, 'loopback_dev'].compact.join('_').to_sym
+      loopback_part_label = [label_prefix, 'loopback_part'].compact.join('_').to_sym
+      mount_point_obj.set(loopback_dev_label, Regexp.last_match(1))
+      mount_point_obj.set(loopback_part_label, "#{Regexp.last_match(1)}#{Regexp.last_match(2)}")
     end
     sleep 1
   end
 
-  def kpartxd(name, mount_point_obj)
-    loopback = mount_point_obj.get(:loopback_dev)
+  def kpartxd(name, mount_point_obj, host_device = false, label_prefix = nil)
+    loopback_dev_label = [label_prefix, 'loopback_dev'].compact.join('_').to_sym
+    loopback_part_label = [label_prefix, 'loopback_part'].compact.join('_').to_sym
+    loopback = mount_point_obj.get(loopback_dev_label)
 
     sleep 1
     cmd "udevadm settle"
@@ -159,12 +180,18 @@ module Provision::Storage::Local
     if loopback
       cmd "kpartx -dv /dev/#{loopback}"
       cmd "losetup -dv /dev/#{loopback}"
-      mount_point_obj.unset(:loopback_part)
-      mount_point_obj.unset(:loopback_dev)
+      mount_point_obj.unset(loopback_part_label)
+      mount_point_obj.unset(loopback_dev_label)
     else
+      cmd "udevadm settle"
       underscore_name = underscore_name(name, mount_point_obj.name)
-      cmd "kpartx -dv #{device(underscore_name)}"
+      the_device = host_device ? device(underscore_name) : actual_device(name, mount_point_obj)
+      cmd "kpartx -dv #{the_device}"
     end
+  end
+
+  def underscorize(string)
+    "#{string.to_s.gsub('/', '_').gsub(/_$/, '')}"
   end
 
   def underscore_name(name, mount_point)
@@ -177,21 +204,28 @@ module Provision::Storage::Local
     chmod = mount_point_obj.config[:chmod]
 
     underscore_name = underscore_name(name, mount_point_obj.name)
+    guest_device = create_lvm?(mount_point_obj) ? guest_device(name, mount_point_obj) : underscore_name
     dir_existed_at_start = File.exists? dir
 
     run_task(name, "make directory #{dir}",
              :task => lambda { FileUtils.mkdir(dir) if temp_mountpoint && !dir_existed_at_start },
              :cleanup => lambda { FileUtils.rmdir(dir) if temp_mountpoint && !dir_existed_at_start })
 
-    run_task(name, "create partition device nodes #{underscore_name}",
-             :task => lambda { kpartxa(name, mount_point_obj) },
-             :cleanup => lambda { kpartxd(name, mount_point_obj) })
+    unless create_lvm?(mount_point_obj)
+      run_task(name, "create partition device nodes #{guest_device}",
+               :task => create_lvm?(mount_point_obj) ? lambda { kpartxa_new(guest_device) } : lambda { kpartxa(name, mount_point_obj) },
+               :cleanup => create_lvm?(mount_point_obj) ? lambda { kpartxd_new(guest_device) } : lambda { kpartxd(name, mount_point_obj) })
+    end
 
-    part_name = partition_name(name, mount_point_obj)
+    part_name = if create_lvm?(mount_point_obj)
+                  guest_device(name, mount_point_obj)
+                else
+                  "/dev/mapper/#{partition_name(name, mount_point_obj)}"
+                end
     run_task(name, "mount #{part_name} on #{dir}",
              :task => lambda do
                sleep 1
-               cmd "mount /dev/mapper/#{part_name} #{dir}"
+               cmd "mount #{part_name} #{dir}"
              end,
              :cleanup => lambda { cmd "umount #{dir}" })
 
@@ -209,7 +243,8 @@ module Provision::Storage::Local
     dir_existed_at_start = mount_point_obj.get(:dir_existed_at_start)
 
     underscore_name = underscore_name(name, mount_point_obj.name)
-    part_name = partition_name(name, mount_point_obj)
+    guest_device = create_lvm?(mount_point_obj) ? guest_device(name, mount_point_obj) : underscore_name
+    part_name = create_lvm?(mount_point_obj) ? guest_device(name, mount_point_obj) : partition_name(name, mount_point_obj)
 
     run_task(name, "undo mount #{part_name} on #{dir}",
              :task => lambda do
@@ -218,9 +253,11 @@ module Provision::Storage::Local
              end,
              :remove_cleanup => "mount #{part_name} on #{dir}")
 
-    run_task(name, "undo create partition device nodes #{underscore_name}",
-             :task => lambda { kpartxd(name, mount_point_obj) },
-             :remove_cleanup => "create partition device nodes #{underscore_name}")
+    unless create_lvm?(mount_point_obj)
+      run_task(name, "undo create partition device nodes #{guest_device}",
+               :task => create_lvm?(mount_point_obj) ? lambda { kpartxd_new(guest_device) } : lambda { kpartxd(name, mount_point_obj) },
+               :remove_cleanup => "create partition device nodes #{guest_device}")
+    end
 
     run_task(name, "undo make directory #{dir}",
              :task => lambda { FileUtils.rmdir(dir) if delete_mountpoint && dir_existed_at_start },
@@ -232,6 +269,20 @@ module Provision::Storage::Local
   def libvirt_source(name, mount_point)
     underscore_name = underscore_name(name, mount_point)
     "dev='#{device(underscore_name)}'"
+  end
+
+  def create_lvm?(mount_point_obj)
+    mount_point_obj.config[:prepare][:options][:create_guest_lvm] rescue false
+  end
+
+  def lvm_device_name(name, mount_point_obj)
+    underscore_name = underscore_name(name, mount_point_obj.name)
+    "/dev/#{underscore_name}/#{underscore_name('', mount_point_obj.name)}"
+  end
+
+  def actual_device(name, mount_point_obj)
+    underscore_name = underscore_name(name, mount_point_obj.name)
+    create_lvm?(mount_point_obj) ? lvm_device_name(name, mount_point_obj) : device(underscore_name)
   end
 
   def copy_to(name, mount_point_obj, transport_string, transport_options)
