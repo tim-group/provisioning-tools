@@ -124,7 +124,6 @@ module Provision::Storage::Local
       end
     else
       @@logger.info("Persistent storage #{device(underscore_name)} exists")
-      check_and_resize_filesystem(name, mount_point_obj, false)
     end
   end
 

@@ -329,17 +329,6 @@ describe Provision::Storage::Local do
       @storage_type.should_receive(:create).with("oy-foodb-001", mount_point_obj)
       @storage_type.check_persistent_storage('oy-foodb-001', mount_point_obj)
     end
-
-    it 'will check storage if persistent storage already exists' do
-      FileUtils.touch "#{@tmpdir}/oy-foodb-001_var_lib_mysql"
-      mount_point_hash = {
-        :size => '10G',
-        :persistent => true
-      }
-      mount_point_obj = Provision::Storage::MountPoint.new('/var/lib/mysql'.to_sym, mount_point_hash)
-      @storage_type.should_receive(:check_and_resize_filesystem).with("oy-foodb-001", mount_point_obj, false)
-      @storage_type.check_persistent_storage('oy-foodb-001', mount_point_obj)
-    end
   end
 
   describe 'copying storage' do
