@@ -137,7 +137,7 @@ Pin-Priority: 1001\n"
 
   run("misc packages we want on all machines") do
     apt_install 'acpid '\
-                'bzip2'\
+                'bzip2 '\
                 'collectd '\
                 'dnsutils '\
                 'dstat '\
@@ -150,7 +150,7 @@ Pin-Priority: 1001\n"
                 'libnet-ping-ruby '\
                 'libstomp-ruby '\
                 'libstomp-ruby1.8 '\
-                'lsb-release'\
+                'lsb-release '\
                 'lsof '\
                 'lvm2 '\
                 'mailutils '\
@@ -162,7 +162,7 @@ Pin-Priority: 1001\n"
                 'openssh-server '\
                 'postfix '\
                 'psmisc '\
-                'rsync'\
+                'rsync '\
                 'screen '\
                 'strace '\
                 'subversion '\
