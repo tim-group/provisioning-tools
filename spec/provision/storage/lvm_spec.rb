@@ -7,7 +7,7 @@ describe Provision::Storage::LVM do
     @storage_type = Provision::Storage::LVM.new(:vg => 'main')
     @mount_point_obj = Provision::Storage::MountPoint.new('/', :size => '10G')
     @large_mount_point_obj = Provision::Storage::MountPoint.new('/', :size => '5000G')
-    @lvm_in_lvm_mount_point_obj = \
+    @lvm_in_guest_mount_point_obj = \
       Provision::Storage::MountPoint.new('/mnt/data',
                                          :size => '5G',
                                          :prepare => {
@@ -16,7 +16,7 @@ describe Provision::Storage::LVM do
                                              :guest_lvm_pv_size => '10G'
                                            }
                                          })
-    @lvm_in_lvm_mount_point_obj.set(:actual_mount_point, '/mnt/somewhere/mnt/data')
+    @lvm_in_guest_mount_point_obj.set(:actual_mount_point, '/mnt/somewhere/mnt/data')
   end
 
   it 'creates some storage given a name and a size' do
@@ -124,7 +124,7 @@ describe Provision::Storage::LVM do
       @storage_type.should_receive(:cmd).with('vgcreate oy-lvminlvm-001_mnt_data /dev/mapper/main-oy--lvminlvm--001_mnt_data1').ordered
       @storage_type.should_receive(:cmd).with('lvcreate -L 5G -n _mnt_data oy-lvminlvm-001_mnt_data').ordered
 
-      @storage_type.create('oy-lvminlvm-001', @lvm_in_lvm_mount_point_obj)
+      @storage_type.create('oy-lvminlvm-001', @lvm_in_guest_mount_point_obj)
     end
 
     it 'runs the correct commands to remove a guests storage when lvm is configured within lvm' do
@@ -143,7 +143,7 @@ describe Provision::Storage::LVM do
       @storage_type.should_receive(:cmd).with('lvremove -f /dev/main/oy-lvminlvm-001_mnt_data').ordered
       @storage_type.should_receive(:cmd).with('lvremove -f /dev/main/oy-lvminlvm-001_mnt_data').ordered
 
-      @storage_type.remove('oy-lvminlvm-001', @lvm_in_lvm_mount_point_obj)
+      @storage_type.remove('oy-lvminlvm-001', @lvm_in_guest_mount_point_obj)
     end
 
     it 'runs the correct commands to initialise a filesystem when lvm is configured within lvm' do
@@ -158,7 +158,7 @@ describe Provision::Storage::LVM do
 
       @storage_type.should_receive(:cmd).with('mkfs.ext4 /dev/oy-lvminlvm-001_mnt_data/_mnt_data').ordered
 
-      @storage_type.init_filesystem('oy-lvminlvm-001', @lvm_in_lvm_mount_point_obj)
+      @storage_type.init_filesystem('oy-lvminlvm-001', @lvm_in_guest_mount_point_obj)
     end
 
     it 'runs the correct commands to mount the filesystem when lvm is configured within lvm' do
@@ -174,7 +174,7 @@ describe Provision::Storage::LVM do
 
       @storage_type.should_receive(:cmd).with('mount /dev/oy-lvminlvm-001_mnt_data/_mnt_data /mnt/somewhere/mnt/data').ordered
 
-      @storage_type.mount('oy-lvminlvm-001', @lvm_in_lvm_mount_point_obj)
+      @storage_type.mount('oy-lvminlvm-001', @lvm_in_guest_mount_point_obj)
     end
 
     it 'runs the correct commands to unmount the filesystem when lvm is configured within lvm' do
@@ -190,23 +190,21 @@ describe Provision::Storage::LVM do
 
       @storage_type.should_receive(:cmd).with('umount /mnt/somewhere/mnt/data').ordered
 
-      @storage_type.unmount('oy-lvminlvm-001', @lvm_in_lvm_mount_point_obj)
+      @storage_type.unmount('oy-lvminlvm-001', @lvm_in_guest_mount_point_obj)
     end
-    #    it 'runs the correct commands to  lvm is configured within lvm' do
-    #      File.stub(:exists?).and_return()
-    #      @storage_type.stub(:cmd) do |arg|
-    #        case arg
-    #        when ''
-    #          true
-    #        else
-    #          fail arg
-    #        end
-    #      end
-    #
-    #      @storage_type.should_receive(:cmd).with('dd if=/dev/zero of=/dev/main/oy-lvminlvm-001_mnt_data bs=512k count=10').ordered
-    #
-    #      @storage_type.('oy-lvminlvm-001', @lvm_in_lvm_mount_point_obj)
-    #    end
+
+    it 'should call the correct commands when calling format_filesystem' do
+      @storage_type.stub(:cmd) do |arg|
+        case arg
+        when 'mkfs.ext4 /dev/production-db-001_mnt_data/_mnt_data'
+          true
+        else
+          fail arg
+        end
+      end
+      @storage_type.should_receive(:cmd).with("mkfs.ext4 /dev/production-db-001_mnt_data/_mnt_data")
+      @storage_type.format_filesystem('production-db-001', @lvm_in_guest_mount_point_obj)
+    end
   end
 
   describe 'grow' do

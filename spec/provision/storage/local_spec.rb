@@ -18,6 +18,10 @@ describe Provision::Storage::Local do
       "dev='#{device(name)}'"
     end
 
+    def partition_name(name, mount_point_obj)
+      "some--place-#{underscore_name(name, mount_point_obj.name)}1"
+    end
+
     def remove(_name)
       true
     end
@@ -42,6 +46,15 @@ describe Provision::Storage::Local do
 
     @storage_type = MockStorage.new(:tmpdir => @tmpdir)
     @mount_point_obj = Provision::Storage::MountPoint.new('/', :size => '10G')
+    @lvm_in_guest_mount_point_obj = \
+      Provision::Storage::MountPoint.new('/mnt/data',
+                                         :size => '5G',
+                                         :prepare => {
+                                           :options => {
+                                             :create_guest_lvm => true,
+                                             :guest_lvm_pv_size => '10G'
+                                           }
+                                         })
   end
 
   it 'should symbolize the value of method' do
@@ -196,8 +209,31 @@ describe Provision::Storage::Local do
     expect { @storage_type.rebuild_partition(name, @mount_point_obj) }.to raise_error
   end
 
-  it 'should call the correct commands if this storage should create lvm within itself' do
+  it 'should call the correct commands when calling format_filesystem' do
     name = 'create'
+    underscore_name = @storage_type.underscore_name(name, '/'.to_sym)
+    device_name = @storage_type.device(underscore_name)
+    partition_name = @storage_type.partition_name(name, @mount_point_obj)
+    @storage_type.stub(:cmd) do |arg|
+      case arg
+      when "parted -s #{device_name} mklabel msdos",
+           "parted -s #{device_name} mkpart primary ext4 2048s 100%",
+           "udevadm settle",
+           "kpartx -av #{device_name}",
+           "mkfs.ext4 /dev/mapper/#{partition_name}",
+           "kpartx -dv #{device_name}",
+        true
+      else
+        fail arg
+      end
+    end
+    @storage_type.should_receive(:cmd).with("parted -s #{device_name} mklabel msdos")
+    @storage_type.should_receive(:cmd).with("parted -s #{device_name} mkpart primary ext4 2048s 100%")
+    @storage_type.should_receive(:cmd).with("udevadm settle")
+    @storage_type.should_receive(:cmd).with("kpartx -av #{device_name}")
+    @storage_type.should_receive(:cmd).with("mkfs.ext4 /dev/mapper/#{partition_name}")
+    @storage_type.should_receive(:cmd).with("kpartx -dv #{device_name}")
+    @storage_type.format_filesystem(name, @mount_point_obj)
   end
 
   it 'should check and resize the filesystem' do

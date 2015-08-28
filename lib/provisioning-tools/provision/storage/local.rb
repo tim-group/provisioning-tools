@@ -40,7 +40,7 @@ module Provision::Storage::Local
   def format_filesystem(name, mount_point_obj)
     underscore_name = underscore_name(name, mount_point_obj.name)
     fs_type = mount_point_obj.config[:prepare][:options][:type]
-    guest_device = create_lvm?(mount_point_obj) ? guest_device(name, mount_point_obj) : underscore_name
+    guest_device = create_lvm?(mount_point_obj) ? guest_device(name, mount_point_obj) : device(underscore_name)
 
     unless create_lvm?(mount_point_obj)
       run_task(name, "create partition on #{guest_device}", :task => lambda do
