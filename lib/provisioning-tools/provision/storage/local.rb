@@ -155,24 +155,20 @@ module Provision::Storage::Local
              :remove_cleanup => "create partition device nodes #{underscore_name}")
   end
 
-  def kpartxa(name, mount_point_obj, host_device = false, label_prefix = nil)
+  def kpartxa(name, mount_point_obj)
     underscore_name = underscore_name(name, mount_point_obj.name)
-    the_device = host_device ? device(underscore_name) : actual_device(name, mount_point_obj)
+    the_device = device(underscore_name)
     cmd "udevadm settle"
     output = cmd "kpartx -av #{the_device}"
     if output =~ /^add map (loop\d+)(p\d+) \(\d+:\d+\): \d+ \d+ linear \/dev\/loop\d+ \d+$/
-      loopback_dev_label = [label_prefix, 'loopback_dev'].compact.join('_').to_sym
-      loopback_part_label = [label_prefix, 'loopback_part'].compact.join('_').to_sym
-      mount_point_obj.set(loopback_dev_label, Regexp.last_match(1))
-      mount_point_obj.set(loopback_part_label, "#{Regexp.last_match(1)}#{Regexp.last_match(2)}")
+      mount_point_obj.set(:loopback_dev, Regexp.last_match(1))
+      mount_point_obj.set(:loopback_part, "#{Regexp.last_match(1)}#{Regexp.last_match(2)}")
     end
     sleep 1
   end
 
-  def kpartxd(name, mount_point_obj, host_device = false, label_prefix = nil)
-    loopback_dev_label = [label_prefix, 'loopback_dev'].compact.join('_').to_sym
-    loopback_part_label = [label_prefix, 'loopback_part'].compact.join('_').to_sym
-    loopback = mount_point_obj.get(loopback_dev_label)
+  def kpartxd(name, mount_point_obj)
+    loopback = mount_point_obj.get(:loopback_dev)
 
     sleep 1
     cmd "udevadm settle"
@@ -180,12 +176,12 @@ module Provision::Storage::Local
     if loopback
       cmd "kpartx -dv /dev/#{loopback}"
       cmd "losetup -dv /dev/#{loopback}"
-      mount_point_obj.unset(loopback_part_label)
-      mount_point_obj.unset(loopback_dev_label)
+      mount_point_obj.unset(:loopback_part)
+      mount_point_obj.unset(:loopback_dev)
     else
       cmd "udevadm settle"
       underscore_name = underscore_name(name, mount_point_obj.name)
-      the_device = host_device ? device(underscore_name) : actual_device(name, mount_point_obj)
+      the_device = device(underscore_name)
       cmd "kpartx -dv #{the_device}"
     end
   end
@@ -278,11 +274,6 @@ module Provision::Storage::Local
   def lvm_device_name(name, mount_point_obj)
     underscore_name = underscore_name(name, mount_point_obj.name)
     "/dev/#{underscore_name}/#{underscore_name('', mount_point_obj.name)}"
-  end
-
-  def actual_device(name, mount_point_obj)
-    underscore_name = underscore_name(name, mount_point_obj.name)
-    create_lvm?(mount_point_obj) ? lvm_device_name(name, mount_point_obj) : device(underscore_name)
   end
 
   def copy_to(name, mount_point_obj, transport_string, transport_options)

@@ -51,8 +51,9 @@ class Provision::Storage::Image < Provision::Storage
   end
 
   def partition_name(name, mount_point_obj)
+    underscore_name = underscore_name(name, mount_point_obj.name)
     if create_lvm?(mount_point_obj)
-      vm_partition_name = cmd "kpartx -l #{actual_device(name, mount_point_obj)} | grep -v 'loop deleted : /dev/loop' | " \
+      vm_partition_name = cmd "kpartx -l #{device(underscore_name)} | grep -v 'loop deleted : /dev/loop' | " \
         "awk '{ print $1 }' | tail -1"
       fail "unable to work out vm_partition_name" if vm_partition_name.nil?
       vm_partition_name

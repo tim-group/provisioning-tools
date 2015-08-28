@@ -84,9 +84,9 @@ class Provision::Storage::LVM < Provision::Storage
     end
   end
 
-  def partition_name(name, mount_point_obj, host_device = true, _label_prefix = nil)
+  def partition_name(name, mount_point_obj)
     underscore_name = underscore_name(name, mount_point_obj.name)
-    the_device = host_device ? device(underscore_name) : actual_device(name, mount_point_obj)
+    the_device = device(underscore_name)
     vm_partition_name = cmd "kpartx -l #{the_device} | grep -v 'loop deleted : /dev/loop' | " \
       "awk '{ print $1 }' | tail -1"
     fail "unable to work out vm_partition_name" if vm_partition_name.nil?
