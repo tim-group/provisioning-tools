@@ -173,7 +173,7 @@ Pin-Priority: 1001\n"
                 'traceroute '\
                 'unzip '\
                 'vim '\
-                'wget'\
+                'wget '\
                 'zip '\
                 'zsh '
   end
