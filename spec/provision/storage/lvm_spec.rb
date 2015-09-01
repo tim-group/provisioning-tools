@@ -90,94 +90,94 @@ describe Provision::Storage::LVM do
     end.to raise_error("Tried to lvremove but failed 100 times and didn't raise an exception!?")
   end
 
-  describe 'lvm within lvm' do
+  describe 'lvm in guest' do
     it 'runs the correct commands to create guest lvm within a hosts lv' do
       File.stub(:exists?).and_return(false)
       @storage_type.stub(:cmd) do |arg|
         case arg
-        when 'lvcreate -L 10G -n oy-lvminlvm-001_mnt_data main',
-             'parted -s /dev/main/oy-lvminlvm-001_mnt_data mklabel msdos',
-             'parted -s /dev/main/oy-lvminlvm-001_mnt_data mkpart primary ext2 2048s 100%',
-             'parted -s /dev/main/oy-lvminlvm-001_mnt_data set 1 lvm on',
+        when 'lvcreate -L 10G -n oy-lvminguest-001_mnt_data main',
+             'parted -s /dev/main/oy-lvminguest-001_mnt_data mklabel msdos',
+             'parted -s /dev/main/oy-lvminguest-001_mnt_data mkpart primary ext2 2048s 100%',
+             'parted -s /dev/main/oy-lvminguest-001_mnt_data set 1 lvm on',
              'udevadm settle',
-             'kpartx -av /dev/main/oy-lvminlvm-001_mnt_data',
-             'pvcreate /dev/mapper/main-oy--lvminlvm--001_mnt_data1',
-             'vgcreate oy-lvminlvm-001_mnt_data /dev/mapper/main-oy--lvminlvm--001_mnt_data1',
-             'lvcreate -L 5G -n _mnt_data oy-lvminlvm-001_mnt_data'
+             'kpartx -av /dev/main/oy-lvminguest-001_mnt_data',
+             'pvcreate /dev/mapper/main-oy--lvminguest--001_mnt_data1',
+             'vgcreate oy-lvminguest-001_mnt_data /dev/mapper/main-oy--lvminguest--001_mnt_data1',
+             'lvcreate -L 5G -n _mnt_data oy-lvminguest-001_mnt_data'
           true
-        when 'kpartx -l /dev/main/oy-lvminlvm-001_mnt_data'
-          "main-oy--lvminlvm--001_mnt_data1 : 0 20969472 /dev/main/oy-lvminlvm-001_mnt_data 2048"
+        when 'kpartx -l /dev/main/oy-lvminguest-001_mnt_data'
+          "main-oy--lvminguest--001_mnt_data1 : 0 20969472 /dev/main/oy-lvminguest-001_mnt_data 2048"
         else
           fail arg
         end
       end
 
-      @storage_type.should_receive(:cmd).with('lvcreate -L 10G -n oy-lvminlvm-001_mnt_data main').ordered
-      @storage_type.should_receive(:cmd).with('parted -s /dev/main/oy-lvminlvm-001_mnt_data mklabel msdos').ordered
-      @storage_type.should_receive(:cmd).with('parted -s /dev/main/oy-lvminlvm-001_mnt_data mkpart primary ext2 2048s 100%').ordered
-      @storage_type.should_receive(:cmd).with('parted -s /dev/main/oy-lvminlvm-001_mnt_data set 1 lvm on').ordered
+      @storage_type.should_receive(:cmd).with('lvcreate -L 10G -n oy-lvminguest-001_mnt_data main').ordered
+      @storage_type.should_receive(:cmd).with('parted -s /dev/main/oy-lvminguest-001_mnt_data mklabel msdos').ordered
+      @storage_type.should_receive(:cmd).with('parted -s /dev/main/oy-lvminguest-001_mnt_data mkpart primary ext2 2048s 100%').ordered
+      @storage_type.should_receive(:cmd).with('parted -s /dev/main/oy-lvminguest-001_mnt_data set 1 lvm on').ordered
       @storage_type.should_receive(:cmd).with('udevadm settle').ordered
-      @storage_type.should_receive(:cmd).with('kpartx -av /dev/main/oy-lvminlvm-001_mnt_data').ordered
+      @storage_type.should_receive(:cmd).with('kpartx -av /dev/main/oy-lvminguest-001_mnt_data').ordered
       @storage_type.should_receive(:cmd).with('udevadm settle').ordered
-      @storage_type.should_receive(:cmd).with('kpartx -l /dev/main/oy-lvminlvm-001_mnt_data').ordered
-      @storage_type.should_receive(:cmd).with('pvcreate /dev/mapper/main-oy--lvminlvm--001_mnt_data1').ordered
-      @storage_type.should_receive(:cmd).with('vgcreate oy-lvminlvm-001_mnt_data /dev/mapper/main-oy--lvminlvm--001_mnt_data1').ordered
-      @storage_type.should_receive(:cmd).with('lvcreate -L 5G -n _mnt_data oy-lvminlvm-001_mnt_data').ordered
+      @storage_type.should_receive(:cmd).with('kpartx -l /dev/main/oy-lvminguest-001_mnt_data').ordered
+      @storage_type.should_receive(:cmd).with('pvcreate /dev/mapper/main-oy--lvminguest--001_mnt_data1').ordered
+      @storage_type.should_receive(:cmd).with('vgcreate oy-lvminguest-001_mnt_data /dev/mapper/main-oy--lvminguest--001_mnt_data1').ordered
+      @storage_type.should_receive(:cmd).with('lvcreate -L 5G -n _mnt_data oy-lvminguest-001_mnt_data').ordered
 
-      @storage_type.create('oy-lvminlvm-001', @lvm_in_guest_mount_point_obj)
+      @storage_type.create('oy-lvminguest-001', @lvm_in_guest_mount_point_obj)
     end
 
-    it 'runs the correct commands to remove a guests storage when lvm is configured within lvm' do
+    it 'runs the correct commands to remove a guests storage when lvm in guest is setup' do
       File.stub(:exists?).and_return(true, true, true, true, false)
       @storage_type.stub(:cmd) do |arg|
         case arg
-        when 'dd if=/dev/zero of=/dev/main/oy-lvminlvm-001_mnt_data bs=512k count=10',
-             'lvremove -f /dev/main/oy-lvminlvm-001_mnt_data'
+        when 'dd if=/dev/zero of=/dev/main/oy-lvminguest-001_mnt_data bs=512k count=10',
+             'lvremove -f /dev/main/oy-lvminguest-001_mnt_data'
           true
         else
           fail arg
         end
       end
 
-      @storage_type.should_receive(:cmd).with('dd if=/dev/zero of=/dev/main/oy-lvminlvm-001_mnt_data bs=512k count=10').ordered
-      @storage_type.should_receive(:cmd).with('lvremove -f /dev/main/oy-lvminlvm-001_mnt_data').ordered
-      @storage_type.should_receive(:cmd).with('lvremove -f /dev/main/oy-lvminlvm-001_mnt_data').ordered
+      @storage_type.should_receive(:cmd).with('dd if=/dev/zero of=/dev/main/oy-lvminguest-001_mnt_data bs=512k count=10').ordered
+      @storage_type.should_receive(:cmd).with('lvremove -f /dev/main/oy-lvminguest-001_mnt_data').ordered
+      @storage_type.should_receive(:cmd).with('lvremove -f /dev/main/oy-lvminguest-001_mnt_data').ordered
 
-      @storage_type.remove('oy-lvminlvm-001', @lvm_in_guest_mount_point_obj)
+      @storage_type.remove('oy-lvminguest-001', @lvm_in_guest_mount_point_obj)
     end
 
-    it 'runs the correct commands to initialise a filesystem when lvm is configured within lvm' do
+    it 'runs the correct commands to initialise a filesystem when lvm in guest is configured' do
       @storage_type.stub(:cmd) do |arg|
         case arg
-        when 'mkfs.ext4 /dev/oy-lvminlvm-001_mnt_data/_mnt_data'
+        when 'mkfs.ext4 /dev/oy-lvminguest-001_mnt_data/_mnt_data'
           true
         else
           fail arg
         end
       end
 
-      @storage_type.should_receive(:cmd).with('mkfs.ext4 /dev/oy-lvminlvm-001_mnt_data/_mnt_data').ordered
+      @storage_type.should_receive(:cmd).with('mkfs.ext4 /dev/oy-lvminguest-001_mnt_data/_mnt_data').ordered
 
-      @storage_type.init_filesystem('oy-lvminlvm-001', @lvm_in_guest_mount_point_obj)
+      @storage_type.init_filesystem('oy-lvminguest-001', @lvm_in_guest_mount_point_obj)
     end
 
-    it 'runs the correct commands to mount the filesystem when lvm is configured within lvm' do
+    it 'runs the correct commands to mount the filesystem when lvm is configured within the guest' do
       File.stub(:exists?).and_return(true)
       @storage_type.stub(:cmd) do |arg|
         case arg
-        when 'mount /dev/oy-lvminlvm-001_mnt_data/_mnt_data /mnt/somewhere/mnt/data'
+        when 'mount /dev/oy-lvminguest-001_mnt_data/_mnt_data /mnt/somewhere/mnt/data'
           true
         else
           fail("#{arg}")
         end
       end
 
-      @storage_type.should_receive(:cmd).with('mount /dev/oy-lvminlvm-001_mnt_data/_mnt_data /mnt/somewhere/mnt/data').ordered
+      @storage_type.should_receive(:cmd).with('mount /dev/oy-lvminguest-001_mnt_data/_mnt_data /mnt/somewhere/mnt/data').ordered
 
-      @storage_type.mount('oy-lvminlvm-001', @lvm_in_guest_mount_point_obj)
+      @storage_type.mount('oy-lvminguest-001', @lvm_in_guest_mount_point_obj)
     end
 
-    it 'runs the correct commands to unmount the filesystem when lvm is configured within lvm' do
+    it 'runs the correct commands to unmount the filesystem when lvm is configured within the guest' do
       File.stub(:exists?).and_return(true)
       @storage_type.stub(:cmd) do |arg|
         case arg
@@ -190,7 +190,7 @@ describe Provision::Storage::LVM do
 
       @storage_type.should_receive(:cmd).with('umount /mnt/somewhere/mnt/data').ordered
 
-      @storage_type.unmount('oy-lvminlvm-001', @lvm_in_guest_mount_point_obj)
+      @storage_type.unmount('oy-lvminguest-001', @lvm_in_guest_mount_point_obj)
     end
 
     it 'should call the correct commands when calling format_filesystem' do
