@@ -242,10 +242,10 @@ describe Provision::Storage::LVM do
       :prepare => {
         :options => {
           :create_guest_lvm => true,
-          :guest_lvm_pv_size => '20G',
+          :guest_lvm_pv_size => '20G'
         }
       },
-      :persistent => true,
+      :persistent => true
     }
     File.stub(:exist?).and_return(true)
     @storage_type.stub(:cmd) do |arg|
