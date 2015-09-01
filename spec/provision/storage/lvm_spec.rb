@@ -235,4 +235,31 @@ describe Provision::Storage::LVM do
     end
     @storage_type.partition_name('magical', @mount_point_obj).should eql "magical"
   end
+
+  it 'will create device nodes for lvm in guest if persistent storage is found that should be lvm in guest' do
+    mount_point_hash = {
+      :size => '10G',
+      :prepare => {
+        :options => {
+          :create_guest_lvm => true,
+          :guest_lvm_pv_size => '20G',
+        }
+      },
+      :persistent => true,
+    }
+    File.stub(:exist?).and_return(true)
+    @storage_type.stub(:cmd) do |arg|
+      case arg
+      when 'udevadm settle',
+           'kpartx -av /dev/main/oy-foodb-001_var_lib_mysql'
+        true
+      else
+        fail arg
+      end
+    end
+    mount_point_obj = Provision::Storage::MountPoint.new('/var/lib/mysql'.to_sym, mount_point_hash)
+    @storage_type.should_receive(:cmd).with('udevadm settle').ordered
+    @storage_type.should_receive(:cmd).with('kpartx -av /dev/main/oy-foodb-001_var_lib_mysql').ordered
+    @storage_type.check_persistent_storage('oy-foodb-001', mount_point_obj)
+  end
 end

@@ -124,6 +124,9 @@ module Provision::Storage::Local
       end
     else
       @@logger.info("Persistent storage #{device(underscore_name)} exists")
+      return unless create_lvm?(mount_point_obj)
+      host_device = host_device(name, mount_point_obj)
+      create_partition_device_nodes_task(name, host_device)
     end
   end
 
