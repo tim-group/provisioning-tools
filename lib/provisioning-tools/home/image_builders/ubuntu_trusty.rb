@@ -234,8 +234,10 @@ sun-java6-jre   shared/present-sun-dlj-v1-1     note
     chroot "grub-install --no-floppy #{host_device}"
   end
 
-  run("remove cached packages") do
-    chroot "DEBIAN_FRONTEND=noninteractive apt-get clean"
+  cleanup do
+    run("remove cached packages") do
+      chroot "DEBIAN_FRONTEND=noninteractive apt-get clean"
+    end
   end
 
   run("download packages that we would like") do
