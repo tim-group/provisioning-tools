@@ -1,4 +1,4 @@
 *.deb
 .*.sw[a-z]
-/tags
+tags
 /build
