@@ -163,6 +163,7 @@ Pin-Priority: 1001\n"
                 'postfix '\
                 'psmisc '\
                 'rsync '\
+                'rubygem-msgpack ' \
                 'screen '\
                 'strace '\
                 'subversion '\

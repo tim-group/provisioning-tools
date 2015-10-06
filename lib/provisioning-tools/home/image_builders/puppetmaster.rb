@@ -21,7 +21,7 @@ define 'puppetmaster' do
         "  environment   = masterbranch\n" \
         "  configtimeout = 3000\n" \
         "  reports       = graphite,successful_run_commit_id,stomp\n" \
-        "  preferred_serialization_format = pson\n" \
+        "  preferred_serialization_format = msgpack\n" \
         "  strict_variables = false\n" \
         "[agent]\n" \
         "  report            = true\n" \
