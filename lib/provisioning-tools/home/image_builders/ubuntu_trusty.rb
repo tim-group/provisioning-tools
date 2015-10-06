@@ -216,7 +216,6 @@ sun-java6-jre   shared/present-sun-dlj-v1-1     note
 
     kernel = "/boot/vmlinuz-#{kernel_version}"
     initrd = "/boot/initrd.img-#{kernel_version}"
-    uuid = `blkid -o value #{host_device_partition} | head -n1`.chomp
 
     open("#{spec[:temp_dir]}/boot/grub/grub.cfg", 'w') do |f|
       f.puts "
