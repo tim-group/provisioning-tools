@@ -13,7 +13,7 @@ define "puppetclient" do
         "  templatedir                    = $confdir/templates\n" \
         "  pluginsync                     = true\n" \
         "  environment                    = masterbranch\n" \
-        "  configtimeout                  = 3000\n"
+        "  configtimeout                  = 3000\n" \
         "  preferred_serialization_format = msgpack\n"
     end
   end
