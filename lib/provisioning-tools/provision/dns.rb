@@ -37,7 +37,6 @@ class Provision::DNSChecker
     logger.info("SUCCESS: #{msg} resolved to #{result}")
     result
   end
-
 end
 
 class Provision::DNSNetwork
@@ -97,9 +96,9 @@ class Provision::DNSNetwork
     end
 
     actual_ip = @checker.try_resolve(hostname, :forward)
-    fail "unable to resolve forward #{hostname} expected #{ip.to_s}, actual: #{actual_ip}" if ip.to_s != actual_ip.to_s
+    fail "unable to resolve forward #{hostname} expected #{ip}, actual: #{actual_ip}" if ip.to_s != actual_ip.to_s
     actual_hostname = @checker.try_resolve(ip.to_s, :reverse)
-    fail "unable to resolve reverse #{ip.to_s} expected #{hostname}, actual: #{actual_hostname}" if hostname != actual_hostname
+    fail "unable to resolve reverse #{ip} expected #{hostname}, actual: #{actual_hostname}" if hostname != actual_hostname
     {
       :netmask => @subnet_mask.to_s,
       :address => ip.to_s
