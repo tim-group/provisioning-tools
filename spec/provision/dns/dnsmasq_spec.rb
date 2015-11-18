@@ -86,14 +86,14 @@ describe Provision::DNS::DNSMasq do
 
   def expect_checks(allocations)
     allocations.each do |hostname, ip|
-      @checker.should_receive(:resolve_forward).with(hostname).and_return([ip])
-      @checker.should_receive(:resolve_reverse).with(ip).and_return([hostname])
+      @checker.should_receive(:try_resolve).with(hostname, :forward).and_return(ip)
+      @checker.should_receive(:try_resolve).with(ip, :reverse).and_return(hostname)
     end
   end
 
   def expect_cname_checks(allocations)
     allocations.each do |hostname, ip|
-      @checker.should_receive(:resolve_forward).with(hostname).and_return(ip)
+      @checker.should_receive(:try_resolve).with(hostname, :forward).and_return(ip)
     end
   end
 

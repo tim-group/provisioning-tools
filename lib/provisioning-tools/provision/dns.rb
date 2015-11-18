@@ -17,13 +17,14 @@ class Provision::DNSChecker
     @primary_nameserver = options[:primary_nameserver] || '192.168.5.1'
   end
 
-  def resolve(record, element, max_attempts = 10)
+  def try_resolve(record, direction, max_attempts = 10)
     attempt = 1
-    addrinfo = Set.new
+    result = ''
     while (attempt <= max_attempts)
       msg = "Lookup #{record} (#{attempt}/#{max_attempts})"
       begin
-        addrinfo = Set.new(Socket.getaddrinfo(record, nil)).map { |a| a[element] }
+        result = Resolv.getname(record)  if direction == :reverse
+        result = Resolv.getaddress(record) if direction == :forward
         break
       rescue Exception => e
         logger.error("DNS RESOLVE FAILURE: #{msg} - #{e.inspect}")
@@ -33,17 +34,10 @@ class Provision::DNSChecker
     end
     attempt >= max_attempts ? (fail "Lookup #{record} failed after #{max_attempts} attempts") : false
 
-    logger.info("SUCCESS: #{msg} resolved to #{addrinfo.join(' ')}")
-    addrinfo
+    logger.info("SUCCESS: #{msg} resolved to #{result}")
+    result
   end
 
-  def resolve_forward(hostname)
-    resolve(hostname, 3)
-  end
-
-  def resolve_reverse(ip)
-    resolve(ip, 2)
-  end
 end
 
 class Provision::DNSNetwork
@@ -102,10 +96,10 @@ class Provision::DNSNetwork
       add_forward_lookup(ip, hostname)
     end
 
-    fail "unable to resolve forward #{hostname} -> #{ip}" unless @checker.resolve_forward(hostname).include?(ip.to_s)
-    resolve_reverse_set = @checker.resolve_reverse(ip.to_s)
-    logger.info("Resolve reverse #{ip} debug output: #{resolve_reverse_set}")
-    fail "unable to resolve reverse #{ip} -> #{hostname}" unless resolve_reverse_set.include?(hostname)
+    actual_ip = @checker.try_resolve(hostname, :forward)
+    fail "unable to resolve forward #{hostname} expected #{ip.to_s}, actual: #{actual_ip}" if ip.to_s != actual_ip.to_s
+    actual_hostname = @checker.try_resolve(ip.to_s, :reverse)
+    fail "unable to resolve reverse #{ip.to_s} expected #{hostname}, actual: #{actual_hostname}" if hostname != actual_hostname
     {
       :netmask => @subnet_mask.to_s,
       :address => ip.to_s
@@ -148,7 +142,7 @@ class Provision::DNSNetwork
         end
         result.merge!(fqdn => cname)
 
-        fail "unable to resolve cname #{fqdn} -> #{cname}" unless @checker.resolve_forward(fqdn)
+        fail "unable to resolve cname #{fqdn} -> #{cname}" unless @checker.try_resolve(fqdn, :forward)
       end
     end
     result
