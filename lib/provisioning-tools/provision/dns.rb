@@ -103,8 +103,9 @@ class Provision::DNSNetwork
     end
 
     fail "unable to resolve forward #{hostname} -> #{ip}" unless @checker.resolve_forward(hostname).include?(ip.to_s)
-    fail "unable to resolve reverse #{ip} -> #{hostname}" unless @checker.resolve_reverse(ip.to_s).include?(hostname)
-
+    resolve_reverse_set = @checker.resolve_reverse(ip.to_s)
+    logger.info("Resolve reverse #{ip} debug output: #{resolve_reverse_set}")
+    fail "unable to resolve reverse #{ip} -> #{hostname}" unless resolve_reverse_set.include?(hostname)
     {
       :netmask => @subnet_mask.to_s,
       :address => ip.to_s
