@@ -84,8 +84,8 @@ task :package_main do
   arguments = [
     '--description', 'provisioning tools',
     '--url', 'https://github.com/tim-group/provisioning-tools',
-    '-p', "build/provisioning-tools-transition_#{version}.deb",
-    '-n', 'provisioning-tools-transition',
+    '-p', "build/provisioning-tools_#{version}.deb",
+    '-n', 'provisioning-tools',
     '-v', "#{version}",
     '-m', 'Infrastructure <infra@timgroup.com>',
     '-d', 'provisioning-tools-gold-image-precise',
@@ -98,7 +98,7 @@ task :package_main do
   ]
 
   argv = arguments.map { |x| "'#{x}'" }.join(' ')
-  sh 'rm -f build/provisioning-tools-transition_*.deb'
+  sh 'rm -f build/provisioning-tools_*.deb'
   sh "fpm #{argv}"
 end
 
