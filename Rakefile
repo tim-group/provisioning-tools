@@ -72,8 +72,6 @@ end
 
 desc "Create Debian package"
 task :package_main do
-  version = "1.0.#{ENV['BUILD_NUMBER']}" # XXX 1.0 -> 0.0, use @version
-
   sh 'rm -rf build/package'
   sh 'mkdir -p build/package/usr/local/lib/site_ruby/timgroup/'
   sh 'cp -r lib/* build/package/usr/local/lib/site_ruby/timgroup/'
@@ -84,9 +82,9 @@ task :package_main do
   arguments = [
     '--description', 'provisioning tools',
     '--url', 'https://github.com/tim-group/provisioning-tools',
-    '-p', "build/provisioning-tools_#{version}.deb",
+    '-p', "build/provisioning-tools_#{@version}.deb",
     '-n', 'provisioning-tools',
-    '-v', "#{version}",
+    '-v', "#{@version}",
     '-m', 'Infrastructure <infra@timgroup.com>',
     '-d', 'provisioning-tools-gold-image-precise',
     '-d', 'debootstrap',
