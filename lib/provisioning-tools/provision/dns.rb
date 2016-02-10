@@ -23,7 +23,7 @@ class Provision::DNSChecker
     while (attempt <= max_attempts)
       msg = "Lookup #{record} (#{attempt}/#{max_attempts})"
       begin
-        result = Resolv.getname(record)  if direction == :reverse
+        result = Resolv.getname(record) if direction == :reverse
         result = Resolv.getaddress(record) if direction == :forward
         break
       rescue Exception => e

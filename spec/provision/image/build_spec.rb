@@ -162,7 +162,7 @@ describe XYZ do
     @commands.should_receive(:action).with("1")
     @commands.should_not_receive(:action).with("3")
 
-    lambda {  build.execute }.should raise_error
+    lambda { build.execute }.should raise_error
   end
 
   it 'I can pass options through to my build' do

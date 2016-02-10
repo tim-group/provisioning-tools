@@ -29,7 +29,7 @@ class Provision::Core::ProvisioningService
       if with_numbering
         @logger.info("Getting numbering for spec #{spec.inspect}")
         # FIXME - We should pull this step out to a rake task in stacks as per 'free' later..
-        spec[:networking] =  @numbering_service.allocate_ips_for(spec)
+        spec[:networking] = @numbering_service.allocate_ips_for(spec)
         @logger.info("Numbering is #{spec[:networking].inspect}")
         @numbering_service.add_cnames_for(spec)
       end

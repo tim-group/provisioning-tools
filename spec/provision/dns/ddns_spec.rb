@@ -38,7 +38,7 @@ describe Provision::DNS::DDNS do
 
   it 'constructs once' do
     dns = Provision::DNS::DDNSNetwork.new('prod', '192.168.1.0/24',
-                                          :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
+                                          :rndc_key => "fa5dUl+sdm/8cSZtDv1xFw==",
                                           :primary_nameserver => "mars"
                                          )
     dns.network.to_s.should eql('192.168.1.0')
@@ -53,7 +53,7 @@ describe Provision::DNS::DDNS do
   # to do here as we don't actually fire up bind in any way shape or form
   it 'will restrict ip allocations to min and max allocations' do
     dns = Provision::DNS::DDNSNetwork.new('prod', '192.168.1.0/24',
-                                          :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
+                                          :rndc_key => "fa5dUl+sdm/8cSZtDv1xFw==",
                                           :primary_nameserver => "mars",
                                           :min_allocation => "192.168.1.99",
                                           :max_allocation => "192.168.1.150"
@@ -66,7 +66,7 @@ describe Provision::DNS::DDNS do
 
   it 'is mocked in subclass as expected' do
     dns = MockProvision.new('prod', '192.168.1.0/24',
-                            :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
+                            :rndc_key => "fa5dUl+sdm/8cSZtDv1xFw==",
                             :nsupdate_replies => [],
                             :lookup_table => {
                               'foo.example.com' => '172.16.0.1'
@@ -80,7 +80,7 @@ describe Provision::DNS::DDNS do
 
   it 'calculates /16 reverse zones right' do
     dns = MockProvision.new('prod', '192.168.1.0/16',
-                            :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
+                            :rndc_key => "fa5dUl+sdm/8cSZtDv1xFw==",
                             :nsupdate_replies => [],
                             :lookup_table => {
                             },
@@ -91,7 +91,7 @@ describe Provision::DNS::DDNS do
 
   it 'calculates /27 reverse zones right' do
     dns = MockProvision.new('prod', '192.168.1.33/27',
-                            :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
+                            :rndc_key => "fa5dUl+sdm/8cSZtDv1xFw==",
                             :nsupdate_replies => [],
                             :lookup_table => {
                             },
@@ -102,7 +102,7 @@ describe Provision::DNS::DDNS do
 
   it 'allows overriding the automatically generated reverse zone file name' do
     dns = MockProvision.new('prod', '192.168.1.0/16',
-                            :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
+                            :rndc_key => "fa5dUl+sdm/8cSZtDv1xFw==",
                             :reverse_zone_override => '192.168.1',
                             :nsupdate_replies => [],
                             :lookup_table => {
@@ -114,7 +114,7 @@ describe Provision::DNS::DDNS do
 
   it 'raises an exception if we get bad rndc key' do
     dns = MockProvision.new('prod', '192.168.1.0/16',
-                            :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
+                            :rndc_key => "fa5dUl+sdm/8cSZtDv1xFw==",
                             :nsupdate_replies => ['; TSIG error with server: tsig indicates error (RuntimeError)
                       update failed: NOTAUTH(BADKEY)
                       '],
@@ -126,7 +126,7 @@ describe Provision::DNS::DDNS do
 
   it 'raises an exception if we get a timeout' do
     dns = MockProvision.new('prod', '192.168.1.0/16',
-                            :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
+                            :rndc_key => "fa5dUl+sdm/8cSZtDv1xFw==",
                             :nsupdate_replies => ['; Communication with server failed: timed out'],
                             :lookup_table => {},
                             :primary_nameserver => "mars"
@@ -136,7 +136,7 @@ describe Provision::DNS::DDNS do
 
   it 'can allocate a name' do
     dns = MockProvision.new('prod', '192.168.1.0/16',
-                            :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
+                            :rndc_key => "fa5dUl+sdm/8cSZtDv1xFw==",
                             :nsupdate_replies => ['', ''],
                             :lookup_table => {},
                             :primary_nameserver => "mars"
@@ -153,7 +153,7 @@ describe Provision::DNS::DDNS do
 
   it 'can de-allocate an already allocated name' do
     dns = MockProvision.new('prod', '192.168.1.0/16',
-                            :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
+                            :rndc_key => "fa5dUl+sdm/8cSZtDv1xFw==",
                             :nsupdate_replies => ['', '', '', ''],
                             :lookup_table => { 'st-testmachine-001.mgmt.st.net.local' => '192.168.0.10' },
                             :primary_nameserver => "mars"
@@ -167,7 +167,7 @@ describe Provision::DNS::DDNS do
 
   it 'can de-allocate a not already allocated name' do
     dns = MockProvision.new('prod', '192.168.1.0/16',
-                            :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
+                            :rndc_key => "fa5dUl+sdm/8cSZtDv1xFw==",
                             :nsupdate_replies => [],
                             :lookup_table => {},
                             :primary_nameserver => "mars"
@@ -178,7 +178,7 @@ describe Provision::DNS::DDNS do
 
   it 'fails if a freshly-allocated name cannot be resolved' do
     dns = MockProvision.new('prod', '192.168.1.0/16',
-                            :rndc_key      => "fa5dUl+sdm/8cSZtDv1xFw==",
+                            :rndc_key => "fa5dUl+sdm/8cSZtDv1xFw==",
                             :nsupdate_replies => ['', ''],
                             :lookup_table => {},
                             :primary_nameserver => "mars"

@@ -54,7 +54,7 @@ class Provision::Storage::LVM < Provision::Storage
     underscore_name = underscore_name(name, mount_point_obj.name)
     newsize = cmd("parted -sm #{device(underscore_name)} print | grep -e '^1:' | awk -F ':' '{ print $3 }'")
 
-    run_task(name, "shrink lvm #{underscore_name}",                :task => lambda do
+    run_task(name, "shrink lvm #{underscore_name}", :task => lambda do
       cmd "lvreduce -f -L #{newsize} #{device(underscore_name)}"
     end)
   end

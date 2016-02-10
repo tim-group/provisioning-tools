@@ -2,7 +2,7 @@ require 'provisioning-tools/provision/image/service'
 require 'provisioning-tools/provision/image/catalogue'
 require 'tempfile'
 
-describe Provision::Image::Service  do
+describe Provision::Image::Service do
   before do
     @image_file = Tempfile.new('image')
   end

@@ -3,7 +3,7 @@ end
 
 class Util::SymbolUtils
   def symbolize_keys(hash)
-    transform_keys(hash) { |key| key.to_sym }
+    transform_keys(hash, &:to_sym)
   end
 
   private

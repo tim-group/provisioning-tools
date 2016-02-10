@@ -189,11 +189,11 @@ module Provision::Storage::Local
   end
 
   def underscorize(string)
-    "#{string.to_s.gsub('/', '_').gsub(/_$/, '')}"
+    "#{string.to_s.tr('/', '_').gsub(/_$/, '')}"
   end
 
   def underscore_name(name, mount_point)
-    "#{name}#{mount_point.to_s.gsub('/', '_').gsub(/_$/, '')}"
+    "#{name}#{mount_point.to_s.tr('/', '_').gsub(/_$/, '')}"
   end
 
   def mount(name, mount_point_obj)
@@ -270,7 +270,9 @@ module Provision::Storage::Local
   end
 
   def create_lvm?(mount_point_obj)
-    mount_point_obj.config[:prepare][:options][:create_guest_lvm] rescue false
+    mount_point_obj.config[:prepare][:options][:create_guest_lvm]
+  rescue
+    false
   end
 
   def lvm_device_name(name, mount_point_obj)

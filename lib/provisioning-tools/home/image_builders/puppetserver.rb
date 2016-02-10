@@ -34,18 +34,18 @@ define 'puppetserver' do
         "  external_nodes = /usr/local/bin/stacks_indirector\n" \
         "  environmentpath = $confdir/environments\n" \
         "  reportdir         = $vardir/reports\n" \
-#        "  storeconfigs      = true\n" \
-#        "  storeconfigs_backend = puppetdb\n" \
-        "  certname          = puppet.DOMAIN\n" \
-        "  dns_alt_names     = puppet.DOMAIN,HOSTNAME,puppet"
+      #        "  storeconfigs      = true\n" \
+      #        "  storeconfigs_backend = puppetdb\n" \
+      "  certname          = puppet.DOMAIN\n" \
+      "  dns_alt_names     = puppet.DOMAIN,HOSTNAME,puppet"
     end
   end
 
   run('install ruby') do
-#    apt_install 'ruby1.8'
-#    apt_install 'rubygems'
-#    apt_install 'rubygems1.8'
-#    apt_install 'rubygem-rspec'
+    #    apt_install 'ruby1.8'
+    #    apt_install 'rubygems'
+    #    apt_install 'rubygems1.8'
+    #    apt_install 'rubygem-rspec'
     apt_install 'rubygem-mongo'
   end
 
@@ -53,11 +53,11 @@ define 'puppetserver' do
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') do |f|
       f.puts "#!/bin/bash\n" \
              "\n" \
-#             "if [[ $(hostname) == dev-* || $(hostname) == ephemeral-* ]]; then\n" \
-#             "  test -e /etc/rc.local-dev_puppetserver && sh /etc/rc.local-dev_puppetserver\n" \
-#             "else\n" \
-             "  test -e /etc/rc.local-prod_puppetserver && sh /etc/rc.local-prod_puppetserver\n" \
-#            "fi\n"
+      #             "if [[ $(hostname) == dev-* || $(hostname) == ephemeral-* ]]; then\n" \
+      #             "  test -e /etc/rc.local-dev_puppetserver && sh /etc/rc.local-dev_puppetserver\n" \
+      #             "else\n" \
+      "  test -e /etc/rc.local-prod_puppetserver && sh /etc/rc.local-prod_puppetserver\n" \
+      #            "fi\n"
     end
 
     # need to save puppet.conf in /tmp when removing /etc/puppet/ (git clone will fail if /etc/puppet is non-empty)
