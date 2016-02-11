@@ -30,8 +30,7 @@ define 'puppetserver' do
         "[agent]\n" \
         "  report            = true\n" \
         "[master]\n" \
-        "  node_terminus  = exec\n" \
-        "  external_nodes = /usr/local/bin/stacks_indirector\n" \
+        "  node_terminus  = stacks\n" \
         "  environmentpath = $confdir/environments\n" \
         "  reportdir         = $vardir/reports\n" \
       #        "  storeconfigs      = true\n" \
