@@ -40,11 +40,7 @@ define 'puppetserver' do
     end
   end
 
-  run('install ruby') do
-    #    apt_install 'ruby1.8'
-    #    apt_install 'rubygems'
-    #    apt_install 'rubygems1.8'
-    #    apt_install 'rubygem-rspec'
+  run('install rubygem-mongo') do
     apt_install 'rubygem-mongo'
   end
 
@@ -52,41 +48,11 @@ define 'puppetserver' do
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') do |f|
       f.puts "#!/bin/bash\n" \
         "\n" \
-        "test -e /etc/rc.local-prod_puppetserver && sh /etc/rc.local-prod_puppetserver\n" \
-    end
-
-    # need to save puppet.conf in /tmp when removing /etc/puppet/ (git clone will fail if /etc/puppet is non-empty)
-    open("#{spec[:temp_dir]}/etc/rc.local-dev_puppetserver", 'w') do |f|
-      f.puts "#!/bin/bash\n" \
-             "\n" \
-             "echo 'running ntpdate...' | logger\n" \
-             "/etc/init.d/ntp stop | logger 2>&1\n" \
-             "/usr/sbin/ntpdate -s ci-1.youdevise.com | logger 2>&1\n" \
-             "/etc/init.d/ntp start | logger 2>&1\n" \
-             "\n" \
-             "echo 'mirroring puppet.git...' | logger\n" \
-             "mv /etc/puppet/puppet.conf /tmp\n" \
-             "rm -rf /etc/puppet/\n" \
-             "git clone git://git.youdevise.com/puppet.git /etc/puppet/\n" \
-             "mv /tmp/puppet.conf /etc/puppet\n" \
-             "sed -i -e \"s/HOSTNAME/\$(hostname -f)/g\" /etc/puppet/puppet.conf\n" \
-             "sed -i -e \"s/DOMAIN/\$(hostname -d)/g\" /etc/puppet/puppet.conf\n" \
-             "ln -s /etc/puppet/modules/puppetmaster/files/hiera.yaml /etc/puppet/\n" \
-             "ln -s /etc/puppet/modules/puppetmaster/files/auth.conf /etc/puppet/\n" \
-             "ln -s /etc/puppet/modules/puppetmaster/files/routes.yaml /etc/puppet/\n" \
-             "puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/modules " \
-               "--logdest=syslog /etc/puppet/manifests\n" \
-             "\n" \
-             "echo 'running puppet agent...' | logger\n" \
-             "puppet agent --debug --verbose --waitforcert 10 --onetime 2>&1 | logger\n" \
-             "sleep 10 ; puppet cert sign $(hostname -f) 2>&1 | logger\n" \
-             "\n" \
-             "echo 'all done' | logger\n" \
-             "mv /etc/rc.local-dev_puppetserver /etc/rc.local-dev_puppetserver-done\n"
+        "test -e /etc/rc.local-puppetserver && sh /etc/rc.local-puppetserver\n" \
     end
 
     # * XXX symlink hieradata for the puppet apply run, a better way would be to specify hieradata path as an argument
-    open("#{spec[:temp_dir]}/etc/rc.local-prod_puppetserver", 'w') do |f|
+    open("#{spec[:temp_dir]}/etc/rc.local-puppetserver", 'w') do |f|
       f.puts "#!/bin/bash\n" \
              "\n" \
              "echo 'running ntpdate...' | logger\n" \
@@ -119,7 +85,7 @@ define 'puppetserver' do
              "sleep 10 ; puppet cert sign $(hostname -f) 2>&1 | logger\n" \
              "\n" \
              "echo 'all done' | logger\n" \
-             "mv /etc/rc.local-prod_puppetserver /etc/rc.local-prod_puppetserver-done\n"
+             "mv /etc/rc.local-puppetserver /etc/rc.local-puppetserver-done\n"
     end
   end
 end
