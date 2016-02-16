@@ -33,7 +33,7 @@ define 'puppetserver' do
         "  environmentpath = $confdir/environments\n" \
         "  reportdir         = $vardir/reports\n" \
       "  certname          = puppet.DOMAIN\n" \
-      "  dns_alt_names     = puppet.DOMAIN,HOSTNAME,puppet"
+      "  dns_alt_names     = puppet,FQDN"
     end
   end
 
@@ -69,7 +69,7 @@ define 'puppetserver' do
                "/etc/puppet/auth.conf\n" \
              "ln -s /etc/puppet/environments/masterbranch/hieradata/ /etc/puppet/hieradata # XXX needed " \
                "for puppet apply\n" \
-             "sed -i -e \"s/HOSTNAME/\$(hostname -f)/g\" /etc/puppet/puppet.conf\n" \
+             "sed -i -e \"s/FQDN/\$(hostname -f)/g\" /etc/puppet/puppet.conf\n" \
              "sed -i -e \"s/DOMAIN/\$(hostname -d)/g\" /etc/puppet/puppet.conf\n" \
              "echo 'running puppet apply...' | logger\n" \
              "puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/environments/masterbranch/modules " \
