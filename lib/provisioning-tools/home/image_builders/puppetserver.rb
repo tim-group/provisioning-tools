@@ -21,18 +21,18 @@ define 'puppetserver' do
         "  environment   = masterbranch\n" \
         "  configtimeout = 3000\n" \
         "  preferred_serialization_format = msgpack\n" \
-        "  catalog_cache_terminus  = json\n" \
-        "  strict_variables = true\n" \
-        "  trusted_server_facts = true\n" \
-        "  trusted_node_data = true\n" \
-        "  parser = future\n" \
+        "  catalog_cache_terminus = json\n" \
+        "  strict_variables       = true\n" \
+        "  trusted_server_facts   = true\n" \
+        "  trusted_node_data      = true\n" \
+        "  parser                 = future\n" \
         "[agent]\n" \
-        "  report            = true\n" \
+        "  report = true\n" \
         "[master]\n" \
         "  environmentpath = $confdir/environments\n" \
-        "  reportdir         = $vardir/reports\n" \
-      "  certname          = puppet.DOMAIN\n" \
-      "  dns_alt_names     = puppet,FQDN"
+        "  reportdir       = $vardir/reports\n" \
+        "  certname        = puppet.DOMAIN\n" \
+        "  dns_alt_names   = puppet,FQDN"
     end
   end
 
