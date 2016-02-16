@@ -20,7 +20,6 @@ define 'puppetserver' do
         "  splay         = false\n" \
         "  environment   = masterbranch\n" \
         "  configtimeout = 3000\n" \
-        "  reports       = graphite,successful_run_commit_id,stomp\n" \
         "  preferred_serialization_format = msgpack\n" \
         "  catalog_cache_terminus  = json\n" \
         "  strict_variables = true\n" \
@@ -33,8 +32,6 @@ define 'puppetserver' do
         "  node_terminus  = stacks\n" \
         "  environmentpath = $confdir/environments\n" \
         "  reportdir         = $vardir/reports\n" \
-      #        "  storeconfigs      = true\n" \
-      #        "  storeconfigs_backend = puppetdb\n" \
       "  certname          = puppet.DOMAIN\n" \
       "  dns_alt_names     = puppet.DOMAIN,HOSTNAME,puppet"
     end
@@ -70,8 +67,6 @@ define 'puppetserver' do
                "/etc/puppet/hiera.yaml\n" \
              "ln -s /etc/puppet/environments/masterbranch/modules/puppetmaster/files/auth.conf " \
                "/etc/puppet/auth.conf\n" \
-             "ln -s /etc/puppet/environments/masterbranch/modules/puppetmaster/files/routes.yaml " \
-               "/etc/puppet/routes.yaml\n" \
              "ln -s /etc/puppet/environments/masterbranch/hieradata/ /etc/puppet/hieradata # XXX needed " \
                "for puppet apply\n" \
              "sed -i -e \"s/HOSTNAME/\$(hostname -f)/g\" /etc/puppet/puppet.conf\n" \
