@@ -10,7 +10,6 @@ define "puppetclient" do
         "  rundir                         = /var/run/puppet\n" \
         "  ssldir                         = $vardir/ssl\n" \
         "  factpath                       = $vardir/lib/facter\n" \
-        "  templatedir                    = $confdir/templates\n" \
         "  pluginsync                     = true\n" \
         "  environment                    = masterbranch\n" \
         "  configtimeout                  = 3000\n" \
