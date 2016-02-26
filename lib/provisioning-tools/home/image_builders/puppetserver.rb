@@ -32,7 +32,7 @@ define 'puppetserver' do
         "  environmentpath = $confdir/environments\n" \
         "  reportdir       = $vardir/reports\n" \
         "  certname        = puppet.DOMAIN\n" \
-        "  dns_alt_names   = puppet,FQDN"
+        "  dns_alt_names   = puppet,FQDN,puppet.DOMAIN"
     end
   end
 
