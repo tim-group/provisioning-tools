@@ -13,7 +13,12 @@ define "puppetclient" do
         "  pluginsync                     = true\n" \
         "  environment                    = masterbranch\n" \
         "  configtimeout                  = 3000\n" \
-        "  preferred_serialization_format = msgpack\n"
+        "  preferred_serialization_format = msgpack\n" \
+        "  use_srv_records                = true\n" \
+        "  srv_domain                     = #{spec[:logicalenv]}.mgmt.#{spec[:domain]}\n" \
+        "  # BUG Fixed in Puppet 4.0 (https://tickets.puppetlabs.com/browse/PUP-1035)\n" \
+        "  pluginsource                   = puppet:///plugins\n" \
+        "  pluginfactsource               = puppet:///pluginfacts\n"
     end
   end
 
