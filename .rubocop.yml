@@ -10,7 +10,7 @@ Metrics/ParameterLists:
   Max: 8
 
 Metrics/LineLength:
-  Max: 140
+  Max: 147
 
 Metrics/BlockNesting:
   Max: 6
