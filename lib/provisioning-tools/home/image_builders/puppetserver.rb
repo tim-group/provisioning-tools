@@ -74,13 +74,13 @@ define 'puppetserver' do
              "echo 'node /puppetserver-/ { include role::puppetserver }' > /etc/puppet/environments/masterbranch/manifests/000_puppetserver.pp\n" \
              "puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/environments/masterbranch/modules " \
                "--logdest=syslog /etc/puppet/environments/masterbranch/manifests\n" \
+             "rm /etc/puppet/environments/masterbranch/manifests/000_puppetserver.pp\n" \
              "\n" \
              "echo 'running puppet agent...' | logger\n" \
              "puppet agent --debug --verbose --waitforcert 10 --onetime 2>&1 | logger\n" \
              "sleep 10 ; puppet cert sign $(hostname -f) 2>&1 | logger\n" \
              "\n" \
              "echo 'all done' | logger\n" \
-             "rm /etc/puppet/environments/masterbranch/manifests/000_puppetserver.pp\n" \
              "mv /etc/rc.local-puppetserver /etc/rc.local-puppetserver-done\n"
     end
   end
