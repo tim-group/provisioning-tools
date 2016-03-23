@@ -79,7 +79,7 @@ define 'puppetserver' do
              "echo 'running puppet agent...' | logger\n" \
              "puppet agent --debug --verbose --waitforcert 10 --onetime 2>&1 | logger\n" \
              "echo 'running puppet cert sign...' | logger\n" \
-             "until puppet cert sign $(hostname -f) 2>&1; do sleep 1; done | logger\n" \
+             "until puppet cert sign $(hostname -f) 2>&1 || [ -e /var/lib/puppet/ssl/ca/signed/$(hostname -f).pem ]; do sleep 1; done | logger\n" \
              "\n" \
              "echo 'all done' | logger\n" \
              "mv /etc/rc.local-puppetserver /etc/rc.local-puppetserver-done\n"
