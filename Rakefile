@@ -47,15 +47,6 @@ task :package_gold_precise => [:package_main] do
   sh command_line.join(' ')
 end
 
-# XXX what's this for?
-desc "Run puppet"
-task :run_puppet do
-  sh "ssh-keygen -R $(dig dev-puppetmaster-001.dev.net.local @192.168.5.1 +short)"
-  sh "chmod 600 files/id_rsa"
-  sh "ssh -o StrictHostKeyChecking=no -i files/id_rsa root@$(dig dev-puppetmaster-001.dev.net.local @192.168.5.1 " \
-     "+short) 'mco puppetd runall 4'"
-end
-
 desc "Run specs"
 RSpec::Core::RakeTask.new
 
