@@ -62,10 +62,8 @@ define 'puppetserver' do
              "echo 'checking out the master branch...' | logger\n" \
              "git --git-dir=/etc/puppet/puppet.git --work-tree=/etc/puppet/environments/masterbranch/ checkout " \
                "--detach --force master\n" \
-             "ln -s /etc/puppet/environments/masterbranch/modules/puppetmaster/files/hiera.yaml " \
+             "ln -s /etc/puppet/environments/masterbranch/modules/puppetserver/files/hiera.yaml " \
                "/etc/puppet/hiera.yaml\n" \
-             "ln -s /etc/puppet/environments/masterbranch/modules/puppetmaster/files/auth.conf " \
-               "/etc/puppet/auth.conf\n" \
              "ln -s /etc/puppet/environments/masterbranch/hieradata/ /etc/puppet/hieradata # XXX needed " \
                "for puppet apply\n" \
              "sed -i -e \"s/FQDN/\$(hostname -f)/g\" /etc/puppet/puppet.conf\n" \
