@@ -18,9 +18,7 @@ define "puppetclient" do
         "  srv_domain                     = #{spec[:logicalenv]}.mgmt.#{spec[:domain]}\n" \
         "  # BUG Fixed in Puppet 4.0 (https://tickets.puppetlabs.com/browse/PUP-1035)\n" \
         "  pluginsource                   = puppet:///plugins\n" \
-        "  pluginfactsource               = puppet:///pluginfacts\n" \
-        "  http_keepalive_timeout         = -1\n" \
-        "  http_debug                     = true\n"
+        "  pluginfactsource               = puppet:///pluginfacts\n"
     end
   end
 
