@@ -22,39 +22,6 @@ define "puppetclient" do
     end
   end
 
-  run('patch puppet because its crap') do
-    open("/tmp/puppet.patch", 'w') do |f|
-      f.puts "diff --git a/puppet/network/http/pool.rb b/puppet/network/http/pool.rb\n" \
-       "index b817b47..25eae68 100644\n" \
-       "--- a/puppet/network/http/pool.rb\n" \
-       "+++ b/puppet/network/http/pool.rb\n" \
-       "@@ -81,10 +81,19 @@ def borrow(site, verify)\n" \
-       "\n" \
-       '      Puppet.debug("Starting connection for \#{site}")' + "\n" \
-       "      http.start\n" \
-       "+      setsockopts(http.instance_variable_get(:@socket))\n" \
-       "      http\n" \
-       "    end\n" \
-       "  end\n" \
-       "\n" \
-       "+  # Set useful socket option(s) which lack from default settings in Net:HTTP\n" \
-       "+  #\n" \
-       "+  # @api private\n" \
-       "+  def setsockopts(netio)\n" \
-       "+    socket = netio.io\n" \
-       "+    socket.setsockopt(Socket::SOL_SOCKET, Socket::SO_KEEPALIVE, true)\n" \
-       "+  end\n" \
-       "+\n" \
-       "  # Release a connection back into the pool.\n" \
-       "  #\n" \
-       "  # @api private\n"
-    end
-  end
-
-  run('patch the patch') do
-    cmd "cd #{spec[:temp_dir]}/usr/lib/ruby/vendor_ruby/; patch -p 1 < /tmp/puppet.patch"
-  end
-
   run('setup one time password') do
     require 'rubygems'
     require 'rotp'
