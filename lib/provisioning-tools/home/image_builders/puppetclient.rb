@@ -37,15 +37,15 @@ define "puppetclient" do
   run('install rc.local') do
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') do |f|
       f.puts "#!/bin/sh -e\n" \
-        "echo 'Running rc.local'\n" \
-        "echo 'Run ntpdate'\n" \
+        "echo 'Running rc.local' | logger\n" \
+        "echo 'Run ntpdate' | logger\n" \
         "(/usr/sbin/ntpdate -b -v -d -s ci-1.youdevise.com 2>&1 | tee -a /tmp/bootstrap.log || exit 0)\n" \
-        "echo 'Regenerating SSH hostkeys'\n" \
+        "echo 'Regenerating SSH hostkeys' | logger\n" \
         "/bin/rm /etc/ssh/ssh_host_*\n" \
         "/usr/sbin/dpkg-reconfigure openssh-server\n" \
-        "echo 'Running puppet agent'\n" \
+        "echo 'Running puppet agent' | logger\n" \
         "puppet agent --debug --verbose --waitforcert 10 --onetime 2>&1 | tee -a /tmp/bootstrap.log\n" \
-        "echo 'creating initial facts'\n" \
+        "echo 'creating initial facts' | logger\n" \
         "/usr/local/sbin/refresh-mcollective-metadata\n" \
         "echo \"#!/bin/sh -e\\nexit 0\" > /etc/rc.local\n" \
         "echo 'Finished running rc.local'\n" \
