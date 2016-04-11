@@ -47,7 +47,6 @@ define 'puppetserver' do
         "test -e /etc/rc.local-puppetserver && sh /etc/rc.local-puppetserver\n" \
     end
 
-    # * XXX symlink hieradata for the puppet apply run, a better way would be to specify hieradata path as an argument
     open("#{spec[:temp_dir]}/etc/rc.local-puppetserver", 'w') do |f|
       f.puts "#!/bin/bash\n" \
              "\n" \
