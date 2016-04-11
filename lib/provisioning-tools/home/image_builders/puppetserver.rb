@@ -57,7 +57,7 @@ define 'puppetserver' do
              "/etc/init.d/ntp start | logger 2>&1\n" \
              "\n" \
              "echo 'mirroring puppet.git...' | logger\n" \
-             "git clone --mirror git://git.youdevise.com/puppet.git /etc/puppet/puppet.git\n" \
+             "git clone -q --mirror git://git.youdevise.com/puppet.git /etc/puppet/puppet.git\n" \
              "mkdir -p /etc/puppet/environments/masterbranch/\n" \
              "echo 'checking out the master branch...' | logger\n" \
              "git --git-dir=/etc/puppet/puppet.git --work-tree=/etc/puppet/environments/masterbranch/ checkout " \
