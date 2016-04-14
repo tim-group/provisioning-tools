@@ -19,7 +19,7 @@ class Puppet::Network::HTTP::Pool
     @keepalive_timeout = keepalive_timeout
   end
 
-  def with_connection(site, verify, &block)
+  def with_connection(site, verify, &_block)
     reuse = true
 
     http = borrow(site, verify)
@@ -54,9 +54,7 @@ class Puppet::Network::HTTP::Pool
   end
 
   # @api private
-  def pool
-    @pool
-  end
+  attr_reader :pool
 
   # Safely close a persistent connection.
   #
