@@ -26,11 +26,14 @@ class Puppet::Network::HTTP::Pool
     Puppet.debug("Borrowed #{http} in with_connection")
     begin
       if http.use_ssl? && http.verify_mode != OpenSSL::SSL::VERIFY_PEER
+        Puppet.debug("conditional in with_connection setting reuse = false")
         reuse = false
       end
 
       yield http
     rescue => detail
+      Puppet.debug(detail.inspect)
+      Puppet.debug("Rescuing #{detail} in with_connection, setting reuse = false")
       reuse = false
       raise detail
     ensure
@@ -60,6 +63,7 @@ class Puppet::Network::HTTP::Pool
   #
   # @api private
   def close_connection(site, http)
+    Puppet.debug("Closing #{http} in close_connections")
     Puppet.debug("Closing connection for #{site}")
     http.finish
   rescue => detail
@@ -102,6 +106,7 @@ class Puppet::Network::HTTP::Pool
   #
   # @api private
   def release(site, http)
+    Puppet.debug("Releasing connection #{http} in release")
     expiration = Time.now + @keepalive_timeout
     session = Puppet::Network::HTTP::Session.new(http, expiration)
     Puppet.debug("Caching connection for #{site}")
@@ -121,7 +126,7 @@ class Puppet::Network::HTTP::Pool
     now = Time.now
 
     sessions = @pool[site] || []
-    puts "active_sessions length: #{sessions.length}"
+    Puppet.debug("active_sessions length: #{sessions.length}")
     sessions.select do |session|
       if session.expired?(now)
         Puppet.debug("closing connection #{session.connection}, in active_sessions")
