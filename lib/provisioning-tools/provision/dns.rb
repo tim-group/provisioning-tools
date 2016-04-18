@@ -17,7 +17,7 @@ class Provision::DNSChecker
     @primary_nameserver = options[:primary_nameserver] || '192.168.5.1'
   end
 
-  def try_resolve(record, direction, max_attempts = 10)
+  def try_resolve(record, direction, max_attempts = 50)
     attempt = 1
     result = ''
     while (attempt <= max_attempts)
