@@ -23,7 +23,8 @@ class Puppet::Network::HTTP::Pool
     reuse = true
 
     http = borrow(site, verify)
-    Puppet.debug("Borrowed #{http} in with_connection")
+    Puppet.debug("Borrowed #{http} in with_connection, port #{http.instance_variable_get(:@socket).io.io.addr[1]}")
+
     begin
       if http.use_ssl? && http.verify_mode != OpenSSL::SSL::VERIFY_PEER
         Puppet.debug("conditional in with_connection setting reuse = false")
@@ -41,7 +42,7 @@ class Puppet::Network::HTTP::Pool
         Puppet.debug("Release #{http} in with_connection")
         release(site, http)
       else
-        Puppet.debug("Close #{http} in with_connection")
+        Puppet.debug("Close #{http} in with_connection, port #{http.instance_variable_get(:@socket).io.io.addr[1]}")
         close_connection(site, http)
       end
     end

@@ -41,8 +41,10 @@ define "puppetclient" do
         "echo 'Regenerating SSH hostkeys'\n" \
         "/bin/rm /etc/ssh/ssh_host_*\n" \
         "/usr/sbin/dpkg-reconfigure openssh-server\n" \
+        "tcpdump -i any -e -n -s0 port 8140 -w /tmp/out.pcap &" \
         "echo 'Running puppet agent'\n" \
         "puppet agent --debug --verbose --waitforcert 10 --onetime 2>&1 | tee -a /tmp/bootstrap.log\n" \
+        "killall tcpdump" \
         "echo \"#!/bin/sh -e\\nexit 0\" > /etc/rc.local\n" \
         "echo 'Finished running rc.local'\n" \
         "exit 0\n"
