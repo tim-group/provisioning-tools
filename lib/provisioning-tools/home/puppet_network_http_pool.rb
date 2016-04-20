@@ -107,8 +107,8 @@ class Puppet::Network::HTTP::Pool
   #
   # @api private
   def release(site, http)
-    Puppet.debug("Releasing connection #{http} in release")
     expiration = Time.now + @keepalive_timeout
+    Puppet.debug("Releasing connection #{http} in release, with expiration: #{expiration}")
     session = Puppet::Network::HTTP::Session.new(http, expiration)
     Puppet.debug("Caching connection for #{site}")
 
@@ -125,6 +125,7 @@ class Puppet::Network::HTTP::Pool
   # @api private
   def active_sessions(site)
     now = Time.now
+    Puppet.debug("active_sessions, Time.now: #{now}")
 
     sessions = @pool[site] || []
     Puppet.debug("active_sessions length: #{sessions.length}")
