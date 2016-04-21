@@ -48,5 +48,4 @@ define "puppetclient" do
         "exit 0\n"
     end
   end
-
 end
