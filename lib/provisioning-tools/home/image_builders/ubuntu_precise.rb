@@ -99,6 +99,7 @@ exec /sbin/getty -L ttyS0 115200 vt102
       f.puts "deb http://deb-transitional.youdevise.com/stable precise main\n"
       f.puts "deb http://deb-transitional.youdevise.com/stable all main\n"
     end
+    chroot "curl -Ss http://deb.youdevise.com/pubkey.gpg | apt-key add -"
     chroot "curl -Ss http://deb-transitional.youdevise.com/pubkey.gpg | apt-key add -"
   end
 
