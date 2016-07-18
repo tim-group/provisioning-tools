@@ -31,7 +31,13 @@ module MCollective
           if line.match(/Volume group "${volume_group}" not found/)
             fail line
           elsif line.match(/LV\s+Name/)
-            name = line.match(/LV\s+Name\s+\/\w+\/\w+\/(.+)/).captures.first.to_s
+            begin
+              name = line.match(/LV\s+Name\s+\/\w+\/\w+\/(.+)/).captures.first.to_s
+            rescue
+              # This is required for new kvm hosts with trusty.
+              # Normally we expect a path but in this case we dont have that anymore with the system lvm names
+              name = line.match(/LV\s+Name\s+(.+)/).captures.first.to_s
+            end
           elsif line.match(/LV\s+Size/)
             size = line.match(/LV\s+Size\s+(\d+\.\d+)/).captures.first.to_s
             lv_data[name.to_sym] = size
