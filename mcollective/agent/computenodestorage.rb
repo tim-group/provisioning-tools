@@ -34,8 +34,6 @@ module MCollective
             begin
               name = line.match(/LV\s+Name\s+\/\w+\/\w+\/(.+)/).captures.first.to_s
             rescue
-              # This is required for new kvm hosts with trusty.
-              # Normally we expect a path but in this case we dont have that anymore with the system lvm names
               name = line.match(/LV\s+Name\s+(.+)/).captures.first.to_s
             end
           elsif line.match(/LV\s+Size/)
