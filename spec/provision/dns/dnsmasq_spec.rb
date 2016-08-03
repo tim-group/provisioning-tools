@@ -86,14 +86,14 @@ describe Provision::DNS::DNSMasq do
 
   def expect_checks(allocations)
     allocations.each do |hostname, ip|
-      @checker.should_receive(:try_resolve).with(hostname, :forward).and_return(ip)
-      @checker.should_receive(:try_resolve).with(ip, :reverse).and_return(hostname)
+      @checker.should_receive(:try_resolve).with(hostname, :forward).and_return([ip])
+      @checker.should_receive(:try_resolve).with(ip, :reverse).and_return([hostname])
     end
   end
 
   def expect_cname_checks(allocations)
     allocations.each do |hostname, ip|
-      @checker.should_receive(:try_resolve).with(hostname, :forward).and_return(ip)
+      @checker.should_receive(:try_resolve).with(hostname, :forward).and_return([ip])
     end
   end
 
@@ -103,26 +103,36 @@ describe Provision::DNS::DNSMasq do
       File.open("#{dir}/etc/hosts", 'w') { |f| f.write "# Example hosts file\n127.0.0.1 localhost\n" }
       thing = undertest(dir)
       expect_checks('example.mgmt.youdevise.com' => '192.168.5.2', 'example.youdevise.com' => '192.168.6.2')
-      ip = thing.allocate_ips_for(Provision::Core::MachineSpec.new(
-                                    :hostname => "example",
-                                    :domain => "youdevise.com",
-                                    :qualified_hostnames => {
-                                      :prod => 'example.youdevise.com',
-                                      :mgmt => 'example.mgmt.youdevise.com'
-                                    }
-      ))[:mgmt][:address]
-      ip.kind_of?(IPAddr).should eql(false)
-      ip.to_s.should eql("192.168.5.2")
+      ips = thing.allocate_ips_for(Provision::Core::MachineSpec.new(
+                                     :hostname => "example",
+                                     :domain => "youdevise.com",
+                                     :qualified_hostnames => {
+                                       :prod => 'example.youdevise.com',
+                                       :mgmt => 'example.mgmt.youdevise.com'
+                                     }
+      ))[:mgmt].collect do |ip|
+        ip[:address]
+      end
+      expect(ips.length).to be 1
+      ips.each do |ip|
+        ip.kind_of?(IPAddr).should eql(false)
+        ip.to_s.should eql("192.168.5.2")
+      end
       expect_checks('example2.mgmt.youdevise.com' => '192.168.5.3', 'example2.youdevise.com' => '192.168.6.3')
-      other = thing.allocate_ips_for(Provision::Core::MachineSpec.new(
-                                       :hostname => "example2",
-                                       :domain => "youdevise.com",
-                                       :qualified_hostnames => {
-                                         :prod => 'example2.youdevise.com',
-                                         :mgmt => 'example2.mgmt.youdevise.com'
-                                       }
-      ))[:mgmt][:address]
-      other.to_s.should eql("192.168.5.3")
+      other_ips = thing.allocate_ips_for(Provision::Core::MachineSpec.new(
+                                           :hostname => "example2",
+                                           :domain => "youdevise.com",
+                                           :qualified_hostnames => {
+                                             :prod => 'example2.youdevise.com',
+                                             :mgmt => 'example2.mgmt.youdevise.com'
+                                           }
+      ))[:mgmt].collect do |ip|
+        ip[:address]
+      end
+      expect(other_ips.length).to be 1
+      other_ips.each do |ip|
+        ip.to_s.should eql("192.168.5.3")
+      end
       first_again = thing.allocate_ips_for(Provision::Core::MachineSpec.new(
                                              :hostname => "example",
                                              :domain => "youdevise.com",
@@ -130,9 +140,13 @@ describe Provision::DNS::DNSMasq do
                                                :prod => 'example.youdevise.com',
                                                :mgmt => 'example.mgmt.youdevise.com'
                                              }
-      ))[:mgmt][:address]
-
-      first_again.to_s.should eql("192.168.5.2")
+      ))[:mgmt].collect do |ip|
+        ip[:address]
+      end
+      expect(first_again.length).to be 1
+      first_again.each do |ip|
+        ip.to_s.should eql("192.168.5.2")
+      end
 
       new_thing = undertest(dir)
       new_thing_ip = new_thing.allocate_ips_for(Provision::Core::MachineSpec.new(
@@ -142,11 +156,16 @@ describe Provision::DNS::DNSMasq do
                                                     :prod => 'example.youdevise.com',
                                                     :mgmt => 'example.mgmt.youdevise.com'
                                                   }
-      ))[:mgmt][:address]
-      new_thing_ip.to_s.should eql("192.168.5.2")
+      ))[:mgmt].collect do |ip|
+        ip[:address]
+      end
+      expect(new_thing_ip.length).to be 1
+      new_thing_ip.each do |ip|
+        ip.to_s.should eql("192.168.5.2")
+      end
 
-      new_thing.hosts_by_name(:mgmt).should eql("example.mgmt.youdevise.com" => "192.168.5.2",
-                                                "example2.mgmt.youdevise.com" => "192.168.5.3")
+      new_thing.hosts_by_name(:mgmt).should eql("example.mgmt.youdevise.com" => ["192.168.5.2"],
+                                                "example2.mgmt.youdevise.com" => ["192.168.5.3"])
     end
   end
 
@@ -161,11 +180,11 @@ describe Provision::DNS::DNSMasq do
           "192.168.5.1 flib   \n"
       end
       thing = undertest(dir)
-      thing.hosts_by_name(:mgmt).should eql("fnar" => "192.168.5.5",
-                                            "fnar.example.com" => "192.168.5.5",
-                                            "boo.example.com" => "192.168.5.2",
-                                            "boo" => "192.168.5.2",
-                                            "flib" => "192.168.5.1")
+      thing.hosts_by_name(:mgmt).should eql("fnar" => ["192.168.5.5"],
+                                            "fnar.example.com" => ["192.168.5.5"],
+                                            "boo.example.com" => ["192.168.5.2"],
+                                            "boo" => ["192.168.5.2"],
+                                            "flib" => ["192.168.5.1"])
     end
   end
 
@@ -224,18 +243,18 @@ describe Provision::DNS::DNSMasq do
       spec1.hostname_on(:prod).should eql('example.youdevise.com')
       expect_checks('example.mgmt.youdevise.com' => '192.168.5.2', 'example.youdevise.com' => '192.168.6.2')
       ip_spec = thing.allocate_ips_for(spec1)
-      ip_spec.should eql(:mgmt => {
+      ip_spec.should eql(:mgmt => [{
                            :netmask => '255.255.255.0',
                            :address => '192.168.5.2'
-                         },
-                         :prod => {
+                         }],
+                         :prod => [{
                            :netmask => '255.255.255.0',
                            :address => '192.168.6.2'
-                         })
+                         }])
       expect_checks('example2.mgmt.youdevise.com' => '192.168.5.3', 'example2.youdevise.com' => '192.168.6.3')
       thing.allocate_ips_for(spec2)
-      thing.remove_ips_for(spec1)[:mgmt].should eql(:netmask => '255.255.255.0', :address => '192.168.5.2')
-      thing.remove_ips_for(spec2)[:mgmt].should eql(:netmask => '255.255.255.0', :address => '192.168.5.3')
+      thing.remove_ips_for(spec1)[:mgmt].should eql([:netmask => '255.255.255.0', :address => '192.168.5.2'])
+      thing.remove_ips_for(spec2)[:mgmt].should eql([:netmask => '255.255.255.0', :address => '192.168.5.3'])
 
       File.open("#{dir}/etc/hosts", 'r') { |f| f.read.should eql("") }
     end

@@ -143,19 +143,20 @@ describe Provision::DNS::DDNS do
                            )
     dns.checker = double
     dns.checker.should_receive(:try_resolve).with('st-testmachine-001.mgmt.st.net.local', :forward).
-      and_return('192.168.0.10')
+      and_return(['192.168.0.10'])
     dns.checker.should_receive(:try_resolve).with('192.168.0.10', :reverse).
-      and_return('st-testmachine-001.mgmt.st.net.local')
-    ip = dns.allocate_ip_for(get_spec)
-    ip[:address].to_s.should eql('192.168.0.10')
-    ip[:netmask].should eql('255.255.0.0')
+      and_return(['st-testmachine-001.mgmt.st.net.local'])
+    ips = dns.allocate_ip_for(get_spec)
+    expect(ips.length).to be 1
+    ips.first[:address].to_s.should eql('192.168.0.10')
+    ips.first[:netmask].should eql('255.255.0.0')
   end
 
   it 'can de-allocate an already allocated name' do
     dns = MockProvision.new('prod', '192.168.1.0/16',
                             :rndc_key => "fa5dUl+sdm/8cSZtDv1xFw==",
                             :nsupdate_replies => ['', '', '', ''],
-                            :lookup_table => { 'st-testmachine-001.mgmt.st.net.local' => '192.168.0.10' },
+                            :lookup_table => { 'st-testmachine-001.mgmt.st.net.local' => ['192.168.0.10'] },
                             :primary_nameserver => "mars"
                            )
     ip = dns.allocate_ip_for(get_spec)
@@ -184,7 +185,7 @@ describe Provision::DNS::DDNS do
                             :primary_nameserver => "mars"
                            )
     dns.checker = double
-    dns.checker.should_receive(:try_resolve).with('st-testmachine-001.mgmt.st.net.local', :forward).and_return('')
+    dns.checker.should_receive(:try_resolve).with('st-testmachine-001.mgmt.st.net.local', :forward).and_return([])
     expect do
       dns.allocate_ip_for(get_spec)
     end.to raise_error(/unable to resolve forward st-testmachine-001.mgmt.st.net.local expected 192.168.0.10, actual:/)

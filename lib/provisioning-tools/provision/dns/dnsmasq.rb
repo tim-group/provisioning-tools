@@ -50,30 +50,32 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
     $etc_hosts_mutex.synchronize do
       parse_hosts
       return if @cnames_by_fqdn[fqdn] == cname_fqdn
-      ip = @by_name[cname_fqdn]
-      if ip
-        temp_file = Tempfile.new('etc_hosts_update')
-        begin
-          File.open(@hosts_file, 'r') do |file|
-            file.each_line do |line|
-              if line =~ /^#{Regexp.escape(ip)}\s+/
-                temp_file.puts line.strip + " #{fqdn}"
-              else
-                temp_file.puts line
+      ips = @by_name[cname_fqdn]
+      ips.each do |ip|
+        if ip
+          temp_file = Tempfile.new('etc_hosts_update')
+          begin
+            File.open(@hosts_file, 'r') do |file|
+              file.each_line do |line|
+                if line =~ /^#{Regexp.escape(ip)}\s+/
+                  temp_file.puts line.strip + " #{fqdn}"
+                else
+                  temp_file.puts line
+                end
               end
             end
+            temp_file.rewind
+            FileUtils.mv(temp_file.path, @hosts_file)
+            File.chmod(0644, @hosts_file)
+            reload_dnsmasq
+          ensure
+            temp_file.close
+            temp_file.unlink
           end
-          temp_file.rewind
-          FileUtils.mv(temp_file.path, @hosts_file)
-          File.chmod(0644, @hosts_file)
-          reload_dnsmasq
-        ensure
-          temp_file.close
-          temp_file.unlink
+        else
+          fail "Unable to add CNAME for '#{fqdn}' as CNAME: '#{cname_fqdn}' does not have an IP address associated " \
+            "with it"
         end
-      else
-        fail "Unable to add CNAME for '#{fqdn}' as CNAME: '#{cname_fqdn}' does not have an IP address associated " \
-          "with it"
       end
     end
   end
@@ -124,7 +126,8 @@ class Provision::DNS::DNSMasqNetwork < Provision::DNSNetwork
       next unless @subnet.include?(ip)
       names.each_index do |i|
         name = names[i]
-        @by_name[name] = ip
+        @by_name[name] = [] if @by_name[name].nil?
+        @by_name[name] << ip
         @by_ip[ip] = name if i == 0
         @cnames_by_fqdn[name] = names[0] if i > 0
       end

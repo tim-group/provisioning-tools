@@ -35,7 +35,10 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     )
 
     begin
-      IPAddr.new(resolver.getaddress(fqdn).to_s, Socket::AF_INET)
+      resolver.getaddresses(fqdn).collect do |address|
+        IPAddr.new(address.to_s, Socket::AF_INET)
+      end
+
     rescue Resolv::ResolvError
       puts "Could not find #{fqdn}"
       false
@@ -184,14 +187,16 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     nsupdate(tmp_file, "Remove CNAME entry #{fqdn} -> #{cname_fqdn}")
   end
 
-  def remove_reverse_lookup(ip)
-    ip_rev = ip.to_s.split('.').reverse.join('.')
-    tmp_file = Tempfile.new('remove_temp')
-    tmp_file.puts "server #{@primary_nameserver}"
-    tmp_file.puts "zone #{reverse_zone}"
-    tmp_file.puts "update delete #{ip_rev}.in-addr.arpa. PTR"
-    tmp_file.puts "send"
-    tmp_file.close
-    nsupdate(tmp_file, "Remove reverse for #{ip}")
+  def remove_reverse_lookup(ips)
+    ips.each do |ip|
+      ip_rev = ip.to_s.split('.').reverse.join('.')
+      tmp_file = Tempfile.new('remove_temp')
+      tmp_file.puts "server #{@primary_nameserver}"
+      tmp_file.puts "zone #{reverse_zone}"
+      tmp_file.puts "update delete #{ip_rev}.in-addr.arpa. PTR"
+      tmp_file.puts "send"
+      tmp_file.close
+      nsupdate(tmp_file, "Remove reverse for #{ip}")
+    end
   end
 end

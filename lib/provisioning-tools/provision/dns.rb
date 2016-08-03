@@ -23,8 +23,8 @@ class Provision::DNSChecker
     while (attempt <= max_attempts)
       msg = "Lookup #{record} (#{attempt}/#{max_attempts})"
       begin
-        result = Resolv.getname(record) if direction == :reverse
-        result = Resolv.getaddress(record) if direction == :forward
+        result = Resolv.getnames(record) if direction == :reverse
+        result = Resolv.getaddresses(record) if direction == :forward
         break
       rescue Exception => e
         logger.error("DNS RESOLVE FAILURE: #{msg} - #{e.inspect}")
@@ -34,7 +34,7 @@ class Provision::DNSChecker
     end
     attempt >= max_attempts ? (fail "Lookup #{record} failed after #{max_attempts} attempts") : false
 
-    logger.info("SUCCESS: #{msg} resolved to #{result}")
+    logger.info("SUCCESS: #{msg} resolved to #{result.join(', ')}")
     result
   end
 end
@@ -71,16 +71,20 @@ class Provision::DNSNetwork
   def allocate_ip_for(spec)
     hostname = hostname_from_spec spec
     all_hostnames = spec.all_hostnames_on(@name)
-    ip = nil
+    ips = nil
 
-    ip = lookup_ip_for(hostname)
-    if ip
-      @logger.info("No new allocation for #{hostname}, already allocated to #{ip}")
-      puts "No new allocation for #{hostname}, already allocated"
-      return {
-        :netmask => @subnet_mask.to_s,
-        :address => lookup_ip_for(hostname)
-      }
+    ips = lookup_ip_for(hostname)
+    if ips
+      @logger.info("No new allocation for #{hostname}, already allocated to #{ips.join(', ')}")
+      puts "No new allocation for #{hostname}, already allocated to #{ips.join(', ')}"
+      ret = []
+      ips.each do |ip|
+        ret << {
+          :netmask => @subnet_mask.to_s,
+          :address => ip
+        }
+      end
+      return ret
     else
       max_ip = @max_allocation
       ip = @min_allocation
@@ -95,28 +99,31 @@ class Provision::DNSNetwork
       add_forward_lookup(ip, hostname)
     end
 
-    actual_ip = @checker.try_resolve(hostname, :forward)
-    fail "unable to resolve forward #{hostname} expected #{ip}, actual: #{actual_ip}" if ip.to_s != actual_ip.to_s
-    actual_hostname = @checker.try_resolve(ip.to_s, :reverse)
-    fail "unable to resolve reverse #{ip} expected #{hostname}, actual: #{actual_hostname}" if hostname != actual_hostname
-    {
+    actual_ips = @checker.try_resolve(hostname, :forward)
+    fail "unable to resolve forward #{hostname} expected #{ip}, actual: #{actual_ips.join(', ')}" unless actual_ips.include? ip.to_s
+    actual_hostnames = @checker.try_resolve(ip.to_s, :reverse)
+    fail "unable to resolve reverse #{ip} expected #{hostname}, actual: #{actual_hostnames.join(', ')}" unless actual_hostnames.include? hostname
+    [{
       :netmask => @subnet_mask.to_s,
       :address => ip.to_s
-    }
+    }]
   end
 
   def remove_ip_for(spec)
     hostname = hostname_from_spec spec
-    ip = lookup_ip_for(hostname)
-    if ip
-      remove_forward_lookup(hostname)
-      remove_reverse_lookup ip
-    end
+    ips = lookup_ip_for(hostname)
+    return unless ips
+    remove_forward_lookup(hostname)
+    remove_reverse_lookup ips
 
-    {
-      :netmask => @subnet_mask.to_s,
-      :address => ip
-    }
+    ret = []
+    ips.each do |ip|
+      ret << {
+        :netmask => @subnet_mask.to_s,
+        :address => ip
+      }
+    end
+    ret
   end
 
   def add_cnames_for(spec)
@@ -214,7 +221,8 @@ class Provision::DNS
 
       allocations[network] = @networks[network].allocate_ip_for(spec)
 
-      @logger.info("Allocated #{allocations[network][:address]} in network #{network_name} for node #{spec[:hostname]}")
+      @logger.info("Allocated #{allocations[network].collect { |net| net[:address] }.join(', ')} " \
+                   "in network #{network_name} for node #{spec[:hostname]}")
     end
 
     fail("No networks allocated for this machine, cannot be sane") if allocations.empty?
