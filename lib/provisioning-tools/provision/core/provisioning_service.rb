@@ -108,7 +108,14 @@ class Provision::Core::ProvisioningService
     spec = Provision::Core::MachineSpec.new(spec_hash)
     networking = @numbering_service.allocate_ips_for(spec)
     @logger.info("Allocated #{networking.inspect} to #{spec}")
-    networking.values.map { |n| n[:address] }.sort.join(", ")
+    ips = []
+
+    networking.values.each do |net|
+      net.each do |network|
+        ips << network[:address]
+      end
+    end
+    ips.sort.join(", ")
   end
 
   def add_cnames(spec_hash)
