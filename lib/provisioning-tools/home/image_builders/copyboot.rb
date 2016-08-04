@@ -87,7 +87,7 @@ iface lo inet loopback
         if !config.nil?
           f.puts "
 auto #{nic[:network]}"
-          config.each do |net|
+          config.sort_by { |hsh| hsh[:address] }.each do |net|
             f.puts "
 iface #{nic[:network]} inet static
  address #{net[:address]}
