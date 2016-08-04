@@ -69,10 +69,10 @@ describe Provision::Core::ProvisioningService do
 
     it 'allows ips to produce' do
       network_address = {
-        "mgmt" => {
+        "mgmt" => [{
           :ip => "192.168.24.5",
           :netmask => "255.255.255.0"
-        }
+        }]
       }
       @numbering_service.stub(:allocate_ips_for).and_return(network_address)
       @numbering_service.should_receive(:add_cnames_for)

@@ -69,12 +69,12 @@ describe Provision::DNS::DDNS do
                             :rndc_key => "fa5dUl+sdm/8cSZtDv1xFw==",
                             :nsupdate_replies => [],
                             :lookup_table => {
-                              'foo.example.com' => '172.16.0.1'
+                              'foo.example.com' => [ '172.16.0.1' ]
                             },
                             :primary_nameserver => "mars"
                            )
     dns.reverse_zone.should eql('1.168.192.in-addr.arpa')
-    dns.lookup_ip_for('foo.example.com').should eql('172.16.0.1')
+    dns.lookup_ip_for('foo.example.com').should eql(['172.16.0.1'])
     dns.lookup_ip_for('foo2example.com').should eql(false)
   end
 
