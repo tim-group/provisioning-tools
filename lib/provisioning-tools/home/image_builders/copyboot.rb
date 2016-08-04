@@ -85,7 +85,7 @@ iface lo inet loopback
       spec.interfaces.each do |nic|
         config = spec[:networking][nic[:network].to_sym]
         if !config.nil?
-            f.puts "
+          f.puts "
 auto #{nic[:network]}"
           config.each do |net|
             f.puts "
@@ -94,7 +94,7 @@ iface #{nic[:network]} inet static
  netmask #{net[:netmask]}"
             f.puts "
  mtu 1496" if nic[:network] == 'crosssite'
-            f.puts"\n"
+            f.puts "\n"
           end
         else
           f.puts "

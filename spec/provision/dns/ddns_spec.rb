@@ -69,7 +69,7 @@ describe Provision::DNS::DDNS do
                             :rndc_key => "fa5dUl+sdm/8cSZtDv1xFw==",
                             :nsupdate_replies => [],
                             :lookup_table => {
-                              'foo.example.com' => [ '172.16.0.1' ]
+                              'foo.example.com' => ['172.16.0.1']
                             },
                             :primary_nameserver => "mars"
                            )
