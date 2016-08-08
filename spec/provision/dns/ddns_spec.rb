@@ -190,4 +190,19 @@ describe Provision::DNS::DDNS do
       dns.allocate_ip_for(get_spec)
     end.to raise_error(/unable to resolve forward st-testmachine-001.mgmt.st.net.local expected 192.168.0.10, actual:/)
   end
+
+  it 'return false if a DNS lookup fails to find any results' do
+    resolver = double
+    expect(resolver).to receive(:getaddresses).with('st-testmachine-001.mgmt.st.net.local').and_return([])
+    expect(resolver).to receive(:getaddress).with('st-testmachine-001.mgmt.st.net.local').and_raise(Resolv::ResolvError)
+    dns = Provision::DNS::DDNSNetwork.new('prod', '192.168.1.0/24',
+                                          :rndc_key => "fa5dUl+sdm/8cSZtDv1xFw==",
+                                          :primary_nameserver => "mars",
+                                          :min_allocation => "192.168.1.99",
+                                          :max_allocation => "192.168.1.150",
+                                          :resolver => resolver
+                                         )
+    ip = dns.lookup_ip_for('st-testmachine-001.mgmt.st.net.local')
+    expect(ip).to be(false)
+  end
 end

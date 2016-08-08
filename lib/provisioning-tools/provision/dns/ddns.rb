@@ -25,40 +25,32 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     parts = range.split('/')
     fail(":network_range must be of the format X.X.X.X/Y") if parts.size != 2
     @rndc_key = options[:rndc_key] || fail("No :rndc_key supplied")
+    @resolver = options[:resolver] || Resolv::DNS.new(
+      :nameserver => @primary_nameserver,
+      :search => [],
+      :ndots => 1
+    )
   end
 
   def lookup_ip_for(fqdn)
-    resolver = Resolv::DNS.new(
-      :nameserver => @primary_nameserver,
-      :search => [],
-      :ndots => 1
-    )
+    addresses = @resolver.getaddresses(fqdn)
+    @resolver.getaddress(fqdn) if addresses.empty?
 
-    begin
-      resolver.getaddresses(fqdn).collect do |address|
-        IPAddr.new(address.to_s, Socket::AF_INET)
-      end
-
-    rescue Resolv::ResolvError
-      puts "Could not find #{fqdn}"
-      false
+    addresses.collect do |address|
+      IPAddr.new(address.to_s, Socket::AF_INET)
     end
+
+  rescue Resolv::ResolvError
+    puts "Could not find #{fqdn}"
+    false
   end
 
   def lookup_cname_for(fqdn)
-    resolver = Resolv::DNS.new(
-      :nameserver => @primary_nameserver,
-      :search => [],
-      :ndots => 1
-    )
-
-    begin
-      cname = resolver.getresource(fqdn, Resolv::DNS::Resource::IN::CNAME)
-      return cname.name.to_s if cname
-    rescue Resolv::ResolvError
-      puts "Could not find cname for #{fqdn}"
-      return nil
-    end
+    cname = @resolver.getresource(fqdn, Resolv::DNS::Resource::IN::CNAME)
+    return cname.name.to_s if cname
+  rescue Resolv::ResolvError
+    puts "Could not find cname for #{fqdn}"
+    return nil
   end
 
   def reverse_zone
