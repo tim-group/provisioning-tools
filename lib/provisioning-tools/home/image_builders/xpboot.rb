@@ -68,8 +68,10 @@ define "xpboot" do
       config = spec[:networking][nic[:network].to_sym]
       cmd "sed -i s/\"<%DNSDOMAIN%>\"/#{dns_domain}/g #{network_file}"
       cmd "sed -i s/\"<%DNSSERVER%>\"/#{spec[:nameserver]}/g #{network_file}"
-      cmd "sed -i s/\"<%IPADDRESS%>\"/#{config[:address]}/g #{network_file}"
-      cmd "sed -i s/\"<%NETMASK%>\"/#{config[:netmask]}/g #{network_file}"
+      # FIXME: prov-tools can do multiple IPs per adaptor, but unsure how to do
+      # that with sysprep. So default to prior behaviour
+      cmd "sed -i s/\"<%IPADDRESS%>\"/#{config.first[:address]}/g #{network_file}"
+      cmd "sed -i s/\"<%NETMASK%>\"/#{config.first[:netmask]}/g #{network_file}"
       cmd "sed -i s/\"<%GATEWAY%>\"/#{gateway}/g #{network_file}"
     end
   end

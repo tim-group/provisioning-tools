@@ -71,7 +71,9 @@ define "win7boot" do
       cmd "sed -i s/%%COMPUTERNAME%%/#{spec[:hostname]}/g #{sysprep_answer_file}"
       cmd "sed -i s/%%DNSDOMAIN%%/#{dns_domain}/g #{sysprep_answer_file}"
       cmd "sed -i s/%%DNSSERVER%%/#{spec[:nameserver]}/g #{sysprep_answer_file}"
-      cmd "sed -i s/%%IPADDRESS%%/#{config[:address]}/g #{sysprep_answer_file}"
+      # FIXME: prov-tools can do multiple IPs per adaptor, but unsure how to do
+      # that with sysprep. So default to prior behaviour
+      cmd "sed -i s/%%IPADDRESS%%/#{config.first[:address]}/g #{sysprep_answer_file}"
       cmd "sed -i s/%%GATEWAY%%/#{gateway}/g #{sysprep_answer_file}"
     end
   end
