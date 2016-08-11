@@ -185,10 +185,43 @@ describe Provision::DNS::DDNS do
                             :primary_nameserver => "mars"
                            )
     dns.checker = double
-    dns.checker.should_receive(:try_resolve).with('st-testmachine-001.mgmt.st.net.local', :forward).and_return([])
+    dns.checker.should_receive(:try_resolve).with('st-testmachine-001.mgmt.st.net.local', :forward).and_raise(
+      RuntimeError.new('Lookup st-testmachine-001.mgmt.st.net.local failed after 50 attempts')
+    )
     expect do
       dns.allocate_ip_for(get_spec)
-    end.to raise_error(/unable to resolve forward st-testmachine-001.mgmt.st.net.local expected 192.168.0.10, actual:/)
+    end.to raise_error('Lookup st-testmachine-001.mgmt.st.net.local failed after 50 attempts')
+  end
+
+  it 'fails if a freshly-allocated name resolves to something incorrect' do
+    dns = MockProvision.new('prod', '192.168.1.0/16',
+                            :rndc_key => "fa5dUl+sdm/8cSZtDv1xFw==",
+                            :nsupdate_replies => ['', ''],
+                            :lookup_table => {},
+                            :primary_nameserver => "mars"
+                           )
+    dns.checker = double
+    dns.checker.should_receive(:try_resolve).with('st-testmachine-001.mgmt.st.net.local', :forward).and_return(['192.168.0.11'])
+    expect do
+      dns.allocate_ip_for(get_spec)
+    end.to raise_error(/unable to resolve forward st-testmachine-001.mgmt.st.net.local expected 192.168.0.10, actual: 192.168.0.11/)
+  end
+
+  it 'fails if a freshly-allocated ip resolves to something incorrect' do
+    dns = MockProvision.new('prod', '192.168.1.0/16',
+                            :rndc_key => "fa5dUl+sdm/8cSZtDv1xFw==",
+                            :nsupdate_replies => ['', ''],
+                            :lookup_table => {},
+                            :primary_nameserver => "mars"
+                           )
+    dns.checker = double
+    dns.checker.should_receive(:try_resolve).with('st-testmachine-001.mgmt.st.net.local', :forward).and_return(['192.168.0.10'])
+    dns.checker.should_receive(:try_resolve).with('192.168.0.10', :reverse).and_return(['st-testmachine-002.mgmt.st.net.local'])
+    expect do
+      dns.allocate_ip_for(get_spec)
+    end.to raise_error(
+      /unable to resolve reverse 192.168.0.10 expected st-testmachine-001.mgmt.st.net.local, actual: st-testmachine-002.mgmt.st.net.local/
+    )
   end
 
   it 'return false if a DNS lookup fails to find any results' do

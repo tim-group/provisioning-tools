@@ -19,12 +19,20 @@ class Provision::DNSChecker
 
   def try_resolve(record, direction, max_attempts = 50)
     attempt = 1
-    result = ''
+    results = []
     while (attempt <= max_attempts)
       msg = "Lookup #{record} (#{attempt}/#{max_attempts})"
       begin
-        result = Resolv.getnames(record) if direction == :reverse
-        result = Resolv.getaddresses(record) if direction == :forward
+        case direction
+        when :reverse
+          results = Resolv.getnames(record)
+          results = [Resolv.getname(record)] if results.empty?
+        when :forward
+          results = Resolv.getaddresses(record)
+          results = [Resolv.getaddress(record)] if results.empty?
+        else
+          fail("Unsure how to resolve DNS direction #{direction}")
+        end
         break
       rescue Exception => e
         logger.error("DNS RESOLVE FAILURE: #{msg} - #{e.inspect}")
@@ -35,7 +43,7 @@ class Provision::DNSChecker
     attempt >= max_attempts ? (fail "Lookup #{record} failed after #{max_attempts} attempts") : false
 
     logger.info("SUCCESS: #{msg} resolved to #{result.join(', ')}")
-    result
+    results
   end
 end
 
