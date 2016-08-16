@@ -42,7 +42,7 @@ class Provision::DNSChecker
     end
     attempt >= max_attempts ? (fail "Lookup #{record} failed after #{max_attempts} attempts") : false
 
-    logger.info("SUCCESS: #{msg} resolved to #{result.join(', ')}")
+    logger.info("SUCCESS: #{msg} resolved to #{results.join(', ')}")
     results
   end
 end
