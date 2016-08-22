@@ -77,7 +77,6 @@ task :package_main do
     '-n', 'provisioning-tools',
     '-v', "#{@version}",
     '-m', 'Infrastructure <infra@timgroup.com>',
-    '-d', 'provisioning-tools-gold-image-precise',
     '-d', 'debootstrap',
     '-d', 'ruby-bundle',
     '-a', 'all',
