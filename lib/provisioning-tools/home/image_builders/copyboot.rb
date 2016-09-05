@@ -68,7 +68,7 @@ if [ "${IFACE}" == "mgmt" ]; then
 
     cmd "chmod a+x #{spec[:temp_dir]}/etc/network/if-up.d/routes_mgmt"
 
-    open("#{spec[:temp_dir]}/etc/hosts", 'a') do |f|
+    open("#{spec[:temp_dir]}/etc/hosts", 'w') do |f|
       f.puts "\n127.0.0.1		localhost\n"
       f.puts "127.0.1.1		#{spec[:fqdn]}	#{spec[:hostname]}\n"
     end
