@@ -43,7 +43,7 @@ define 'puppetserver' do
       f.puts "kvm_host=#{Facter.value(:hostname)}\n" \
              "rack=#{Facter.value(:rack)}\n" \
              "provision_date=#{DateTime.now.iso8601}"
-             "provision_secs_since_epoch=#{DateTime.now.to_i}"
+      "provision_secs_since_epoch=#{DateTime.now.to_i}"
     end
   end
 
