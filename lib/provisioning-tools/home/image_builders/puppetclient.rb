@@ -32,6 +32,17 @@ define "puppetclient" do
     end
   end
 
+  run('stamp metadata') do
+    require 'facter'
+    cmd "mkdir -p #{spec[:temp_dir]}/etc/facts.d"
+    open("#{spec[:temp_dir]}/etc/facts.d/provision_metadata", 'w') do |f|
+      f.puts "kvm_host=#{Facter.value(:hostname)}\n" \
+             "rack=#{Facter.value(:rack)}\n" \
+             "provision_date=#{DateTime.now.iso8601}"
+             "provision_secs_since_epoch=#{DateTime.now.to_i}"
+    end
+  end
+
   run('install rc.local') do
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') do |f|
       f.puts "#!/bin/sh -e\n" \
