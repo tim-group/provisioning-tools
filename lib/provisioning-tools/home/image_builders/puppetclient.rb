@@ -33,13 +33,14 @@ define "puppetclient" do
   end
 
   run('stamp metadata') do
+    require 'rubygems'
     require 'facter'
     cmd "mkdir -p #{spec[:temp_dir]}/etc/facts.d"
     open("#{spec[:temp_dir]}/etc/facts.d/provision_metadata", 'w') do |f|
       f.puts "kvm_host=#{Facter.value(:hostname)}\n" \
              "rack=#{Facter.value(:rack)}\n" \
-             "provision_date=#{DateTime.now.iso8601}"
-      "provision_secs_since_epoch=#{DateTime.now.to_i}"
+             "provision_date=#{DateTime.now.iso8601}\n" \
+             "provision_secs_since_epoch=#{DateTime.now.to_i}\n"
     end
   end
 
