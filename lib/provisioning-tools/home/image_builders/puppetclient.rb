@@ -54,6 +54,7 @@ define "puppetclient" do
         "/bin/rm /etc/ssh/ssh_host_*\n" \
         "/usr/sbin/dpkg-reconfigure openssh-server\n" \
         "echo 'Running puppet agent'\n" \
+        "export LANG=en_GB.UTF-8\n" \
         "puppet agent --debug --verbose --waitforcert 10 --onetime 2>&1 | tee -a /tmp/bootstrap.log\n" \
         "echo \"#!/bin/sh -e\\nexit 0\" > /etc/rc.local\n" \
         "echo 'Finished running rc.local'\n" \

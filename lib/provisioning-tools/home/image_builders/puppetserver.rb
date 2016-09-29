@@ -80,6 +80,7 @@ define 'puppetserver' do
              "sed -i -e \"s/FQDN/\$(hostname -f)/g\" /etc/puppet/puppet.conf\n" \
              "sed -i -e \"s/DOMAIN/\$(hostname -d)/g\" /etc/puppet/puppet.conf\n" \
              "echo 'running puppet apply...' | logger\n" \
+             "export LANG=en_GB.UTF-8\n" \
              "echo 'node /puppetserver-/ { include role::puppetserver }' > /etc/puppet/environments/masterbranch/manifests/000_puppetserver.pp\n" \
              "puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/environments/masterbranch/modules " \
                "--logdest=syslog /etc/puppet/environments/masterbranch/manifests\n" \
