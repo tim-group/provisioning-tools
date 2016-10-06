@@ -35,6 +35,9 @@ define "puppetclient" do
   run('stamp metadata') do
     require 'rubygems'
     require 'facter'
+    require 'puppet'
+    Puppet.initialize_settings
+    Facter::Util::Config.ext_fact_loader = Facter::Util::DirectoryLoader.loader_for('/etc/facts.d/')
     cmd "mkdir -p #{spec[:temp_dir]}/etc/facts.d"
     open("#{spec[:temp_dir]}/etc/facts.d/provision_metadata.fact", 'w') do |f|
       f.puts "kvm_host=#{Facter.value(:hostname)}\n" \
