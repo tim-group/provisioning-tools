@@ -52,7 +52,7 @@ define "puppetclient" do
       f.puts "#!/bin/sh -e\n" \
         "echo 'Running rc.local' | logger\n" \
         "echo 'Run ntpdate'\n" \
-        "(/usr/sbin/ntpdate -b -v -d -s ci-1.youdevise.com 2>&1 | tee -a /tmp/bootstrap.log || exit 0)\n" \
+        "(/usr/sbin/ntpdate -b -v -d -s 10.108.11.97 2>&1 | tee -a /tmp/bootstrap.log || exit 0)\n" \
         "echo 'Regenerating SSH hostkeys'\n" \
         "/bin/rm /etc/ssh/ssh_host_*\n" \
         "/usr/sbin/dpkg-reconfigure openssh-server\n" \
