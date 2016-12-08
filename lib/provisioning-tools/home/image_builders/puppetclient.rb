@@ -50,6 +50,7 @@ define "puppetclient" do
   run('install rc.local') do
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') do |f|
       f.puts "#!/bin/sh -e\n" \
+        "if [ -e /var/lib/firstboot ]; then exit 0; fi\n" \
         "echo 'Running rc.local' | logger\n" \
         "echo 'Run ntpdate'\n" \
         "(/usr/sbin/ntpdate -b -v -d -s 10.108.11.97 2>&1 | tee -a /tmp/bootstrap.log || exit 0)\n" \
@@ -59,7 +60,7 @@ define "puppetclient" do
         "echo 'Running puppet agent'\n" \
         "export LANG=en_GB.UTF-8\n" \
         "puppet agent --debug --verbose --waitforcert 10 --onetime 2>&1 | tee -a /tmp/bootstrap.log\n" \
-        "echo \"#!/bin/sh -e\\nexit 0\" > /etc/rc.local\n" \
+        "touch /var/lib/firstboot\n" \
         "echo 'Finished running rc.local'\n" \
         "exit 0\n"
     end
