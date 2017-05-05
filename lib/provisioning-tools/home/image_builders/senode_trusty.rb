@@ -32,23 +32,28 @@ define "senode_trusty" do
   end
 
   run("install selenium packages") do
-    apt_install "openjdk-7-jdk"
+    apt_install "zulu-8"
+    chroot "sed -i'.bak' -e 's#^securerandom.source=.*#securerandom.source=file:/dev/../dev/urandom#' \
+      /usr/lib/jvm/zulu-8-amd64/jre/lib/security/java.security"
+
     apt_install "acpid"
     apt_install "xvfb"
     apt_install "dbus"
     apt_install "dbus-x11"
     apt_install "hicolor-icon-theme"
+
     firefox_version = spec[:firefox_version] || "11.0+build1-0ubuntu4"
     apt_install "firefox=#{firefox_version}"
+    chroot "ln -s /usr/lib/firefox/firefox /usr/bin/firefox-bin"
+
     chrome_version = spec[:chrome_version] || "22.0.1229.79-r158531"
     apt_install "google-chrome-stable=#{chrome_version}"
+
     selenium_version = spec[:selenium_version] || "2.32.0"
     apt_install "selenium=#{selenium_version}"
+
     apt_install "selenium-node"
     chroot "update-rc.d selenium-node defaults"
-    chroot "sed -i'.bak' -e 's#^securerandom.source=file:/dev/urandom#securerandom.source=file:" \
-      "/dev/../dev/urandom#g' /etc/java-7-openjdk/security/java.security"
-    chroot "ln -s /usr/lib/firefox/firefox /usr/bin/firefox-bin"
   end
 
   cleanup do
