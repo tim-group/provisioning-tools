@@ -44,7 +44,8 @@ define "senode" do
     apt_install "google-chrome-stable=#{chrome_version}"
     selenium_version = spec[:selenium_version] || "2.32.0"
     apt_install "selenium=#{selenium_version}"
-    apt_install "selenium-node"
+    selenium_node_version = spec[:selenium_node_version] || "3.0.7"
+    apt_install "selenium-node=#{selenium_node_version}"
     chroot "update-rc.d selenium-node defaults"
     chroot "sed -i'.bak' -e 's#^securerandom.source=file:/dev/urandom#securerandom.source=file:" \
       "/dev/../dev/urandom#g' /etc/java-7-openjdk/security/java.security"
