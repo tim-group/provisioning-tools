@@ -3,8 +3,8 @@ define "senode_trusty" do
 
   run('install rc.local') do
     selenium_version = spec[:selenium_version] || "2.53.1"
-    selenium_node_version = spec[:selenium_node_version] || "3.0.7"
-    firefox_version = spec[:firefox_version] || "47.0.1-0ubuntu1"
+    selenium_node_version = spec[:selenium_node_version] || "3.0.1008"
+    firefox_version = spec[:firefox_version] || "47.0.1+build1-0ubuntu0.14.04.1"
     chrome_version = spec[:chrome_version] || "52.0.2743.116-1"
     se_host = spec[:selenium_hub_host]
     se_port = "7799"
