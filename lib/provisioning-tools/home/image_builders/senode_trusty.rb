@@ -15,7 +15,8 @@ define "senode_trusty" do
         "apt-get -y --force-yes update\n" \
         "/usr/sbin/adduser ci\n" \
         "apt-get -y --force-yes install zulu-8\n" \
-        "sed -i'.bak' -e 's#^securerandom.source=.*#securerandom.source=file:/dev/./urandom#' /usr/lib/jvm/zulu-8-amd64/jre/lib/security/java.security\n" \
+        "sed -i'.bak' -e 's#^securerandom.source=.*#securerandom.source=file:/dev/./urandom#'" \
+        " /usr/lib/jvm/zulu-8-amd64/jre/lib/security/java.security\n" \
         "apt-get -y --force-yes install acpid\n" \
         "apt-get -y --force-yes install xvfb\n" \
         "apt-get -y --force-yes install dbus\n" \
