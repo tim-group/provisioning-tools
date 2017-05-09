@@ -11,7 +11,7 @@ define "sehub_trusty" do
         "if [ -e /var/lib/firstboot ]; then exit 0; fi\n" \
         "echo 'Running rc.local' | logger\n" \
         "apt-get -y --force-yes update\n" \
-        "/usr/sbin/adduser --disabled-password --gecos '' ci -M\n" \
+        "/usr/sbin/adduser --disabled-password --no-create-home --gecos '' ci \n" \
         "apt-get -y --force-yes install zulu-8\n" \
         "sed -i'.bak' -e 's#^securerandom.source=.*#securerandom.source=file:/dev/./urandom#'" \
         " /usr/lib/jvm/zulu-8-amd64/jre/lib/security/java.security\n" \
