@@ -32,7 +32,7 @@ define "sehub" do
 
   run("install selenium packages") do
     apt_install "openjdk-7-jdk"
-    selenium_deb_version = spec[:selenium_deb_version] || spec[:selenium_version] || "2.32.0"
+    selenium_deb_version = spec[:selenium_deb_version] || "2.32.0"
     apt_install "selenium=#{selenium_deb_version}"
     apt_install "selenium-hub"
   end

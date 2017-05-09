@@ -42,7 +42,7 @@ define "senode" do
     apt_install "firefox=#{firefox_version}"
     chrome_version = spec[:chrome_version] || "22.0.1229.79-r158531"
     apt_install "google-chrome-stable=#{chrome_version}"
-    selenium_deb_version = spec[:selenium_deb_version] || spec[:selenium_version] || "2.32.0"
+    selenium_deb_version = spec[:selenium_deb_version] || "2.32.0"
     apt_install "selenium=#{selenium_deb_version}"
     selenium_node_deb_version = spec[:selenium_node_deb_version] || spec[:selenium_node_version] || "3.0.7"
     apt_install "selenium-node=#{selenium_node_deb_version}"
