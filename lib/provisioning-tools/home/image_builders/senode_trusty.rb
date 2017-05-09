@@ -2,8 +2,8 @@ define "senode_trusty" do
   copyboot
 
   run('install rc.local') do
-    selenium_version = spec[:selenium_version] || "2.53.1"
-    selenium_node_version = spec[:selenium_node_version] || "3.0.1008"
+    selenium_deb_version = spec[:selenium_deb_version] || "1:2.53.1-1.0.1020"
+    selenium_node_deb_version = spec[:selenium_node_deb_version] || "3.0.1008"
     firefox_version = spec[:firefox_version] || "47.0.1+build1-0ubuntu0.14.04.1"
     chrome_version = spec[:chrome_version] || "52.0.2743.116-1"
     se_host = spec[:selenium_hub_host]
@@ -22,8 +22,8 @@ define "senode_trusty" do
         "apt-get -y --force-yes install firefox=#{firefox_version}\n" \
         "ln -s /usr/lib/firefox/firefox /usr/bin/firefox-bin\n" \
         "apt-get -y --force-yes install google-chrome-stable=#{chrome_version}\n" \
-        "apt-get -y --force-yes install selenium=#{selenium_version}\n" \
-        "apt-get -y --force-yes install selenium-node=#{selenium_node_version}\n" \
+        "apt-get -y --force-yes install selenium=#{selenium_deb_version}\n" \
+        "apt-get -y --force-yes install selenium-node=#{selenium_node_deb_version}\n" \
         "update-rc.d selenium-node defaults\n" \
         "echo 'HUBHOST=#{se_host}' > /etc/default/selenium-node\n" \
         "echo 'HUBPORT=#{se_port}' >> /etc/default/selenium-node\n" \
