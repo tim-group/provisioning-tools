@@ -82,6 +82,7 @@ define "win7boot" do
     selenium_dir = "#{common_files}/selenium"
     java_dir     = "#{common_files}/java"
     start_menu_grid_file = "#{mountpoint}/selenium/start-grid.bat"
+    standalone_launch_file = "#{mountpoint}/selenium/start-standalone.bat"
 
     FileUtils.rm_r "#{mountpoint}/selenium", :force => true
     FileUtils.cp_r selenium_dir, "#{mountpoint}"
@@ -90,8 +91,7 @@ define "win7boot" do
     FileUtils.cp_r java_dir, "#{mountpoint}"
 
     cmd "sed -i s/%SEVERSION%/#{spec[:selenium_version]}/g \"#{start_menu_grid_file}\""
-    # Set Selenium version in script used start Selenium in standalone mode.
-    cmd "sed -i s/%SEVERSION%/#{spec[:selenium_version]}/g \"#{mountpoint}/selenium/start-standalone.bat\""
+    cmd "sed -i s/%SEVERSION%/#{spec[:selenium_version]}/g \"#{standalone_launch_file}\""
 
     cmd "sed -i s/browserName=\\\\*iexplore%IEVERSION%,/browserName=*iexplore,/g \"#{start_menu_grid_file}\""
     FileUtils.mv "#{mountpoint}/selenium/IEDriverServer.exe", "#{mountpoint}/selenium/IEDriverServer-2.32.0.exe"
@@ -99,6 +99,7 @@ define "win7boot" do
                  "#{mountpoint}/selenium/IEDriverServer.exe"
 
     cmd "sed -i s/%IEVERSION%/#{spec[:ie_version]}/g \"#{start_menu_grid_file}\""
+    cmd "sed -i s/%IEVERSION%/#{spec[:ie_version]}/g \"#{standalone_launch_file}\""
   end
 
   run("Configure and start Selenium node on boot") do
@@ -107,6 +108,9 @@ define "win7boot" do
 
       cmd "sed -i s/%HUBHOST%/#{spec[:selenium_hub_host]}/g \"#{start_menu_grid_file}\""
       FileUtils.cp start_menu_grid_file, start_menu_location
+    else
+      standalone_launch_file = "#{mountpoint}/selenium/start-standalone.bat"
+      FileUtils.cp standalone_launch_file, start_menu_location
     end
   end
 
