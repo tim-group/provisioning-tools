@@ -101,8 +101,8 @@ define "win10boot" do
     FileUtils.cp "#{mountpoint}/selenium/IEDriverServer-#{spec[:selenium_version]}.exe",
                  "#{mountpoint}/selenium/IEDriverServer.exe"
 
-    cmd "sed -i s/maxInstances=1\"$/maxInstances=1\" -browser \"seleniumProtocol=WebDriver,browserName=MicrosoftEdge,maxInstances=1\"/" \"#{start_menu_grid_file}\""
-    cmd "sed -i s/maxInstances=1\"$/maxInstances=1\" -browser \"seleniumProtocol=WebDriver,browserName=MicrosoftEdge,maxInstances=1\"/" \"#{standalone_launch_file}\""
+    cmd "sed -i s/maxInstances=1\"$/maxInstances=1\" -browser \"seleniumProtocol=WebDriver,browserName=MicrosoftEdge,maxInstances=1\"/ \"#{start_menu_grid_file}\""
+    cmd "sed -i s/maxInstances=1\"$/maxInstances=1\" -browser \"seleniumProtocol=WebDriver,browserName=MicrosoftEdge,maxInstances=1\"/ \"#{standalone_launch_file}\""
     FileUtils.mv "#{mountpoint}/selenium/MicrosoftWebDriver-#{edge_driver_version}.exe" "#{mountpoint}/selenium/MicrosoftWebDriver.exe"
   end
 
