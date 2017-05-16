@@ -6,7 +6,7 @@ define "win10gold" do
   extend Provision::Image::Commands
 
   def win10_files
-    "/var/lib/provisioning-tools/files/win7gold/"
+    "/var/lib/provisioning-tools/files/win10gold/"
   end
 
   def mountpoint
