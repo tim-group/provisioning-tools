@@ -83,6 +83,7 @@ define "win10boot" do
     java_dir     = "#{common_files}/java"
     start_menu_grid_file = "#{mountpoint}/selenium/start-grid.bat"
     standalone_launch_file = "#{mountpoint}/selenium/start-standalone.bat"
+    edge_driver_version = '4.15063'
 
     FileUtils.rm_r "#{mountpoint}/selenium", :force => true
     FileUtils.cp_r selenium_dir, "#{mountpoint}"
@@ -94,12 +95,15 @@ define "win10boot" do
     cmd "sed -i s/%SEVERSION%/#{spec[:selenium_version]}/g \"#{standalone_launch_file}\""
 
     cmd "sed -i s/browserName=\\\\*iexplore%IEVERSION%,/browserName=*iexplore,/g \"#{start_menu_grid_file}\""
+    cmd "sed -i s/%IEVERSION%/11/g \"#{start_menu_grid_file}\""
+    cmd "sed -i s/%IEVERSION%/11/g \"#{standalone_launch_file}\""
     FileUtils.mv "#{mountpoint}/selenium/IEDriverServer.exe", "#{mountpoint}/selenium/IEDriverServer-2.32.0.exe"
     FileUtils.cp "#{mountpoint}/selenium/IEDriverServer-#{spec[:selenium_version]}.exe",
                  "#{mountpoint}/selenium/IEDriverServer.exe"
 
-    cmd "sed -i s/%IEVERSION%/#{spec[:ie_version]}/g \"#{start_menu_grid_file}\""
-    cmd "sed -i s/%IEVERSION%/#{spec[:ie_version]}/g \"#{standalone_launch_file}\""
+    cmd "sed -i s/maxInstances=1\"$/maxInstances=1\" -browser \"seleniumProtocol=WebDriver,browserName=MicrosoftEdge,maxInstances=1\"/" \"#{start_menu_grid_file}\""
+    cmd "sed -i s/maxInstances=1\"$/maxInstances=1\" -browser \"seleniumProtocol=WebDriver,browserName=MicrosoftEdge,maxInstances=1\"/" \"#{standalone_launch_file}\""
+    FileUtils.mv "#{mountpoint}/selenium/MicrosoftWebDriver-#{edge_driver_version}.exe" "#{mountpoint}/selenium/MicrosoftWebDriver.exe"
   end
 
   run("Configure and start Selenium node on boot") do
