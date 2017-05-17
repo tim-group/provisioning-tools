@@ -22,7 +22,7 @@ define "senode_win10" do
   end
 
   run("copy gold image") do
-    win10_partition_location = 105_906_176
+    win10_partition_location = 525_336_576
     case config[:vm_storage_type]
     when 'lvm', 'image'
       cmd "mkdir -p #{spec[:temp_dir]}"

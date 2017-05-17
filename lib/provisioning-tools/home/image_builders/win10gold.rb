@@ -20,7 +20,7 @@ define "win10gold" do
   case config[:vm_storage_type]
   when "image"
     run("copy master image") do
-      win10_partition_location = 105_906_176
+      win10_partition_location = 525_336_576
       cmd "curl -Ss --fail -o #{spec[:image_path]} #{spec[:master_image_url]}"
       cmd "mkdir -p #{mountpoint}"
       cmd "mount -o offset=#{win10_partition_location} #{spec[:image_path]} #{mountpoint}"
