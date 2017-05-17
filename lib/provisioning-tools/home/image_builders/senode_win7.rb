@@ -2,7 +2,7 @@ require 'provisioning-tools/provision/image/catalogue'
 require 'provisioning-tools/provision/image/commands'
 require 'socket'
 
-define "win7boot" do
+define "senode_win7" do
   extend Provision::Image::Commands
 
   def common_files

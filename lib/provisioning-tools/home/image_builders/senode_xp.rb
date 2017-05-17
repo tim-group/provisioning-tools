@@ -5,7 +5,7 @@ require 'socket'
 ### TODO: put product key in the gold.
 ##        move gold image production to prov tools
 
-define "xpboot" do
+define "senode_xp" do
   extend Provision::Image::Commands
 
   def xp_files
