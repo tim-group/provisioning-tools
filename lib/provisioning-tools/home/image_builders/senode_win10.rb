@@ -102,8 +102,8 @@ define "senode_win10" do
                  "#{mountpoint}/selenium/IEDriverServer.exe"
 
     edge_cfg = 'seleniumProtocol=WebDriver,browserName=MicrosoftEdge,maxInstances=1'
-    cmd "sed -i s/maxInstances=1\"$/maxInstances=1\" -browser \"#{edge_cfg}\"/ \"#{start_menu_grid_file}\""
-    cmd "sed -i s/maxInstances=1\"$/maxInstances=1\" -browser \"#{edge_cfg}\"/ \"#{standalone_launch_file}\""
+    cmd "sed -i 's/-singleWindow/-singleWindow -browser \"#{edge_cfg}\"/' \"#{start_menu_grid_file}\""
+    cmd "sed -i 's/-singleWindow/-singleWindow -browser \"#{edge_cfg}\"/' \"#{standalone_launch_file}\""
     FileUtils.mv "#{mountpoint}/selenium/MicrosoftWebDriver-#{edge_driver_version}.exe" "#{mountpoint}/selenium/MicrosoftWebDriver.exe"
   end
 
