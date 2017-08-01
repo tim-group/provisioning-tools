@@ -25,5 +25,5 @@ result = ns.send(selector, spec)
 network = spec.networks[0].to_sym
 ips = result.fetch(network, {})
 ips.each do |ip|
- puts ip[:address] || "<did not exist>"
+  puts ip[:address] || "<did not exist>"
 end
