@@ -23,4 +23,7 @@ ns = Provision::Factory.new.numbering_service
 result = ns.send(selector, spec)
 
 network = spec.networks[0].to_sym
-puts result.fetch(network, {})[:address] || "<did not exist>"
+ips = result.fetch(network, {})
+ips.each do |ip|
+ puts ip[:address] || "<did not exist>"
+end
