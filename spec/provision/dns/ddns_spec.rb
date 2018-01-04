@@ -228,10 +228,6 @@ describe Provision::DNS::DDNS do
     primary_resolver = double
     resolver = double
     expect(primary_resolver).to receive(:getaddresses).with('st-testmachine-001.mgmt.st.net.local').and_return([])
-    expect(primary_resolver).to receive(:getaddresses).with('st-testmachine-001.mgmt.st.net.local').and_return([])
-    expect(primary_resolver).to receive(:getaddresses).with('st-testmachine-001.mgmt.st.net.local').and_return([])
-    expect(primary_resolver).to receive(:getaddresses).with('st-testmachine-001.mgmt.st.net.local').and_return([])
-    expect(primary_resolver).to receive(:getaddresses).with('st-testmachine-001.mgmt.st.net.local').and_return([])
     expect(resolver).to receive(:getaddresses).with('st-testmachine-001.mgmt.st.net.local').and_return([])
     dns = Provision::DNS::DDNSNetwork.new('prod', '192.168.1.0/24',
                                           :rndc_key => "fa5dUl+sdm/8cSZtDv1xFw==",
@@ -248,10 +244,6 @@ describe Provision::DNS::DDNS do
   it 'looks up DNS using the standard resolver if looking up from the primary resolver fails' do
     primary_resolver = double
     resolver = double
-    expect(primary_resolver).to receive(:getaddresses).with('st-testmachine-001.mgmt.st.net.local').and_return([])
-    expect(primary_resolver).to receive(:getaddresses).with('st-testmachine-001.mgmt.st.net.local').and_return([])
-    expect(primary_resolver).to receive(:getaddresses).with('st-testmachine-001.mgmt.st.net.local').and_return([])
-    expect(primary_resolver).to receive(:getaddresses).with('st-testmachine-001.mgmt.st.net.local').and_return([])
     expect(primary_resolver).to receive(:getaddresses).with('st-testmachine-001.mgmt.st.net.local').and_return([])
     expect(resolver).to receive(:getaddresses).with('st-testmachine-001.mgmt.st.net.local').and_return([IPAddr.new('192.168.0.10/24')])
     dns = Provision::DNS::DDNSNetwork.new('prod', '192.168.1.0/24',

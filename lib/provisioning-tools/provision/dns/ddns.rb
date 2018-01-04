@@ -36,11 +36,7 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
   def lookup_ip_for(fqdn)
     addresses = []
 
-    5.times do
-      addresses = @primary_resolver.getaddresses(fqdn)
-      break unless addresses.empty?
-      sleep 1 if addresses.empty?
-    end
+    addresses = @primary_resolver.getaddresses(fqdn)
 
     # If using the primary nameserver fails, fall back to trying the DNS
     # lookup based on the default resolv.conf. This allows us to reprosivion
