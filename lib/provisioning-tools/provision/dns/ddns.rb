@@ -25,28 +25,40 @@ class Provision::DNS::DDNSNetwork < Provision::DNSNetwork
     parts = range.split('/')
     fail(":network_range must be of the format X.X.X.X/Y") if parts.size != 2
     @rndc_key = options[:rndc_key] || fail("No :rndc_key supplied")
-    @resolver = options[:resolver] || Resolv::DNS.new(
+    @primary_resolver = options[:primary_resolver] || Resolv::DNS.new(
       :nameserver => @primary_nameserver,
       :search => [],
       :ndots => 1
     )
+    @resolver = options[:resolver] || Resolv::DNS.new
   end
 
   def lookup_ip_for(fqdn)
-    addresses = @resolver.getaddresses(fqdn)
-    @resolver.getaddress(fqdn) if addresses.empty?
+    addresses = []
+
+    5.times do
+      addresses = @primary_resolver.getaddresses(fqdn)
+      break unless addresses.empty?
+      sleep 1 if addresses.empty?
+    end
+
+    # If using the primary nameserver fails, fall back to trying the DNS
+    # lookup based on the default resolv.conf. This allows us to reprosivion
+    # things when a primary nameserver is down (or is being reprovisioned itself)
+    addresses = @resolver.getaddresses(fqdn) if addresses.empty?
+
+    if addresses.empty?
+      puts "Could not find #{fqdn}"
+      return false
+    end
 
     addresses.collect do |address|
       IPAddr.new(address.to_s, Socket::AF_INET)
     end
-
-  rescue Resolv::ResolvError
-    puts "Could not find #{fqdn}"
-    false
   end
 
   def lookup_cname_for(fqdn)
-    cname = @resolver.getresource(fqdn, Resolv::DNS::Resource::IN::CNAME)
+    cname = @primary_resolver.getresource(fqdn, Resolv::DNS::Resource::IN::CNAME)
     return cname.name.to_s if cname
   rescue Resolv::ResolvError
     puts "Could not find cname for #{fqdn}"

@@ -225,17 +225,45 @@ describe Provision::DNS::DDNS do
   end
 
   it 'return false if a DNS lookup fails to find any results' do
+    primary_resolver = double
     resolver = double
+    expect(primary_resolver).to receive(:getaddresses).with('st-testmachine-001.mgmt.st.net.local').and_return([])
+    expect(primary_resolver).to receive(:getaddresses).with('st-testmachine-001.mgmt.st.net.local').and_return([])
+    expect(primary_resolver).to receive(:getaddresses).with('st-testmachine-001.mgmt.st.net.local').and_return([])
+    expect(primary_resolver).to receive(:getaddresses).with('st-testmachine-001.mgmt.st.net.local').and_return([])
+    expect(primary_resolver).to receive(:getaddresses).with('st-testmachine-001.mgmt.st.net.local').and_return([])
     expect(resolver).to receive(:getaddresses).with('st-testmachine-001.mgmt.st.net.local').and_return([])
-    expect(resolver).to receive(:getaddress).with('st-testmachine-001.mgmt.st.net.local').and_raise(Resolv::ResolvError)
     dns = Provision::DNS::DDNSNetwork.new('prod', '192.168.1.0/24',
                                           :rndc_key => "fa5dUl+sdm/8cSZtDv1xFw==",
                                           :primary_nameserver => "mars",
                                           :min_allocation => "192.168.1.99",
                                           :max_allocation => "192.168.1.150",
+                                          :primary_resolver => primary_resolver,
                                           :resolver => resolver
                                          )
     ip = dns.lookup_ip_for('st-testmachine-001.mgmt.st.net.local')
     expect(ip).to be(false)
+  end
+
+  it 'looks up DNS using the standard resolver if looking up from the primary resolver fails' do
+    primary_resolver = double
+    resolver = double
+    expect(primary_resolver).to receive(:getaddresses).with('st-testmachine-001.mgmt.st.net.local').and_return([])
+    expect(primary_resolver).to receive(:getaddresses).with('st-testmachine-001.mgmt.st.net.local').and_return([])
+    expect(primary_resolver).to receive(:getaddresses).with('st-testmachine-001.mgmt.st.net.local').and_return([])
+    expect(primary_resolver).to receive(:getaddresses).with('st-testmachine-001.mgmt.st.net.local').and_return([])
+    expect(primary_resolver).to receive(:getaddresses).with('st-testmachine-001.mgmt.st.net.local').and_return([])
+    expect(resolver).to receive(:getaddresses).with('st-testmachine-001.mgmt.st.net.local').and_return([IPAddr.new('192.168.0.10/24')])
+    dns = Provision::DNS::DDNSNetwork.new('prod', '192.168.1.0/24',
+                                          :rndc_key => "fa5dUl+sdm/8cSZtDv1xFw==",
+                                          :primary_nameserver => "mars",
+                                          :min_allocation => "192.168.1.99",
+                                          :max_allocation => "192.168.1.150",
+                                          :primary_resolver => primary_resolver,
+                                          :resolver => resolver
+                                         )
+    ip = dns.lookup_ip_for('st-testmachine-001.mgmt.st.net.local')
+    test_ip = IPAddr.new "192.168.0.10/24"
+    expect(ip).to eq([test_ip])
   end
 end
