@@ -50,11 +50,8 @@
     <console type='pty'>
       <target type='serial' port='0'/>
     </console>
-    <input type='tablet' bus='usb'/>
     <input type='mouse' bus='ps2'/>
     <graphics type='vnc' port='<%=spec[:vnc_port]%>'/>
-    <sound model='ac97'>
-    </sound>
     <video>
       <model type='vga' vram='9216' heads='1'/>
     </video>
