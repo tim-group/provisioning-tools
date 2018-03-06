@@ -101,7 +101,7 @@
     </disk>
 <% when 'lvm' %>
     <disk type='block' device='disk'>
-      <driver name='qemu' type='raw'/>
+      <driver name='qemu' type='raw' cache='none' io='threads'/>
       <source dev='/dev/<%= spec[:lvm_vg] %>/<%= spec[:hostname] %>'/>
       <target dev='vda' bus='virtio'/>
     </disk>
