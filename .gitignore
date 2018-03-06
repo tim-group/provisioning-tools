@@ -3,3 +3,5 @@
 tags
 /build
 /vendor
+/.idea
+/project.iml
