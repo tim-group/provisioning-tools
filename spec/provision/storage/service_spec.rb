@@ -52,7 +52,7 @@ describe Provision::Storage::Service do
       @storage_service.create_config('test', storage_hash)
       @storage_service.spec_to_xml('test').should eql(<<-EOS
     <disk type='block' device='disk'>
-      <driver name='qemu' type='raw'/>
+      <driver name='qemu' type='raw' cache='none' io='threads'/>
       <source dev='/dev/main/test' />
       <target dev='vda' bus='virtio'/>
     </disk>
