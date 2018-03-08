@@ -74,12 +74,12 @@ describe Provision::Storage::Service do
       @storage_service.create_config('test', storage_hash)
       @storage_service.spec_to_xml('test').should eql(<<-EOS
     <disk type='block' device='disk'>
-      <driver name='qemu' type='raw'/>
+      <driver name='qemu' type='raw' cache='none' io='threads'/>
       <source dev='/dev/main/test' />
       <target dev='vda' bus='virtio'/>
     </disk>
     <disk type='block' device='disk'>
-      <driver name='qemu' type='raw'/>
+      <driver name='qemu' type='raw' cache='none' io='threads'/>
       <source dev='/dev/data/test_var_lib_mysql' />
       <target dev='vdb' bus='virtio'/>
     </disk>
@@ -202,7 +202,7 @@ describe Provision::Storage::Service do
       @storage_service.create_config('test', storage_hash)
       @storage_service.spec_to_xml('test').should eql(<<-EOS
     <disk type='block' device='disk'>
-      <driver name='qemu' type='raw'/>
+      <driver name='qemu' type='raw' cache='none' io='threads'/>
       <source dev='#{@tmpdir}/os/test.img' />
       <target dev='vda' bus='virtio'/>
     </disk>
@@ -224,12 +224,12 @@ describe Provision::Storage::Service do
       @storage_service.create_config('test', storage_hash)
       @storage_service.spec_to_xml('test').should eql(<<-EOS
     <disk type='block' device='disk'>
-      <driver name='qemu' type='raw'/>
+      <driver name='qemu' type='raw' cache='none' io='threads'/>
       <source dev='#{@tmpdir}/os/test.img' />
       <target dev='vda' bus='virtio'/>
     </disk>
     <disk type='block' device='disk'>
-      <driver name='qemu' type='raw'/>
+      <driver name='qemu' type='raw' cache='none' io='threads'/>
       <source dev='#{@tmpdir}/data/test_var_lib_mysql.img' />
       <target dev='vdb' bus='virtio'/>
     </disk>
