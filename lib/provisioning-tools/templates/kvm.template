@@ -17,7 +17,6 @@
     <feature policy='require' name='acpi'/>
     <feature policy='require' name='dca'/>
     <feature policy='require' name='ds_cpl'/>
-    <feature policy='require' name='dtes64'/>
     <feature policy='require' name='est'/>
     <feature policy='require' name='ht'/>
     <feature policy='require' name='monitor'/>
