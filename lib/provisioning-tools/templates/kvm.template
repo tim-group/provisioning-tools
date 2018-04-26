@@ -3,6 +3,9 @@
   <memory><%= spec[:ram] %></memory>
   <currentMemory><%= spec[:ram] %></currentMemory>
   <vcpu><%= spec[:vcpus] %></vcpu>
+  <numatune>
+    <memory mode='interleave' nodeset='0-1'/>
+  </numatune>
   <os>
     <type arch='x86_64'>hvm</type>
     <boot dev='hd'/>
