@@ -164,7 +164,7 @@ describe Provision::VM::Virsh do
     system_calls.should eql(["virsh dumpxml vmx-1"])
   end
 
-  it 'passes checks if actual vm definition equals spec' do
+  xit 'passes checks if actual vm definition equals spec' do
     d = Dir.mktmpdir
 
     machine_spec = Provision::Core::MachineSpec.new(
