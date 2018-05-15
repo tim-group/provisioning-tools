@@ -6,11 +6,12 @@ require 'ostruct'
 class Provision::VM::Virsh
   def initialize(config, executor = nil)
     @config = config
-    @executor = executor.nil? ? ->(cli) do
+    @executor = executor
+    @executor = ->(cli) do
       output = `#{cli}`
       fail("Failed to run: #{cli}") unless $CHILD_STATUS.success?
       output
-    end : executor
+    end if @executor.nil?
   end
 
   def is_defined(spec)
