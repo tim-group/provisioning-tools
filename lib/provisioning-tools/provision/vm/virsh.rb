@@ -4,12 +4,17 @@ require 'erb'
 require 'ostruct'
 
 class Provision::VM::Virsh
-  def initialize(config)
+  def initialize(config, executor = nil)
     @config = config
-  end
+    @executor = executor
 
-  def safe_system(cli)
-    fail("Failed to run: #{cli}") if system(cli) != true
+    if @executor.nil?
+      @executor = ->(cli) {
+        output = `#{cli}`
+        fail("Failed to run: #{cli}") unless $CHILD_STATUS.success?
+        output
+      }
+    end
   end
 
   def is_defined(spec)
@@ -22,23 +27,23 @@ class Provision::VM::Virsh
 
   def is_in_virsh_list(spec, extra = '')
     vm_name = spec[:hostname]
-    result = `virsh list #{extra} | grep ' #{vm_name} ' | wc -l`
+    result = @executor.call("virsh list #{extra} | grep ' #{vm_name} ' | wc -l")
     result.match(/1/)
   end
 
   def undefine_vm(spec)
     fail 'VM marked as non-destroyable' if spec[:disallow_destroy]
-    safe_system("virsh undefine #{spec[:hostname]} > /dev/null 2>&1")
+    @executor.call("virsh undefine #{spec[:hostname]} > /dev/null 2>&1")
   end
 
   def destroy_vm(spec)
     fail 'VM marked as non-destroyable' if spec[:disallow_destroy]
-    safe_system("virsh destroy #{spec[:hostname]} > /dev/null 2>&1")
+    @executor.call("virsh destroy #{spec[:hostname]} > /dev/null 2>&1")
   end
 
   def shutdown_vm(spec)
     fail 'VM marked as non-destroyable' if spec[:disallow_destroy]
-    safe_system("virsh shutdown #{spec[:hostname]} > /dev/null 2>&1")
+    @executor.call("virsh shutdown #{spec[:hostname]} > /dev/null 2>&1")
   end
 
   def shutdown_vm_wait_and_destroy(spec, timeout = 60)
@@ -52,7 +57,7 @@ class Provision::VM::Virsh
 
   def start_vm(spec)
     return if is_running(spec)
-    safe_system("virsh start #{spec[:hostname]} > /dev/null 2>&1")
+    @executor.call("virsh start #{spec[:hostname]} > /dev/null 2>&1")
   end
 
   def wait_for_shutdown(spec, timeout = 120)
@@ -64,30 +69,35 @@ class Provision::VM::Virsh
     fail "giving up waiting for #{spec[:hostname]} to shutdown"
   end
 
-  def write_virsh_xml(spec, storage_xml = nil)
+  def generate_virsh_xml(spec, storage_xml = nil)
     template_file = if spec[:kvm_template]
                       "#{Provision.templatedir}/#{spec[:kvm_template]}.template"
                     else
                       "#{Provision.templatedir}/kvm.template"
                     end
     template = ERB.new(File.read(template_file))
-    to = "#{spec[:libvirt_dir]}/#{spec[:hostname]}.xml"
+
     binding = VirshBinding.new(spec, @config, storage_xml)
     begin
       template.result(binding.get_binding)
     rescue Exception => e
       print e
       print e.backtrace
+      nil
     end
+  end
+
+  def write_virsh_xml(spec, storage_xml = nil)
+    to = "#{spec[:libvirt_dir]}/#{spec[:hostname]}.xml"
     File.open to, 'w' do |f|
-      f.write template.result(binding.get_binding)
+      f.write generate_virsh_xml(spec, storage_xml)
     end
     to
   end
 
   def define_vm(spec, storage_xml = nil)
     to = write_virsh_xml(spec, storage_xml)
-    safe_system("virsh define #{to} > /dev/null 2>&1")
+    @executor.call("virsh define #{to} > /dev/null 2>&1")
   end
 end
 
