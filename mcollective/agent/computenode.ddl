@@ -29,3 +29,7 @@ end
 action "remove_cnames", :description => "" do
     display :always
 end
+
+action "check_definition", :description => "" do
+    display :always
+end

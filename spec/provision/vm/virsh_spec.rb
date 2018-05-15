@@ -133,4 +133,55 @@ describe Provision::VM::Virsh do
 
     system_calls.should eql([])
   end
+
+  it 'reports if actual vm definition differs from spec' do
+    d = Dir.mktmpdir
+
+    machine_spec = Provision::Core::MachineSpec.new(
+        :hostname => "vmx-1",
+        :disk_dir => "build/",
+        :vnc_port => 9005,
+        :ram => "1G",
+        :interfaces => [{ :type => "bridge", :name => "br0" }, { :type => "network", :name => "provnat0" }],
+        :images_dir => "build",
+        :libvirt_dir => d
+    )
+
+    config = {
+        :vm_storage_type => 'lvm'
+    }
+    executor = ->(cli) {
+      return "<xml/>"
+    }
+    virt_manager = Provision::VM::Virsh.new(config, executor)
+
+    expect do
+      virt_manager.check_vm_definition(machine_spec)
+    end.to raise_error("actual vm definition differs from spec")
+  end
+
+  it 'passes checks if actual vm definition equals spec' do
+    d = Dir.mktmpdir
+
+    machine_spec = Provision::Core::MachineSpec.new(
+        :hostname => "vmx-1",
+        :disk_dir => "build/",
+        :vnc_port => 9005,
+        :ram => "1G",
+        :interfaces => [{ :type => "bridge", :name => "br0" }, { :type => "network", :name => "provnat0" }],
+        :images_dir => "build",
+        :libvirt_dir => d
+    )
+
+    config = {
+        :vm_storage_type => 'lvm'
+    }
+
+    expected = File.open(File.join(File.dirname(__FILE__), "expected.xml")).read
+    executor = ->(cli) { return expected }
+    virt_manager = Provision::VM::Virsh.new(config, executor)
+
+    virt_manager.check_vm_definition(machine_spec)
+
+  end
 end

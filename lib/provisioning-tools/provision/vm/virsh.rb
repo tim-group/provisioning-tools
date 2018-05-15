@@ -99,6 +99,12 @@ class Provision::VM::Virsh
     to = write_virsh_xml(spec, storage_xml)
     @executor.call("virsh define #{to} > /dev/null 2>&1")
   end
+
+  def check_vm_definition(spec, storage_xml = nil)
+    spec_xml = generate_virsh_xml(spec, storage_xml)
+    actual_xml = @executor.call("virsh dumpxml #{spec[:hostname]}")
+    fail "actual vm definition differs from spec" unless (spec_xml == actual_xml)
+  end
 end
 
 class VirshBinding

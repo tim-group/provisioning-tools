@@ -25,6 +25,13 @@ def prepare_work_queue(specs, listener)
   work_queue
 end
 
+def check_definition(specs, listener)
+  @logger.info("Checking #{specs.size} nodes")
+  queue = prepare_work_queue(specs, listener)
+  queue.check_all(specs)
+  listener.results
+end
+
 def provision(specs, listener)
   @logger.info("Launching #{specs.size} nodes")
   queue = prepare_work_queue(specs, listener)
@@ -95,12 +102,13 @@ specs = mco_args[:data][:specs]
 specs.each { |s| s[:networks].map!(&:to_sym) }
 
 mco_reply = case mco_args[:action]
-            when 'launch'        then with_lock { provision(specs, new_listener) }
-            when 'clean'         then with_lock { clean(specs, new_listener) }
-            when 'allocate_ips'  then allocate_ips(specs, new_listener)
-            when 'free_ips'      then free_ips(specs, new_listener)
-            when 'add_cnames'    then add_cnames(specs, new_listener)
-            when 'remove_cnames' then remove_cnames(specs, new_listener)
+            when 'launch'           then with_lock { provision(specs, new_listener) }
+            when 'clean'            then with_lock { clean(specs, new_listener) }
+            when 'allocate_ips'     then allocate_ips(specs, new_listener)
+            when 'free_ips'         then free_ips(specs, new_listener)
+            when 'add_cnames'       then add_cnames(specs, new_listener)
+            when 'remove_cnames'    then remove_cnames(specs, new_listener)
+            when 'check_definition' then check_definition(specs, new_listener)
             end
 
 File.open(ARGV[1], 'w') do |f|
