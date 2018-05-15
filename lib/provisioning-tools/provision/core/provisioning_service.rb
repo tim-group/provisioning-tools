@@ -16,13 +16,6 @@ class Provision::Core::ProvisioningService
     @logger = options[:logger] || Logger.new(STDERR)
   end
 
-  def check_vm_definition(spec_hash)
-    spec = Provision::Core::MachineSpec.new(@machinespec_defaults.merge(spec_hash))
-    @storage_service.create_config(spec[:hostname], spec[:storage])
-    storage_xml = @storage_service.spec_to_xml(spec[:hostname])
-    @vm_service.check_vm_definition(spec, storage_xml)
-  end
-
   def provision_vm(spec_hash, with_numbering = true)
     spec_hash = @machinespec_defaults.merge(spec_hash)
     spec = Provision::Core::MachineSpec.new(spec_hash)

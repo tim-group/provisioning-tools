@@ -28,10 +28,6 @@ module MCollective
       action 'remove_cnames' do
         implemented_by 'actions.rb'
       end
-
-      action 'check_definition' do
-        implemented_by 'actions.rb'
-      end
     end
   end
 end
