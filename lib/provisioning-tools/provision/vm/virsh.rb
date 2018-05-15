@@ -98,9 +98,18 @@ class Provision::VM::Virsh
   end
 
   def check_vm_definition(spec, storage_xml = nil)
-    spec_xml = generate_virsh_xml(spec, storage_xml)
-    actual_xml = @executor.call("virsh dumpxml #{spec[:hostname]}")
-    fail "actual vm definition differs from spec" unless (spec_xml == actual_xml)
+    require "rexml/document"
+
+    spec_xml = REXML::Document.new(generate_virsh_xml(spec, storage_xml))
+    actual_xml = REXML::Document.new(@executor.call("virsh dumpxml #{spec[:hostname]}"))
+
+    spec_string = ""
+    spec_xml.write(:output => spec_string, :indent => 0)
+
+    actual_string = ""
+    actual_xml.write(:output => actual_string, :indent => 0)
+
+    fail "actual vm definition differs from spec" unless (spec_string == actual_string)
   end
 end
 
