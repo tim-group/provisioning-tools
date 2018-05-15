@@ -9,11 +9,11 @@ class Provision::VM::Virsh
     @executor = executor
 
     if @executor.nil?
-      @executor = ->(cli) {
+      @executor = ->(cli) do
         output = `#{cli}`
         fail("Failed to run: #{cli}") unless $CHILD_STATUS.success?
         output
-      }
+      end
     end
   end
 
