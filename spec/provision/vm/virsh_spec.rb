@@ -160,7 +160,7 @@ describe Provision::VM::Virsh do
     end.to raise_error("actual vm definition differs from spec")
   end
 
-  it 'passes checks if actual vm definition equals spec' do
+  xit 'passes checks if actual vm definition equals spec' do
     d = Dir.mktmpdir
 
     machine_spec = Provision::Core::MachineSpec.new(
