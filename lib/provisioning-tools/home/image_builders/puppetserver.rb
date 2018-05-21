@@ -51,10 +51,6 @@ define 'puppetserver' do
     end
   end
 
-  run('install rubygem-mongo') do
-    apt_install 'rubygem-mongo'
-  end
-
   run('deploy puppetserver') do
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') do |f|
       f.puts "#!/bin/bash\n" \
