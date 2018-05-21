@@ -1,5 +1,4 @@
-module Util
-end
+require 'provisioning-tools/util/namespace'
 
 class Util::SymbolUtils
   def symbolize_keys(hash)
