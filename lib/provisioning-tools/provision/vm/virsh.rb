@@ -14,6 +14,10 @@ class Provision::VM::Virsh
     end if @executor.nil?
   end
 
+  def safe_system(cli)
+    fail("Failed to run: #{cli}") if system(cli) != true
+  end
+
   def is_defined(spec)
     is_in_virsh_list(spec, '--all')
   end
@@ -24,23 +28,23 @@ class Provision::VM::Virsh
 
   def is_in_virsh_list(spec, extra = '')
     vm_name = spec[:hostname]
-    result = @executor.call("virsh list #{extra} | grep ' #{vm_name} ' | wc -l")
+    result = `virsh list #{extra} | grep ' #{vm_name} ' | wc -l`
     result.match(/1/)
   end
 
   def undefine_vm(spec)
     fail 'VM marked as non-destroyable' if spec[:disallow_destroy]
-    @executor.call("virsh undefine #{spec[:hostname]} > /dev/null 2>&1")
+    safe_system("virsh undefine #{spec[:hostname]} > /dev/null 2>&1")
   end
 
   def destroy_vm(spec)
     fail 'VM marked as non-destroyable' if spec[:disallow_destroy]
-    @executor.call("virsh destroy #{spec[:hostname]} > /dev/null 2>&1")
+    safe_system("virsh destroy #{spec[:hostname]} > /dev/null 2>&1")
   end
 
   def shutdown_vm(spec)
     fail 'VM marked as non-destroyable' if spec[:disallow_destroy]
-    @executor.call("virsh shutdown #{spec[:hostname]} > /dev/null 2>&1")
+    safe_system("virsh shutdown #{spec[:hostname]} > /dev/null 2>&1")
   end
 
   def shutdown_vm_wait_and_destroy(spec, timeout = 60)
@@ -54,7 +58,7 @@ class Provision::VM::Virsh
 
   def start_vm(spec)
     return if is_running(spec)
-    @executor.call("virsh start #{spec[:hostname]} > /dev/null 2>&1")
+    safe_system("virsh start #{spec[:hostname]} > /dev/null 2>&1")
   end
 
   def wait_for_shutdown(spec, timeout = 120)
@@ -94,7 +98,7 @@ class Provision::VM::Virsh
 
   def define_vm(spec, storage_xml = nil)
     to = write_virsh_xml(spec, storage_xml)
-    @executor.call("virsh define #{to} > /dev/null 2>&1")
+    safe_system("virsh define #{to} > /dev/null 2>&1")
   end
 
   def check_vm_definition(spec, storage_xml = nil)
