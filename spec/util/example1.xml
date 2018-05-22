@@ -35,7 +35,6 @@
     <feature policy='require' name='vmx'/>
     <feature policy='require' name='xtpr'/>
   </cpu>
-  <clock offset='utc'/>
   <on_poweroff>destroy</on_poweroff>
   <on_reboot>restart</on_reboot>
   <on_crash>restart</on_crash>
@@ -71,6 +70,7 @@
     </console>
     <input type='mouse' bus='ps2'/>
     <input type='keyboard' bus='ps2'/>
+    <input type='joystick' bus='ps2'/>
     <graphics type='vnc' port='9005'/>
     <video>
       <model type='cirrus' vram='9216' heads='1'/>

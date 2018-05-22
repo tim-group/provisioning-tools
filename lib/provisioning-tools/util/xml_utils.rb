@@ -63,18 +63,18 @@ class Util::VirshDomainXmlDiffer
     act_names = names(act, path)
     names = exp_names.to_set + act_names.to_set
 
-    if exp_names != act_names
-      exp_counts = exp_names.group_by { |a| a }.map { |a, b| [a, b.size] }.to_h
-      act_counts = act_names.group_by { |a| a }.map { |a, b| [a, b.size] }.to_h
-      diffs = names.map { |name| [name, exp_counts.fetch(name, 0), act_counts.fetch(name, 0)] }.select { |v| v[1] != v[2] }
-      diffs.each do |diff|
-        diff_type = diff[1] > diff[2] ? "Missing" : "Unexpected"
-        @differences.push "#{diff_type} element \"#{path}/#{diff[0]}\" (expected #{diff[1]}, actual #{diff[2]})."
-      end
-      return
+    exp_counts = exp_names.group_by { |a| a }.map { |a, b| [a, b.size] }.to_h
+    act_counts = act_names.group_by { |a| a }.map { |a, b| [a, b.size] }.to_h
+    counts = names.map { |name| [name, exp_counts.fetch(name, 0), act_counts.fetch(name, 0)] }
+
+    diffs = counts.select { |v| v[1] != v[2] }
+    diffs.each do |diff|
+      diff_type = diff[1] > diff[2] ? "Missing" : "Unexpected"
+      @differences.push "#{diff_type} element \"#{path}/#{diff[0]}\" (expected #{diff[1]}, actual #{diff[2]})."
     end
 
-    names.to_set.each { |name| exp.to_a(name).zip(act.to_a(name)).each { |e, a| diff_element(e, a, path) } }
+    sames = counts.select { |v| v[1] == v[2] }.map { |same| same[0] }
+    sames.to_set.each { |name| exp.to_a(name).zip(act.to_a(name)).each { |e, a| diff_element(e, a, path) } }
   end
 
   def names(elements, path)

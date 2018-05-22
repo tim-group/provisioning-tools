@@ -79,8 +79,11 @@ describe Util::VirshDomainXmlDiffer do
 
     xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
 
-    xml_diff.differences.should eql(["Attribute difference. Expected /domain/devices/interface/address to have attribute \"type=pci\", " \
-                                     "but it has attribute \"type=scsi\"."])
+    xml_diff.differences.should eql([
+      "Unexpected element \"/domain/clock\" (expected 0, actual 1).",
+      "Missing element \"/domain/devices/input\" (expected 3, actual 2).",
+      "Attribute difference. Expected /domain/devices/interface/address to have attribute \"type=pci\", but it has attribute \"type=scsi\"."
+    ])
   end
 
   it 'ignores excluded things' do
