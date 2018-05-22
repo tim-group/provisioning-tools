@@ -17,6 +17,9 @@ class Util::VirshDomainXmlDiffer
         "/domain/devices/video/address",          # generated video address
         "/domain/devices/disk/alias",             # generated disk alias
         "/domain/devices/disk/address",           # generated disk address
+        "/domain/devices/console/@tty",           # generated console tty
+        "/domain/devices/console/alias",          # generated console alias
+        "/domain/devices/console/address",        # generated console address
         "/domain/devices/interface/alias",        # generated interface alias
         "/domain/devices/interface/target",       # generated interface target, next available on host
         "/domain/devices/graphics/@port",         # auto-assigned graphics port
