@@ -108,7 +108,7 @@ class Provision::VM::Virsh
     actual_xml = @executor.call("virsh dumpxml #{spec[:hostname]}")
 
     differences = Util::VirshDomainXmlDiffer.new(spec_xml, actual_xml).differences
-    fail "actual vm definition differs from spec" unless differences.empty?
+    fail "actual vm definition differs from spec\n  #{differences.join("\n  ")}" unless differences.empty?
   end
 end
 

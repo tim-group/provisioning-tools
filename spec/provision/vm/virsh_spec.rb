@@ -154,11 +154,11 @@ describe Provision::VM::Virsh do
 
     expect do
       virt_manager.check_vm_definition(machine_spec)
-    end.to raise_error("actual vm definition differs from spec")
+    end.to raise_error("actual vm definition differs from spec\n  Node name difference. Expected: /domain Actual: /xml")
     system_calls.should eql(["virsh dumpxml vmx-1"])
   end
 
-  xit 'passes checks if actual vm definition equals spec' do
+  it 'passes checks if actual vm definition equals spec' do
     d = Dir.mktmpdir
 
     machine_spec = Provision::Core::MachineSpec.new(
