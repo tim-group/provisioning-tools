@@ -74,4 +74,27 @@ describe Util::VirshDomainXmlDiffer do
     xml_diff.differences.should eql(["Attribute difference. Expected /domain/devices/interface/address to have attribute \"type=pci\", " \
                                      "but it has attribute \"type=scsi\"."])
   end
+
+  it 'ignores excluded things' do
+    expected = "<domain>"\
+               "  <devices>"\
+               "    <interface type='bridge'>"\
+               "      <mac address='feed'/>"\
+               "    </interface>"\
+               "  </devices>"\
+               "</domain>"
+    actual = "<domain id='4'>"\
+             "  <uuid>beef</uuid>"\
+             "  <resource/>"\
+             "  <seclabel/>"\
+             "  <devices>"\
+             "    <interface type='bridge'>"\
+             "      <mac address='dead'/>"\
+             "    </interface>"\
+             "  </devices>"\
+             "</domain>"
+
+    xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
+    xml_diff.differences.should eql([])
+  end
 end

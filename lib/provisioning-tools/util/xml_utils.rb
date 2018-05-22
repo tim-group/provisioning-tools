@@ -8,7 +8,11 @@ class Util::VirshDomainXmlDiffer
     require "rexml/document"
     @differences = []
     @exclusions = Set[
-        "/domain/devices/interface/mac/@address"
+        "/domain/@id",                            # generated vm id
+        "/domain/uuid",                           # generated vm uuid
+        "/domain/resource",                       # we use default resource partition
+        "/domain/seclabel",                       # generated security labels for apparmor
+        "/domain/devices/interface/mac/@address"  # generated mac addresses of interfaces
     ]
     diff_element(REXML::Document.new(expected).root, REXML::Document.new(actual).root)
   end
@@ -55,8 +59,9 @@ class Util::VirshDomainXmlDiffer
   end
 
   def diff_elements(exp, act, path)
-    exp_names = names(exp)
-    act_names = names(act)
+    exp_names = names(exp, path)
+    act_names = names(act, path)
+
     if exp_names != act_names
       @differences.push("Inconsistent Children. Expected #{path}"\
                         " to have children #{exp_names},"\
@@ -64,13 +69,13 @@ class Util::VirshDomainXmlDiffer
       return
     end
 
-    (1..exp_names.size).each { |i| diff_element(exp[i], act[i], path) }
+    exp_names.to_set.each { |name| exp.to_a(name).zip(act.to_a(name)).each { |e, a| diff_element(e, a, path) } }
   end
 
-  def names(elements)
+  def names(elements, path)
     names = []
     elements.each do |element|
-      names.push(element.name)
+      names.push(element.name) unless @exclusions.include?("#{path}/#{element.name}")
     end
     names
   end
