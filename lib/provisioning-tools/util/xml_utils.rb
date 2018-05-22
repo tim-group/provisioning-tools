@@ -61,15 +61,20 @@ class Util::VirshDomainXmlDiffer
   def diff_elements(exp, act, path)
     exp_names = names(exp, path)
     act_names = names(act, path)
+    names = exp_names.to_set + act_names.to_set
 
     if exp_names != act_names
-      @differences.push("Inconsistent Children. Expected #{path}"\
-                        " to have children #{exp_names},"\
-                        " but it has children #{act_names}.")
+      exp_counts = exp_names.group_by { |a| a }.map { |a, b| [a, b.size] }.to_h
+      act_counts = act_names.group_by { |a| a }.map { |a, b| [a, b.size] }.to_h
+      diffs = names.map { |name| [name, exp_counts.fetch(name, 0), act_counts.fetch(name, 0)]}.select { |v| v[1] != v[2] }
+      diffs.each do |diff|
+        @differences.push diff[1] > diff[2] ? "Missing element \"#{path}/#{diff[0]}\" (#{diff[1] - diff[2]} missing)."
+                                            : "Unexpected element \"#{path}/#{diff[0]}\" (#{diff[2] - diff[1]} extra)."
+      end
       return
     end
 
-    exp_names.to_set.each { |name| exp.to_a(name).zip(act.to_a(name)).each { |e, a| diff_element(e, a, path) } }
+    names.to_set.each { |name| exp.to_a(name).zip(act.to_a(name)).each { |e, a| diff_element(e, a, path) } }
   end
 
   def names(elements, path)

@@ -56,13 +56,21 @@ describe Util::VirshDomainXmlDiffer do
   end
 
   it 'describes where elements are missing' do
+    expected = "<a><b/><b/><b/></a>"
+    actual = "<a><b/><b/></a>"
+
+    xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
+
+    xml_diff.differences.should eql(["Missing element \"/a/b\" (1 missing)."])
+  end
+
+  it 'describes where elements are unexpected' do
     expected = "<a><b/><b/></a>"
     actual = "<a><b/><b/><b/></a>"
 
     xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
 
-    xml_diff.differences.should eql(["Inconsistent Children. Expected /a to have children [\"b\", \"b\"], " \
-                                     "but it has children [\"b\", \"b\", \"b\"]."])
+    xml_diff.differences.should eql(["Unexpected element \"/a/b\" (1 extra)."])
   end
 
   it 'diffs complex stuff' do
