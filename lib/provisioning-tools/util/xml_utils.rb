@@ -12,7 +12,17 @@ class Util::VirshDomainXmlDiffer
         "/domain/uuid",                           # generated vm uuid
         "/domain/resource",                       # we use default resource partition
         "/domain/seclabel",                       # generated security labels for apparmor
-        "/domain/devices/interface/mac/@address"  # generated mac addresses of interfaces
+        "/domain/devices/interface/mac/@address", # generated mac addresses of interfaces
+        "/domain/devices/video/alias",            # generated video alias
+        "/domain/devices/video/address",          # generated video address
+        "/domain/devices/disk/alias",             # generated disk alias
+        "/domain/devices/disk/address",           # generated disk address
+        "/domain/devices/interface/alias",        # generated interface alias
+        "/domain/devices/interface/target",       # generated interface target, next available on host
+        "/domain/devices/graphics/@port",         # auto-assigned graphics port
+        "/domain/devices/graphics/@autoport",     # auto-assigned graphics port
+        "/domain/devices/memballoon",             # always added back automatically, despite us disabling
+        "/domain/devices/serial/source"           # auto-allocated serial source (e.g. /dev/pts/17)
     ]
     diff_element(REXML::Document.new(expected).root, REXML::Document.new(actual).root)
   end
