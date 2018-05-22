@@ -61,7 +61,7 @@ describe Util::VirshDomainXmlDiffer do
 
     xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
 
-    xml_diff.differences.should eql(["Missing element \"/a/b\" (1 missing)."])
+    xml_diff.differences.should eql(["Missing element \"/a/b\" (expected 3, actual 2)."])
   end
 
   it 'describes where elements are unexpected' do
@@ -70,7 +70,7 @@ describe Util::VirshDomainXmlDiffer do
 
     xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
 
-    xml_diff.differences.should eql(["Unexpected element \"/a/b\" (1 extra)."])
+    xml_diff.differences.should eql(["Unexpected element \"/a/b\" (expected 2, actual 3)."])
   end
 
   it 'diffs complex stuff' do

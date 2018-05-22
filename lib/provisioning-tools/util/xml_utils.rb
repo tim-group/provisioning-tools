@@ -66,10 +66,10 @@ class Util::VirshDomainXmlDiffer
     if exp_names != act_names
       exp_counts = exp_names.group_by { |a| a }.map { |a, b| [a, b.size] }.to_h
       act_counts = act_names.group_by { |a| a }.map { |a, b| [a, b.size] }.to_h
-      diffs = names.map { |name| [name, exp_counts.fetch(name, 0), act_counts.fetch(name, 0)]}.select { |v| v[1] != v[2] }
+      diffs = names.map { |name| [name, exp_counts.fetch(name, 0), act_counts.fetch(name, 0)] }.select { |v| v[1] != v[2] }
       diffs.each do |diff|
-        @differences.push diff[1] > diff[2] ? "Missing element \"#{path}/#{diff[0]}\" (#{diff[1] - diff[2]} missing)."
-                                            : "Unexpected element \"#{path}/#{diff[0]}\" (#{diff[2] - diff[1]} extra)."
+        diff_type = diff[1] > diff[2] ? "Missing" : "Unexpected"
+        @differences.push "#{diff_type} element \"#{path}/#{diff[0]}\" (expected #{diff[1]}, actual #{diff[2]})."
       end
       return
     end
