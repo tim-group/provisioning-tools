@@ -31,6 +31,15 @@ describe Util::VirshDomainXmlDiffer do
     xml_diff.differences.should eql(["Node value difference. Expected /a to have text \"foo\", but it has text \"bar\"."])
   end
 
+  it 'ignores where text is blank' do
+    expected = "<a></a>"
+    actual = "<a>         \n      </a>"
+
+    xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
+
+    xml_diff.differences.should eql([])
+  end
+
   it 'describes where attributes are missing' do
     expected = "<a foo='one'/>"
     actual = "<a/>"

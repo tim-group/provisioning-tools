@@ -37,16 +37,18 @@ class Util::VirshDomainXmlDiffer
       return
     end
 
-    if exp.has_text? != act.has_text? || (exp.has_text? && act.has_text? && exp.get_text.value != act.get_text.value)
-      @differences.push("Node value difference. Expected #{nodepath}"\
-                        " to have #{exp.has_text? ? "text \"#{exp.get_text.value}\"" : 'no text'},"\
-                        " but it has #{act.has_text? ? "text \"#{act.get_text.value}\"" : 'no text'}.")
-    end
-
+    diff_text(exp, act, nodepath)
     diff_attributes(exp.attributes, act.attributes, nodepath)
     diff_elements(exp.elements, act.elements, nodepath)
+  end
 
-    @differences
+  def diff_text(exp, act, path)
+    exp_text = exp.has_text? ? exp.get_text.value.strip : ""
+    act_text = act.has_text? ? act.get_text.value.strip : ""
+    @differences.push("Node value difference. Expected #{path}" \
+                      " to have #{exp.has_text? ? "text \"#{exp.get_text.value}\"" : 'no text'}," \
+                      " but it has #{act.has_text? ? "text \"#{act.get_text.value}\"" : 'no text'}.") \
+                      if exp_text != act_text
   end
 
   def diff_attributes(exp, act, path)
