@@ -99,7 +99,7 @@ describe Util::VirshDomainXmlDiffer do
     expected = "<domain>"\
                "  <devices>"\
                "    <interface type='bridge'>"\
-               "      <mac address='feed'/>"\
+               "      <mac/>"\
                "    </interface>"\
                "  </devices>"\
                "</domain>"
@@ -116,5 +116,26 @@ describe Util::VirshDomainXmlDiffer do
 
     xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
     xml_diff.differences.should eql([])
+  end
+
+  it 'checks things that are not ignored, but are similar to those that are ignored' do
+    expected = "<domain>"\
+               "  <id>4</id>"\
+               "  <devices>"\
+               "    <uuid>fee</uuid>"\
+               "  </devices>"\
+               "</domain>"
+    actual = "<domain id='4'>"\
+             "  <id>5</id>"\
+             "  <devices>"\
+             "    <uuid>beef</uuid>"\
+             "  </devices>"\
+             "</domain>"
+
+    xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
+    xml_diff.differences.should eql([
+      "Node value difference. Expected /domain/id to have text \"4\", but it has text \"5\".",
+      "Node value difference. Expected /domain/devices/uuid to have text \"fee\", but it has text \"beef\"."
+    ])
   end
 end
