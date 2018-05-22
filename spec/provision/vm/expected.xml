@@ -52,7 +52,7 @@
     </controller>
     
     <interface type='bridge'>
-      <mac address='52:54:00:41:d7:77'/>
+      <mac address='52:54:00:41:d7:78'/>
       <source bridge='br_mgmt'/>
       <model type='virtio'/>
       <driver name='vhost' txmode='iothread'/>
@@ -60,7 +60,7 @@
     </interface>
     
     <interface type='bridge'>
-      <mac address='52:54:00:96:5a:b0'/>
+      <mac address='52:54:00:96:5a:b1'/>
       <source bridge='br_prod'/>
       <model type='virtio'/>
       <driver name='vhost' txmode='iothread'/>

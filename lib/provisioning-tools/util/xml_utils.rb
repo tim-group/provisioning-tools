@@ -8,6 +8,9 @@ class Util::VirshDomainXmlDiffer
   def initialize(expected, actual)
     require "rexml/document"
     @differences = []
+    @exclusions = Set[
+        "/domain/devices/interface/mac/@address"
+    ]
     diff(REXML::Document.new(expected).root, REXML::Document.new(actual).root)
   end
 
@@ -15,7 +18,6 @@ class Util::VirshDomainXmlDiffer
 
   def diff(exp, act, path = "")
     nodepath = "#{path}/#{exp.name}"
-    STDERR.puts(nodepath)
 
     if exp.name != act.name
       @differences.push("Node name difference. Expected: #{nodepath} Actual: #{path}/#{act.name}")
@@ -42,13 +44,12 @@ class Util::VirshDomainXmlDiffer
     act.each do |name, _|
       names.add(name)
     end
+    names = names.delete_if { |name| @exclusions.include?("#{path}/@#{name}") }
     names.each { |name| diff_attribute(name, exp[name], act[name], path) }
   end
 
   def diff_attribute(name, exp, act, path)
-    STDERR.puts("- #{name}: #{exp}=#{act}")
     if exp != act
-      STDERR.puts("!!!!")
       @differences.push("Attribute difference. Expected #{path}"\
                         " to have #{exp.nil? ? "no attribute \"#{name}\"" : "attribute \"#{name}=#{exp}\""},"\
                         " but it had #{act.nil? ? "no attribute \"#{name}\"" : "attribute \"#{name}=#{act}\""}.")

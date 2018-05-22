@@ -182,6 +182,7 @@ describe Provision::VM::Virsh do
       system_calls.push(cli)
       return expected
     end
+
     virt_manager = Provision::VM::Virsh.new(config, executor)
 
     virt_manager.check_vm_definition(machine_spec)
