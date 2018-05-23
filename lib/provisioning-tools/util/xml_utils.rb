@@ -108,8 +108,8 @@ class Util::VirshDomainXmlDiffer
   end
 
   def diff_elements(exp, act, path)
-    exp_names = exp.map { |e| e.name }
-    act_names = act.map { |e| e.name }
+    exp_names = exp.map(&:name)
+    act_names = act.map(&:name)
     names = exp_names.to_set + act_names.to_set
 
     exp_counts = exp_names.group_by { |a| a }.map { |a, b| [a, b.size] }.to_h

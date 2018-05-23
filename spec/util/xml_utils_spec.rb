@@ -45,7 +45,9 @@ describe Util::VirshDomainXmlDiffer do
     actual = "<a/>"
 
     xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
-    expect(xml_diff.differences).to match_array(["Attribute difference. Expected /a to have attribute \"foo=one\", but it has no attribute \"foo\"."])
+    expect(xml_diff.differences).to match_array([
+      "Attribute difference. Expected /a to have attribute \"foo=one\", but it has no attribute \"foo\"."
+    ])
   end
 
   it 'describes where attributes are unexpected' do
@@ -53,7 +55,9 @@ describe Util::VirshDomainXmlDiffer do
     actual = "<a foo='two'/>"
 
     xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
-    expect(xml_diff.differences).to match_array(["Attribute difference. Expected /a to have no attribute \"foo\", but it has attribute \"foo=two\"."])
+    expect(xml_diff.differences).to match_array([
+      "Attribute difference. Expected /a to have no attribute \"foo\", but it has attribute \"foo=two\"."
+    ])
   end
 
   it 'describes where attributes are different' do
@@ -61,7 +65,9 @@ describe Util::VirshDomainXmlDiffer do
     actual = "<a foo='two'/>"
 
     xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
-    expect(xml_diff.differences).to match_array(["Attribute difference. Expected /a to have attribute \"foo=one\", but it has attribute \"foo=two\"."])
+    expect(xml_diff.differences).to match_array([
+      "Attribute difference. Expected /a to have attribute \"foo=one\", but it has attribute \"foo=two\"."
+    ])
   end
 
   it 'describes where elements are missing' do
