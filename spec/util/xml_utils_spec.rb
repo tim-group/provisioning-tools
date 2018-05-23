@@ -90,7 +90,7 @@ describe Util::VirshDomainXmlDiffer do
 
     xml_diff.differences.should eql([
       "Unexpected element \"/domain/clock\" (expected 0, actual 1).",
-      "Missing element \"/domain/devices/input\" (expected 3, actual 2).",
+      "Missing element \"/domain/devices/input\" (expected 2, actual 1).",
       "Attribute difference. Expected /domain/devices/interface/address to have attribute \"type=pci\", but it has attribute \"type=scsi\"."
     ])
   end
@@ -111,6 +111,7 @@ describe Util::VirshDomainXmlDiffer do
              "    <interface type='bridge'>"\
              "      <mac address='dead'/>"\
              "    </interface>"\
+             "    <input type='keyboard' bus='ps2'/>"\
              "  </devices>"\
              "</domain>"
 
@@ -125,16 +126,19 @@ describe Util::VirshDomainXmlDiffer do
                "    <uuid>fee</uuid>"\
                "  </devices>"\
                "</domain>"
-    actual = "<domain id='4'>"\
+    actual = "<domain idx='4'>"\
              "  <id>5</id>"\
              "  <devices>"\
              "    <uuid>beef</uuid>"\
+             "    <input type='mouse' bus='ps2'/>"\
              "  </devices>"\
              "</domain>"
 
     xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
     xml_diff.differences.should eql([
+      "Attribute difference. Expected /domain to have no attribute \"idx\", but it has attribute \"idx=4\".",
       "Node value difference. Expected /domain/id to have text \"4\", but it has text \"5\".",
+      "Unexpected element \"/domain/devices/input\" (expected 0, actual 1).",
       "Node value difference. Expected /domain/devices/uuid to have text \"fee\", but it has text \"beef\"."
     ])
   end

@@ -69,7 +69,6 @@
       <target type='serial' port='0'/>
     </console>
     <input type='mouse' bus='ps2'/>
-    <input type='keyboard' bus='ps2'/>
     <input type='joystick' bus='ps2'/>
     <graphics type='vnc'/>
     <video>

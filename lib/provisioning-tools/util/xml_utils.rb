@@ -33,6 +33,9 @@ class Util::VirshDomainXmlDiffer
     remove_xml!(actual, '/domain/devices/memballoon')       # always added back automatically, despite us disabling
     remove_xml!(actual, '/domain/devices/serial/source')    # auto-allocated serial source (e.g. /dev/pts/17)
 
+    # remove specialist elements from actual
+    remove_xml!(actual, '/domain/devices/input[@type="keyboard"]') # keyboard is auto-added
+
     diff_element(expected.root, actual.root)
   end
 
