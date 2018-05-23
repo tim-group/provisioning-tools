@@ -51,7 +51,9 @@
     </console>
     <input type='tablet' bus='usb'/>
     <input type='mouse' bus='ps2'/>
-    <graphics type='vnc' port='<%=spec[:vnc_port]%>'/>
+    <graphics type='vnc' port='<%=spec[:vnc_port]%>' listen='0.0.0.0'>
+      <listen type='address' address='0.0.0.0'/>
+    </graphics>
     <video>
       <model type='vga' vram='9216' heads='1'/>
     </video>
