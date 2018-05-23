@@ -5,9 +5,9 @@ class Util::VirshDomainXmlDiffer
   attr_reader :differences
 
   def initialize(expected, actual)
-    require "rexml/document"
     @differences = []
 
+    require "rexml/document"
     expected = REXML::Document.new(expected)
     actual = REXML::Document.new(actual)
 
@@ -28,6 +28,7 @@ class Util::VirshDomainXmlDiffer
     remove_xml!(actual, '/domain/devices/disk/address')     # generated disk address
     remove_xml!(actual, '/domain/devices/console/alias')    # generated console alias
     remove_xml!(actual, '/domain/devices/console/address')  # generated console address
+    remove_xml!(actual, '/domain/devices/console/source')   # generated console source
     remove_xml!(actual, '/domain/devices/interface/alias')  # generated interface alias
     remove_xml!(actual, '/domain/devices/interface/target') # generated interface target, next available on host
     remove_xml!(actual, '/domain/devices/memballoon')       # always added back automatically, despite us disabling
@@ -35,6 +36,8 @@ class Util::VirshDomainXmlDiffer
 
     # remove specialist elements from actual
     remove_xml!(actual, '/domain/devices/input[@type="keyboard"]') # keyboard is auto-added
+    remove_xml!(actual, '/domain/devices/controller[@type="usb"]') # usb controller is auto-added
+    remove_xml!(actual, '/domain/devices/controller[@type="pci"]') # pci controller is auto-added
 
     diff_element(expected.root, actual.root)
   end
