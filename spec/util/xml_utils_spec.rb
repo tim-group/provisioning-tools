@@ -3,7 +3,7 @@ require 'provisioning-tools/util/xml_utils'
 describe Util::VirshDomainXmlDiffer do
   it 'fails if xml node name is different' do
     xml_diff = Util::VirshDomainXmlDiffer.new("<foo/>", "<bar/>")
-    xml_diff.differences.should eql(["Node name difference. Expected: /foo Actual: /bar"])
+    expect(xml_diff.differences).to match_array(["Node name difference. Expected: /foo Actual: /bar"])
   end
 
   it 'describes where text is missing' do
@@ -11,7 +11,7 @@ describe Util::VirshDomainXmlDiffer do
     actual = "<a/>"
 
     xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
-    xml_diff.differences.should eql(["Node value difference. Expected /a to have text \"foo\", but it has no text."])
+    expect(xml_diff.differences).to match_array(["Node value difference. Expected /a to have text \"foo\", but it has no text."])
   end
 
   it 'describes where text is unexpected' do
@@ -19,7 +19,7 @@ describe Util::VirshDomainXmlDiffer do
     actual = "<a>foo</a>"
 
     xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
-    xml_diff.differences.should eql(["Node value difference. Expected /a to have no text, but it has text \"foo\"."])
+    expect(xml_diff.differences).to match_array(["Node value difference. Expected /a to have no text, but it has text \"foo\"."])
   end
 
   it 'describes where text is different' do
@@ -28,7 +28,7 @@ describe Util::VirshDomainXmlDiffer do
 
     xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
 
-    xml_diff.differences.should eql(["Node value difference. Expected /a to have text \"foo\", but it has text \"bar\"."])
+    expect(xml_diff.differences).to match_array(["Node value difference. Expected /a to have text \"foo\", but it has text \"bar\"."])
   end
 
   it 'ignores where text is blank' do
@@ -37,7 +37,7 @@ describe Util::VirshDomainXmlDiffer do
 
     xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
 
-    xml_diff.differences.should eql([])
+    expect(xml_diff.differences).to match_array([])
   end
 
   it 'describes where attributes are missing' do
@@ -45,7 +45,7 @@ describe Util::VirshDomainXmlDiffer do
     actual = "<a/>"
 
     xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
-    xml_diff.differences.should eql(["Attribute difference. Expected /a to have attribute \"foo=one\", but it has no attribute \"foo\"."])
+    expect(xml_diff.differences).to match_array(["Attribute difference. Expected /a to have attribute \"foo=one\", but it has no attribute \"foo\"."])
   end
 
   it 'describes where attributes are unexpected' do
@@ -53,7 +53,7 @@ describe Util::VirshDomainXmlDiffer do
     actual = "<a foo='two'/>"
 
     xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
-    xml_diff.differences.should eql(["Attribute difference. Expected /a to have no attribute \"foo\", but it has attribute \"foo=two\"."])
+    expect(xml_diff.differences).to match_array(["Attribute difference. Expected /a to have no attribute \"foo\", but it has attribute \"foo=two\"."])
   end
 
   it 'describes where attributes are different' do
@@ -61,7 +61,7 @@ describe Util::VirshDomainXmlDiffer do
     actual = "<a foo='two'/>"
 
     xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
-    xml_diff.differences.should eql(["Attribute difference. Expected /a to have attribute \"foo=one\", but it has attribute \"foo=two\"."])
+    expect(xml_diff.differences).to match_array(["Attribute difference. Expected /a to have attribute \"foo=one\", but it has attribute \"foo=two\"."])
   end
 
   it 'describes where elements are missing' do
@@ -70,7 +70,7 @@ describe Util::VirshDomainXmlDiffer do
 
     xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
 
-    xml_diff.differences.should eql(["Missing element \"/a/b\" (expected 3, actual 2)."])
+    expect(xml_diff.differences).to match_array(["Missing element \"/a/b\" (expected 3, actual 2)."])
   end
 
   it 'describes where elements are unexpected' do
@@ -79,7 +79,7 @@ describe Util::VirshDomainXmlDiffer do
 
     xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
 
-    xml_diff.differences.should eql(["Unexpected element \"/a/b\" (expected 2, actual 3)."])
+    expect(xml_diff.differences).to match_array(["Unexpected element \"/a/b\" (expected 2, actual 3)."])
   end
 
   it 'diffs complex stuff' do
@@ -88,7 +88,7 @@ describe Util::VirshDomainXmlDiffer do
 
     xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
 
-    xml_diff.differences.should eql([
+    expect(xml_diff.differences).to match_array([
       "Unexpected element \"/domain/clock\" (expected 0, actual 1).",
       "Missing element \"/domain/devices/input\" (expected 2, actual 1).",
       "Attribute difference. Expected /domain/devices/interface/address to have attribute \"type=pci\", but it has attribute \"type=scsi\"."
@@ -116,7 +116,7 @@ describe Util::VirshDomainXmlDiffer do
              "</domain>"
 
     xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
-    xml_diff.differences.should eql([])
+    expect(xml_diff.differences).to match_array([])
   end
 
   it 'checks things that are not ignored, but are similar to those that are ignored' do
@@ -135,7 +135,7 @@ describe Util::VirshDomainXmlDiffer do
              "</domain>"
 
     xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
-    xml_diff.differences.should eql([
+    expect(xml_diff.differences).to match_array([
       "Attribute difference. Expected /domain to have no attribute \"idx\", but it has attribute \"idx=4\".",
       "Node value difference. Expected /domain/id to have text \"4\", but it has text \"5\".",
       "Unexpected element \"/domain/devices/input\" (expected 0, actual 1).",
