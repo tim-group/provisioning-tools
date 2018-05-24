@@ -44,6 +44,14 @@ class Util::VirshDomainXmlDiffer
     remove_xml!(expected, '/domain/devices/interface/mac/@address') # generated mac addresses of interfaces
     remove_xml!(expected, '/domain/devices/graphics/@port')         # auto-assigned graphics port
 
+    # explicitly add default values to both sides where they are not present, as libvirt sometimes drops defaults
+    set_default!(expected, actual, '/domain/memory', 'unit', 'KiB')
+    set_default!(expected, actual, '/domain/currentMemory', 'unit', 'KiB')
+    set_default!(expected, actual, '/domain/vcpu', 'placement', 'static')
+    set_default!(expected, actual, '/domain/cpu', 'mode', 'custom')
+    set_default!(expected, actual, '/domain/cpu/model', 'fallback', 'allow')
+    set_default!(expected, actual, '/domain/devices/graphics', 'listen', '0.0.0.0')
+
     diff_element(expected.root, actual.root)
   end
 
@@ -51,6 +59,16 @@ class Util::VirshDomainXmlDiffer
 
   def remove_xml!(document, xpath)
     REXML::XPath.match(document, xpath).each(&:remove)
+  end
+
+  def set_default!(doc1, doc2, ele_path, attr_name, default_value)
+    xpath = "#{ele_path}[not(@unit)]"
+    set_attribute!(doc1, xpath, attr_name, default_value)
+    set_attribute!(doc2, xpath, attr_name, default_value)
+  end
+
+  def set_attribute!(document, xpath, attr_name, attr_value)
+    REXML::XPath.match(document, xpath).each { |ele| ele.add_attribute(attr_name, attr_value) }
   end
 
   def diff_element(exp, act, path = "")

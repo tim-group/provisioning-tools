@@ -148,4 +148,30 @@ describe Util::VirshDomainXmlDiffer do
       "Node value difference. Expected /domain/devices/uuid to have text \"fee\", but it has text \"beef\"."
     ])
   end
+
+  it 'applies default values where they are not present' do
+    expected = "<domain>"\
+               "  <memory unit='KiB'/>"\
+               "</domain>"
+    actual = "<domain>"\
+             "  <memory/>"\
+             "</domain>"
+
+    expect(Util::VirshDomainXmlDiffer.new(expected, actual).differences).to match_array([])
+    expect(Util::VirshDomainXmlDiffer.new(actual, expected).differences).to match_array([])
+  end
+
+  it 'does not apply default values where they are present' do
+    expected = "<domain>"\
+               "  <memory unit='b'/>"\
+               "</domain>"
+    actual = "<domain>"\
+             "  <memory/>"\
+             "</domain>"
+
+    xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
+    expect(xml_diff.differences).to match_array([
+      "Attribute difference. Expected /domain/memory to have attribute \"unit=b\", but it has attribute \"unit=KiB\"."
+    ])
+  end
 end
