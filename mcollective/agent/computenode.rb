@@ -32,6 +32,40 @@ module MCollective
       action 'check_definition' do
         implemented_by 'actions.rb'
       end
+
+      action 'enable_live_migration' do
+        manage_live_migration(request[:direction], request[:other_host], true)
+      end
+
+      action 'disable_live_migration' do
+        manage_live_migration(request[:direction], request[:other_host], false)
+      end
+
+      private
+
+      def manage_live_migration(direction, host, enable)
+        factfile = '/etc/facts.d/live_migration.fact'
+        factname = direction == 'inbound' ? 'incoming_live_migration_sources' : 'outgoing_live_migration_destinations'
+
+        facts = {}
+        File.read(factfile).split("\n").each do |line|
+          fact = line.split('=')
+          facts[fact[0].strip] = fact[1].strip
+        end if File.exists? factfile
+
+        current = facts.fetch(factname, '').split(',')
+        if enable
+          current.push(host) unless current.include?(host)
+        else
+          current.delete(host)
+        end
+        facts[factname] = current.join(',')
+        facts.delete(factname) if current.empty?
+
+        File.open(factfile, 'w') do |outfile|
+          facts.each { |name, value| outfile.puts "#{name}=#{value}" }
+        end
+      end
     end
   end
 end
