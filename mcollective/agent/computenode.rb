@@ -9,10 +9,6 @@ module MCollective
         implemented_by 'actions.rb'
       end
 
-      action 'hello' do
-        implemented_by 'actions.rb'
-      end
-
       action 'allocate_ips' do
         implemented_by 'actions.rb'
       end
