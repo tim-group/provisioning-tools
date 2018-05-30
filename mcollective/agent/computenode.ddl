@@ -90,6 +90,6 @@ action "live_migrate_vm", :description => "" do
           :type        => :string,
           :validation  => '^[a-zA-Z\-_\d]+$',
           :optional    => false,
-          :maxlength   => 128
+          :maxlength   => 128,
           :optional    => false
 end
