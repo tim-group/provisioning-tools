@@ -29,6 +29,10 @@ module MCollective
         implemented_by 'actions.rb'
       end
 
+      action 'create_storage' do
+        implemented_by 'actions.rb'
+      end
+
       action 'enable_live_migration' do
         manage_live_migration(request[:direction], request[:other_host], true)
       end

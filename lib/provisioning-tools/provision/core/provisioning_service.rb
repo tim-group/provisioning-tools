@@ -96,6 +96,13 @@ class Provision::Core::ProvisioningService
     end
   end
 
+  def create_storage(spec_hash)
+    spec_hash = @machinespec_defaults.merge(spec_hash)
+    spec = Provision::Core::MachineSpec.new(spec_hash)
+    @storage_service.create_config(spec[:hostname], spec[:storage])
+    @storage_service.create_storage(spec[:hostname])
+  end
+
   def clean_vm(spec_hash)
     spec_hash = @machinespec_defaults.merge(spec_hash)
     spec = Provision::Core::MachineSpec.new(spec_hash)

@@ -68,6 +68,14 @@ class Provision::WorkQueue
     process
   end
 
+  def create_storage_all(specs)
+    fail "an array of machine specifications is expected" unless specs.kind_of?(Array)
+    specs.each do |spec|
+      create_storage(spec)
+    end
+    process
+  end
+
   def add_cnames(specs)
     specs.each do |spec|
       @queue << SpecTask.new(spec) do
@@ -90,6 +98,12 @@ class Provision::WorkQueue
     @queue << SpecTask.new(spec) do
       @logger.info("Provisioning a VM")
       @provisioning_service.provision_vm(spec)
+    end
+  end
+
+  def create_storage(spec)
+    @queue << SpecTask.new(spec) do
+      @provisioning_service.create_storage(spec)
     end
   end
 

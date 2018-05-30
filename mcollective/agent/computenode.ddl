@@ -34,6 +34,10 @@ action "check_definition", :description => "" do
     display :always
 end
 
+action "create_storage", :description => "" do
+    display :always
+end
+
 action "enable_live_migration", :description => "" do
     display :always
     input :other_host,

@@ -79,6 +79,14 @@ def remove_cnames(specs, listener)
   listener.results
 end
 
+def create_storage(specs, listener)
+  queue = prepare_work_queue(specs, listener)
+  @logger.info("Cleaning #{specs.size} nodes")
+  queue.create_storage_all(specs)
+
+  listener.results
+end
+
 def new_listener
   NoopListener.new(:logger => @logger)
 end
@@ -109,6 +117,7 @@ mco_reply = case mco_args[:action]
             when 'add_cnames'       then add_cnames(specs, new_listener)
             when 'remove_cnames'    then remove_cnames(specs, new_listener)
             when 'check_definition' then check_definition(specs, new_listener)
+            when 'create_storage'   then create_storage(specs, new_listener)
             end
 
 File.open(ARGV[1], 'w') do |f|
