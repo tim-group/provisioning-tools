@@ -41,6 +41,13 @@ module MCollective
         manage_live_migration(request[:direction], request[:other_host], false)
       end
 
+      action 'live_migrate_vm' do
+        vm_name = request[:vm_name]
+        dest_host_fqdn = request[:other_host]
+        puts "LIBVIRT_DEBUG=2 "\
+             "virsh migrate --live --verbose --copy-storage-all --persistent --change-protection #{vm_name} #{dest_host_fqdn}"
+      end
+
       private
 
       def manage_live_migration(direction, host, enable)

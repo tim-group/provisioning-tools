@@ -73,3 +73,23 @@ action "disable_live_migration", :description => "" do
           :list        => ["inbound", "outbound"],
           :optional    => false
 end
+
+action "live_migrate_vm", :description => "" do
+    display :always
+    input :other_host,
+          :prompt      => "Dest Host",
+          :description => "The destination host",
+          :type        => :string,
+          :validation  => '^[a-zA-Z\-_.\d]+$',
+          :optional    => false,
+          :maxlength   => 128
+
+    input :vm_name,
+          :prompt      => "VM Name",
+          :description => "The name of the vm being migrated",
+          :type        => :string,
+          :validation  => '^[a-zA-Z\-_\d]+$',
+          :optional    => false,
+          :maxlength   => 128
+          :optional    => false
+end
