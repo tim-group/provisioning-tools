@@ -34,11 +34,11 @@ module MCollective
       end
 
       action 'enable_live_migration' do
-        manage_live_migration(request[:direction], request[:other_host], true)
+        manage_live_migration(request[:direction] == 'inbound', request[:other_host], true)
       end
 
       action 'disable_live_migration' do
-        manage_live_migration(request[:direction], request[:other_host], false)
+        manage_live_migration(request[:direction] == 'inbound', request[:other_host], false)
       end
 
       action 'live_migrate_vm' do
@@ -50,9 +50,9 @@ module MCollective
 
       private
 
-      def manage_live_migration(direction, host, enable)
+      def manage_live_migration(inbound, host, enable)
         factfile = '/etc/facts.d/live_migration.fact'
-        factname = direction == 'inbound' ? 'incoming_live_migration_sources' : 'outgoing_live_migration_destinations'
+        factname = inbound ? 'incoming_live_migration_sources' : 'outgoing_live_migration_destinations'
 
         facts = {}
         File.read(factfile).split("\n").each do |line|
