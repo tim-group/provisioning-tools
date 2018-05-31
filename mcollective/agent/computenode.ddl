@@ -89,7 +89,6 @@ action "live_migrate_vm", :description => "" do
           :description => "The name of the vm being migrated",
           :type        => :string,
           :validation  => '^[a-zA-Z\-_\d]+$',
-          :optional    => false,
           :maxlength   => 128,
           :optional    => false
 end
