@@ -44,8 +44,8 @@ module MCollective
       action 'live_migrate_vm' do
         vm_name = request[:vm_name]
         dest_host_fqdn = request[:other_host]
-        puts "LIBVIRT_DEBUG=2 "\
-             "virsh migrate --live --verbose --copy-storage-all --persistent --change-protection #{vm_name} #{dest_host_fqdn}"
+        reply[:status] = run("/usr/local/sbin/live-migrate-vm '#{vm_name}' '#{dest_host_fqdn}'",
+                             :stdout => :out, :stderr => :err, :chomp => true)
       end
 
       private
