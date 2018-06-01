@@ -111,9 +111,9 @@ module MCollective
       def pid_running?(pid)
         begin
           ::Process.getpgid( pid )
-          return 0
+          return true
         rescue Errno::ESRCH
-          return 1
+          return false
         end
       end
     end
