@@ -53,13 +53,13 @@ module MCollective
         FileUtils.mkdir_p logdir, :mode => 0755
         FileUtils.ln_sf log_filename, "#{logdir}/#{vm_name}-current"
 
-        pid = Process.spawn("/usr/local/sbin/live-migrate-vm '#{vm_name}' '#{dest_host_fqdn}'",
-                            :pgroup => true,
-                            :chdir => '/',
-                            :in => :close,
-                            :out => log_filename,
-                            :err => :out)
-        Process.detach(pid)
+        pid = ::Process.spawn("/usr/local/sbin/live-migrate-vm '#{vm_name}' '#{dest_host_fqdn}'",
+                              :pgroup => true,
+                              :chdir => '/',
+                              :in => :close,
+                              :out => log_filename,
+                              :err => :out)
+        ::Process.detach(pid)
         reply[:state] = pid_running?(pid) ? 'running' : 'failed'
       end
 
@@ -104,7 +104,7 @@ module MCollective
 
       def pid_running?(pid)
         begin
-          Process.getpgid( pid )
+          ::Process.getpgid( pid )
           return 0
         rescue Errno::ESRCH
           return 1
