@@ -60,17 +60,23 @@ module MCollective
                               :out => log_filename,
                               :err => :out)
         ::Process.detach(pid)
+
+        File.write("/var/run/live_migration_#{vm_name}.pid", pid)
+
         reply[:state] = pid_running?(pid) ? 'running' : 'failed'
       end
 
       action 'check_live_vm_migration' do
         vm_name = request[:vm_name]
-        log_filename = "/var/log/live_migration/#{vm_name}-current"
+
+        pid_filename = "/var/run/live_migration_#{vm_name}.pid"
+        pid = File.exist?(pid_filename) ? File.read(pid_filename).to_i : -1
 
         if pid_running?(pid)
           reply[:state] = 'running'
           # virsh domjobinfo #{vm_name}
         else
+          log_filename = "/var/log/live_migration/#{vm_name}-current"
           successful = File.exist?(log_filename) && !File.readlines(log_filename).grep(/MIGRATION SUCCESSFUL/).empty?
           reply[:state] = successful ? 'successful' : 'failed'
         end
