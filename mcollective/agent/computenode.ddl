@@ -92,3 +92,14 @@ action "live_migrate_vm", :description => "" do
           :maxlength   => 128,
           :optional    => false
 end
+
+action "check_live_vm_migration", :description => "" do
+    display :always
+    input :vm_name,
+          :prompt      => "VM Name",
+          :description => "The name of the vm being migrated",
+          :type        => :string,
+          :validation  => '^[a-zA-Z\-_\d]+$',
+          :maxlength   => 128,
+          :optional    => false
+end

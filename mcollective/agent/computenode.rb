@@ -44,8 +44,36 @@ module MCollective
       action 'live_migrate_vm' do
         vm_name = request[:vm_name]
         dest_host_fqdn = request[:other_host]
-        reply[:status] = run("/usr/local/sbin/live-migrate-vm '#{vm_name}' '#{dest_host_fqdn}'",
-                             :stdout => :out, :stderr => :err, :chomp => true)
+        logdir = '/var/log/live_migration'
+
+        require 'time'
+        log_filename = "#{logdir}/#{vm_name}-#{Time.now.utc.iso8601}"
+
+        require 'fileutils'
+        FileUtils.mkdir_p logdir, :mode => 0755
+        FileUtils.ln_sf log_filename, "#{logdir}/#{vm_name}-current"
+
+        pid = Process.spawn("/usr/local/sbin/live-migrate-vm '#{vm_name}' '#{dest_host_fqdn}'",
+                            :pgroup => true,
+                            :chdir => '/',
+                            :in => :close,
+                            :out => log_filename,
+                            :err => :out)
+        Process.detach(pid)
+        reply[:state] = pid_running?(pid) ? 'running' : 'failed'
+      end
+
+      action 'check_live_vm_migration' do
+        vm_name = request[:vm_name]
+        log_filename = "/var/log/live_migration/#{vm_name}-current"
+
+        if pid_running?(pid)
+          reply[:state] = 'running'
+          # virsh domjobinfo #{vm_name}
+        else
+          successful = File.exist?(log_filename) && !File.readlines(log_filename).grep(/MIGRATION SUCCESSFUL/).empty?
+          reply[:state] = successful ? 'successful' : 'failed'
+        end
       end
 
       private
@@ -58,7 +86,7 @@ module MCollective
         File.read(factfile).split("\n").each do |line|
           fact = line.split('=')
           facts[fact[0].strip] = fact[1].strip
-        end if File.exists? factfile
+        end if File.exist? factfile
 
         current = facts.fetch(factname, '').split(',')
         if enable
@@ -71,6 +99,15 @@ module MCollective
 
         File.open(factfile, 'w') do |outfile|
           facts.each { |name, value| outfile.puts "#{name}=#{value}" }
+        end
+      end
+
+      def pid_running?(pid)
+        begin
+          Process.getpgid( pid )
+          return 0
+        rescue Errno::ESRCH
+          return 1
         end
       end
     end
