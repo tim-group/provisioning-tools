@@ -86,12 +86,9 @@ class Provision::Storage::Service
   end
 
   def archive_persistent_storage(name, archive_datetime)
-    @storage_configs[name].mount_points.
-                           map { |mount_point| get_mount_point(name, mount_point) }.
-                           select { |mount_point_obj| mount_point_obj.config[:persistent] }.
-                           each do |mount_point_obj|
-      storage = get_storage(mount_point_obj.config[:type].to_sym)
-      storage.archive(name, mount_point_obj, archive_datetime)
+    @storage_configs[name].mount_points.map { |mp| get_mount_point(name, mp) }.select { |mpo| mpo.config[:persistent] }.each do |mpo|
+      storage = get_storage(mpo.config[:type].to_sym)
+      storage.archive(name, mpo, archive_datetime)
     end
   end
 
