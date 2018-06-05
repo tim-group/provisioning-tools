@@ -60,6 +60,15 @@ module Provision::Storage::Commands
     cmd "lvcreate -L #{size} -n #{lv_name} #{vg_name}"
   end
 
+  def rename_lvm_lv(lv_name, vg_name, new_lv_name)
+    fail_if_arg_empty('lv_name', lv_name)
+    fail_if_arg_empty('vg_name', vg_name)
+    fail_if_arg_empty('new_lv_name', new_lv_name)
+    fail("LV #{lv_name} does not exist in VG #{vg_name}") unless File.exists?("/dev/#{vg_name}/#{lv_name}")
+    fail("LV #{new_lv_name} already exists in VG #{vg_name}") if File.exists?("/dev/#{vg_name}/#{new_lv_name}")
+    cmd "lvrename #{vg_name} #{lv_name} #{new_lv_name}"
+  end
+
   def remove_lvm_lv(lv_name, vg_name)
     fail_if_arg_empty('lv_name', lv_name)
     fail_if_arg_empty('vg_name', vg_name)

@@ -38,6 +38,10 @@ action "create_storage", :description => "" do
     display :always
 end
 
+action "archive_persistent_storage", :description => "" do
+    display :always
+end
+
 action "enable_live_migration", :description => "" do
     display :always
     input :other_host,

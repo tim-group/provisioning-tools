@@ -85,6 +85,16 @@ class Provision::Storage::Service
     end
   end
 
+  def archive_persistent_storage(name, archive_datetime)
+    @storage_configs[name].mount_points.
+                           map { |mount_point| get_mount_point(name, mount_point) }.
+                           select { |mount_point_obj| mount_point_obj.config[:persistent] }.
+                           each do |mount_point_obj|
+      storage = get_storage(mount_point_obj.config[:type].to_sym)
+      storage.archive(name, mount_point_obj, archive_datetime)
+    end
+  end
+
   def init_filesystems(name)
     @storage_configs[name].mount_points.each do |mount_point|
       mount_point_obj = get_mount_point(name, mount_point)

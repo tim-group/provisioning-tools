@@ -76,6 +76,15 @@ class Provision::WorkQueue
     process
   end
 
+  def archive_persistent_storage_all(specs)
+    fail "an array of machine specifications is expected" unless specs.kind_of?(Array)
+    archive_datetime = Time.now.utc
+    specs.each do |spec|
+      archive_persistent_storage(spec, archive_datetime)
+    end
+    process
+  end
+
   def add_cnames(specs)
     specs.each do |spec|
       @queue << SpecTask.new(spec) do
@@ -104,6 +113,12 @@ class Provision::WorkQueue
   def create_storage(spec)
     @queue << SpecTask.new(spec) do
       @provisioning_service.create_storage(spec)
+    end
+  end
+
+  def archive_persistent_storage(spec, archive_datetime)
+    @queue << SpecTask.new(spec) do
+      @provisioning_service.archive_persistent_storage(spec, archive_datetime)
     end
   end
 

@@ -43,7 +43,7 @@ class Provision::Storage::LVM < Provision::Storage
              to_h
 
     specified = specified_mp_objs.map do |mount_point_obj|
-      lv_name = guest_vg_name(name, mount_point_obj)
+      lv_name = host_lv_name(name, mount_point_obj)
       lv_size = host_lv_size(mount_point_obj).chomp('G').to_f * 1024 * 1024
       [lv_name, :spec_size => lv_size]
     end.to_h
@@ -52,6 +52,14 @@ class Provision::Storage::LVM < Provision::Storage
       merge(actual) { |_, s, a| s.merge(a) }.
       reject { |_, size| size[:spec_size] == size[:actual_size] }.
       map { |vol, size| "#{vol} differs: expected size '#{size[:spec_size]}', but actual size is '#{size[:actual_size]}'" }
+  end
+
+  def archive(name, mount_point_obj, archive_datetime)
+    lv_name = host_lv_name(name, mount_point_obj)
+    vg_name = @options[:vg]
+    max_len = 126 - vg_name.length
+    archive_lv_name = "a+#{archive_datetime.to_i}.#{lv_name}".slice(0, max_len)
+    rename_lvm_lv(lv_name, vg_name, archive_lv_name)
   end
 
   def grow_filesystem(name, mount_point_obj)

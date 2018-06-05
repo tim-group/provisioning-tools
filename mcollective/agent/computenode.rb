@@ -33,6 +33,10 @@ module MCollective
         implemented_by 'actions.rb'
       end
 
+      action 'archive_persistent_storage' do
+        implemented_by 'actions.rb'
+      end
+
       action 'enable_live_migration' do
         manage_live_migration(request[:direction] == 'inbound', request[:other_host], true)
       end

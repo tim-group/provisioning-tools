@@ -305,4 +305,36 @@ describe Provision::Storage::LVM do
       expect(diffs).to match_array(["oy-extra-001_extra differs: expected size '', but actual size is '1048576.0'"])
     end
   end
+
+  describe 'archive' do
+    it 'archives lv by renaming it' do
+      time = Time.now.utc
+
+      File.stub(:exists?) do |arg|
+        case arg
+        when '/dev/main/working'
+          true
+        end
+      end
+
+      @storage_type.should_receive(:cmd).with("lvrename main working a+#{time.to_i}.working")
+      @storage_type.archive('working', @mount_point_obj, time)
+    end
+
+    it 'fails when archiving non-existent storage' do
+      expect do
+        @storage_type.archive('missing', @mount_point_obj, Time.now.utc)
+      end.to raise_error("LV missing does not exist in VG main")
+    end
+
+    it 'fails when clashing with existing archive' do
+      time = Time.now.utc
+
+      File.stub(:exists?).and_return(true)
+
+      expect do
+        @storage_type.archive('clashes', @mount_point_obj, Time.now.utc)
+      end.to raise_error("LV a+#{time.to_i}.clashes already exists in VG main")
+    end
+  end
 end
