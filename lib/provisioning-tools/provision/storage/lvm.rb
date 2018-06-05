@@ -11,16 +11,7 @@ class Provision::Storage::LVM < Provision::Storage
   end
 
   def create(name, mount_point_obj)
-    size = mount_point_obj.config[:size]
-    if create_lvm?(mount_point_obj)
-      begin
-        size = mount_point_obj.config[:prepare][:options][:guest_lvm_pv_size]
-      rescue
-        size = false
-      end
-      guest_lvm_lv_size = mount_point_obj.config[:size]
-    end
-    fail("prepare options guest_lvm_pv_size must be set to create lvm within the VM storage") unless size
+    size = host_lv_size(mount_point_obj)
 
     guest_vg_name = guest_vg_name(name, mount_point_obj)
     host_lv_name = guest_vg_name
@@ -38,7 +29,29 @@ class Provision::Storage::LVM < Provision::Storage
     host_device_partition = host_device_partition(name, mount_point_obj)
 
     initialise_vg_in_guest_lvm_task(name, host_device_partition, guest_vg_name)
-    create_lvm_lv_task(name, guest_lv_name, guest_vg_name, guest_lvm_lv_size, false)
+    create_lvm_lv_task(name, guest_lv_name, guest_vg_name, mount_point_obj.config[:size], false)
+  end
+
+  def diff_against_actual(name, specified_mp_objs)
+    actual = cmd("lvs --noheadings --nosuffix --separator , --units k --options lv_name,vg_name,lv_size").
+      split("\n").
+      map { |line| line.strip }.
+      select { |line| line.start_with?(name) }.
+      map { |line| line.split(',') }.
+      select { |cols| cols[1] == @options[:vg] }.
+      map { |cols| [cols[0], :actual_size => cols[2].to_f]}.
+      to_h
+
+    specified = specified_mp_objs.map do |mount_point_obj|
+      lv_name = guest_vg_name(name, mount_point_obj)
+      lv_size = host_lv_size(mount_point_obj).chomp('G').to_f * 1024 * 1024
+      [lv_name, :spec_size => lv_size]
+    end.to_h
+
+    specified.
+      merge(actual) { |_, s, a| s.merge(a) }.
+      reject { |_, size| size[:spec_size] == size[:actual_size] }.
+      map { |vol, size| "#{vol} differs: expected size '#{size[:spec_size]}', but actual size is '#{size[:actual_size]}'" }
   end
 
   def grow_filesystem(name, mount_point_obj)
@@ -110,6 +123,19 @@ class Provision::Storage::LVM < Provision::Storage
 
   def host_lv_name(name, mount_point_obj)
     "#{name}#{underscorize(mount_point_obj.name)}"
+  end
+
+  def host_lv_size(mount_point_obj)
+    size = mount_point_obj.config[:size]
+    if create_lvm?(mount_point_obj)
+      begin
+        size = mount_point_obj.config[:prepare][:options][:guest_lvm_pv_size]
+      rescue
+        size = false
+      end
+    end
+    fail("prepare options guest_lvm_pv_size must be set to create lvm within the VM storage") unless size
+    size
   end
 
   def guest_vg_name(name, mount_point_obj)

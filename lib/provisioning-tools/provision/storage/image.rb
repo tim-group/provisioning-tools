@@ -19,6 +19,18 @@ class Provision::Storage::Image < Provision::Storage
              :cleanup => lambda { remove(name, mount_point_obj) })
   end
 
+  def diff_against_actual(name, specified_mp_objs)
+    actual = Dir[device("#{name}_*")].map { |f| [f, { :actual_size => File.size(f).to_f / 1024.0 }] }.to_h
+    specified = specified_mp_objs.map do |mp|
+      [device(underscore_name(name, mp.name)), { :spec_size => kb_from_size_string(mp.config[:size]).to_f }]
+    end.to_h
+
+    specified.
+      merge(actual) { |_, s, a| s.merge(a) }.
+      reject { |_, size| size[:spec_size] == size[:actual_size] }.
+      map { |vol, size| "#{vol} differs: expected size '#{size[:spec_size]}', but actual size is '#{size[:actual_size]}'" }
+  end
+
   def grow_filesystem(name, mount_point_obj)
     fail("it's currently not possible to grow the filesystem within lvm that's within an image") if create_lvm?(mount_point_obj)
     underscore_name = underscore_name(name, mount_point_obj.name)
@@ -60,5 +72,13 @@ class Provision::Storage::Image < Provision::Storage
     else
       mount_point_obj.get(:loopback_part)
     end
+  end
+
+  private
+
+  def kb_from_size_string(size)
+    unit = size[-1]
+    multipliers = { :K => 1, :M => 1024, :G => 1024 * 1024 }
+    size.chomp(unit).to_i * multipliers[unit.to_sym]
   end
 end

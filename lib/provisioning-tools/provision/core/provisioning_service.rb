@@ -21,6 +21,7 @@ class Provision::Core::ProvisioningService
     @storage_service.create_config(spec[:hostname], spec[:storage])
     storage_xml = @storage_service.spec_to_xml(spec[:hostname])
     @vm_service.check_vm_definition(spec, storage_xml)
+    @storage_service.check_storage_definition(spec[:hostname])
   end
 
   def provision_vm(spec_hash, with_numbering = true)

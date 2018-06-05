@@ -159,6 +159,17 @@ class Provision::Storage::Service
     end
   end
 
+  def check_storage_definition(name)
+    mounts_by_type = @storage_configs[name].mount_points.map { |m| get_mount_point(name, m) }.group_by { |mp| mp.config[:type].to_sym }
+
+    differences = []
+    @storage_types.each do |type, storage|
+      differences += storage.diff_against_actual(name, mounts_by_type.fetch(type, []))
+    end
+
+    fail "actual vm storage differs from spec\n  #{differences.join("\n  ")}" unless differences.empty?
+  end
+
   def spec_to_xml(name)
     template_file = "#{Provision.templatedir}/disk.template"
     xml_output = ""

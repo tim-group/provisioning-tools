@@ -262,4 +262,47 @@ describe Provision::Storage::LVM do
     @storage_type.should_receive(:cmd).with('kpartx -av /dev/main/oy-foodb-001_var_lib_mysql').ordered
     @storage_type.check_persistent_storage('oy-foodb-001', mount_point_obj)
   end
+
+  describe 'diff_against_actual' do
+    def setup_actual_storage
+      actual = File.open(File.join(File.dirname(__FILE__), "expected.lvs")).read
+      @storage_type.stub(:cmd) do |arg|
+        case arg
+        when 'lvs --noheadings --nosuffix --separator , --units k --options lv_name,vg_name,lv_size'
+          actual
+        else
+          fail("#{arg}")
+        end
+      end
+      @storage_type.should_receive(:cmd).with('lvs --noheadings --nosuffix --separator , --units k --options lv_name,vg_name,lv_size')
+    end
+
+    it 'passes when actual storage matches spec' do
+      setup_actual_storage
+      diffs = @storage_type.diff_against_actual('oy-good-001', [@mount_point_obj])
+
+      expect(diffs).to be_empty
+    end
+
+    it 'reports difference when actual storage missing' do
+      setup_actual_storage
+      diffs = @storage_type.diff_against_actual('oy-missing-001', [@mount_point_obj])
+
+      expect(diffs).to match_array(["oy-missing-001 differs: expected size '10485760.0', but actual size is ''"])
+    end
+
+    it 'reports difference when actual storage different' do
+      setup_actual_storage
+      diffs = @storage_type.diff_against_actual('oy-different-001', [@mount_point_obj])
+
+      expect(diffs).to match_array(["oy-different-001 differs: expected size '10485760.0', but actual size is '5242880.0'"])
+    end
+
+    it 'reports difference when extra actual storage present' do
+      setup_actual_storage
+      diffs = @storage_type.diff_against_actual('oy-extra-001', [@mount_point_obj])
+
+      expect(diffs).to match_array(["oy-extra-001_extra differs: expected size '', but actual size is '1048576.0'"])
+    end
+  end
 end
