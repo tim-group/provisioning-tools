@@ -274,7 +274,7 @@ describe Provision::Storage::LVM do
           fail("#{arg}")
         end
       end
-      @storage_type.should_receive(:cmd).with('lvs --noheadings --nosuffix --separator , --units k --options lv_name,vg_name,lv_size')
+      @storage_type.should_receive(:cmd).with('lvs --noheadings --nosuffix --separator , --units k --options lv_name,vg_name,lv_size', true)
     end
 
     it 'passes when actual storage matches spec' do

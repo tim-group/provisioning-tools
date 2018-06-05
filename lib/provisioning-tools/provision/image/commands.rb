@@ -1,7 +1,7 @@
 require 'provisioning-tools/util/symbol_utils'
 
 module Provision::Image::Commands
-  def cmd(cmd)
+  def cmd(cmd, include_newlines = false)
     start_time = Time.now
     log.debug("running command #{cmd}")
 
@@ -12,6 +12,7 @@ module Provision::Image::Commands
       pipe.each_line do |line|
         log.debug("> " + line.chomp)
         output += line.chomp
+        output += "\n" if include_newlines
       end
     end
 

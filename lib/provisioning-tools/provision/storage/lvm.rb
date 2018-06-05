@@ -33,7 +33,7 @@ class Provision::Storage::LVM < Provision::Storage
   end
 
   def diff_against_actual(name, specified_mp_objs)
-    actual = cmd("lvs --noheadings --nosuffix --separator , --units k --options lv_name,vg_name,lv_size").
+    actual = cmd("lvs --noheadings --nosuffix --separator , --units k --options lv_name,vg_name,lv_size", true).
              split("\n").
              map(&:strip).
              select { |line| line.start_with?(name) }.
