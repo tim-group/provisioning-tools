@@ -57,12 +57,12 @@ module MCollective
         FileUtils.mkdir_p logdir, :mode => 0755
         FileUtils.ln_sf log_filename, "#{logdir}/#{vm_name}-current"
 
-        pid = ::Process.spawn("/usr/local/sbin/live-migrate-vm '#{vm_name}' '#{dest_host_fqdn}'",
+        pid = ::Process.spawn("/usr/local/sbin/live-migrate-vm '#{vm_name}' '#{dest_host_fqdn}' 2>&1",
                               :pgroup => true,
                               :chdir => '/',
                               :in => :close,
                               :out => log_filename,
-                              :err => :out)
+                              :err => :close)
         ::Process.detach(pid)
 
         File.write("/var/run/live_migration_#{vm_name}.pid", pid)
