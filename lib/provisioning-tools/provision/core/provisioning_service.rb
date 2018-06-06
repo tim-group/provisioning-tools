@@ -104,11 +104,11 @@ class Provision::Core::ProvisioningService
     @storage_service.create_storage(spec[:hostname])
   end
 
-  def archive_persistent_storage(spec_hash)
+  def archive_persistent_storage(spec_hash, archive_datetime)
     spec_hash = @machinespec_defaults.merge(spec_hash)
     spec = Provision::Core::MachineSpec.new(spec_hash)
     @storage_service.create_config(spec[:hostname], spec[:storage])
-    @storage_service.archive_persistent_storage(spec[:hostname])
+    @storage_service.archive_persistent_storage(spec[:hostname], archive_datetime)
   end
 
   def clean_vm(spec_hash)
