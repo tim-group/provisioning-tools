@@ -76,13 +76,20 @@ module MCollective
         pid_filename = "/var/run/live_migration_#{vm_name}.pid"
         pid = File.exist?(pid_filename) ? File.read(pid_filename).to_i : -1
 
+        log_filename = "/var/log/live_migration/#{vm_name}-current"
+        log_file_content = []
+        if File.exist?(log_filename)
+          log_file_content = File.readlines(log_filename)
+        end
+
+        progress_percentages = log_file_content.map { |line| line.scan(/Migration: \[ (\d?\d?\d) %\]/) }.flatten
+        reply[:progress_percentage] = progress_percentages.empty? ? 0 : progress_percentages.last.to_i
+
         if pid_running?(pid)
           reply[:state] = 'running'
-          # virsh domjobinfo #{vm_name}
         else
-          log_filename = "/var/log/live_migration/#{vm_name}-current"
-          successful = File.exist?(log_filename) && !File.readlines(log_filename).grep(/MIGRATION SUCCESSFUL/).empty?
-          reply[:state] = successful ? 'successful' : 'failed'
+          failed = log_file_content.grep(/MIGRATION SUCCESSFUL/).empty?
+          reply[:state] = failed ? 'failed' : 'successful'
         end
       end
 
