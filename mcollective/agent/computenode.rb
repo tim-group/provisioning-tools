@@ -87,6 +87,10 @@ module MCollective
 
         if pid_running?(pid)
           reply[:state] = 'running'
+          reply[:domjobinfo] = `virsh domjobinfo #{vm_name} 2>&1`.split("\n").grep(/:/).map do |line|
+            pair = line.gsub(/\s+/, ' ').split(':', 2).map(&:strip)
+            [pair[0].gsub(' ', '_').downcase.to_sym, pair[1]]
+          end.to_h
         else
           failed = log_file_content.grep(/MIGRATION SUCCESSFUL/).empty?
           reply[:state] = failed ? 'failed' : 'successful'
