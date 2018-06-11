@@ -46,34 +46,12 @@ module MCollective
       end
 
       action 'live_migrate_vm' do
-        vm_name = request[:vm_name]
-        dest_host_fqdn = request[:other_host]
-        logdir = '/var/log/live_migration'
-
-        require 'time'
-        log_filename = "#{logdir}/#{vm_name}-#{Time.now.utc.iso8601}"
-
-        require 'fileutils'
-        FileUtils.mkdir_p logdir, :mode => 0755
-        FileUtils.ln_sf log_filename, "#{logdir}/#{vm_name}-current"
-
-        pid = ::Process.spawn("/usr/local/sbin/live-migrate-vm '#{vm_name}' '#{dest_host_fqdn}' 2>&1",
-                              :pgroup => true,
-                              :chdir => '/',
-                              :in => :close,
-                              :out => log_filename,
-                              :err => :close)
-        ::Process.detach(pid)
-
-        File.write("/var/run/live_migration_#{vm_name}.pid", pid)
-
-        status = get_live_migration_status(vm_name)
-        status.each { |key, value| reply[key] = value }
+        start_live_migration(request[:vm_name], request[:other_host])
+        get_live_migration_status(request[:vm_name]).each { |key, value| reply[key] = value }
       end
 
       action 'check_live_vm_migration' do
-        status = get_live_migration_status(request[:vm_name])
-        status.each { |key, value| reply[key] = value }
+        get_live_migration_status(request[:vm_name]).each { |key, value| reply[key] = value }
       end
 
       private
@@ -100,6 +78,27 @@ module MCollective
         File.open(factfile, 'w') do |outfile|
           facts.each { |name, value| outfile.puts "#{name}=#{value}" }
         end
+      end
+
+      def start_live_migration(vm_name, dest_host_fqdn)
+        logdir = '/var/log/live_migration'
+
+        require 'time'
+        log_filename = "#{logdir}/#{vm_name}-#{Time.now.utc.iso8601}"
+
+        require 'fileutils'
+        FileUtils.mkdir_p logdir, :mode => 0755
+        FileUtils.ln_sf log_filename, "#{logdir}/#{vm_name}-current"
+
+        pid = ::Process.spawn("/usr/local/sbin/live-migrate-vm '#{vm_name}' '#{dest_host_fqdn}' 2>&1",
+                              :pgroup => true,
+                              :chdir => '/',
+                              :in => :close,
+                              :out => log_filename,
+                              :err => :close)
+        ::Process.detach(pid)
+
+        File.write("/var/run/live_migration_#{vm_name}.pid", pid)
       end
 
       def get_live_migration_status(vm_name)
