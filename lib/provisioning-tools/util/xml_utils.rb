@@ -116,8 +116,8 @@ class Util::VirshDomainXmlDiffer
     act_names = act.map(&:name)
     names = exp_names.to_set + act_names.to_set
 
-    exp_counts = exp_names.group_by { |a| a }.map { |a, b| [a, b.size] }.to_h
-    act_counts = act_names.group_by { |a| a }.map { |a, b| [a, b.size] }.to_h
+    exp_counts = Hash[exp_names.group_by { |a| a }.map { |a, b| [a, b.size] }]
+    act_counts = Hash[act_names.group_by { |a| a }.map { |a, b| [a, b.size] }]
     counts = names.map { |name| [name, exp_counts.fetch(name, 0), act_counts.fetch(name, 0)] }
 
     diffs = counts.select { |v| v[1] != v[2] }

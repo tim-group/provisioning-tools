@@ -33,20 +33,19 @@ class Provision::Storage::LVM < Provision::Storage
   end
 
   def diff_against_actual(name, specified_mp_objs)
-    actual = cmd("lvs --noheadings --nosuffix --separator , --units k --options lv_name,vg_name,lv_size", true).
+    actual = Hash[cmd("lvs --noheadings --nosuffix --separator , --units k --options lv_name,vg_name,lv_size", true).
              split("\n").
              map(&:strip).
              select { |line| line.start_with?(name) }.
              map { |line| line.split(',') }.
              select { |cols| cols[1] == @options[:vg] }.
-             map { |cols| [cols[0], :actual_size => cols[2].to_f] }.
-             to_h
+             map { |cols| [cols[0], :actual_size => cols[2].to_f] }]
 
-    specified = specified_mp_objs.map do |mount_point_obj|
+    specified = Hash[specified_mp_objs.map do |mount_point_obj|
       lv_name = host_lv_name(name, mount_point_obj)
       lv_size = host_lv_size(mount_point_obj).chomp('G').to_f * 1024 * 1024
       [lv_name, :spec_size => lv_size]
-    end.to_h
+    end]
 
     specified.
       merge(actual) { |_, s, a| s.merge(a) }.

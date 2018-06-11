@@ -20,10 +20,10 @@ class Provision::Storage::Image < Provision::Storage
   end
 
   def diff_against_actual(name, specified_mp_objs)
-    actual = Dir[device("#{name}_*")].map { |f| [f, { :actual_size => File.size(f).to_f / 1024.0 }] }.to_h
-    specified = specified_mp_objs.map do |mp|
+    actual = Hash[Dir[device("#{name}_*")].map { |f| [f, { :actual_size => File.size(f).to_f / 1024.0 }] }]
+    specified = Hash[specified_mp_objs.map do |mp|
       [device(underscore_name(name, mp.name)), { :spec_size => kb_from_size_string(mp.config[:size]).to_f }]
-    end.to_h
+    end]
 
     specified.
       merge(actual) { |_, s, a| s.merge(a) }.
