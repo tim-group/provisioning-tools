@@ -67,34 +67,13 @@ module MCollective
 
         File.write("/var/run/live_migration_#{vm_name}.pid", pid)
 
-        reply[:state] = pid_running?(pid) ? 'running' : 'failed'
+        status = get_live_migration_status(vm_name)
+        status.each { |key, value| reply[key] = value }
       end
 
       action 'check_live_vm_migration' do
-        vm_name = request[:vm_name]
-
-        pid_filename = "/var/run/live_migration_#{vm_name}.pid"
-        pid = File.exist?(pid_filename) ? File.read(pid_filename).to_i : -1
-
-        log_filename = "/var/log/live_migration/#{vm_name}-current"
-        log_file_content = []
-        if File.exist?(log_filename)
-          log_file_content = File.readlines(log_filename)
-        end
-
-        progress_percentages = log_file_content.map { |line| line.scan(/Migration: \[ (\d?\d?\d) %\]/) }.flatten
-        reply[:progress_percentage] = progress_percentages.empty? ? 0 : progress_percentages.last.to_i
-
-        if pid_running?(pid)
-          reply[:state] = 'running'
-          reply[:domjobinfo] = `virsh domjobinfo #{vm_name} 2>&1`.split("\n").grep(/:/).map do |line|
-            pair = line.gsub(/\s+/, ' ').split(':', 2).map(&:strip)
-            [pair[0].gsub(' ', '_').downcase.to_sym, pair[1]]
-          end.to_h
-        else
-          failed = log_file_content.grep(/MIGRATION SUCCESSFUL/).empty?
-          reply[:state] = failed ? 'failed' : 'successful'
-        end
+        status = get_live_migration_status(request[:vm_name])
+        status.each { |key, value| reply[key] = value }
       end
 
       private
@@ -121,6 +100,34 @@ module MCollective
         File.open(factfile, 'w') do |outfile|
           facts.each { |name, value| outfile.puts "#{name}=#{value}" }
         end
+      end
+
+      def get_live_migration_status(vm_name)
+        status = {}
+
+        pid_filename = "/var/run/live_migration_#{vm_name}.pid"
+        pid = File.exist?(pid_filename) ? File.read(pid_filename).to_i : -1
+
+        log_filename = "/var/log/live_migration/#{vm_name}-current"
+        log_file_content = []
+        if File.exist?(log_filename)
+          log_file_content = File.readlines(log_filename)
+        end
+
+        progress_percentages = log_file_content.map { |line| line.scan(/Migration: \[ (\d?\d?\d) %\]/) }.flatten
+        status[:progress_percentage] = progress_percentages.empty? ? 0 : progress_percentages.last.to_i
+
+        if pid_running?(pid)
+          status[:state] = 'running'
+          status[:domjobinfo] = `virsh domjobinfo #{vm_name} 2>&1`.split("\n").grep(/:/).map do |line|
+            pair = line.gsub(/\s+/, ' ').split(':', 2).map(&:strip)
+            [pair[0].gsub(' ', '_').downcase.to_sym, pair[1]]
+          end.to_h
+        else
+          failed = log_file_content.grep(/MIGRATION SUCCESSFUL/).empty?
+          status[:state] = failed ? 'failed' : 'successful'
+        end
+        status
       end
 
       def pid_running?(pid)
