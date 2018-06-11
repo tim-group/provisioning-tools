@@ -45,7 +45,7 @@ class Provision::Storage::LVM < Provision::Storage
       lv_name = host_lv_name(name, mount_point_obj)
       lv_size = host_lv_size(mount_point_obj).chomp('G').to_f * 1024 * 1024
       [lv_name, :spec_size => lv_size]
-    end]4
+    end]
 
     specified.
       merge(actual) { |_, s, a| s.merge(a) }.
