@@ -54,6 +54,14 @@ module MCollective
         get_live_migration_status(request[:vm_name]).each { |key, value| reply[key] = value }
       end
 
+      action 'enable_allocation' do
+        `/usr/local/bin/allocation enable`
+      end
+
+      action 'disable_allocation' do
+        `/usr/local/bin/allocation disable '#{request[:reason]}'`
+      end
+
       private
 
       def manage_live_migration(inbound, host, enable)

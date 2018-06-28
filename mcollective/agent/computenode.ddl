@@ -107,3 +107,18 @@ action "check_live_vm_migration", :description => "" do
           :maxlength   => 128,
           :optional    => false
 end
+
+action "enable_allocation", :description => "" do
+    display :always
+end
+
+action "disable_allocation", :description => "" do
+    display :always
+    input :reason,
+          :prompt      => "Reason",
+          :description => "The reason for disabling allocation",
+          :type        => :string,
+          :maxlength   => 256,
+          :validation  => '^[a-zA-Z ,.;:\_\d]+$',
+          :optional    => false
+end
