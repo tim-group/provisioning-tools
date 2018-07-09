@@ -88,6 +88,18 @@ describe Util::VirshDomainXmlDiffer do
     expect(xml_diff.differences).to match_array(["Unexpected element \"/a/b\" (expected 2, actual 3)."])
   end
 
+  it 'validates os machine type' do
+    bad = "<domain><os><type machine='pc-1.0'/></os></domain>"
+    good = "<domain><os><type machine='pc-1.0-qemu-kvm'/></os></domain>"
+    none = "<domain><os><type/></os></domain>"
+
+    xml_diff = Util::VirshDomainXmlDiffer.new(none, bad)
+    expect(xml_diff.differences).to match_array(["Bad attribute. Element /domain/os/type has incorrect attribute \"machine=pc-1.0\"."])
+
+    xml_diff = Util::VirshDomainXmlDiffer.new(none, good)
+    expect(xml_diff.differences).to match_array([])
+  end
+
   it 'diffs complex stuff' do
     expected = File.open(File.join(File.dirname(__FILE__), "example1.xml")).read
     actual = File.open(File.join(File.dirname(__FILE__), "example2.xml")).read
@@ -95,6 +107,7 @@ describe Util::VirshDomainXmlDiffer do
     xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
 
     expect(xml_diff.differences).to match_array([
+      "Bad attribute. Element /domain/os/type has incorrect attribute \"machine=pc-1.0\".",
       "Unexpected element \"/domain/clock\" (expected 0, actual 1).",
       "Missing element \"/domain/devices/input\" (expected 2, actual 1).",
       "Attribute difference. Expected /domain/devices/interface/address to have attribute \"type=pci\", but it has attribute \"type=scsi\"."
