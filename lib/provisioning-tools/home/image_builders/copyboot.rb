@@ -92,8 +92,6 @@ auto #{nic[:network]}"
 iface #{nic[:network]} inet static
  address #{net[:address]}
  netmask #{net[:netmask]}"
-            f.puts "
- mtu 1496" if nic[:network] == 'crosssite'
             f.puts "\n"
           end
         else
