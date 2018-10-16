@@ -28,7 +28,7 @@ class Provision::Storage::Image < Provision::Storage
     specified.
       merge(actual) { |_, s, a| s.merge(a) }.
       reject { |_, size| size[:spec_size] == size[:actual_size] }.
-      map { |vol, size| "#{vol} differs: expected size '#{size[:spec_size]}', but actual size is '#{size[:actual_size]}'" }
+      map { |vol, size| "#{vol} differs: expected size '#{size[:spec_size]}' (KiB), but actual size is '#{size[:actual_size]}' (KiB)" }
   end
 
   def grow_filesystem(name, mount_point_obj)

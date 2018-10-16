@@ -288,21 +288,21 @@ describe Provision::Storage::LVM do
       setup_actual_storage
       diffs = @storage_type.diff_against_actual('oy-missing-001', [@mount_point_obj])
 
-      expect(diffs).to match_array(["oy-missing-001 differs: expected size '10485760.0', but actual size is ''"])
+      expect(diffs).to match_array(["oy-missing-001 differs: expected size '10485760.0' (KiB), but actual size is '' (KiB)"])
     end
 
     it 'reports difference when actual storage different' do
       setup_actual_storage
       diffs = @storage_type.diff_against_actual('oy-different-001', [@mount_point_obj])
 
-      expect(diffs).to match_array(["oy-different-001 differs: expected size '10485760.0', but actual size is '5242880.0'"])
+      expect(diffs).to match_array(["oy-different-001 differs: expected size '10485760.0' (KiB), but actual size is '5242880.0' (KiB)"])
     end
 
     it 'reports difference when extra actual storage present' do
       setup_actual_storage
       diffs = @storage_type.diff_against_actual('oy-extra-001', [@mount_point_obj])
 
-      expect(diffs).to match_array(["oy-extra-001_extra differs: expected size '', but actual size is '1048576.0'"])
+      expect(diffs).to match_array(["oy-extra-001_extra differs: expected size '' (KiB), but actual size is '1048576.0' (KiB)"])
     end
   end
 
