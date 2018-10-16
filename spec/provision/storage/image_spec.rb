@@ -83,7 +83,9 @@ describe Provision::Storage::Image do
       mount_point_obj = Provision::Storage::MountPoint.new('/var/lib/mysql', :size => '2M')
       diffs = @storage_type.diff_against_actual('oy-missing-001', [mount_point_obj])
 
-      expect(diffs).to match_array(["#{@tmpdir}/oy-missing-001_var_lib_mysql.img differs: expected size '2048.0' (KiB), but actual size is '' (KiB)"])
+      expect(diffs).to match_array(
+        ["#{@tmpdir}/oy-missing-001_var_lib_mysql.img differs: expected size '2048.0' (KiB), but actual size is '' (KiB)"]
+      )
     end
 
     it 'reports difference when actual storage different' do
@@ -91,7 +93,9 @@ describe Provision::Storage::Image do
       mount_point_obj = Provision::Storage::MountPoint.new('/var/lib/mysql', :size => '1K')
       diffs = @storage_type.diff_against_actual('oy-different-001', [mount_point_obj])
 
-      expect(diffs).to match_array(["#{@tmpdir}/oy-different-001_var_lib_mysql.img differs: expected size '1.0' (KiB), but actual size is '0.5' (KiB)"])
+      expect(diffs).to match_array(
+        ["#{@tmpdir}/oy-different-001_var_lib_mysql.img differs: expected size '1.0' (KiB), but actual size is '0.5' (KiB)"]
+      )
     end
 
     it 'reports difference when extra actual storage present' do
@@ -100,7 +104,9 @@ describe Provision::Storage::Image do
       mount_point_obj = Provision::Storage::MountPoint.new('/var/lib/mysql', :size => '1K')
       diffs = @storage_type.diff_against_actual('oy-extra-001', [mount_point_obj])
 
-      expect(diffs).to match_array(["#{@tmpdir}/oy-extra-001_var_lib_poop.img differs: expected size '' (KiB), but actual size is '0.5' (KiB)"])
+      expect(diffs).to match_array(
+        ["#{@tmpdir}/oy-extra-001_var_lib_poop.img differs: expected size '' (KiB), but actual size is '0.5' (KiB)"]
+      )
     end
   end
 end
