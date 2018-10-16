@@ -6,3 +6,4 @@ tags
 /.idea
 /project.iml
 /classes
+*.iml
