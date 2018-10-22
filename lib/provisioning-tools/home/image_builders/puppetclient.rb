@@ -20,6 +20,14 @@ define "puppetclient" do
     end
   end
 
+  if !spec[:spectre_patches]
+    run("Disable spectre patches") do
+      # We need to replace the live grub config instead of using the standard /etc/default/grub as we can't run update-grub in this env.
+      # /etc/default/grub will get updated to match by puppet on first run
+      cmd "sed -i 's| ro  quiet| ro pti=off spectre_v2=retpoline noibrs noibpb|' #{spec[:temp_dir]}/boot/grub/grub.cfg"
+    end
+  end
+
   run('setup one time password') do
     require 'rubygems'
     require 'rotp'
