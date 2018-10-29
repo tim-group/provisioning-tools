@@ -114,6 +114,27 @@ describe Util::VirshDomainXmlDiffer do
     ])
   end
 
+  it 'depends on the declaration order for multiple elements differing by attribute' do
+    expected = "<domain>"\
+               "  <cpu mode='custom' match='exact'>"\
+               "    <feature policy='require' name='apple'/>"\
+               "    <feature policy='require' name='banana'/>"\
+               "  </cpu>"\
+               "</domain>"
+    actual   = "<domain>"\
+               "  <cpu mode='custom' match='exact'>"\
+               "    <feature policy='require' name='banana'/>"\
+               "    <feature policy='require' name='apple'/>"\
+               "  </cpu>"\
+               "</domain>"
+
+    xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
+    expect(xml_diff.differences).to match_array([
+      "Attribute difference. Expected /domain/cpu/feature to have attribute \"name=apple\", but it has attribute \"name=banana\".",
+      "Attribute difference. Expected /domain/cpu/feature to have attribute \"name=banana\", but it has attribute \"name=apple\"."
+    ])
+  end
+
   it 'ignores excluded things' do
     expected = "<domain>"\
                "  <devices>"\
@@ -186,5 +207,52 @@ describe Util::VirshDomainXmlDiffer do
     expect(xml_diff.differences).to match_array([
       "Attribute difference. Expected /domain/memory to have attribute \"unit=b\", but it has attribute \"unit=KiB\"."
     ])
+  end
+
+  it 'reports on safe diffs by default' do
+    expected = "<domain>"\
+               "  <cpu mode='custom' match='exact'>"\
+               "    <feature policy='require' name='ssbd'/>"\
+               "  </cpu>"\
+               "</domain>"
+    actual = "<domain>"\
+               "  <cpu mode='custom' match='exact'>"\
+               "    <feature policy='disable' name='ssbd'/>"\
+               "  </cpu>"\
+               "</domain>"
+
+    xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual)
+    expect(xml_diff.differences).to match_array([
+      "Attribute difference. Expected /domain/cpu/feature to have attribute \"policy=require\", but it has attribute \"policy=disable\"."
+    ])
+  end
+
+  it 'ignores safe diffs when instructed' do
+    expected = "<domain>"\
+               "  <cpu mode='custom' match='exact'>"\
+               "    <feature policy='require' name='ssbd'/>"\
+               "  </cpu>"\
+               "</domain>"
+    actual = "<domain>"\
+               "  <cpu mode='custom' match='exact'>"\
+               "    <feature policy='disable' name='ssbd'/>"\
+               "  </cpu>"\
+               "</domain>"
+
+    xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual, true)
+    expect(xml_diff.differences).to match_array([])
+
+    expected = "<domain>"\
+               "  <cpu mode='custom' match='exact'>"\
+               "    <feature policy='require' name='ssbd'/>"\
+               "  </cpu>"\
+               "</domain>"
+    actual = "<domain>"\
+               "  <cpu mode='custom' match='exact'>"\
+               "  </cpu>"\
+               "</domain>"
+
+    xml_diff = Util::VirshDomainXmlDiffer.new(expected, actual, true)
+    expect(xml_diff.differences).to match_array([])
   end
 end

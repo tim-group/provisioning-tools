@@ -4,7 +4,7 @@ require 'set'
 class Util::VirshDomainXmlDiffer
   attr_reader :differences
 
-  def initialize(expected, actual)
+  def initialize(expected, actual, ignore_safe_vm_diffs = false)
     @differences = []
 
     require "rexml/document"
@@ -54,6 +54,24 @@ class Util::VirshDomainXmlDiffer
     set_default!(expected, actual, '/domain/cpu', 'mode', 'custom')
     set_default!(expected, actual, '/domain/cpu/model', 'fallback', 'allow')
     set_default!(expected, actual, '/domain/devices/graphics', 'listen', '0.0.0.0')
+
+    # remove known-safe vm diffs if instructed
+    if ignore_safe_vm_diffs
+      safe_paths = [
+        '/domain/cpu/feature[@name="dtes64"]',
+        '/domain/cpu/feature[@name="pcid"]',
+        '/domain/cpu/feature[@name="pclmuldq"]',
+        '/domain/cpu/feature[@name="pdcm"]',
+        '/domain/cpu/feature[@name="smx"]',
+        '/domain/cpu/feature[@name="spec-ctrl"]',
+        '/domain/cpu/feature[@name="ssbd"]'
+      ]
+
+      safe_paths.each do |path|
+        remove_xml!(actual, path)
+        remove_xml!(expected, path)
+      end
+    end
 
     diff_element(expected.root, actual.root)
   end

@@ -32,6 +32,11 @@ end
 
 action "check_definition", :description => "" do
     display :always
+    input :ignore_safe_vm_diffs,
+          :prompt      => "Should ignore safe VM XML diffs?",
+          :description => "Whether to ignore safe VM XML diffs",
+          :type        => :boolean,
+          :optional    => true
 end
 
 action "create_storage", :description => "" do

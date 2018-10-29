@@ -101,13 +101,13 @@ class Provision::VM::Virsh
     safe_system("virsh define #{to} > /dev/null 2>&1")
   end
 
-  def check_vm_definition(spec, storage_xml = nil)
+  def check_vm_definition(spec, storage_xml = nil, ignore_safe_vm_diffs = false)
     require 'provisioning-tools/util/xml_utils'
 
     spec_xml = generate_virsh_xml(spec, storage_xml)
     actual_xml = @executor.call("virsh dumpxml #{spec[:hostname]}")
 
-    differences = Util::VirshDomainXmlDiffer.new(spec_xml, actual_xml).differences
+    differences = Util::VirshDomainXmlDiffer.new(spec_xml, actual_xml, ignore_safe_vm_diffs).differences
     fail "actual vm definition differs from spec\n  #{differences.join("\n  ")}" unless differences.empty?
   end
 end

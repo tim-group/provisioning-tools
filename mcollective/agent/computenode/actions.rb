@@ -25,10 +25,10 @@ def prepare_work_queue(specs, listener)
   work_queue
 end
 
-def check_definition(specs, listener)
+def check_definition(specs, ignore_safe_vm_diffs, listener)
   @logger.info("Checking #{specs.size} nodes")
   queue = prepare_work_queue(specs, listener)
-  queue.check_all(specs)
+  queue.check_all(specs, ignore_safe_vm_diffs)
   listener.results
 end
 
@@ -117,6 +117,8 @@ specs = mco_args[:data][:specs]
 #     and thus the conversion must be made manually. this can lead to hard to debug problems.
 specs.each { |s| s[:networks].map!(&:to_sym) }
 
+should_ignore_safe_vm_diffs = mco_args[:data].has_key?(:ignore_safe_vm_diffs) ? mco_args[:data][:ignore_safe_vm_diffs] : false
+
 mco_reply = case mco_args[:action]
             when 'launch'                     then with_lock { provision(specs, new_listener) }
             when 'clean'                      then with_lock { clean(specs, new_listener) }
@@ -124,7 +126,7 @@ mco_reply = case mco_args[:action]
             when 'free_ips'                   then free_ips(specs, new_listener)
             when 'add_cnames'                 then add_cnames(specs, new_listener)
             when 'remove_cnames'              then remove_cnames(specs, new_listener)
-            when 'check_definition'           then check_definition(specs, new_listener)
+            when 'check_definition'           then check_definition(specs, should_ignore_safe_vm_diffs, new_listener)
             when 'create_storage'             then create_storage(specs, new_listener)
             when 'archive_persistent_storage' then archive_persistent_storage(specs, new_listener)
             end

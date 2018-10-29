@@ -36,10 +36,10 @@ class Provision::WorkQueue
     process
   end
 
-  def check_all(specs)
+  def check_all(specs, ignore_safe_vm_diffs)
     fail "an array of machine specifications is expected" unless specs.kind_of?(Array)
     specs.each do |spec|
-      check_definition(spec)
+      check_definition(spec, ignore_safe_vm_diffs)
     end
     process
   end
@@ -122,9 +122,9 @@ class Provision::WorkQueue
     end
   end
 
-  def check_definition(spec)
+  def check_definition(spec, ignore_safe_vm_diffs)
     @queue << SpecTask.new(spec) do
-      @provisioning_service.check_vm_definition(spec)
+      @provisioning_service.check_vm_definition(spec, ignore_safe_vm_diffs)
     end
   end
 
