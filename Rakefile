@@ -61,7 +61,7 @@ task :clean do
   sh 'rm -rf build'
 end
 
-desc "Create Debian package"
+desc "Create provisioning-tools Debian package"
 task :package_main do
   sh 'rm -rf build/package'
   sh 'mkdir -p build/package/usr/local/lib/site_ruby/timgroup/'
@@ -90,7 +90,7 @@ task :package_main do
   sh "fpm #{argv}"
 end
 
-desc "Generate deb file for the MCollective agent"
+desc "Generate computenode MCollective agent and DDL packages"
 task :package_agent => [:package_main] do
   arguments = [
     '--description', 'provisioning tools mcollective agent',
@@ -133,6 +133,7 @@ task :package_agent => [:package_main] do
   sh "fpm #{argv}"
 end
 
+desc 'Create all packages (prov-tools, computenode agent, computenode DDLs)'
 task :package => [:clean, :package_main, :package_agent]
 desc 'build and install packages locally'
 task :install => [:package] do
