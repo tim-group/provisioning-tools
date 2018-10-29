@@ -117,7 +117,7 @@ specs = mco_args[:data][:specs]
 #     and thus the conversion must be made manually. this can lead to hard to debug problems.
 specs.each { |s| s[:networks].map!(&:to_sym) }
 
-should_ignore_safe_vm_diffs = mco_args[:data].has_key?(:ignore_safe_vm_diffs) ? mco_args[:data][:ignore_safe_vm_diffs] : false
+should_ignore_safe_vm_diffs = mco_args[:data].key?(:ignore_safe_vm_diffs) ? mco_args[:data][:ignore_safe_vm_diffs] : false
 
 mco_reply = case mco_args[:action]
             when 'launch'                     then with_lock { provision(specs, new_listener) }
