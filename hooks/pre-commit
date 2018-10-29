@@ -1,0 +1,14 @@
+#!/bin/sh
+if which rubocop > /dev/null; then
+	# check only touched files
+	tmpdir=$(mktemp -d pre-commit.XXXXXXXXXX)
+	trap "rm -rf $tmpdir" EXIT
+
+	git diff --cached --name-only --diff-filter=ACM \
+	 | git checkout-index --stdin --prefix=$tmpdir/
+
+	rubocop $tmpdir/ || exit 1
+else
+	echo "[31mrubocop not found[0m" >&2
+	exit 1
+fi
