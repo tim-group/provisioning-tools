@@ -61,7 +61,7 @@ define "puppetclient" do
         "if [ -e /var/lib/firstboot ]; then exit 0; fi\n" \
         "echo 'Running rc.local' | logger\n" \
         "echo 'Sync time' | logger\n" \
-        "(/usr/bin/timeout 30s /usr/bin/sntp -s 10.108.11.97 2>&1 | tee -a /tmp/bootstrap.log || exit 0)\n" \
+        "(/usr/bin/timeout 30s /usr/bin/sntp -s ntp1 2>&1 | tee -a /tmp/bootstrap.log || exit 0)\n" \
         "echo 'Regenerating SSH hostkeys'| logger\n" \
         "/bin/rm /etc/ssh/ssh_host_* | logger\n" \
         "/usr/sbin/dpkg-reconfigure openssh-server | logger\n" \
