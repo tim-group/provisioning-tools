@@ -56,12 +56,15 @@ define "puppetclient" do
   end
 
   run('install rc.local') do
+    require 'resolv'
+    ntp_ip = Resolv.getaddress('ntp1')
+
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') do |f|
       f.puts "#!/bin/sh -e\n" \
         "if [ -e /var/lib/firstboot ]; then exit 0; fi\n" \
         "echo 'Running rc.local' | logger\n" \
         "echo 'Sync time' | logger\n" \
-        "(/usr/bin/timeout 30s /usr/bin/sntp -s ntp1 2>&1 | tee -a /tmp/bootstrap.log || exit 0)\n" \
+        "(/usr/bin/timeout 30s /usr/bin/sntp -s #{ntp_ip} 2>&1 | tee -a /tmp/bootstrap.log || exit 0)\n" \
         "echo 'Regenerating SSH hostkeys'| logger\n" \
         "/bin/rm /etc/ssh/ssh_host_* | logger\n" \
         "/usr/sbin/dpkg-reconfigure openssh-server | logger\n" \
