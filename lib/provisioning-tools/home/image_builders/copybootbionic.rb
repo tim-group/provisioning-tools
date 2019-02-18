@@ -91,6 +91,9 @@ network:
         macaddress: "#{nic[:mac]}"
       set-name: #{nic[:network]}
       addresses: [ "#{net[:address]}#{IPAddr.new(net[:netmask]).to_cidr}" ]
+      nameservers:
+        addresses: [ "#{spec[:nameserver]}" ]
+        search: [ #{spec[:dns_search_path].gsub(' ', ', ')} ]
     HEREDOC
         end
       end
