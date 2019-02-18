@@ -120,4 +120,6 @@ There are numerous things that can be provided within the storage spec for each 
           - size in the format <number><units>, for example 25G would mean 25 Gigabytes
           - can only be used when create_guest_lvm is set to true
           - must be equal to or larger than mount point's size setting.
+        - **usage_type**: < usage_type >
+          - The data provided to mkfs.extX -T argument
 

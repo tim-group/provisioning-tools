@@ -60,7 +60,12 @@ module Provision::Storage::Local
                      end
 
     run_task(name, "create filesystem on #{partition_name}", :task => lambda do
-      cmd "mkfs.#{fs_type} #{partition_name}"
+      usage_type = mount_point_obj.config[:prepare][:options][:usage_type]
+      if usage_type.nil?
+        cmd "mkfs.#{fs_type} #{partition_name}"
+      else
+        cmd "mkfs.#{fs_type} -T #{usage_type} #{partition_name}"
+      end
     end)
 
     return if create_lvm?(mount_point_obj)
