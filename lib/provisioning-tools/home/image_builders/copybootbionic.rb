@@ -101,6 +101,8 @@ network:
 
     open("#{spec[:temp_dir]}/etc/cron.d/netplan-apply", 'w') do |f|
       f.puts "@reboot root /usr/sbin/netplan apply"
+      f.puts "@reboot root sed -i 's/Domains/\#Domains/g' /etc/systemd/resolved.conf"
+      f.puts "@reboot root systemctl restart systemd-resolved"
     end
   end
 
