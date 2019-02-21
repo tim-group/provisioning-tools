@@ -65,26 +65,30 @@ define 'puppetserver' do
              "/etc/init.d/ntp stop | logger 2>&1\n" \
              "/usr/sbin/ntpdate -s ci-1.youdevise.com | logger 2>&1\n" \
              "/etc/init.d/ntp start | logger 2>&1\n" \
+             "https_proxy=http://aptproxy:3142/ wget https://apt.puppetlabs.com/puppet5-release-trusty.deb\n" \
+             "dpkg -i puppet5-release-trusty.deb\n" \
+             "apt-get update\n" \
+             "apt-get install puppet-agent\n" \
              "\n" \
              "echo 'mirroring puppet.git...' | logger\n" \
-             "git clone -q --mirror git://git.youdevise.com/puppet.git /etc/puppet/puppet.git\n" \
-             "mkdir -p /etc/puppet/environments/masterbranch/\n" \
+             "git clone -q --mirror git://git.youdevise.com/puppet.git /etc/puppet.git\n" \
+             "mkdir -p /etc/puppetlabs/code/environments/masterbranch/\n" \
              "echo 'checking out the master branch...' | logger\n" \
-             "git --git-dir=/etc/puppet/puppet.git --work-tree=/etc/puppet/environments/masterbranch/ checkout " \
-               "--detach --force master\n" \
-             "ln -s /etc/puppet/environments/masterbranch/modules/role/files/puppetserver/hiera.yaml " \
-               "/etc/puppet/hiera.yaml\n" \
-             "ln -s /etc/puppet/environments/masterbranch/hieradata/ /etc/puppet/hieradata # XXX needed " \
-               "for puppet apply\n" \
-             "sed -i -e \"s/FQDN/\$(hostname -f)/g\" /etc/puppet/puppet.conf\n" \
-             "sed -i -e \"s/DOMAIN/\$(hostname -d)/g\" /etc/puppet/puppet.conf\n" \
+             "git --git-dir=/etc/puppet.git --work-tree=/etc/puppetlabs/code/environments/masterbranch/ checkout " \
+               "--detach --force puppetserver5\n" \
+             "ln -sf /etc/puppetlabs/code/environments/masterbranch/modules/role/files/puppetserver/hiera_puppetserver5.yaml " \
+               "/etc/puppetlabs/puppet/hiera.yaml\n" \
+             "ln -sf /etc/puppetlabs/code/environments/masterbranch/hieradata/ /etc/puppetlabs/puppet/hieradata # XXX needed " \
+              "for puppet apply\n" \
+             "sed -i -e "s/FQDN/$(hostname -f)/g" /etc/puppetlabs/puppet/puppet.conf\n" \
+             "sed -i -e "s/DOMAIN/$(hostname -d)/g" /etc/puppetlabs/puppet/puppet.conf\n" \
              "echo 'running puppet apply...' | logger\n" \
              "export LANG=en_GB.UTF-8\n" \
-             "echo 'node /puppetserver-/ { include server, role::puppetserver }'" \
-             "> /etc/puppet/environments/masterbranch/manifests/000_puppetserver.pp\n" \
-             "puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppet/environments/masterbranch/modules " \
-               "--logdest=syslog /etc/puppet/environments/masterbranch/manifests\n" \
-             "rm /etc/puppet/environments/masterbranch/manifests/000_puppetserver.pp\n" \
+             "echo 'node /puppetserver-/ { include server, role::puppetserver }'> " \
+               "/etc/puppetlabs/code/environments/masterbranch/manifests/000_puppetserver.pp\n" \
+             "/opt/puppetlabs/bin/puppet apply --debug --verbose --pluginsync --modulepath=/etc/puppetlabs/code/environments/masterbranch/modules " \
+               "--logdest=syslog /etc/puppetlabs/code/environments/masterbranch/manifests\n" \
+             "rm /etc/puppetlabs/code/environments/masterbranch/manifests/000_puppetserver.pp\n" \
              "\n" \
              "echo 'running puppet agent...' | logger\n" \
              "puppet agent --debug --verbose --waitforcert 10 --onetime 2>&1 | logger\n" \
