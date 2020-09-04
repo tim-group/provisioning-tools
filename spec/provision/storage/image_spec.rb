@@ -29,7 +29,7 @@ describe Provision::Storage::Image do
       end.to raise_error("Image file #{@tmpdir}/existing.img already exists")
     end
 
-    it 'should create an empty file' do
+    xit 'should create an empty file' do
       device_name = "#{@tmpdir}/ok.img"
       mount_point_obj = Provision::Storage::MountPoint.new('/', :size => '1M')
       @storage_type.create('ok', mount_point_obj)
