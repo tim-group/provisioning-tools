@@ -230,7 +230,7 @@ module Provision::Storage::Local
                sleep 1
                cmd "mount #{part_name} #{dir}"
              end,
-             :cleanup => lambda { cmd "umount #{dir}" })
+             :cleanup => lambda { cmd "umount #{dir}", false, "fuser -mv #{dir}" })
 
     if chmod
       run_task(name, "chmod directory #{dir}",

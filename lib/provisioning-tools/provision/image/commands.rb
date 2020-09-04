@@ -1,7 +1,7 @@
 require 'provisioning-tools/util/symbol_utils'
 
 module Provision::Image::Commands
-  def cmd(cmd, include_newlines = false)
+  def cmd(cmd, include_newlines = false, run_command_on_fail = false)
     start_time = Time.now
     log.debug("running command #{cmd}")
 
@@ -19,6 +19,9 @@ module Provision::Image::Commands
     exit_status = $?
     if exit_status != 0
       log.debug("command #{cmd} returned non-zero error code #{exit_status}, output: #{output}")
+      if run_command_on_fail
+        cmd(run_command_on_fail)
+      end
       fail "command #{cmd} returned non-zero error code #{exit_status}, output: #{output}"
     end
     elapsed_time = Time.now - start_time
