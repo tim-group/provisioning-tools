@@ -21,7 +21,7 @@ GEM
       clamp (~> 0.6)
       ffi
       json (>= 1.7.7)
-    json (2.1.0)
+    json (2.3.1)
     parser (2.4.0.2)
       ast (~> 2.3)
     powerpack (0.1.1)
