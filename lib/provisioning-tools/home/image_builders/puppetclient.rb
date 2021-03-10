@@ -57,7 +57,7 @@ define "puppetclient" do
 
   run('install rc.local') do
     require 'resolv'
-    ntp_ip = Resolv.getaddress('ntp1')
+    ntp_ip = Resolv.getaddress('ntp')
 
     open("#{spec[:temp_dir]}/etc/rc.local", 'w') do |f|
       f.puts "#!/bin/sh -e\n" \
