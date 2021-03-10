@@ -63,7 +63,7 @@ define 'puppetserver' do
              "\n" \
              "echo 'running ntpdate...' | logger\n" \
              "/etc/init.d/ntp stop | logger 2>&1\n" \
-             "/usr/sbin/ntpdate -s ci-1.youdevise.com | logger 2>&1\n" \
+             "/usr/sbin/ntpdate -s ntp | logger 2>&1\n" \
              "/etc/init.d/ntp start | logger 2>&1\n" \
              "\n" \
              "echo 'mirroring puppet.git...' | logger\n" \
